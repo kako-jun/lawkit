@@ -1,0 +1,43 @@
+[package]
+name = "benf"
+version = "0.1.0"
+edition = "2021"
+authors = ["kako-jun"]
+license = "MIT"
+description = "A CLI tool for detecting anomalies using Benford's Law with Japanese numeral support"
+homepage = "https://github.com/kako-jun/benf"
+repository = "https://github.com/kako-jun/benf"
+keywords = ["benford", "fraud-detection", "statistics", "cli", "japanese"]
+categories = ["command-line-utilities", "mathematics"]
+
+[[bin]]
+name = "benf"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+scraper = "0.17"
+calamine = "0.22"
+pdf-extract = "0.7"
+docx-rs = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+regex = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+[dev-dependencies]
+tempfile = "3.0"
+mockito = "1.0"
+pretty_assertions = "1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
