@@ -3,6 +3,8 @@ pub mod pdf;
 pub mod csv;
 pub mod json_xml;
 pub mod html;
+pub mod word;
+pub mod powerpoint;
 
 pub use excel::*;
 pub use pdf::*;

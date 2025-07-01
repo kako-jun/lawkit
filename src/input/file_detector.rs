@@ -159,6 +159,8 @@ pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Res
     match format {
         FileFormat::Excel => excel::parse_excel_file(file_path),
         FileFormat::Pdf => pdf::parse_pdf_file(file_path),
+        FileFormat::Word => word::parse_word_file(file_path),
+        FileFormat::PowerPoint => powerpoint::parse_powerpoint_file(file_path),
         FileFormat::Csv => csv::parse_csv_file(file_path),
         FileFormat::Tsv => csv::parse_csv_file(file_path), // TSV uses same parser as CSV
         FileFormat::Json => json_xml::parse_json_file(file_path),
@@ -178,7 +180,7 @@ pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Res
             }
         },
         // Future formats - not yet implemented
-        FileFormat::Word | FileFormat::PowerPoint | FileFormat::OpenDocument => {
+        FileFormat::OpenDocument => {
             Err(crate::BenfError::ParseError(format!("Format {:?} not yet implemented", format)))
         }
     }
@@ -196,6 +198,8 @@ mod tests {
         assert_eq!(detect_file_format(&PathBuf::from("config.json")), FileFormat::Json);
         assert_eq!(detect_file_format(&PathBuf::from("document.pdf")), FileFormat::Pdf);
         assert_eq!(detect_file_format(&PathBuf::from("page.html")), FileFormat::Html);
+        assert_eq!(detect_file_format(&PathBuf::from("report.docx")), FileFormat::Word);
+        assert_eq!(detect_file_format(&PathBuf::from("legacy.doc")), FileFormat::Word);
     }
 
     #[test]
