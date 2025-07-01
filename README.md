@@ -4,7 +4,9 @@ A CLI tool for detecting anomalies using Benford's Law with support for Japanese
 
 ## Overview
 
-`benf` analyzes numerical data to check if it follows Benford's Law, which states that in many naturally occurring datasets, the digit 1 appears as the leading digit about 30.1% of the time, 2 appears 17.6% of the time, and so on. Deviations from this law can indicate data manipulation or fraud.
+`benf` analyzes numerical data to check if it follows Benford's Law, which states that in many naturally occurring datasets, the digit 1 appears as the **first (leading) digit** about 30.1% of the time, 2 appears 17.6% of the time, and so on. Deviations from this law can indicate data manipulation or fraud.
+
+**Note**: This tool analyzes only the **first digit** of each number, not the entire number sequence.
 
 **Unique Features:**
 - 🇯🇵 Japanese numeral support (full-width digits: ０１２, kanji numerals: 一二三)
@@ -193,6 +195,38 @@ fi
 - **Insurance claims**: Spot fraudulent claim patterns
 - **Scientific data**: Validate research results
 - **Quality control**: Monitor manufacturing data
+
+## ⚠️ Important Limitations
+
+**Benford's Law does NOT apply to:**
+- **Constrained ranges**: Adult heights (1.5-2.0m), ages (0-100), temperatures
+- **Sequential data**: Invoice numbers, employee IDs, zip codes
+- **Assigned numbers**: Phone numbers, social security numbers, lottery numbers
+- **Small datasets**: Less than 30-50 numbers (insufficient for statistical analysis)
+- **Single-source data**: All from same process/machine with similar magnitudes
+- **Rounded data**: Heavily rounded amounts (e.g., all ending in 00)
+
+**Best suited for:**
+- **Multi-scale natural data**: Financial transactions, populations, physical measurements
+- **Diverse sources**: Mixed data from different processes/timeframes
+- **Large datasets**: 100+ numbers for reliable analysis
+- **Unmanipulated data**: Naturally occurring, not artificially constrained
+
+## Historical Background
+
+**Discovery and Development:**
+- **1881**: Simon Newcomb first observed the phenomenon while studying logarithm tables
+- **1938**: Physicist Frank Benford rediscovered and formalized the law with extensive research
+- **1972**: First application to accounting and fraud detection in academic literature
+- **1980s**: Major accounting firms began using Benford's Law as a standard audit tool
+- **1990s**: Mark Nigrini popularized its use in forensic accounting and tax fraud detection
+- **2000s+**: Expanded to election monitoring, scientific data validation, and financial crime investigation
+
+**Modern Applications:**
+- Used by IRS for tax audit screening
+- Standard tool in Big Four accounting firms
+- Applied in election fraud detection (notably 2009 Iran election analysis)
+- Employed in anti-money laundering investigations
 
 ## Exit Codes
 
