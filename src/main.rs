@@ -1,7 +1,8 @@
 use clap::{Arg, Command};
 use benf::{
-    core::{RiskLevel, BenfordResult},
+    core::{RiskLevel, BenfordResult, NumberFilter, RiskThreshold, apply_number_filter},
     input::{parse_input_auto, parse_text_input, formats::html::parse_html_content},
+    BenfError, Result,
     VERSION
 };
 use std::io::{self, Read};
@@ -39,6 +40,20 @@ async fn main() {
             .value_name("LANGUAGE")
             .help("Output language: en, ja, zh, hi, ar")
             .default_value("auto"))
+        .arg(Arg::new("filter")
+            .long("filter")
+            .value_name("RANGE")
+            .help("Filter numbers by range (e.g., >=100, <1000, 50-500)"))
+        .arg(Arg::new("threshold")
+            .long("threshold")
+            .value_name("LEVEL")
+            .help("Custom anomaly detection threshold (low, medium, high, critical)")
+            .default_value("auto"))
+        .arg(Arg::new("min-count")
+            .long("min-count")
+            .value_name("NUMBER")
+            .help("Minimum number of data points required for analysis")
+            .default_value("5"))
         .get_matches();
 
     // Determine input source based on arguments
@@ -62,8 +77,8 @@ async fn main() {
                     }
                 };
                 
-                // Calculate Benford's Law analysis
-                let result = match BenfordResult::new(url.to_string(), &numbers) {
+                // Apply filtering and custom analysis
+                let result = match analyze_numbers_with_options(&matches, url.to_string(), &numbers) {
                     Ok(result) => result,
                     Err(e) => {
                         let language = get_language(&matches);
@@ -93,8 +108,8 @@ async fn main() {
                     std::process::exit(1);
                 }
                 
-                // Calculate Benford's Law analysis directly with extracted numbers
-                let result = match BenfordResult::new(input.to_string(), &numbers) {
+                // Apply filtering and custom analysis
+                let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
                     Ok(result) => result,
                     Err(e) => {
                         let language = get_language(&matches);
@@ -134,8 +149,8 @@ async fn main() {
                     }
                 };
                 
-                // Calculate Benford's Law analysis
-                let result = match BenfordResult::new("stdin".to_string(), &numbers) {
+                // Apply filtering and custom analysis
+                let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
                     Ok(result) => result,
                     Err(e) => {
                         let language = get_language(&matches);
@@ -538,7 +553,53 @@ fn generate_bar(value: f64, max_value: f64) -> String {
     bar
 }
 
-async fn fetch_url_content(url: &str) -> Result<String, reqwest::Error> {
+/// Analyze numbers with filtering and custom options
+fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<BenfordResult> {
+    use std::str::FromStr;
+    
+    // Apply number filtering if specified
+    let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
+        let filter = NumberFilter::parse(filter_str)
+            .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
+        
+        let filtered = apply_number_filter(numbers, &filter);
+        
+        // Inform user about filtering results
+        if filtered.len() != numbers.len() {
+            eprintln!("フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})", 
+                     numbers.len(), filtered.len(), filter.description());
+        }
+        
+        filtered
+    } else {
+        numbers.to_vec()
+    };
+    
+    // Parse custom threshold if specified
+    let threshold = if let Some(threshold_str) = matches.get_one::<String>("threshold") {
+        if threshold_str == "auto" {
+            RiskThreshold::Auto
+        } else {
+            RiskThreshold::from_str(threshold_str)
+                .map_err(|e| BenfError::ParseError(format!("無効な閾値: {}", e)))?
+        }
+    } else {
+        RiskThreshold::Auto
+    };
+    
+    // Parse minimum count requirement
+    let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
+        min_count_str.parse::<usize>()
+            .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
+    } else {
+        5
+    };
+    
+    // Perform Benford analysis with custom options
+    BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
+}
+
+async fn fetch_url_content(url: &str) -> std::result::Result<String, reqwest::Error> {
     let client = reqwest::Client::new();
     let response = client.get(url).send().await?;
     
