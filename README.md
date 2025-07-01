@@ -1,6 +1,6 @@
 # benf
 
-A CLI tool for detecting anomalies using Benford's Law with support for Japanese numerals.
+A CLI tool for detecting anomalies using Benford's Law with support for international numerals (Japanese, Chinese, Hindi, Arabic).
 
 ## Overview
 
@@ -9,7 +9,7 @@ A CLI tool for detecting anomalies using Benford's Law with support for Japanese
 **Note**: This tool analyzes only the **first digit** of each number, not the entire number sequence.
 
 **Unique Features:**
-- 🇯🇵 Japanese numeral support (full-width digits: ０１２, kanji numerals: 一二三)
+- 🌍 **International numeral support**: English, Japanese (全角・漢数字), Chinese (中文数字), Hindi (हिन्दी अंक), Arabic (الأرقام العربية)
 - 📊 Multiple input formats (Microsoft Excel, Word, PowerPoint, PDF, etc.)
 - 🌐 Direct URL analysis with HTML parsing
 - 🔍 Fraud detection focus with risk level indicators
@@ -76,22 +76,28 @@ Current implementation supports basic Chinese numerals that are identical to Jap
 - **Traditional**: 萬 (10,000) vs Japanese 万
 - **Regional variants**: Traditional vs Simplified Chinese
 
-### Other Numeral Systems (Planned)
+### Hindi Numerals (हिन्दी अंक)
+```bash
+# Devanagari numerals
+echo "१२३४५६ ७८९०१२" | benf --lang hi
+```
 
-#### Arabic-Indic Numerals
-- **Eastern Arabic**: ٠١٢٣٤٥٦٧٨٩ (Middle East)
+### Arabic Numerals (الأرقام العربية)
+```bash  
+# Eastern Arabic-Indic numerals
+echo "١٢٣٤٥٦ ٧٨٩٠١٢" | benf --lang ar
+```
+
+### Other Numeral Systems (Future Support)
+
+#### Additional Scripts (Planned)
 - **Persian**: ۰۱۲۳۴۵۶۷۸۹ (Iran, Afghanistan)
-
-#### South Asian Scripts
-- **Hindi**: ०१२३४५६७८९ (India)
 - **Bengali**: ০১২৩৪৫৬৭৮৯ (Bangladesh)
 - **Tamil**: ௦௧௨௩௪௫௬௭௮௯ (Tamil Nadu)
-
-#### Southeast Asian Scripts
 - **Thai**: ๐๑๒๓๔๕๖๗๘๙ (Thailand)
 - **Myanmar**: ၀၁၂၃၄၅၆၇၈၉ (Myanmar)
 
-> **Note**: International numeral support is being expanded based on user demand. Current focus is on Japanese/Chinese financial document analysis.
+> **Note**: International numeral support continues expanding based on user demand. Current priority: Japanese/Chinese/Hindi/Arabic financial document analysis.
 
 ## Installation
 
@@ -145,6 +151,7 @@ Priority: URL > File > String > Pipe
 | `--format <FORMAT>` | Output format: text, csv, json, yaml, toml, xml |
 | `--quiet` | Minimal output (numbers only) |
 | `--verbose` | Detailed statistics |
+| `--lang <LANGUAGE>` | Output language: en, ja, zh, hi, ar (default: auto) |
 | `--filter <RANGE>` | Filter numbers (e.g., `--filter ">=100"`) |
 | `--threshold <LEVEL>` | Alert threshold: low, medium, high, critical |
 | `--proxy <URL>` | HTTP proxy server |
