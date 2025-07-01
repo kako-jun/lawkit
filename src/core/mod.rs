@@ -1,9 +1,11 @@
 pub mod benford;
 pub mod japanese;
+pub mod international;
 pub mod statistics;
 
 pub use benford::*;
 pub use japanese::*;
+pub use international::*;
 pub use statistics::*;
 
 #[derive(Debug, Clone, PartialEq)]

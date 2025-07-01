@@ -1,7 +1,6 @@
 use clap::{Arg, Command};
 use benf::{
-    core::{japanese::extract_numbers, benford::*, statistics::*, RiskLevel, BenfordResult},
-    error::BenfError, 
+    core::{international::extract_numbers_international, RiskLevel, BenfordResult},
     VERSION
 };
 use std::io::{self, Read};
@@ -96,8 +95,8 @@ async fn main() {
         }
     };
 
-    // Extract numbers from input text
-    let numbers = extract_numbers(&input_text);
+    // Extract numbers from input text with international numeral support
+    let numbers = extract_numbers_international(&input_text);
     
     if numbers.is_empty() {
         let language = get_language(&matches);
