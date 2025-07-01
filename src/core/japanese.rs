@@ -200,6 +200,7 @@ fn parse_kanji_number_advanced(kanji: &str) -> Result<u64, String> {
 }
 
 /// Parse a kanji number string into an Arabic number (legacy function)
+#[allow(dead_code)]
 fn parse_kanji_number(kanji: &str) -> Result<u64, String> {
     if kanji.is_empty() {
         return Err("Empty string".to_string());
