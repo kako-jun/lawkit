@@ -68,8 +68,15 @@ impl BenfordResult {
             return Err(crate::BenfError::NoNumbersFound);
         }
         
-        if numbers.len() < 30 {
+        // Allow smaller datasets for demonstration purposes
+        // In practice, Benford's Law requires 30+ numbers for reliable analysis
+        if numbers.len() < 5 {
             return Err(crate::BenfError::InsufficientData(numbers.len()));
+        }
+        
+        // Issue warning for small datasets but continue analysis
+        if numbers.len() < 30 {
+            eprintln!("Warning: {} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.", numbers.len());
         }
 
         let digit_distribution = benford::calculate_digit_distribution(numbers);
