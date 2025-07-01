@@ -125,6 +125,10 @@ async fn main() {
     match format.as_str() {
         "text" => print_text_output(&result, quiet, verbose, language),
         "json" => print_json_output(&result),
+        "csv" => print_csv_output(&result),
+        "yaml" => print_yaml_output(&result),
+        "toml" => print_toml_output(&result),
+        "xml" => print_xml_output(&result),
         _ => {
             let error_msg = localized_text("unsupported_format", language);
             eprintln!("{}: {}", error_msg, format);
@@ -373,6 +377,109 @@ fn print_json_output(result: &BenfordResult) {
     });
     
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
+}
+
+fn print_csv_output(result: &BenfordResult) {
+    // CSV header
+    println!("dataset,numbers_analyzed,risk_level,digit,observed,expected,deviation,chi_square,p_value,mad");
+    
+    // CSV data rows for each digit
+    for (i, &observed) in result.digit_distribution.iter().enumerate() {
+        let digit = i + 1;
+        let expected = result.expected_distribution[i];
+        let deviation = observed - expected;
+        
+        println!("{},{},{:?},{},{:.2},{:.2},{:.2},{:.6},{:.6},{:.2}",
+                 result.dataset_name,
+                 result.numbers_analyzed,
+                 result.risk_level,
+                 digit,
+                 observed,
+                 expected,
+                 deviation,
+                 result.chi_square,
+                 result.p_value,
+                 result.mean_absolute_deviation);
+    }
+}
+
+fn print_yaml_output(result: &BenfordResult) {
+    println!("dataset: \"{}\"", result.dataset_name);
+    println!("numbers_analyzed: {}", result.numbers_analyzed);
+    println!("risk_level: \"{:?}\"", result.risk_level);
+    println!("digits:");
+    
+    for (i, &observed) in result.digit_distribution.iter().enumerate() {
+        let digit = i + 1;
+        let expected = result.expected_distribution[i];
+        let deviation = observed - expected;
+        
+        println!("  {}:", digit);
+        println!("    observed: {:.2}", observed);
+        println!("    expected: {:.2}", expected);
+        println!("    deviation: {:.2}", deviation);
+    }
+    
+    println!("statistics:");
+    println!("  chi_square: {:.6}", result.chi_square);
+    println!("  p_value: {:.6}", result.p_value);
+    println!("  mad: {:.2}", result.mean_absolute_deviation);
+}
+
+fn print_toml_output(result: &BenfordResult) {
+    println!("dataset = \"{}\"", result.dataset_name);
+    println!("numbers_analyzed = {}", result.numbers_analyzed);
+    println!("risk_level = \"{:?}\"", result.risk_level);
+    println!();
+    
+    println!("[statistics]");
+    println!("chi_square = {:.6}", result.chi_square);
+    println!("p_value = {:.6}", result.p_value);
+    println!("mad = {:.2}", result.mean_absolute_deviation);
+    println!();
+    
+    for (i, &observed) in result.digit_distribution.iter().enumerate() {
+        let digit = i + 1;
+        let expected = result.expected_distribution[i];
+        let deviation = observed - expected;
+        
+        println!("[[digits]]");
+        println!("digit = {}", digit);
+        println!("observed = {:.2}", observed);
+        println!("expected = {:.2}", expected);
+        println!("deviation = {:.2}", deviation);
+        println!();
+    }
+}
+
+fn print_xml_output(result: &BenfordResult) {
+    println!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    println!("<benford_analysis>");
+    println!("  <dataset>{}</dataset>", result.dataset_name);
+    println!("  <numbers_analyzed>{}</numbers_analyzed>", result.numbers_analyzed);
+    println!("  <risk_level>{:?}</risk_level>", result.risk_level);
+    println!("  <statistics>");
+    println!("    <chi_square>{:.6}</chi_square>", result.chi_square);
+    println!("    <p_value>{:.6}</p_value>", result.p_value);
+    println!("    <mad>{:.2}</mad>", result.mean_absolute_deviation);
+    println!("  </statistics>");
+    println!("  <digits>");
+    
+    for (i, &observed) in result.digit_distribution.iter().enumerate() {
+        let digit = i + 1;
+        let expected = result.expected_distribution[i];
+        let deviation = observed - expected;
+        
+        println!("    <digit>");
+        println!("      <number>{}</number>", digit);
+        println!("      <observed>{:.2}</observed>", observed);
+        println!("      <expected>{:.2}</expected>", expected);
+        println!("      <deviation>{:.2}</deviation>", deviation);
+        println!("    </digit>");
+    }
+    
+    println!("  </digits>");
+    println!("</benford_analysis>");
 }
 
 fn get_risk_emoji(risk: &RiskLevel) -> &'static str {
