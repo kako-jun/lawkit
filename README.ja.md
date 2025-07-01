@@ -220,6 +220,7 @@ fi
 | `--filter <範囲>` | 数値フィルター (例: `--filter ">=100"`) |
 | `--threshold <レベル>` | アラート閾値: low, medium, high, critical |
 | `--proxy <URL>` | HTTPプロキシサーバー |
+| `--insecure` | SSL証明書検証をスキップ |
 | `--timeout <秒>` | リクエストタイムアウト (デフォルト: 30) |
 | `--log-level <レベル>` | ログレベル: debug, info, warn, error |
 | `--help, -h` | ヘルプを表示 |
@@ -229,12 +230,14 @@ fi
 
 | 形式 | 拡張子 | 備考 |
 |------|--------|------|
-| Excel | .xlsx, .xls | スプレッドシートデータ |
+| Microsoft Excel | .xlsx, .xls | スプレッドシートデータ |
+| Microsoft Word | .docx, .doc | 文書解析 |
+| Microsoft PowerPoint | .pptx, .ppt | プレゼンデータ |
+| OpenDocument | .ods, .odt | OpenOffice/LibreOfficeファイル |
 | PDF | .pdf | テキスト抽出 |
-| Word | .docx, .doc | 文書解析 |
-| PowerPoint | .pptx, .ppt | プレゼンデータ |
 | CSV/TSV | .csv, .tsv | 構造化データ |
 | JSON/XML | .json, .xml | APIレスポンス |
+| YAML/TOML | .yaml, .toml | 設定ファイル、データ定義 |
 | HTML | .html | Webページ |
 | テキスト | .txt | プレーンテキスト |
 

@@ -1,0 +1,43 @@
+# NOTE: This is a placeholder for OpenDocument Text (.odt) file
+# In actual implementation, this would be a binary ODT file
+# For testing purposes, we'll create a mock ODT file structure
+
+# ODT files are ZIP archives containing XML files
+# The main content is in content.xml within the archive
+# Here's what the content.xml would contain:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                        xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h text:style-name="Heading_20_1">Financial Report Q4 2023</text:h>
+      
+      <text:p>This quarter showed strong performance across all metrics:</text:p>
+      
+      <text:p>Total Revenue: $1,234,567.89</text:p>
+      <text:p>Operating Expenses: $567,890.12</text:p>
+      <text:p>Marketing Costs: $234,567.34</text:p>
+      <text:p>Net Profit: $432,110.43</text:p>
+      
+      <text:h text:style-name="Heading_20_2">Key Metrics</text:h>
+      
+      <text:p>Customer Acquisition: 12,345 new customers</text:p>
+      <text:p>Average Order Value: $789.01</text:p>
+      <text:p>Conversion Rate: 5.67%</text:p>
+      <text:p>Monthly Recurring Revenue: $98,765.43</text:p>
+      
+      <text:h text:style-name="Heading_20_2">Department Breakdown</text:h>
+      
+      <text:p>Sales Department: $456,789.00 revenue</text:p>
+      <text:p>Marketing Department: $123,456.78 budget</text:p>
+      <text:p>Operations: $345,678.90 costs</text:p>
+      <text:p>R&amp;D Investment: $678,901.23</text:p>
+      
+      <text:p>Numbers in Japanese format:</text:p>
+      <text:p>売上高：１，２３４，５６７円</text:p>
+      <text:p>経費：五十六万七千八百九十円</text:p>
+      <text:p>利益：六十六万六千六百七十七円</text:p>
+    </office:text>
+  </office:body>
+</office:document-content>
