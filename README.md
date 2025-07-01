@@ -77,10 +77,11 @@ Priority: URL > File > String > Pipe
 
 | Format | Extensions | Notes |
 |--------|------------|-------|
-| Excel | .xlsx, .xls | Spreadsheet data |
+| Microsoft Excel | .xlsx, .xls | Spreadsheet data |
+| Microsoft Word | .docx, .doc | Document analysis |
+| Microsoft PowerPoint | .pptx, .ppt | Presentation data |
+| OpenDocument | .ods, .odt | OpenOffice/LibreOffice files |
 | PDF | .pdf | Text extraction |
-| Word | .docx, .doc | Document analysis |
-| PowerPoint | .pptx, .ppt | Presentation data |
 | CSV/TSV | .csv, .tsv | Structured data |
 | JSON/XML | .json, .xml | API responses |
 | YAML/TOML | .yaml, .toml | Configuration files |
