@@ -6,6 +6,54 @@ use benf::{
     VERSION
 };
 use std::io::{self, Read};
+use std::time::Duration;
+
+/// HTTP request configuration options
+#[derive(Debug, Clone)]
+struct HttpOptions {
+    proxy: Option<String>,
+    insecure: bool,
+    timeout: Duration,
+    user_agent: String,
+}
+
+impl HttpOptions {
+    fn from_matches(matches: &clap::ArgMatches) -> std::result::Result<Self, String> {
+        let proxy = matches.get_one::<String>("proxy").cloned();
+        let insecure = matches.get_flag("insecure");
+        
+        let timeout_secs = matches.get_one::<String>("timeout")
+            .unwrap()
+            .parse::<u64>()
+            .map_err(|_| "無効なタイムアウト値".to_string())?;
+        
+        // Validate timeout range
+        if timeout_secs == 0 {
+            return Err("タイムアウトは0より大きい値にしてください".to_string());
+        }
+        if timeout_secs > 3600 {
+            return Err("タイムアウトは1時間以下にしてください".to_string());
+        }
+        
+        let timeout = Duration::from_secs(timeout_secs);
+        
+        let user_agent = matches.get_one::<String>("user-agent")
+            .unwrap()
+            .clone();
+        
+        // Validate User-Agent
+        if user_agent.is_empty() {
+            return Err("User-Agentは空にできません".to_string());
+        }
+        
+        Ok(HttpOptions {
+            proxy,
+            insecure,
+            timeout,
+            user_agent,
+        })
+    }
+}
 
 #[tokio::main]
 async fn main() {
@@ -54,12 +102,39 @@ async fn main() {
             .value_name("NUMBER")
             .help("Minimum number of data points required for analysis")
             .default_value("5"))
+        .arg(Arg::new("proxy")
+            .long("proxy")
+            .value_name("URL")
+            .help("HTTP proxy server URL (e.g., http://proxy.example.com:8080)"))
+        .arg(Arg::new("insecure")
+            .long("insecure")
+            .help("Skip SSL certificate verification (use with caution)")
+            .action(clap::ArgAction::SetTrue))
+        .arg(Arg::new("timeout")
+            .long("timeout")
+            .value_name("SECONDS")
+            .help("Request timeout in seconds")
+            .default_value("30"))
+        .arg(Arg::new("user-agent")
+            .long("user-agent")
+            .value_name("STRING")
+            .help("Custom User-Agent header")
+            .default_value("benf-cli/0.1.0"))
         .get_matches();
 
     // Determine input source based on arguments
     if let Some(url) = matches.get_one::<String>("url") {
+        // Parse HTTP options
+        let http_options = match HttpOptions::from_matches(&matches) {
+            Ok(options) => options,
+            Err(e) => {
+                eprintln!("HTTPオプションエラー: {}", e);
+                std::process::exit(2);
+            }
+        };
+        
         // Fetch URL content and analyze
-        match fetch_url_content(url).await {
+        match fetch_url_content(url, &http_options).await {
             Ok(content) => {
                 if content.trim().is_empty() {
                     eprintln!("Error: No content from URL: {}", url);
@@ -599,8 +674,30 @@ fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String
     BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
 }
 
-async fn fetch_url_content(url: &str) -> std::result::Result<String, reqwest::Error> {
-    let client = reqwest::Client::new();
+async fn fetch_url_content(url: &str, options: &HttpOptions) -> std::result::Result<String, reqwest::Error> {
+    let mut client_builder = reqwest::Client::builder()
+        .timeout(options.timeout)
+        .user_agent(&options.user_agent);
+    
+    // Configure SSL certificate verification
+    if options.insecure {
+        client_builder = client_builder.danger_accept_invalid_certs(true);
+    }
+    
+    // Configure proxy if specified
+    if let Some(proxy_url) = &options.proxy {
+        match reqwest::Proxy::all(proxy_url) {
+            Ok(proxy) => {
+                client_builder = client_builder.proxy(proxy);
+            }
+            Err(e) => {
+                eprintln!("プロキシ設定エラー: {}", e);
+                return Err(e);
+            }
+        }
+    }
+    
+    let client = client_builder.build()?;
     let response = client.get(url).send().await?;
     
     if response.status().is_success() {
