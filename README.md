@@ -10,9 +10,88 @@ A CLI tool for detecting anomalies using Benford's Law with support for Japanese
 
 **Unique Features:**
 - 🇯🇵 Japanese numeral support (full-width digits: ０１２, kanji numerals: 一二三)
-- 📊 Multiple input formats (Excel, PDF, Word, HTML, etc.)
+- 📊 Multiple input formats (Microsoft Excel, Word, PowerPoint, PDF, etc.)
 - 🌐 Direct URL analysis with HTML parsing
 - 🔍 Fraud detection focus with risk level indicators
+
+## International Numeral Support
+
+### Supported Number Formats
+
+#### 1. Full-width Digits
+```bash
+echo "１２３４５６ ７８９０１２" | benf
+```
+
+#### 2. Kanji Numerals (Basic)
+```bash
+echo "一二三四五六七八九" | benf
+```
+
+#### 3. Kanji Numerals (Positional)
+```bash
+echo "一千二百三十四 五千六百七十八 九万一千二百" | benf
+```
+
+#### 4. Mixed Patterns
+```bash
+echo "売上123万円 経費45万6千円 利益78万９千円" | benf
+```
+
+### Conversion Rules
+
+| Kanji | Number | Notes |
+|-------|--------|-------|
+| 一 | 1 | Basic digit |
+| 十 | 10 | Tens place |
+| 百 | 100 | Hundreds place |
+| 千 | 1000 | Thousands place |
+| 万 | 10000 | Ten thousands place |
+| 一千二百三十四 | 1234 | Positional notation |
+
+#### Decimal Numbers
+```bash
+# Only numbers ≥ 1 are analyzed
+echo "12.34 0.567 123.45" | benf
+# Result: 1, (excluded), 1 (numbers < 1 are excluded)
+```
+
+#### Negative Numbers
+```bash
+# Uses absolute value's first digit
+echo "-123 -456 -789" | benf
+# Result: 1, 4, 7
+```
+
+### Chinese Numeral Compatibility
+
+Current implementation supports basic Chinese numerals that are identical to Japanese kanji:
+
+#### Supported (Basic Forms)
+- 一二三四五六七八九 (1-9) - Same as Japanese
+- 十百千 (10, 100, 1000) - Positional markers
+
+#### Planned Support
+- **Financial forms**: 壹貳參肆伍陸柒捌玖 (anti-fraud variants)
+- **Traditional**: 萬 (10,000) vs Japanese 万
+- **Regional variants**: Traditional vs Simplified Chinese
+
+### Other Numeral Systems (Planned)
+
+#### Arabic-Indic Numerals
+- **Eastern Arabic**: ٠١٢٣٤٥٦٧٨٩ (Middle East)
+- **Persian**: ۰۱۲۳۴۵۶۷۸۹ (Iran, Afghanistan)
+
+#### South Asian Scripts
+- **Hindi**: ०१२३४५६७८९ (India)
+- **Bengali**: ০১২৩৪৫৬৭৮৯ (Bangladesh)
+- **Tamil**: ௦௧௨௩௪௫௬௭௮௯ (Tamil Nadu)
+
+#### Southeast Asian Scripts
+- **Thai**: ๐๑๒๓๔๕๖๗๘๙ (Thailand)
+- **Myanmar**: ၀၁၂၃၄၅၆၇၈၉ (Myanmar)
+
+> **Note**: International numeral support is being expanded based on user demand. Current focus is on Japanese/Chinese financial document analysis.
 
 ## Installation
 
@@ -82,7 +161,7 @@ Priority: URL > File > String > Pipe
 | Microsoft Excel | .xlsx, .xls | Spreadsheet data |
 | Microsoft Word | .docx, .doc | Document analysis |
 | Microsoft PowerPoint | .pptx, .ppt | Presentation data |
-| OpenDocument | .ods, .odt | OpenOffice/LibreOffice files |
+| OpenDocument | ods, .odt | OpenOffice/LibreOffice files |
 | PDF | .pdf | Text extraction |
 | CSV/TSV | .csv, .tsv | Structured data |
 | JSON/XML | .json, .xml | API responses |

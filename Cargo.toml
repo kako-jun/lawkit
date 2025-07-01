@@ -1,13 +1,13 @@
 [package]
 name = "benf"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["kako-jun"]
 license = "MIT"
-description = "A CLI tool for detecting anomalies using Benford's Law with Japanese numeral support"
+description = "A CLI tool for detecting anomalies using Benford's Law with international numeral support (Japanese, Chinese, Arabic)"
 homepage = "https://github.com/kako-jun/benf"
 repository = "https://github.com/kako-jun/benf"
-keywords = ["benford", "fraud-detection", "statistics", "cli", "japanese"]
+keywords = ["benford", "fraud-detection", "statistics", "chinese", "japanese"]
 categories = ["command-line-utilities", "mathematics"]
 
 [[bin]]
