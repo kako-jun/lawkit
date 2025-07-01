@@ -1,6 +1,7 @@
 use clap::{Arg, Command};
 use benf::{
-    core::{international::extract_numbers_international, RiskLevel, BenfordResult},
+    core::{RiskLevel, BenfordResult},
+    input::{parse_input_auto, parse_text_input, formats::html::parse_html_content},
     VERSION
 };
 use std::io::{self, Read};
@@ -41,15 +42,40 @@ async fn main() {
         .get_matches();
 
     // Determine input source based on arguments
-    let input_text = if let Some(url) = matches.get_one::<String>("url") {
-        // Fetch URL content
+    if let Some(url) = matches.get_one::<String>("url") {
+        // Fetch URL content and analyze
         match fetch_url_content(url).await {
             Ok(content) => {
                 if content.trim().is_empty() {
                     eprintln!("Error: No content from URL: {}", url);
                     std::process::exit(2);
                 }
-                content
+                
+                // Parse HTML content from URL
+                let numbers = match parse_html_content(&content) {
+                    Ok(numbers) => numbers,
+                    Err(e) => {
+                        let language = get_language(&matches);
+                        let error_msg = localized_text("analysis_error", language);
+                        eprintln!("{}: {}", error_msg, e);
+                        std::process::exit(1);
+                    }
+                };
+                
+                // Calculate Benford's Law analysis
+                let result = match BenfordResult::new(url.to_string(), &numbers) {
+                    Ok(result) => result,
+                    Err(e) => {
+                        let language = get_language(&matches);
+                        let error_msg = localized_text("analysis_error", language);
+                        eprintln!("{}: {}", error_msg, e);
+                        std::process::exit(1);
+                    }
+                };
+
+                // Output results and exit
+                output_results(&matches, &result);
+                std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
                 eprintln!("Error fetching URL '{}': {}", url, e);
@@ -57,25 +83,35 @@ async fn main() {
             }
         }
     } else if let Some(input) = matches.get_one::<String>("input") {
-        // Check if it's a file path or string data
-        if std::path::Path::new(input).exists() {
-            // Read file contents
-            match std::fs::read_to_string(input) {
-                Ok(content) => {
-                    if content.trim().is_empty() {
-                        eprintln!("Error: File is empty: {}", input);
-                        std::process::exit(2);
-                    }
-                    content
-                }
-                Err(e) => {
-                    eprintln!("Error reading file '{}': {}", input, e);
+        // Use auto-detection for file vs string input
+        match parse_input_auto(input) {
+            Ok(numbers) => {
+                if numbers.is_empty() {
+                    let language = get_language(&matches);
+                    let error_msg = localized_text("no_numbers_found", language);
+                    eprintln!("{}", error_msg);
                     std::process::exit(1);
                 }
+                
+                // Calculate Benford's Law analysis directly with extracted numbers
+                let result = match BenfordResult::new(input.to_string(), &numbers) {
+                    Ok(result) => result,
+                    Err(e) => {
+                        let language = get_language(&matches);
+                        let error_msg = localized_text("analysis_error", language);
+                        eprintln!("{}: {}", error_msg, e);
+                        std::process::exit(1);
+                    }
+                };
+
+                // Output results and exit
+                output_results(&matches, &result);
+                std::process::exit(result.risk_level.exit_code());
             }
-        } else {
-            // Treat as string data
-            input.clone()
+            Err(e) => {
+                eprintln!("Error processing input '{}': {}", input, e);
+                std::process::exit(1);
+            }
         }
     } else {
         // Read from stdin
@@ -86,37 +122,42 @@ async fn main() {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                buffer
+                
+                // Extract numbers from stdin input text with international numeral support
+                let numbers = match parse_text_input(&buffer) {
+                    Ok(numbers) => numbers,
+                    Err(e) => {
+                        let language = get_language(&matches);
+                        let error_msg = localized_text("analysis_error", language);
+                        eprintln!("{}: {}", error_msg, e);
+                        std::process::exit(1);
+                    }
+                };
+                
+                // Calculate Benford's Law analysis
+                let result = match BenfordResult::new("stdin".to_string(), &numbers) {
+                    Ok(result) => result,
+                    Err(e) => {
+                        let language = get_language(&matches);
+                        let error_msg = localized_text("analysis_error", language);
+                        eprintln!("{}: {}", error_msg, e);
+                        std::process::exit(1);
+                    }
+                };
+
+                // Output results and exit
+                output_results(&matches, &result);
+                std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
                 eprintln!("Error reading from stdin: {}", e);
                 std::process::exit(1);
             }
         }
-    };
-
-    // Extract numbers from input text with international numeral support
-    let numbers = extract_numbers_international(&input_text);
-    
-    if numbers.is_empty() {
-        let language = get_language(&matches);
-        let error_msg = localized_text("no_numbers_found", language);
-        eprintln!("{}", error_msg);
-        std::process::exit(1);
     }
+}
 
-    // Calculate Benford's Law analysis
-    let result = match BenfordResult::new("stdin".to_string(), &numbers) {
-        Ok(result) => result,
-        Err(e) => {
-            let language = get_language(&matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{}: {}", error_msg, e);
-            std::process::exit(1);
-        }
-    };
-
-    // Output results based on format
+fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
@@ -135,15 +176,6 @@ async fn main() {
             std::process::exit(2);
         }
     }
-
-    // Exit with appropriate code based on risk level
-    let exit_code = match result.risk_level {
-        RiskLevel::Low | RiskLevel::Medium => 0,
-        RiskLevel::High => 10,
-        RiskLevel::Critical => 11,
-    };
-    
-    std::process::exit(exit_code);
 }
 
 fn get_language(matches: &clap::ArgMatches) -> &str {
