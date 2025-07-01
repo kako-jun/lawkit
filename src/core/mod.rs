@@ -2,11 +2,13 @@ pub mod benford;
 pub mod japanese;
 pub mod international;
 pub mod statistics;
+pub mod filtering;
 
 pub use benford::*;
 pub use japanese::*;
 pub use international::*;
 pub use statistics::*;
+pub use filtering::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum RiskLevel {
@@ -64,13 +66,21 @@ pub struct BenfordResult {
 
 impl BenfordResult {
     pub fn new(dataset_name: String, numbers: &[f64]) -> crate::Result<Self> {
+        Self::new_with_threshold(dataset_name, numbers, &RiskThreshold::Auto, 5)
+    }
+
+    pub fn new_with_threshold(
+        dataset_name: String, 
+        numbers: &[f64], 
+        threshold: &RiskThreshold,
+        min_count: usize
+    ) -> crate::Result<Self> {
         if numbers.is_empty() {
             return Err(crate::BenfError::NoNumbersFound);
         }
         
-        // Allow smaller datasets for demonstration purposes
-        // In practice, Benford's Law requires 30+ numbers for reliable analysis
-        if numbers.len() < 5 {
+        // Check minimum count requirement
+        if numbers.len() < min_count {
             return Err(crate::BenfError::InsufficientData(numbers.len()));
         }
         
@@ -84,7 +94,9 @@ impl BenfordResult {
         let chi_square = statistics::calculate_chi_square(&digit_distribution, &expected_distribution);
         let p_value = statistics::calculate_p_value(chi_square, 8); // 8 degrees of freedom
         let mean_absolute_deviation = statistics::calculate_mad(&digit_distribution, &expected_distribution);
-        let risk_level = RiskLevel::from_p_value(p_value);
+        
+        // Use custom threshold if provided, otherwise use default logic
+        let risk_level = threshold.evaluate_risk(p_value);
         
         let verdict = match risk_level {
             RiskLevel::Low => "NORMAL_DISTRIBUTION".to_string(),
