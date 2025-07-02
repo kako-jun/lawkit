@@ -128,8 +128,8 @@ sudo cp target/release/benf /usr/local/bin/
 # CSVファイルの解析
 benf 売上データ.csv
 
-# WebサイトのデータをURL指定で解析
-benf --url https://example.com/財務報告
+# WebサイトのデータをURL指定で解析（curlと組み合わせ）
+curl -s https://example.com/財務報告 | benf
 
 # パイプでデータを渡す
 cat 取引履歴.txt | benf
@@ -368,6 +368,101 @@ find ./請求 -name "*.xlsx" | while read file; do
     jq --arg id "$claim_id" '{請求ID: $id, リスク評価: .risk_level, 総数値数: .numbers_analyzed}'
 done | jq -s '.' > 請求リスク評価.json
 ```
+
+### 高度なGNU parallel連携
+
+GNU parallelとの組み合わせで大規模データ処理を効率化：
+
+```bash
+# 高性能並列処理と負荷分散
+find /大規模データセット -name "*.xlsx" | \
+parallel -j+0 --eta --bar 'benf {} --format json | jq -r "\(.dataset),\(.risk_level)"' | \
+sort | uniq -c | sort -nr > リスク集計.csv
+
+# システムリソースに応じた動的負荷調整
+find ./財務データ -name "*.xlsx" | \
+parallel --load 80% --noswap 'benf {} --format json --min-count 10' | \
+jq -s 'group_by(.risk_level) | map({risk: .[0].risk_level, count: length})'
+
+# 進捗監視とETA表示
+find /監査ファイル -name "*.csv" | \
+parallel --progress --eta --joblog 並列監査.log \
+'benf {} --threshold critical --format json | jq -r "select(.risk_level==\"Critical\") | .dataset"'
+
+# 失敗ジョブの自動リトライ  
+find ./疑わしいファイル -name "*.xlsx" | \
+parallel --retries 3 --joblog 失敗ジョブ.log \
+'timeout 30 benf {} --format json || echo "失敗: {}"'
+
+# 複数マシンへの分散処理（SSH）
+find /共有ストレージ -name "*.xlsx" | \
+parallel --sshloginfile サーバーリスト.txt --transfer --return 監査-{/}.json \
+'benf {} --format json > 監査-{/}.json'
+
+# メモリを考慮した大規模データセット処理
+find /企業データ -name "*.xlsx" | \
+parallel --memfree 1G --delay 0.1 \
+'benf {} --format csv | awk -F, "$3==\"Critical\" {print}"' | \
+tee 重大な発見.csv
+
+# ファイル種別ごとのスマートな負荷分散
+{
+    find ./レポート -name "*.xlsx" | sed 's/$/ xlsx/'
+    find ./レポート -name "*.pdf" | sed 's/$/ pdf/'  
+    find ./レポート -name "*.csv" | sed 's/$/ csv/'
+} | parallel --colsep ' ' --header : --tag \
+'echo "処理中 {1} ({2})"; benf {1} --format json | jq -r .risk_level'
+
+# リソース考慮型バッチ処理
+find ./四半期データ -name "*.xlsx" | \
+parallel --jobs 50% --max-replace-args 1 --max-chars 1000 \
+'benf {} --format json 2>/dev/null | jq -c "select(.risk_level==\"High\" or .risk_level==\"Critical\")"' | \
+jq -s '. | group_by(.dataset) | map(.[0])' > 高リスク要約.json
+
+# 条件付き処理を含む複雑なパイプライン
+find ./請求書 -name "*.pdf" | \
+parallel 'if benf {} --threshold low --format json | jq -e ".risk_level == \"Critical\"" >/dev/null; then
+    echo "🚨 重大: {}"
+    benf {} --verbose | mail -s "重大請求書アラート: $(basename {})" 監査担当@company.com
+fi'
+
+# ベンチマークとパフォーマンス最適化
+find ./テストデータ -name "*.xlsx" | head -100 | \
+parallel --dry-run --joblog パフォーマンステスト.log \
+'time benf {} --format json' | \
+parallel --joblog パフォーマンス実測.log \
+'benf {} --format json' && \
+echo "パフォーマンス分析:" && \
+awk '{sum+=$4; count++} END {print "平均時間:", sum/count, "秒"}' パフォーマンス実測.log
+
+# 結果に基づく高度なフィルタリングとルーティング
+find ./混合データ -name "*.xlsx" | \
+parallel --pipe --block 10M --cat \
+'benf --format json | jq -r "
+if .risk_level == \"Critical\" then \"重大/\" + .dataset
+elif .risk_level == \"High\" then \"高/\" + .dataset  
+else \"通常/\" + .dataset
+end"' | \
+while read dest; do mkdir -p "$(dirname "$dest")"; done
+
+# クロスプラットフォーム互換性テスト
+find ./サンプル -name "*.xlsx" | \
+parallel --env PATH --sshlogin :,windows-server,mac-server \
+'benf {} --format json | jq -r ".risk_level + \": \" + .dataset"' | \
+sort | uniq -c
+```
+
+**活用されるGNU parallel主要機能:**
+
+- **`--eta`**: 完了予想時間表示
+- **`--progress`**: リアルタイム進捗バー
+- **`--load 80%`**: CPU負荷を考慮したスケジューリング
+- **`--memfree 1G`**: メモリを考慮した処理
+- **`--retries 3`**: 失敗ジョブの自動リトライ
+- **`--sshloginfile`**: 複数サーバーへの分散
+- **`--joblog`**: 詳細な実行ログ
+- **`--bar`**: 視覚的進捗表示
+- **`-j+0`**: 全CPUコアの最適活用
 
 ## 危険度レベル
 
