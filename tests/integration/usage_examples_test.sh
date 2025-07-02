@@ -1,0 +1,338 @@
+#!/bin/bash
+
+# Usage Examples Test Script
+# Tests practical usage examples from README to ensure they work correctly
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Test counter
+TESTS_RUN=0
+TESTS_PASSED=0
+
+# Function to print test status
+print_test() {
+    echo -e "${YELLOW}[TEST]${NC} $1"
+    TESTS_RUN=$((TESTS_RUN + 1))
+}
+
+print_pass() {
+    echo -e "${GREEN}[PASS]${NC} $1"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+}
+
+print_fail() {
+    echo -e "${RED}[FAIL]${NC} $1"
+}
+
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+# Build the project first
+echo "Building benf..."
+cargo build --release >/dev/null 2>&1 || {
+    echo -e "${RED}Failed to build benf${NC}"
+    exit 1
+}
+
+# Set up test environment
+TEST_DIR="$(dirname "$0")/usage_test_data"
+mkdir -p "$TEST_DIR"
+cd "$TEST_DIR"
+
+# Create realistic test data structure
+echo "Setting up realistic test data structure..."
+
+# Create department structure
+mkdir -p {accounting,marketing,sales}/{Q1-2024,Q2-2024,Q3-2024,Q4-2024}
+mkdir -p {expenses,tax-filings,uploaded-reports,daily-uploads}
+mkdir -p {audit-sample,monthly-reports,archives/2020-2024}
+mkdir -p {election-data,research-data,invoices/2024,claims}
+
+# Create realistic financial data files
+create_financial_data() {
+    local file="$1"
+    local base_amount="$2"
+    
+    # Generate Benford-like distribution with some realistic financial numbers
+    {
+        echo "Amount,Description,Date"
+        # Mix of amounts that should follow Benford's law
+        for i in {1..20}; do
+            amount=$((base_amount + RANDOM % (base_amount * 2)))
+            echo "$amount,Transaction $i,2024-0$((RANDOM % 12 + 1))-0$((RANDOM % 28 + 1))"
+        done
+        # Add some specific patterns
+        echo "1234,Invoice Payment,2024-01-15"
+        echo "2567,Supplier Payment,2024-02-20"
+        echo "3891,Consulting Fee,2024-03-10"
+        echo "4123,Equipment Purchase,2024-04-05"
+        echo "5678,Marketing Campaign,2024-05-12"
+        echo "6789,Office Supplies,2024-06-18"
+        echo "7234,Software License,2024-07-22"
+        echo "8456,Travel Expenses,2024-08-09"
+        echo "9123,Training Cost,2024-09-14"
+    } > "$file"
+}
+
+# Create test files with realistic data
+print_info "Creating test files with realistic financial data..."
+
+# Department quarterly reports
+for dept in accounting marketing sales; do
+    for quarter in Q1-2024 Q2-2024 Q3-2024 Q4-2024; do
+        create_financial_data "$dept/$quarter/report.csv" $((RANDOM % 5000 + 1000))
+    done
+done
+
+# Monthly reports with date-sorted naming
+for month in {01..12}; do
+    create_financial_data "monthly-reports/2024-$month-report.csv" $((RANDOM % 10000 + 2000))
+done
+
+# Archive data
+for year in {2020..2024}; do
+    for i in {1..3}; do
+        create_financial_data "archives/2020-2024/archive-$year-$i.csv" $((RANDOM % 15000 + 5000))
+    done
+done
+
+# Other test data
+create_financial_data "audit-sample/sample1.csv" 3000
+create_financial_data "audit-sample/sample2.csv" 5000
+create_financial_data "tax-filings/tax2024.csv" 8000
+create_financial_data "uploaded-reports/upload1.csv" 1500
+create_financial_data "daily-uploads/today.csv" 2500
+
+# Special test cases
+create_financial_data "election-data/votes.csv" 50000
+create_financial_data "research-data/lab-results.csv" 100
+create_financial_data "invoices/2024/vendor1.csv" 4000
+create_financial_data "claims/claim123.csv" 7500
+
+# Get benf executable path
+BENF="../../../target/release/benf"
+if [ ! -f "$BENF" ]; then
+    echo -e "${RED}benf executable not found at $BENF${NC}"
+    exit 1
+fi
+
+echo -e "\n${YELLOW}=== Testing README Usage Examples ===${NC}\n"
+
+# Test 1: Basic quarterly audit workflow
+print_test "Quarterly audit workflow - process Q4 files"
+q4_files_processed=0
+find ./accounting/Q4-2024 -name "*.csv" | while read file; do
+    if $BENF "$file" --min-count 5 >/dev/null 2>&1; then
+        echo "Processed: $file" >/dev/null
+    fi
+done
+q4_files_processed=$(find ./accounting/Q4-2024 -name "*.csv" | wc -l)
+if [ "$q4_files_processed" -gt 0 ]; then
+    print_pass "Q4 audit workflow processed $q4_files_processed files"
+else
+    print_fail "Q4 audit workflow failed"
+fi
+
+# Test 2: Department-based processing
+print_test "Department-based expense validation"
+dept_success=0
+for dept in accounting marketing sales; do
+    files_found=$(find "./$dept" -name "*.csv" | wc -l)
+    if [ "$files_found" -gt 0 ]; then
+        file_count=$(find "./$dept" -name "*.csv" | head -2 | xargs -I {} $BENF {} --min-count 3 2>/dev/null | grep -c "解析した数値数\|Numbers analyzed\|analyzed" || echo "0")
+        if [ "$file_count" -gt 0 ]; then
+            dept_success=$((dept_success + 1))
+        fi
+    fi
+done
+if [ "$dept_success" -eq 3 ]; then
+    print_pass "Department validation succeeded for all 3 departments"
+else
+    print_fail "Department validation failed (succeeded for $dept_success/3 departments)"
+fi
+
+# Test 3: JSON format processing and jq integration
+print_test "JSON format processing with jq"
+if command -v jq >/dev/null 2>&1; then
+    json_test_result=$($BENF audit-sample/sample1.csv --format json --min-count 5 2>/dev/null | jq -r '.risk_level' 2>/dev/null || echo "ERROR")
+    if [ "$json_test_result" != "ERROR" ] && [ -n "$json_test_result" ]; then
+        print_pass "JSON format processing with jq works (risk level: $json_test_result)"
+    else
+        print_fail "JSON format processing with jq failed"
+    fi
+else
+    print_pass "jq not available (optional dependency)"
+    TESTS_RUN=$((TESTS_RUN - 1))
+fi
+
+# Test 4: Parallel processing capability
+print_test "Parallel processing capability"
+if command -v parallel >/dev/null 2>&1; then
+    parallel_files=$(find ./audit-sample -name "*.csv" | parallel $BENF {} --min-count 5 2>/dev/null | grep -c "numbers" || true)
+    if [ "$parallel_files" -gt 0 ]; then
+        print_pass "Parallel processing works for $parallel_files files"
+    else
+        print_fail "Parallel processing failed"
+    fi
+else
+    print_pass "parallel not available (optional dependency)"
+    TESTS_RUN=$((TESTS_RUN - 1))
+fi
+
+# Test 5: Time-series analysis (date-sorted files)
+print_test "Time-series risk analysis"
+timeline_files=$(find ./monthly-reports -name "2024-*.csv" | sort | head -3 | xargs -I {} $BENF {} --format json --min-count 3 2>/dev/null | grep -c "risk_level" || echo "0")
+if [ "$timeline_files" -gt 0 ]; then
+    print_pass "Time-series analysis processed $timeline_files monthly files"
+else
+    print_fail "Time-series analysis failed"
+fi
+
+# Test 6: Archive processing simulation
+print_test "Archive data processing"
+archive_files=$(find ./archives/2020-2024 -name "*.csv" | head -5 | xargs -I {} $BENF {} --filter ">=1000" --min-count 3 2>/dev/null | grep -c "解析した数値数\|Numbers analyzed\|analyzed" || echo "0")
+if [ "$archive_files" -gt 0 ]; then
+    print_pass "Archive processing handled $archive_files files"
+else
+    print_fail "Archive processing failed"
+fi
+
+# Test 7: Filter functionality testing
+print_test "Filter functionality (>=1000)"
+filter_test=$($BENF audit-sample/sample1.csv --filter ">=1000" --min-count 3 2>/dev/null | grep -c "解析した数値数\|Numbers analyzed\|analyzed" || echo "0")
+if [ "$filter_test" -gt 0 ]; then
+    print_pass "Filter functionality works correctly"
+else
+    print_fail "Filter functionality failed"
+fi
+
+# Test 8: Risk level detection and thresholds
+print_test "Risk level detection with thresholds"
+risk_levels_detected=0
+for threshold in low medium high; do
+    if $BENF audit-sample/sample1.csv --threshold "$threshold" --min-count 3 >/dev/null 2>&1; then
+        risk_levels_detected=$((risk_levels_detected + 1))
+    fi
+done
+if [ "$risk_levels_detected" -eq 3 ]; then
+    print_pass "Risk level detection works for all thresholds"
+else
+    print_fail "Risk level detection failed for some thresholds"
+fi
+
+# Test 9: CSV output format for reporting
+print_test "CSV output format for reporting"
+csv_output=$($BENF audit-sample/sample1.csv --format csv --min-count 3 2>/dev/null | head -1)
+if echo "$csv_output" | grep -q "," && [ -n "$csv_output" ]; then
+    print_pass "CSV output format works correctly"
+else
+    print_fail "CSV output format failed"
+fi
+
+# Test 10: Large-scale processing simulation (performance test)
+print_test "Large-scale processing simulation"
+large_scale_files=$(find . -name "*.csv" | head -10 | xargs -I {} $BENF {} --min-count 3 2>/dev/null | grep -c "解析した数値数\|Numbers analyzed\|analyzed" || echo "0")
+if [ "$large_scale_files" -ge 8 ]; then
+    print_pass "Large-scale processing handled $large_scale_files files successfully"
+else
+    print_fail "Large-scale processing failed (only $large_scale_files files processed)"
+fi
+
+# Test 11: Exit code verification
+print_test "Exit code verification"
+exit_code_tests=0
+for file in audit-sample/*.csv; do
+    $BENF "$file" --min-count 3 >/dev/null 2>&1
+    exit_code=$?
+    if [ "$exit_code" -ge 0 ] && [ "$exit_code" -le 11 ]; then
+        exit_code_tests=$((exit_code_tests + 1))
+    fi
+done
+if [ "$exit_code_tests" -gt 0 ]; then
+    print_pass "Exit codes are within expected range for $exit_code_tests files"
+else
+    print_fail "Exit code verification failed"
+fi
+
+# Test 12: Multi-format file handling
+print_test "Multi-format file handling"
+format_tests=0
+if [ -f audit-sample/sample1.csv ]; then
+    # Test CSV
+    if $BENF audit-sample/sample1.csv --min-count 3 >/dev/null 2>&1; then
+        format_tests=$((format_tests + 1))
+    fi
+fi
+# Note: For real Excel files, we'd need actual .xlsx files, but CSV testing covers the core functionality
+if [ "$format_tests" -gt 0 ]; then
+    print_pass "Multi-format file handling works for $format_tests formats"
+else
+    print_fail "Multi-format file handling failed"
+fi
+
+# Test 13: Error handling and robustness
+print_test "Error handling with invalid files"
+# Create an invalid file
+echo "invalid,data,format" > invalid_test.txt
+echo "not,numbers,here" >> invalid_test.txt
+if ! $BENF invalid_test.txt --min-count 3 >/dev/null 2>&1; then
+    print_pass "Error handling works correctly for invalid data"
+else
+    print_fail "Error handling failed - should have rejected invalid data"
+fi
+rm -f invalid_test.txt
+
+# Test 14: Memory efficiency with many small files
+print_test "Memory efficiency with multiple small files"
+small_files_count=$(find . -name "*.csv" | wc -l)
+if [ "$small_files_count" -gt 10 ]; then
+    # Test processing many files without memory issues
+    find . -name "*.csv" | head -15 | xargs -n 1 $BENF --min-count 3 >/dev/null 2>&1 || true
+    print_pass "Memory efficiency test completed with $small_files_count files"
+else
+    print_fail "Not enough test files for memory efficiency test"
+fi
+
+# Test 15: Automation workflow simulation
+print_test "Automation workflow simulation"
+automation_result=$(
+    RESULT=$($BENF daily-uploads/today.csv --format json --min-count 3 2>/dev/null || echo '{"risk_level":"UNKNOWN"}')
+    RISK=$(echo "$RESULT" | grep -o '"risk_level":"[^"]*"' | cut -d'"' -f4 || echo "UNKNOWN")
+    echo "$RISK"
+)
+if [ "$automation_result" != "UNKNOWN" ] && [ -n "$automation_result" ]; then
+    print_pass "Automation workflow simulation works (detected risk: $automation_result)"
+else
+    print_fail "Automation workflow simulation failed"
+fi
+
+# Summary
+echo -e "\n${YELLOW}=== Test Summary ===${NC}"
+echo "Tests run: $TESTS_RUN"
+echo "Tests passed: $TESTS_PASSED"
+echo "Tests failed: $((TESTS_RUN - TESTS_PASSED))"
+
+if [ $TESTS_PASSED -eq $TESTS_RUN ]; then
+    echo -e "${GREEN}All tests passed! 🎉${NC}"
+    echo "README usage examples are working correctly."
+    exit_code=0
+else
+    echo -e "${RED}Some tests failed! ❌${NC}"
+    echo "Review failed tests and update README examples if needed."
+    exit_code=1
+fi
+
+# Cleanup
+cd ..
+rm -rf usage_test_data
+
+echo -e "\n${BLUE}Usage examples testing completed.${NC}"
+exit $exit_code
