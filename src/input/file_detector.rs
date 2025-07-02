@@ -179,10 +179,7 @@ pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Res
                 Ok(numbers)
             }
         },
-        // Future formats - not yet implemented
-        FileFormat::OpenDocument => {
-            Err(crate::BenfError::ParseError(format!("Format {:?} not yet implemented", format)))
-        }
+        FileFormat::OpenDocument => opendocument::parse_opendocument_file(file_path),
     }
 }
 

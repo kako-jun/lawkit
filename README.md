@@ -176,6 +176,65 @@ Priority: URL > File > String > Pipe
 | HTML | .html | Web pages |
 | Text | .txt | Plain text |
 
+## Batch Processing with Unix Tools
+
+Benf follows Unix philosophy and works excellently with standard Unix tools for processing multiple files:
+
+### Process Multiple Files
+```bash
+# Process all Excel files in current directory
+for file in *.xlsx; do benf "$file"; done
+
+# Process files with find
+find ./audit-data -name "*.xlsx" -exec benf {} \;
+
+# Process with xargs for better performance
+find ./audit-data -name "*.xlsx" | xargs -I {} benf {}
+
+# Process in parallel with GNU parallel
+ls *.xlsx | parallel benf {}
+find ./data -name "*.csv" | parallel benf {}
+```
+
+### Generate Reports
+```bash
+# Create CSV report for all files
+find ./data -name "*.xlsx" -exec benf {} --format csv \; > audit_report.csv
+
+# JSON report with jq processing
+find ./data -name "*.csv" | xargs -I {} benf {} --format json | jq -s '.'
+
+# Summary report with risk levels only
+find ./audit -name "*.xlsx" | while read file; do
+    echo -n "$file: "
+    benf "$file" --format json | jq -r '.risk_level'
+done
+```
+
+### Filter and Alert
+```bash
+# Alert on high risk files
+find ./data -name "*.xlsx" | while read file; do
+    if benf "$file" >/dev/null 2>&1; then
+        case $? in
+            10|11) echo "⚠️  HIGH RISK: $file" ;;
+        esac
+    fi
+done
+
+# Generate audit trail
+find ./quarterly-data -name "*.xlsx" | parallel 'echo "File: {} Risk: $(benf {} --format json | jq -r .risk_level)"'
+```
+
+### Performance Optimization
+```bash
+# Process large datasets efficiently
+find ./big-data -name "*.csv" | parallel -j 8 benf {} --filter ">=1000" --format json
+
+# Memory-efficient processing for huge directories
+find ./archives -name "*.xlsx" -print0 | xargs -0 -n 1 -P 4 benf
+```
+
 ## Output
 
 ### Default Output

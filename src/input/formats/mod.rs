@@ -5,6 +5,7 @@ pub mod json_xml;
 pub mod html;
 pub mod word;
 pub mod powerpoint;
+pub mod opendocument;
 
 pub use excel::*;
 pub use pdf::*;
