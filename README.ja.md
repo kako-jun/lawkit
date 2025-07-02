@@ -202,32 +202,171 @@ benf 決算報告書.pdf
 }
 ```
 
-## 実用例
+## 実務での活用例
 
-### 会計監査
+benfはUnix哲学に従い、標準的なUnixツールと組み合わせて複数ファイルの処理に優れています：
+
+### 会計監査ワークフロー
+
 ```bash
-# 売上データの不正チェック
-benf 月次売上.xlsx --threshold high
+# 四半期財務監査 - すべてのExcelレポートをチェック
+find ./2024年第4四半期 -name "*.xlsx" | while read file; do
+    echo "監査中: $file"
+    benf "$file" --filter ">=1000" --threshold critical --verbose
+    echo "---"
+done
 
-# 経費精算の異常検知
-find . -name "*経費*.csv" -exec benf {} \; | grep "高"
+# 月次経費レポートの検証
+for dept in 経理 マーケティング 営業; do
+    echo "部署: $dept"
+    find "./経費/$dept" -name "*.xlsx" -exec benf {} --format json \; | \
+    jq '.risk_level' | sort | uniq -c
+done
+
+# 税務書類の検証（高精度分析）
+find ./税務申告 -name "*.pdf" | parallel benf {} --min-count 50 --format csv | \
+awk -F, '$3=="Critical" {print "🚨 重大:", $1}'
 ```
 
-### リアルタイム監視
-```bash
-# 取引ログの監視
-tail -f 取引ログ.txt | benf --format json | jq 'select(.risk_level == "HIGH")'
-```
+### 自動監視・アラート
 
-### 自動化スクリプト
 ```bash
+# 会計システム出力の日次監視スクリプト
 #!/bin/bash
-# 日次不正検知
-結果=$(benf 日次売上.csv --format json)
-危険度=$(echo $結果 | jq -r '.risk_level')
-if [ "$危険度" = "HIGH" ]; then
-    echo $結果 | mail -s "不正検知アラート" admin@company.com
+ALERT_EMAIL="audit@company.com"
+find /exports/daily -name "*.csv" -newer /var/log/last-benf-check | while read file; do
+    benf "$file" --format json | jq -r 'select(.risk_level=="Critical" or .risk_level=="High") | "\(.dataset): \(.risk_level)"'
+done | mail -s "日次ベンフォード・アラート" $ALERT_EMAIL
+
+# 継続的統合による不正検知
+find ./アップロード済みレポート -name "*.xlsx" -mtime -1 | \
+xargs -I {} sh -c 'benf "$1" || echo "不正アラート: $1" >> /var/log/fraud-alerts.log' _ {}
+
+# inotifyによるリアルタイムフォルダ監視
+inotifywait -m ./financial-uploads -e create --format '%f' | while read file; do
+    if [[ "$file" =~ \.(xlsx|csv|pdf)$ ]]; then
+        echo "$(date): 分析中 $file" >> /var/log/benf-monitor.log
+        benf "./financial-uploads/$file" --threshold high || \
+        echo "$(date): アラート - 疑わしいファイル: $file" >> /var/log/fraud-alerts.log
+    fi
+done
+```
+
+### 大規模データ処理
+
+```bash
+# コンプライアンス監査のための企業ファイルシステム全体処理
+find /corporate-data -type f \( -name "*.xlsx" -o -name "*.csv" -o -name "*.pdf" \) | \
+parallel -j 16 'echo "{}: $(benf {} --format json 2>/dev/null | jq -r .risk_level // "エラー")"' | \
+tee compliance-audit-$(date +%Y%m%d).log
+
+# アーカイブ分析 - 過去データの効率的処理
+find ./アーカイブ/2020-2024 -name "*.xlsx" -print0 | \
+xargs -0 -n 100 -P 8 -I {} benf {} --filter ">=10000" --format csv | \
+awk -F, 'BEGIN{OFS=","} NR>1 && $3~/High|Critical/ {sum++} END{print "高リスクファイル数:", sum}'
+
+# 進捗追跡付きネットワークストレージスキャン
+total_files=$(find /nfs/financial-data -name "*.xlsx" | wc -l)
+find /nfs/financial-data -name "*.xlsx" | nl | while read num file; do
+    echo "[$num/$total_files] 処理中: $(basename "$file")"
+    benf "$file" --format json | jq -r '"ファイル: \(.dataset), リスク: \(.risk_level), 数値数: \(.numbers_analyzed)"'
+done | tee network-scan-report.txt
+```
+
+### 高度なレポート・分析
+
+```bash
+# 部署別リスク分布分析
+for dept in */; do
+    echo "=== 部署: $dept ==="
+    find "$dept" -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r '.risk_level' | sort | uniq -c | awk '{print $2": "$1" ファイル"}'
+    echo
+done
+
+# 時系列リスク分析（日付順ファイル必要）
+find ./月次レポート -name "202[0-4]-*.xlsx" | sort | while read file; do
+    month=$(basename "$file" .xlsx)
+    risk=$(benf "$file" --format json 2>/dev/null | jq -r '.risk_level // "N/A"')
+    echo "$month,$risk"
+done > risk-timeline.csv
+
+# 統計サマリー生成
+{
+    echo "ファイル,リスクレベル,数値数,カイ二乗,p値"
+    find ./監査サンプル -name "*.xlsx" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.numbers_analyzed),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+} > 統計分析.csv
+
+# 期間比較分析
+echo "第3四半期 vs 第4四半期のリスクレベル比較..."
+q3_high=$(find ./2024年第3四半期 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+q4_high=$(find ./2024年第4四半期 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+echo "第3四半期高リスクファイル: $q3_high"
+echo "第4四半期高リスクファイル: $q4_high"
+echo "変化: $((q4_high - q3_high))"
+```
+
+### 他ツールとの連携
+
+```bash
+# データ検証用Gitプレコミットフック
+#!/bin/bash
+# .git/hooks/pre-commit
+changed_files=$(git diff --cached --name-only --diff-filter=A | grep -E '\.(xlsx|csv|pdf)$')
+for file in $changed_files; do
+    if ! benf "$file" --min-count 10 >/dev/null 2>&1; then
+        echo "⚠️  警告: $file に疑わしいデータパターンが含まれている可能性があります"
+        benf "$file" --format json | jq '.risk_level'
+    fi
+done
+
+# データベースインポート検証
+psql -c "COPY suspicious_files FROM STDIN CSV HEADER" <<< $(
+    echo "ファイル名,リスクレベル,カイ二乗,p値"
+    find ./インポートデータ -name "*.csv" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+)
+
+# Slack/Teams webhook連携
+high_risk_files=$(find ./日次アップロード -name "*.xlsx" -mtime -1 | \
+    xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | .dataset')
+
+if [ -n "$high_risk_files" ]; then
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"🚨 高リスクファイルが検出されました:\n$high_risk_files\"}" \
+    $SLACK_WEBHOOK_URL
 fi
+```
+
+### 専門分野での活用
+
+```bash
+# 選挙監査（投票数チェック）
+find ./選挙データ -name "*.csv" | parallel benf {} --min-count 100 --threshold low | \
+grep -E "(HIGH|CRITICAL)" > 選挙異常.txt
+
+# 科学データ検証
+find ./研究データ -name "*.xlsx" | while read file; do
+    lab=$(dirname "$file" | xargs basename)
+    result=$(benf "$file" --format json | jq -r '.risk_level')
+    echo "$lab,$file,$result"
+done | grep -E "(High|Critical)" > データ整合性問題.csv
+
+# サプライチェーン請求書検証
+find ./請求書/2024 -name "*.pdf" | parallel 'vendor=$(dirname {} | xargs basename); benf {} --format json | jq --arg v "$vendor" '"'"'{vendor: $v, file: .dataset, risk: .risk_level}'"'"' > 請求書分析.jsonl
+
+# 保険金請求分析
+find ./請求 -name "*.xlsx" | while read file; do
+    claim_id=$(basename "$file" .xlsx)
+    benf "$file" --filter ">=1000" --format json | \
+    jq --arg id "$claim_id" '{請求ID: $id, リスク評価: .risk_level, 総数値数: .numbers_analyzed}'
+done | jq -s '.' > 請求リスク評価.json
 ```
 
 ## 危険度レベル

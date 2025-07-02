@@ -176,63 +176,175 @@ Priority: URL > File > String > Pipe
 | HTML | .html | Web pages |
 | Text | .txt | Plain text |
 
-## Batch Processing with Unix Tools
+## Real-World Usage Examples
 
 Benf follows Unix philosophy and works excellently with standard Unix tools for processing multiple files:
 
-### Process Multiple Files
+### Financial Audit Workflows
+
 ```bash
-# Process all Excel files in current directory
-for file in *.xlsx; do benf "$file"; done
+# Quarterly financial audit - check all Excel reports
+find ./Q4-2024 -name "*.xlsx" | while read file; do
+    echo "Auditing: $file"
+    benf "$file" --filter ">=1000" --threshold critical --verbose
+    echo "---"
+done
 
-# Process files with find
-find ./audit-data -name "*.xlsx" -exec benf {} \;
+# Monthly expense report validation
+for dept in accounting marketing sales; do
+    echo "Department: $dept"
+    find "./expenses/$dept" -name "*.xlsx" -exec benf {} --format json \; | \
+    jq '.risk_level' | sort | uniq -c
+done
 
-# Process with xargs for better performance
-find ./audit-data -name "*.xlsx" | xargs -I {} benf {}
-
-# Process in parallel with GNU parallel
-ls *.xlsx | parallel benf {}
-find ./data -name "*.csv" | parallel benf {}
+# Tax document verification (high-precision analysis)
+find ./tax-filings -name "*.pdf" | parallel benf {} --min-count 50 --format csv | \
+awk -F, '$3=="Critical" {print "🚨 CRITICAL:", $1}'
 ```
 
-### Generate Reports
+### Automated Monitoring & Alerts
+
 ```bash
-# Create CSV report for all files
-find ./data -name "*.xlsx" -exec benf {} --format csv \; > audit_report.csv
+# Daily monitoring script for accounting system exports
+#!/bin/bash
+ALERT_EMAIL="audit@company.com"
+find /exports/daily -name "*.csv" -newer /var/log/last-benf-check | while read file; do
+    benf "$file" --format json | jq -r 'select(.risk_level=="Critical" or .risk_level=="High") | "\(.dataset): \(.risk_level)"'
+done | mail -s "Daily Benford Alert" $ALERT_EMAIL
 
-# JSON report with jq processing
-find ./data -name "*.csv" | xargs -I {} benf {} --format json | jq -s '.'
+# Continuous integration fraud detection
+find ./uploaded-reports -name "*.xlsx" -mtime -1 | \
+xargs -I {} sh -c 'benf "$1" || echo "FRAUD ALERT: $1" >> /var/log/fraud-alerts.log' _ {}
 
-# Summary report with risk levels only
-find ./audit -name "*.xlsx" | while read file; do
-    echo -n "$file: "
-    benf "$file" --format json | jq -r '.risk_level'
+# Real-time folder monitoring with inotify
+inotifywait -m ./financial-uploads -e create --format '%f' | while read file; do
+    if [[ "$file" =~ \.(xlsx|csv|pdf)$ ]]; then
+        echo "$(date): Analyzing $file" >> /var/log/benf-monitor.log
+        benf "./financial-uploads/$file" --threshold high || \
+        echo "$(date): ALERT - Suspicious file: $file" >> /var/log/fraud-alerts.log
+    fi
 done
 ```
 
-### Filter and Alert
+### Large-Scale Data Processing
+
 ```bash
-# Alert on high risk files
-find ./data -name "*.xlsx" | while read file; do
-    if benf "$file" >/dev/null 2>&1; then
-        case $? in
-            10|11) echo "⚠️  HIGH RISK: $file" ;;
-        esac
+# Process entire corporate filesystem for compliance audit
+find /corporate-data -type f \( -name "*.xlsx" -o -name "*.csv" -o -name "*.pdf" \) | \
+parallel -j 16 'echo "{}: $(benf {} --format json 2>/dev/null | jq -r .risk_level // "ERROR")"' | \
+tee compliance-audit-$(date +%Y%m%d).log
+
+# Archive analysis - process historical data efficiently
+find ./archives/2020-2024 -name "*.xlsx" -print0 | \
+xargs -0 -n 100 -P 8 -I {} benf {} --filter ">=10000" --format csv | \
+awk -F, 'BEGIN{OFS=","} NR>1 && $3~/High|Critical/ {sum++} END{print "High-risk files:", sum}'
+
+# Network storage scanning with progress tracking
+total_files=$(find /nfs/financial-data -name "*.xlsx" | wc -l)
+find /nfs/financial-data -name "*.xlsx" | nl | while read num file; do
+    echo "[$num/$total_files] Processing: $(basename "$file")"
+    benf "$file" --format json | jq -r '"File: \(.dataset), Risk: \(.risk_level), Numbers: \(.numbers_analyzed)"'
+done | tee network-scan-report.txt
+```
+
+### Advanced Reporting & Analytics
+
+```bash
+# Risk distribution analysis across departments
+for dept in */; do
+    echo "=== Department: $dept ==="
+    find "$dept" -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r '.risk_level' | sort | uniq -c | awk '{print $2": "$1" files"}'
+    echo
+done
+
+# Time-series risk analysis (requires date-sorted files)
+find ./monthly-reports -name "202[0-4]-*.xlsx" | sort | while read file; do
+    month=$(basename "$file" .xlsx)
+    risk=$(benf "$file" --format json 2>/dev/null | jq -r '.risk_level // "N/A"')
+    echo "$month,$risk"
+done > risk-timeline.csv
+
+# Statistical summary generation
+{
+    echo "file,risk_level,numbers_count,chi_square,p_value"
+    find ./audit-sample -name "*.xlsx" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.numbers_analyzed),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+} > statistical-analysis.csv
+
+# Comparative analysis between periods
+echo "Comparing Q3 vs Q4 risk levels..."
+q3_high=$(find ./Q3-2024 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+q4_high=$(find ./Q4-2024 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+echo "Q3 high-risk files: $q3_high"
+echo "Q4 high-risk files: $q4_high"
+echo "Change: $((q4_high - q3_high))"
+```
+
+### Integration with Other Tools
+
+```bash
+# Git pre-commit hook for data validation
+#!/bin/bash
+# .git/hooks/pre-commit
+changed_files=$(git diff --cached --name-only --diff-filter=A | grep -E '\.(xlsx|csv|pdf)$')
+for file in $changed_files; do
+    if ! benf "$file" --min-count 10 >/dev/null 2>&1; then
+        echo "⚠️  Warning: $file may contain suspicious data patterns"
+        benf "$file" --format json | jq '.risk_level'
     fi
 done
 
-# Generate audit trail
-find ./quarterly-data -name "*.xlsx" | parallel 'echo "File: {} Risk: $(benf {} --format json | jq -r .risk_level)"'
+# Database import validation
+psql -c "COPY suspicious_files FROM STDIN CSV HEADER" <<< $(
+    echo "filename,risk_level,chi_square,p_value"
+    find ./import-data -name "*.csv" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+)
+
+# Slack/Teams webhook integration
+high_risk_files=$(find ./daily-uploads -name "*.xlsx" -mtime -1 | \
+    xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | .dataset')
+
+if [ -n "$high_risk_files" ]; then
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"🚨 High-risk files detected:\n$high_risk_files\"}" \
+    $SLACK_WEBHOOK_URL
+fi
+
+# Excel macro integration (save as macro-enabled workbook)
+# VBA code to call benf from Excel:
+# Shell "benf """ & ActiveWorkbook.FullName & """ --format json > benf-result.json"
 ```
 
-### Performance Optimization
-```bash
-# Process large datasets efficiently
-find ./big-data -name "*.csv" | parallel -j 8 benf {} --filter ">=1000" --format json
+### Specialized Use Cases
 
-# Memory-efficient processing for huge directories
-find ./archives -name "*.xlsx" -print0 | xargs -0 -n 1 -P 4 benf
+```bash
+# Election audit (checking vote counts)
+find ./election-data -name "*.csv" | parallel benf {} --min-count 100 --threshold low | \
+grep -E "(HIGH|CRITICAL)" > election-anomalies.txt
+
+# Scientific data validation
+find ./research-data -name "*.xlsx" | while read file; do
+    lab=$(dirname "$file" | xargs basename)
+    result=$(benf "$file" --format json | jq -r '.risk_level')
+    echo "$lab,$file,$result"
+done | grep -E "(High|Critical)" > data-integrity-issues.csv
+
+# Supply chain invoice verification
+find ./invoices/2024 -name "*.pdf" | parallel 'vendor=$(dirname {} | xargs basename); benf {} --format json | jq --arg v "$vendor" '"'"'{vendor: $v, file: .dataset, risk: .risk_level}'"'"' > invoice-analysis.jsonl
+
+# Insurance claim analysis  
+find ./claims -name "*.xlsx" | while read file; do
+    claim_id=$(basename "$file" .xlsx)
+    benf "$file" --filter ">=1000" --format json | \
+    jq --arg id "$claim_id" '{claim_id: $id, risk_assessment: .risk_level, total_numbers: .numbers_analyzed}'
+done | jq -s '.' > claims-risk-assessment.json
 ```
 
 ## Output
