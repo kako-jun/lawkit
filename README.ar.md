@@ -218,6 +218,173 @@ benf [OPTIONS] [INPUT]
 }
 ```
 
+## أمثلة الاستخدام الواقعي
+
+Benf يتبع فلسفة Unix ويعمل بامتياز مع أدوات Unix القياسية لمعالجة ملفات متعددة:
+
+### سير عمل التدقيق المالي
+
+```bash
+# التدقيق المالي الفصلي - فحص جميع تقارير Excel
+find ./الربع-الرابع-2024 -name "*.xlsx" | while read file; do
+    echo "تدقيق: $file"
+    benf "$file" --filter ">=1000" --threshold critical --verbose
+    echo "---"
+done
+
+# التحقق من تقارير المصروفات الشهرية
+for dept in المحاسبة التسويق المبيعات; do
+    echo "القسم: $dept"
+    find "./المصروفات/$dept" -name "*.xlsx" -exec benf {} --format json \; | \
+    jq '.risk_level' | sort | uniq -c
+done
+
+# التحقق من الوثائق الضريبية (تحليل عالي الدقة)
+find ./الإقرارات-الضريبية -name "*.pdf" | parallel benf {} --min-count 50 --format csv | \
+awk -F, '$3=="Critical" {print "🚨 حرج:", $1}'
+```
+
+### المراقبة التلقائية والتنبيهات
+
+```bash
+# سكريبت المراقبة اليومية لصادرات نظام المحاسبة
+#!/bin/bash
+ALERT_EMAIL="audit@company.com"
+find /exports/daily -name "*.csv" -newer /var/log/last-benf-check | while read file; do
+    benf "$file" --format json | jq -r 'select(.risk_level=="Critical" or .risk_level=="High") | "\(.dataset): \(.risk_level)"'
+done | mail -s "تنبيه بنفورد اليومي" $ALERT_EMAIL
+
+# اكتشاف الاحتيال بالتكامل المستمر
+find ./التقارير-المرفوعة -name "*.xlsx" -mtime -1 | \
+xargs -I {} sh -c 'benf "$1" || echo "تنبيه احتيال: $1" >> /var/log/fraud-alerts.log' _ {}
+
+# مراقبة المجلد في الوقت الفعلي باستخدام inotify
+inotifywait -m ./الرفع-المالي -e create --format '%f' | while read file; do
+    if [[ "$file" =~ \.(xlsx|csv|pdf)$ ]]; then
+        echo "$(date): تحليل $file" >> /var/log/benf-monitor.log
+        benf "./الرفع-المالي/$file" --threshold high || \
+        echo "$(date): تنبيه - ملف مشبوه: $file" >> /var/log/fraud-alerts.log
+    fi
+done
+```
+
+### معالجة البيانات واسعة النطاق
+
+```bash
+# معالجة نظام الملفات المؤسسي بالكامل لتدقيق الامتثال
+find /corporate-data -type f \( -name "*.xlsx" -o -name "*.csv" -o -name "*.pdf" \) | \
+parallel -j 16 'echo "{}: $(benf {} --format json 2>/dev/null | jq -r .risk_level // "خطأ")"' | \
+tee compliance-audit-$(date +%Y%m%d).log
+
+# تحليل الأرشيف - معالجة البيانات التاريخية بكفاءة
+find ./الأرشيف/2020-2024 -name "*.xlsx" -print0 | \
+xargs -0 -n 100 -P 8 -I {} benf {} --filter ">=10000" --format csv | \
+awk -F, 'BEGIN{OFS=","} NR>1 && $3~/High|Critical/ {sum++} END{print "ملفات عالية المخاطر:", sum}'
+
+# مسح التخزين الشبكي مع تتبع التقدم
+total_files=$(find /nfs/financial-data -name "*.xlsx" | wc -l)
+find /nfs/financial-data -name "*.xlsx" | nl | while read num file; do
+    echo "[$num/$total_files] معالجة: $(basename "$file")"
+    benf "$file" --format json | jq -r '"ملف: \(.dataset), مخاطر: \(.risk_level), أرقام: \(.numbers_analyzed)"'
+done | tee network-scan-report.txt
+```
+
+### التقارير والتحليلات المتقدمة
+
+```bash
+# تحليل توزيع المخاطر عبر الأقسام
+for dept in */; do
+    echo "=== القسم: $dept ==="
+    find "$dept" -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r '.risk_level' | sort | uniq -c | awk '{print $2": "$1" ملفات"}'
+    echo
+done
+
+# تحليل مخاطر السلاسل الزمنية (يتطلب ملفات مرتبة حسب التاريخ)
+find ./التقارير-الشهرية -name "202[0-4]-*.xlsx" | sort | while read file; do
+    month=$(basename "$file" .xlsx)
+    risk=$(benf "$file" --format json 2>/dev/null | jq -r '.risk_level // "غير متاح"')
+    echo "$month,$risk"
+done > risk-timeline.csv
+
+# إنشاء ملخص إحصائي
+{
+    echo "ملف,مستوى_المخاطر,عدد_الأرقام,كاي_مربع,قيمة_p"
+    find ./عينة-التدقيق -name "*.xlsx" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.numbers_analyzed),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+} > التحليل-الإحصائي.csv
+
+# التحليل المقارن بين الفترات
+echo "مقارنة مستويات المخاطر الربع الثالث مقابل الرابع..."
+q3_high=$(find ./الربع-الثالث-2024 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+q4_high=$(find ./الربع-الرابع-2024 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+echo "ملفات عالية المخاطر الربع الثالث: $q3_high"
+echo "ملفات عالية المخاطر الربع الرابع: $q4_high"
+echo "التغيير: $((q4_high - q3_high))"
+```
+
+### التكامل مع أدوات أخرى
+
+```bash
+# خطاف Git ما قبل الالتزام للتحقق من البيانات
+#!/bin/bash
+# .git/hooks/pre-commit
+changed_files=$(git diff --cached --name-only --diff-filter=A | grep -E '\.(xlsx|csv|pdf)$')
+for file in $changed_files; do
+    if ! benf "$file" --min-count 10 >/dev/null 2>&1; then
+        echo "⚠️  تحذير: $file قد يحتوي على أنماط بيانات مشبوهة"
+        benf "$file" --format json | jq '.risk_level'
+    fi
+done
+
+# التحقق من استيراد قاعدة البيانات
+psql -c "COPY suspicious_files FROM STDIN CSV HEADER" <<< $(
+    echo "اسم_الملف,مستوى_المخاطر,كاي_مربع,قيمة_p"
+    find ./بيانات-الاستيراد -name "*.csv" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+)
+
+# تكامل Slack/Teams webhook
+high_risk_files=$(find ./الرفع-اليومي -name "*.xlsx" -mtime -1 | \
+    xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | .dataset')
+
+if [ -n "$high_risk_files" ]; then
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"🚨 تم اكتشاف ملفات عالية المخاطر:\n$high_risk_files\"}" \
+    $SLACK_WEBHOOK_URL
+fi
+```
+
+### حالات الاستخدام المتخصصة
+
+```bash
+# تدقيق الانتخابات (فحص أعداد الأصوات)
+find ./بيانات-الانتخابات -name "*.csv" | parallel benf {} --min-count 100 --threshold low | \
+grep -E "(HIGH|CRITICAL)" > شذوذ-الانتخابات.txt
+
+# التحقق من البيانات العلمية
+find ./بيانات-البحث -name "*.xlsx" | while read file; do
+    lab=$(dirname "$file" | xargs basename)
+    result=$(benf "$file" --format json | jq -r '.risk_level')
+    echo "$lab,$file,$result"
+done | grep -E "(High|Critical)" > مشاكل-سلامة-البيانات.csv
+
+# التحقق من فواتير سلسلة التوريد
+find ./الفواتير/2024 -name "*.pdf" | parallel 'vendor=$(dirname {} | xargs basename); benf {} --format json | jq --arg v "$vendor" '"'"'{vendor: $v, file: .dataset, risk: .risk_level}'"'"' > تحليل-الفواتير.jsonl
+
+# تحليل مطالبات التأمين
+find ./المطالبات -name "*.xlsx" | while read file; do
+    claim_id=$(basename "$file" .xlsx)
+    benf "$file" --filter ">=1000" --format json | \
+    jq --arg id "$claim_id" '{معرف_المطالبة: $id, تقييم_المخاطر: .risk_level, إجمالي_الأرقام: .numbers_analyzed}'
+done | jq -s '.' > تقييم-مخاطر-المطالبات.json
+```
+
 ## أمثلة
 
 ### اكتشاف الاحتيال
