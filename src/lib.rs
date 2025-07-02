@@ -6,4 +6,4 @@ pub mod error;
 pub use core::*;
 pub use error::*;
 
-pub const VERSION: &str = "0.1.0";
+pub const VERSION: &str = "1.0.0";

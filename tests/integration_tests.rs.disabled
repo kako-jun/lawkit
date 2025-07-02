@@ -28,7 +28,7 @@ mod cli_integration_tests {
         assert!(stdout.contains("benf"));
         assert!(stdout.contains("Benford"));
         assert!(stdout.contains("--format"));
-        assert!(stdout.contains("--url"));
+        // assert!(stdout.contains("--url")); // URL functionality removed
     }
 
     #[test]
@@ -38,7 +38,7 @@ mod cli_integration_tests {
         
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("benf"));
-        assert!(stdout.contains("0.1.0"));
+        assert!(stdout.contains("1.0.0"));
     }
 
     #[test]
@@ -98,7 +98,7 @@ mod cli_integration_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         // Check for either English or Japanese output (depends on system locale)
         assert!(stdout.contains("Numbers analyzed") || stdout.contains("解析した数値数"));
-        assert!(stdout.contains("Risk Level") || stdout.contains("リスクレベル"));
+        assert!(stdout.contains("Attention Level") || stdout.contains("注意レベル"));
     }
 
     #[test]
@@ -362,6 +362,7 @@ amount = 234.56
 }
 
 #[cfg(test)]
+#[cfg(feature = "url")] // Disabled since URL functionality was removed
 mod url_integration_tests {
     use super::*;
     use mockito::Server;
