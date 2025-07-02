@@ -1,72 +1,20 @@
 use clap::{Arg, Command};
 use benf::{
     core::{RiskLevel, BenfordResult, NumberFilter, RiskThreshold, apply_number_filter},
-    input::{parse_input_auto, parse_text_input, formats::html::parse_html_content},
+    input::{parse_input_auto, parse_text_input},
     BenfError, Result,
     VERSION
 };
 use std::io::{self, Read};
-use std::time::Duration;
 
-/// HTTP request configuration options
-#[derive(Debug, Clone)]
-struct HttpOptions {
-    proxy: Option<String>,
-    insecure: bool,
-    timeout: Duration,
-    user_agent: String,
-}
 
-impl HttpOptions {
-    fn from_matches(matches: &clap::ArgMatches) -> std::result::Result<Self, String> {
-        let proxy = matches.get_one::<String>("proxy").cloned();
-        let insecure = matches.get_flag("insecure");
-        
-        let timeout_secs = matches.get_one::<String>("timeout")
-            .unwrap()
-            .parse::<u64>()
-            .map_err(|_| "無効なタイムアウト値".to_string())?;
-        
-        // Validate timeout range
-        if timeout_secs == 0 {
-            return Err("タイムアウトは0より大きい値にしてください".to_string());
-        }
-        if timeout_secs > 3600 {
-            return Err("タイムアウトは1時間以下にしてください".to_string());
-        }
-        
-        let timeout = Duration::from_secs(timeout_secs);
-        
-        let user_agent = matches.get_one::<String>("user-agent")
-            .unwrap()
-            .clone();
-        
-        // Validate User-Agent
-        if user_agent.is_empty() {
-            return Err("User-Agentは空にできません".to_string());
-        }
-        
-        Ok(HttpOptions {
-            proxy,
-            insecure,
-            timeout,
-            user_agent,
-        })
-    }
-}
-
-#[tokio::main]
-async fn main() {
+fn main() {
     let matches = Command::new("benf")
         .version(VERSION)
         .about("A CLI tool for detecting anomalies using Benford's Law with international numeral support")
         .arg(Arg::new("input")
-            .help("Input data (file path, URL, or string)")
+            .help("Input data (file path or string)")
             .index(1))
-        .arg(Arg::new("url")
-            .long("url")
-            .value_name("URL")
-            .help("Fetch data from URL"))
         .arg(Arg::new("format")
             .long("format")
             .value_name("FORMAT")
@@ -102,77 +50,10 @@ async fn main() {
             .value_name("NUMBER")
             .help("Minimum number of data points required for analysis")
             .default_value("5"))
-        .arg(Arg::new("proxy")
-            .long("proxy")
-            .value_name("URL")
-            .help("HTTP proxy server URL (e.g., http://proxy.example.com:8080)"))
-        .arg(Arg::new("insecure")
-            .long("insecure")
-            .help("Skip SSL certificate verification (use with caution)")
-            .action(clap::ArgAction::SetTrue))
-        .arg(Arg::new("timeout")
-            .long("timeout")
-            .value_name("SECONDS")
-            .help("Request timeout in seconds")
-            .default_value("30"))
-        .arg(Arg::new("user-agent")
-            .long("user-agent")
-            .value_name("STRING")
-            .help("Custom User-Agent header")
-            .default_value("benf-cli/0.1.0"))
         .get_matches();
 
     // Determine input source based on arguments
-    if let Some(url) = matches.get_one::<String>("url") {
-        // Parse HTTP options
-        let http_options = match HttpOptions::from_matches(&matches) {
-            Ok(options) => options,
-            Err(e) => {
-                eprintln!("HTTPオプションエラー: {}", e);
-                std::process::exit(2);
-            }
-        };
-        
-        // Fetch URL content and analyze
-        match fetch_url_content(url, &http_options).await {
-            Ok(content) => {
-                if content.trim().is_empty() {
-                    eprintln!("Error: No content from URL: {}", url);
-                    std::process::exit(2);
-                }
-                
-                // Parse HTML content from URL
-                let numbers = match parse_html_content(&content) {
-                    Ok(numbers) => numbers,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
-                
-                // Apply filtering and custom analysis
-                let result = match analyze_numbers_with_options(&matches, url.to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
-
-                // Output results and exit
-                output_results(&matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error fetching URL '{}': {}", url, e);
-                std::process::exit(1);
-            }
-        }
-    } else if let Some(input) = matches.get_one::<String>("input") {
+    if let Some(input) = matches.get_one::<String>("input") {
         // Use auto-detection for file vs string input
         match parse_input_auto(input) {
             Ok(numbers) => {
@@ -300,7 +181,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "analysis_results") => "Benford's Law Analysis Results",
         ("en", "dataset") => "Dataset",
         ("en", "numbers_analyzed") => "Numbers analyzed",
-        ("en", "risk_level") => "Risk Level",
+        ("en", "risk_level") => "Attention Level",
         ("en", "digit_distribution") => "First Digit Distribution",
         ("en", "expected") => "expected",
         ("en", "deviation") => "deviation",
@@ -312,7 +193,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "normal_distribution") => "✅ Normal distribution - data appears natural",
         ("en", "slight_deviation") => "⚠️  Slight deviation - worth monitoring",
         ("en", "significant_deviation") => "🚨 Significant deviation - potential anomaly detected",
-        ("en", "critical_deviation") => "💀 Critical deviation - strong evidence of manipulation",
+        ("en", "critical_deviation") => "🔍 Significant attention needed - strong evidence of patterns",
         ("en", "unsupported_format") => "Error: Unsupported output format",
         ("en", "no_numbers_found") => "Error: No valid numbers found in input",
         ("en", "analysis_error") => "Analysis error",
@@ -321,7 +202,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "analysis_results") => "ベンフォードの法則解析結果",
         ("ja", "dataset") => "データセット",
         ("ja", "numbers_analyzed") => "解析した数値数",
-        ("ja", "risk_level") => "リスクレベル",
+        ("ja", "risk_level") => "注意レベル",
         ("ja", "digit_distribution") => "先頭桁分布",
         ("ja", "expected") => "期待値",
         ("ja", "deviation") => "偏差",
@@ -333,7 +214,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "normal_distribution") => "✅ 正常な分布 - データは自然に見えます",
         ("ja", "slight_deviation") => "⚠️  軽微な偏差 - 監視が必要です",
         ("ja", "significant_deviation") => "🚨 有意な偏差 - 異常の可能性があります", 
-        ("ja", "critical_deviation") => "💀 致命的偏差 - 操作の強い証拠",
+        ("ja", "critical_deviation") => "🔍 特に注意が必要 - パターンの強い証拠",
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
@@ -342,7 +223,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("zh", "analysis_results") => "本福德定律分析结果",
         ("zh", "dataset") => "数据集",
         ("zh", "numbers_analyzed") => "分析的数字数量",
-        ("zh", "risk_level") => "风险等级",
+        ("zh", "risk_level") => "注意等级",
         ("zh", "digit_distribution") => "首位数字分布",
         ("zh", "expected") => "预期",
         ("zh", "deviation") => "偏差",
@@ -354,7 +235,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("zh", "normal_distribution") => "✅ 正常分布 - 数据看起来自然",
         ("zh", "slight_deviation") => "⚠️  轻微偏差 - 需要监测",
         ("zh", "significant_deviation") => "🚨 显著偏差 - 可能存在异常",
-        ("zh", "critical_deviation") => "💀 严重偏差 - 有操作的强烈证据",
+        ("zh", "critical_deviation") => "🔍 需要特别注意 - 模式的强烈证据",
         ("zh", "unsupported_format") => "错误: 不支持的输出格式",
         ("zh", "no_numbers_found") => "错误: 输入中未找到有效数字",
         ("zh", "analysis_error") => "分析错误",
@@ -363,7 +244,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("hi", "analysis_results") => "बेनफोर्ड के नियम का विश्लेषण परिणाम",
         ("hi", "dataset") => "डेटासेट",
         ("hi", "numbers_analyzed") => "विश्लेषित संख्याएँ",
-        ("hi", "risk_level") => "जोखिम स्तर",
+        ("hi", "risk_level") => "ध्यान स्तर",
         ("hi", "digit_distribution") => "पहले अंक का वितरण",
         ("hi", "expected") => "अपेक्षित",
         ("hi", "deviation") => "विचलन",
@@ -375,7 +256,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("hi", "normal_distribution") => "✅ सामान्य वितरण - डेटा प्राकृतिक दिखता है",
         ("hi", "slight_deviation") => "⚠️  हल्का विचलन - निगरानी आवश्यक",
         ("hi", "significant_deviation") => "🚨 महत्वपूर्ण विचलन - संभावित असामान्यता",
-        ("hi", "critical_deviation") => "💀 गंभीर विचलन - हेराफेरी का मजबूत प्रमाण",
+        ("hi", "critical_deviation") => "🔍 विशेष ध्यान आवश्यक - पैटर्न का मजबूत प्रमाण",
         ("hi", "unsupported_format") => "त्रुटि: असमर्थित आउटपुट प्रारूप",
         ("hi", "no_numbers_found") => "त्रुटि: इनपुट में कोई वैध संख्या नहीं मिली",
         ("hi", "analysis_error") => "विश्लेषण त्रुटि",
@@ -384,7 +265,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ar", "analysis_results") => "نتائج تحليل قانون بنفورد",
         ("ar", "dataset") => "مجموعة البيانات",
         ("ar", "numbers_analyzed") => "الأرقام المحللة",
-        ("ar", "risk_level") => "مستوى المخاطر",
+        ("ar", "risk_level") => "مستوى الانتباه",
         ("ar", "digit_distribution") => "توزيع الرقم الأول",
         ("ar", "expected") => "متوقع",
         ("ar", "deviation") => "انحراف",
@@ -396,7 +277,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ar", "normal_distribution") => "✅ توزيع طبيعي - البيانات تبدو طبيعية",
         ("ar", "slight_deviation") => "⚠️  انحراف طفيف - يستحق المراقبة",
         ("ar", "significant_deviation") => "🚨 انحراف كبير - شذوذ محتمل مكتشف",
-        ("ar", "critical_deviation") => "💀 انحراف حرج - دليل قوي على التلاعب",
+        ("ar", "critical_deviation") => "🔍 يحتاج انتباه خاص - دليل قوي على الأنماط",
         ("ar", "unsupported_format") => "خطأ: تنسيق الإخراج غير مدعوم",
         ("ar", "no_numbers_found") => "خطأ: لم يتم العثور على أرقام صحيحة في الإدخال",
         ("ar", "analysis_error") => "خطأ في التحليل",
@@ -405,7 +286,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         (_, "analysis_results") => "Benford's Law Analysis Results",
         (_, "dataset") => "Dataset",
         (_, "numbers_analyzed") => "Numbers analyzed",
-        (_, "risk_level") => "Risk Level",
+        (_, "risk_level") => "Attention Level",
         (_, "digit_distribution") => "First Digit Distribution",
         (_, "expected") => "expected",
         (_, "deviation") => "deviation",
@@ -417,7 +298,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         (_, "normal_distribution") => "✅ Normal distribution - data appears natural",
         (_, "slight_deviation") => "⚠️  Slight deviation - worth monitoring",
         (_, "significant_deviation") => "🚨 Significant deviation - potential anomaly detected",
-        (_, "critical_deviation") => "💀 Critical deviation - strong evidence of manipulation",
+        (_, "critical_deviation") => "🔍 Significant attention needed - strong evidence of patterns",
         (_, "unsupported_format") => "Error: Unsupported output format",
         (_, "no_numbers_found") => "Error: No valid numbers found in input",
         (_, "analysis_error") => "Analysis error",
@@ -607,9 +488,9 @@ fn print_xml_output(result: &BenfordResult) {
 fn get_risk_emoji(risk: &RiskLevel) -> &'static str {
     match risk {
         RiskLevel::Low => "✅",
-        RiskLevel::Medium => "⚠️",
-        RiskLevel::High => "🚨",
-        RiskLevel::Critical => "💀",
+        RiskLevel::Medium => "👀",
+        RiskLevel::High => "🔍",
+        RiskLevel::Critical => "⚠️",
     }
 }
 
@@ -674,36 +555,4 @@ fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String
     BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
 }
 
-async fn fetch_url_content(url: &str, options: &HttpOptions) -> std::result::Result<String, reqwest::Error> {
-    let mut client_builder = reqwest::Client::builder()
-        .timeout(options.timeout)
-        .user_agent(&options.user_agent);
-    
-    // Configure SSL certificate verification
-    if options.insecure {
-        client_builder = client_builder.danger_accept_invalid_certs(true);
-    }
-    
-    // Configure proxy if specified
-    if let Some(proxy_url) = &options.proxy {
-        match reqwest::Proxy::all(proxy_url) {
-            Ok(proxy) => {
-                client_builder = client_builder.proxy(proxy);
-            }
-            Err(e) => {
-                eprintln!("プロキシ設定エラー: {}", e);
-                return Err(e);
-            }
-        }
-    }
-    
-    let client = client_builder.build()?;
-    let response = client.get(url).send().await?;
-    
-    if response.status().is_success() {
-        let text = response.text().await?;
-        Ok(text)
-    } else {
-        Err(reqwest::Error::from(response.error_for_status().unwrap_err()))
-    }
-}
+

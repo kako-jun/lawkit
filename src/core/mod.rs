@@ -12,10 +12,10 @@ pub use filtering::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum RiskLevel {
-    Low,      // p > 0.1
-    Medium,   // 0.05 < p ≤ 0.1
-    High,     // 0.01 < p ≤ 0.05
-    Critical, // p ≤ 0.01
+    Low,        // p > 0.1 - Normal distribution
+    Medium,     // 0.05 < p ≤ 0.1 - Moderate attention
+    High,       // 0.01 < p ≤ 0.05 - Notable deviation
+    Critical,   // p ≤ 0.01 - Significant attention needed
 }
 
 impl RiskLevel {

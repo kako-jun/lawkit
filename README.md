@@ -118,8 +118,8 @@ Download from [releases page](https://github.com/kako-jun/benf/releases)
 # Analyze CSV file
 benf data.csv
 
-# Analyze website data
-benf --url https://example.com/financial-report
+# Analyze website data with curl
+curl -s https://example.com/financial-report | benf
 
 # Pipe data
 echo "123 456 789 101112" | benf
@@ -137,27 +137,23 @@ benf [OPTIONS] [INPUT]
 
 ### Input Methods
 1. **File path**: `benf financial_data.xlsx`
-2. **URL**: `benf --url https://api.example.com/data`
+2. **Web data with curl**: `curl -s https://api.example.com/data | benf`
 3. **String**: `benf "123 456 789 101112"`
 4. **Pipe**: `cat data.txt | benf`
 
-Priority: URL > File > String > Pipe
+Priority: File > String > Pipe
 
 ### Options
 
 | Option | Description |
 |--------|-------------|
-| `--url <URL>` | Fetch data from URL |
 | `--format <FORMAT>` | Output format: text, csv, json, yaml, toml, xml |
 | `--quiet` | Minimal output (numbers only) |
 | `--verbose` | Detailed statistics |
 | `--lang <LANGUAGE>` | Output language: en, ja, zh, hi, ar (default: auto) |
 | `--filter <RANGE>` | Filter numbers (e.g., `--filter ">=100"`) |
 | `--threshold <LEVEL>` | Alert threshold: low, medium, high, critical |
-| `--proxy <URL>` | HTTP proxy server |
-| `--insecure` | Skip SSL certificate verification |
-| `--timeout <SECONDS>` | Request timeout (default: 30) |
-| `--log-level <LEVEL>` | Log level: debug, info, warn, error |
+| `--min-count <NUMBER>` | Minimum number of data points required for analysis |
 | `--help, -h` | Show help |
 | `--version, -V` | Show version |
 
@@ -347,6 +343,174 @@ find ./claims -name "*.xlsx" | while read file; do
 done | jq -s '.' > claims-risk-assessment.json
 ```
 
+### Web & API Analysis Integration
+
+```bash
+# Financial API monitoring - real-time fraud detection
+#!/bin/bash
+API_BASE="https://api.company.com"
+ENDPOINTS=("daily-transactions" "expense-reports" "payroll-data")
+
+for endpoint in "${ENDPOINTS[@]}"; do
+    echo "Analyzing $endpoint..."
+    curl -s -H "Authorization: Bearer $API_TOKEN" "$API_BASE/$endpoint" | \
+    benf --format json --min-count 10 | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | 
+           "🚨 \(.dataset): \(.risk_level) risk (\(.numbers_analyzed) numbers)"'
+done
+
+# Stock market data validation
+curl -s "https://api.stockdata.com/v1/data?symbol=AAPL&period=1y" | \
+jq '.prices[]' | benf --format json | \
+jq 'if .risk_level == "Critical" then "⚠️ Unusual price pattern detected" else "✅ Normal price distribution" end'
+
+# Government data integrity checking
+curl -s "https://data.gov/api/financial/spending?year=2024" | \
+benf --filter ">=1000" --format csv | \
+awk -F, '$3=="Critical" {print "Department:", $1, "Risk:", $3}'
+
+# Cryptocurrency exchange analysis
+for exchange in binance coinbase kraken; do
+    echo "Checking $exchange volume data..."
+    curl -s "https://api.$exchange.com/v1/ticker/24hr" | \
+    jq -r '.[].volume' | benf --min-count 20 --format json | \
+    jq --arg ex "$exchange" '{exchange: $ex, risk: .risk_level, numbers: .numbers_analyzed}'
+done | jq -s '.'
+
+# Banking API compliance monitoring
+#!/bin/bash
+BANKS=("bank1.api.com" "bank2.api.com" "bank3.api.com")
+DATE=$(date +%Y-%m-%d)
+
+{
+    echo "bank,endpoint,risk_level,chi_square,p_value,timestamp"
+    for bank in "${BANKS[@]}"; do
+        for endpoint in deposits withdrawals transfers; do
+            result=$(curl -s "https://$bank/$endpoint?date=$DATE" | benf --format json 2>/dev/null)
+            if [ $? -eq 0 ]; then
+                echo "$result" | jq -r --arg bank "$bank" --arg ep "$endpoint" \
+                '"\($bank),\($ep),\(.risk_level),\(.statistics.chi_square),\(.statistics.p_value),\(now)"'
+            fi
+        done
+    done
+} > banking-compliance-$(date +%Y%m%d).csv
+
+# E-commerce fraud detection pipeline
+curl -s "https://api.ecommerce.com/orders/today" | \
+jq -r '.orders[].total_amount' | \
+benf --threshold critical --format json | \
+if jq -e '.risk_level == "Critical"' >/dev/null; then
+    # Alert webhook
+    curl -X POST "https://alerts.company.com/webhook" \
+    -H "Content-Type: application/json" \
+    -d '{"alert": "Critical fraud pattern in daily orders", "timestamp": "'$(date -Iseconds)'"}'
+fi
+
+# International data source aggregation
+declare -A REGIONS=([us]="api.us.finance.com" [eu]="api.eu.finance.com" [asia]="api.asia.finance.com")
+for region in "${!REGIONS[@]}"; do
+    echo "Processing $region region..."
+    curl -s "https://${REGIONS[$region]}/financial-data" | \
+    benf --format json | \
+    jq --arg region "$region" '{region: $region, risk: .risk_level, timestamp: now}'
+done | jq -s 'group_by(.region) | map({region: .[0].region, risk_levels: [.[].risk] | group_by(.) | map({risk: .[0], count: length})})'
+```
+
+### Advanced GNU parallel Integration
+
+GNU parallel provides powerful features for high-performance batch processing:
+
+```bash
+# High-performance parallel processing with load balancing
+find /massive-dataset -name "*.xlsx" | \
+parallel -j+0 --eta --bar 'benf {} --format json | jq -r "\(.dataset),\(.risk_level)"' | \
+sort | uniq -c | sort -nr > risk-summary.csv
+
+# Dynamic load adjustment based on system resources
+find ./financial-data -name "*.xlsx" | \
+parallel --load 80% --noswap 'benf {} --format json --min-count 10' | \
+jq -s 'group_by(.risk_level) | map({risk: .[0].risk_level, count: length})'
+
+# Progress monitoring with ETA and throughput stats
+find /audit-files -name "*.csv" | \
+parallel --progress --eta --joblog parallel-audit.log \
+'benf {} --threshold critical --format json | jq -r "select(.risk_level==\"Critical\") | .dataset"'
+
+# Retry failed jobs automatically
+find ./suspicious-files -name "*.xlsx" | \
+parallel --retries 3 --joblog failed-jobs.log \
+'timeout 30 benf {} --format json || echo "FAILED: {}"'
+
+# Distribute work across multiple machines (SSH)
+find /shared-storage -name "*.xlsx" | \
+parallel --sshloginfile servers.txt --transfer --return audit-{/}.json \
+'benf {} --format json > audit-{/}.json'
+
+# Memory-conscious processing for large datasets
+find /enterprise-data -name "*.xlsx" | \
+parallel --memfree 1G --delay 0.1 \
+'benf {} --format csv | awk -F, "$3==\"Critical\" {print}"' | \
+tee critical-findings.csv
+
+# Smart workload distribution with different file types
+{
+    find ./reports -name "*.xlsx" | sed 's/$/ xlsx/'
+    find ./reports -name "*.pdf" | sed 's/$/ pdf/'
+    find ./reports -name "*.csv" | sed 's/$/ csv/'
+} | parallel --colsep ' ' --header : --tag \
+'echo "Processing {1} ({2})"; benf {1} --format json | jq -r .risk_level'
+
+# Resource-aware batch processing with custom slots
+find ./quarterly-data -name "*.xlsx" | \
+parallel --jobs 50% --max-replace-args 1 --max-chars 1000 \
+'benf {} --format json 2>/dev/null | jq -c "select(.risk_level==\"High\" or .risk_level==\"Critical\")"' | \
+jq -s '. | group_by(.dataset) | map(.[0])' > high-risk-summary.json
+
+# Complex pipeline with conditional processing
+find ./invoices -name "*.pdf" | \
+parallel 'if benf {} --threshold low --format json | jq -e ".risk_level == \"Critical\"" >/dev/null; then
+    echo "🚨 CRITICAL: {}"
+    benf {} --verbose | mail -s "Critical Invoice Alert: $(basename {})" auditor@company.com
+fi'
+
+# Benchmark and performance optimization
+find ./test-data -name "*.xlsx" | head -100 | \
+parallel --dry-run --joblog performance-test.log \
+'time benf {} --format json' | \
+parallel --joblog performance-actual.log \
+'benf {} --format json' && \
+echo "Performance analysis:" && \
+awk '{sum+=$4; count++} END {print "Average time:", sum/count, "seconds"}' performance-actual.log
+
+# Advanced filtering and routing based on results
+find ./mixed-data -name "*.xlsx" | \
+parallel --pipe --block 10M --cat \
+'benf --format json | jq -r "
+if .risk_level == \"Critical\" then \"critical/\" + .dataset
+elif .risk_level == \"High\" then \"high/\" + .dataset  
+else \"normal/\" + .dataset
+end"' | \
+while read dest; do mkdir -p "$(dirname "$dest")"; done
+
+# Cross-platform compatibility testing
+find ./samples -name "*.xlsx" | \
+parallel --env PATH --sshlogin :,windows-server,mac-server \
+'benf {} --format json | jq -r ".risk_level + \": \" + .dataset"' | \
+sort | uniq -c
+```
+
+**Key GNU parallel Features Leveraged:**
+
+- **`--eta`**: Shows estimated completion time
+- **`--progress`**: Real-time progress bar  
+- **`--load 80%`**: CPU load-aware scheduling
+- **`--memfree 1G`**: Memory-aware processing
+- **`--retries 3`**: Automatic retry for failed jobs
+- **`--sshloginfile`**: Distribute across multiple servers
+- **`--joblog`**: Detailed execution logging
+- **`--bar`**: Visual progress indicator
+- **`-j+0`**: Use all CPU cores optimally
+
 ## Output
 
 ### Default Output
@@ -415,23 +579,67 @@ echo "一千二百三十四 五千六百七十八" | benf
 benf japanese_financial_report.pdf
 ```
 
-### Web Analysis
+### Web Analysis with curl
 ```bash
-# Financial website
-benf --url https://company.com/earnings --format json
+# Financial website analysis
+curl -s https://company.com/earnings | benf --format json
 
-# API endpoint
-benf --url https://api.finance.com/data --proxy http://proxy:8080
+# API endpoint with authentication
+curl -s -H "Authorization: Bearer $TOKEN" https://api.finance.com/data | benf
+
+# Handle redirects and cookies
+curl -sL -b cookies.txt https://secure-reports.company.com/quarterly | benf
+
+# Proxy usage (curl handles all proxy scenarios)
+curl -s --proxy http://proxy:8080 https://api.finance.com/data | benf
+
+# SSL/TLS options
+curl -sk https://self-signed-site.com/data | benf  # Skip cert verification
+curl -s --cacert custom-ca.pem https://internal-api.company.com/data | benf
+
+# Multiple endpoints processing
+for url in api1.com/data api2.com/data api3.com/data; do
+    echo "Processing: $url"
+    curl -s "https://$url" | benf --format json | jq '.risk_level'
+done
+
+# Rate limiting and retries
+curl -s --retry 3 --retry-delay 2 --max-time 30 https://slow-api.com/data | benf
+
+# POST requests with JSON data
+curl -s -X POST -H "Content-Type: application/json" \
+     -d '{"query":"financial_data","format":"numbers"}' \
+     https://api.company.com/search | benf
 ```
 
-### Automation
+### Automation with curl Integration
 ```bash
-# Daily fraud check
+# Daily fraud check from web API
 #!/bin/bash
-RESULT=$(benf daily_sales.csv --format json)
+RESULT=$(curl -s "https://api.company.com/daily-sales" | benf --format json)
 RISK=$(echo $RESULT | jq -r '.risk_level')
 if [ "$RISK" = "HIGH" ]; then
     echo $RESULT | mail -s "Fraud Alert" admin@company.com
+fi
+
+# Multi-source monitoring script
+#!/bin/bash
+for endpoint in sales expenses payroll; do
+    echo "Checking $endpoint..."
+    curl -s "https://api.company.com/$endpoint" | \
+    benf --format json | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | 
+           "ALERT: \(.dataset) shows \(.risk_level) risk"'
+done
+
+# Webhook integration
+#!/bin/bash
+WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+DATA=$(curl -s https://reports.company.com/latest | benf --format json)
+if echo "$DATA" | jq -e '.risk_level == "Critical"' >/dev/null; then
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"🚨 Critical fraud pattern detected in latest report\"}" \
+    "$WEBHOOK_URL"
 fi
 ```
 
@@ -498,14 +706,23 @@ fi
 
 ## Configuration
 
-Benf respects standard environment variables:
-- `HTTP_PROXY` / `HTTPS_PROXY`: Proxy settings
-- `NO_PROXY`: Proxy bypass list
+Benf is designed to work with standard Unix tools. For web data access, use curl with its rich configuration options:
 
-Logs are written to:
-- Linux: `~/.local/state/benf/`
-- macOS: `~/Library/Logs/benf/`
-- Windows: `%APPDATA%\benf\Logs\`
+```bash
+# Proxy configuration (handled by curl)
+export HTTP_PROXY=http://proxy.company.com:8080
+export HTTPS_PROXY=https://proxy.company.com:8080
+export NO_PROXY=localhost,*.internal.com
+
+# Use curl's proxy options directly
+curl -s --proxy http://proxy:8080 https://api.company.com/data | benf
+
+# SSL/TLS configuration
+curl -s --cacert company-ca.pem https://internal-api.com/data | benf
+curl -sk https://self-signed-site.com/data | benf  # Skip verification
+```
+
+Benf itself requires no configuration files or environment variables.
 
 ## Contributing
 
