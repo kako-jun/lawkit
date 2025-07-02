@@ -218,6 +218,173 @@ benf [OPTIONS] [INPUT]
 }
 ```
 
+## 实际应用示例
+
+Benf遵循Unix哲学，与标准Unix工具配合处理多个文件效果极佳：
+
+### 财务审计工作流
+
+```bash
+# 季度财务审计 - 检查所有Excel报告
+find ./2024年第4季度 -name "*.xlsx" | while read file; do
+    echo "审计中: $file"
+    benf "$file" --filter ">=1000" --threshold critical --verbose
+    echo "---"
+done
+
+# 月度费用报告验证
+for dept in 财务部 市场部 销售部; do
+    echo "部门: $dept"
+    find "./费用/$dept" -name "*.xlsx" -exec benf {} --format json \; | \
+    jq '.risk_level' | sort | uniq -c
+done
+
+# 税务文件验证（高精度分析）
+find ./税务申报 -name "*.pdf" | parallel benf {} --min-count 50 --format csv | \
+awk -F, '$3=="Critical" {print "🚨 严重:", $1}'
+```
+
+### 自动监控与警报
+
+```bash
+# 会计系统导出的日常监控脚本
+#!/bin/bash
+ALERT_EMAIL="audit@company.com"
+find /exports/daily -name "*.csv" -newer /var/log/last-benf-check | while read file; do
+    benf "$file" --format json | jq -r 'select(.risk_level=="Critical" or .risk_level=="High") | "\(.dataset): \(.risk_level)"'
+done | mail -s "日常本福德警报" $ALERT_EMAIL
+
+# 持续集成欺诈检测
+find ./上传报告 -name "*.xlsx" -mtime -1 | \
+xargs -I {} sh -c 'benf "$1" || echo "欺诈警报: $1" >> /var/log/fraud-alerts.log' _ {}
+
+# 使用inotify实时文件夹监控
+inotifywait -m ./财务上传 -e create --format '%f' | while read file; do
+    if [[ "$file" =~ \.(xlsx|csv|pdf)$ ]]; then
+        echo "$(date): 分析中 $file" >> /var/log/benf-monitor.log
+        benf "./财务上传/$file" --threshold high || \
+        echo "$(date): 警报 - 可疑文件: $file" >> /var/log/fraud-alerts.log
+    fi
+done
+```
+
+### 大规模数据处理
+
+```bash
+# 企业文件系统合规审计全面处理
+find /corporate-data -type f \( -name "*.xlsx" -o -name "*.csv" -o -name "*.pdf" \) | \
+parallel -j 16 'echo "{}: $(benf {} --format json 2>/dev/null | jq -r .risk_level // "错误")"' | \
+tee compliance-audit-$(date +%Y%m%d).log
+
+# 档案分析 - 高效处理历史数据
+find ./档案/2020-2024 -name "*.xlsx" -print0 | \
+xargs -0 -n 100 -P 8 -I {} benf {} --filter ">=10000" --format csv | \
+awk -F, 'BEGIN{OFS=","} NR>1 && $3~/High|Critical/ {sum++} END{print "高风险文件数:", sum}'
+
+# 带进度跟踪的网络存储扫描
+total_files=$(find /nfs/financial-data -name "*.xlsx" | wc -l)
+find /nfs/financial-data -name "*.xlsx" | nl | while read num file; do
+    echo "[$num/$total_files] 处理中: $(basename "$file")"
+    benf "$file" --format json | jq -r '"文件: \(.dataset), 风险: \(.risk_level), 数字数: \(.numbers_analyzed)"'
+done | tee network-scan-report.txt
+```
+
+### 高级报告与分析
+
+```bash
+# 各部门风险分布分析
+for dept in */; do
+    echo "=== 部门: $dept ==="
+    find "$dept" -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r '.risk_level' | sort | uniq -c | awk '{print $2": "$1" 个文件"}'
+    echo
+done
+
+# 时间序列风险分析（需要按日期排序的文件）
+find ./月度报告 -name "202[0-4]-*.xlsx" | sort | while read file; do
+    month=$(basename "$file" .xlsx)
+    risk=$(benf "$file" --format json 2>/dev/null | jq -r '.risk_level // "N/A"')
+    echo "$month,$risk"
+done > risk-timeline.csv
+
+# 统计摘要生成
+{
+    echo "文件,风险级别,数字数量,卡方值,p值"
+    find ./审计样本 -name "*.xlsx" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.numbers_analyzed),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+} > 统计分析.csv
+
+# 期间比较分析
+echo "第三季度 vs 第四季度风险级别比较..."
+q3_high=$(find ./2024年第3季度 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+q4_high=$(find ./2024年第4季度 -name "*.xlsx" | xargs -I {} benf {} --format json 2>/dev/null | jq -r 'select(.risk_level=="High" or .risk_level=="Critical")' | wc -l)
+echo "第三季度高风险文件: $q3_high"
+echo "第四季度高风险文件: $q4_high"
+echo "变化: $((q4_high - q3_high))"
+```
+
+### 与其他工具集成
+
+```bash
+# 数据验证Git预提交钩子
+#!/bin/bash
+# .git/hooks/pre-commit
+changed_files=$(git diff --cached --name-only --diff-filter=A | grep -E '\.(xlsx|csv|pdf)$')
+for file in $changed_files; do
+    if ! benf "$file" --min-count 10 >/dev/null 2>&1; then
+        echo "⚠️  警告: $file 可能包含可疑数据模式"
+        benf "$file" --format json | jq '.risk_level'
+    fi
+done
+
+# 数据库导入验证
+psql -c "COPY suspicious_files FROM STDIN CSV HEADER" <<< $(
+    echo "文件名,风险级别,卡方值,p值"
+    find ./导入数据 -name "*.csv" | while read file; do
+        benf "$file" --format json 2>/dev/null | \
+        jq -r '"\(.dataset),\(.risk_level),\(.statistics.chi_square),\(.statistics.p_value)"'
+    done
+)
+
+# Slack/Teams webhook集成
+high_risk_files=$(find ./日常上传 -name "*.xlsx" -mtime -1 | \
+    xargs -I {} benf {} --format json 2>/dev/null | \
+    jq -r 'select(.risk_level=="High" or .risk_level=="Critical") | .dataset')
+
+if [ -n "$high_risk_files" ]; then
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"🚨 检测到高风险文件:\n$high_risk_files\"}" \
+    $SLACK_WEBHOOK_URL
+fi
+```
+
+### 专门用例
+
+```bash
+# 选举审计（检查选票计数）
+find ./选举数据 -name "*.csv" | parallel benf {} --min-count 100 --threshold low | \
+grep -E "(HIGH|CRITICAL)" > 选举异常.txt
+
+# 科学数据验证
+find ./研究数据 -name "*.xlsx" | while read file; do
+    lab=$(dirname "$file" | xargs basename)
+    result=$(benf "$file" --format json | jq -r '.risk_level')
+    echo "$lab,$file,$result"
+done | grep -E "(High|Critical)" > 数据完整性问题.csv
+
+# 供应链发票验证
+find ./发票/2024 -name "*.pdf" | parallel 'vendor=$(dirname {} | xargs basename); benf {} --format json | jq --arg v "$vendor" '"'"'{vendor: $v, file: .dataset, risk: .risk_level}'"'"' > 发票分析.jsonl
+
+# 保险理赔分析
+find ./理赔 -name "*.xlsx" | while read file; do
+    claim_id=$(basename "$file" .xlsx)
+    benf "$file" --filter ">=1000" --format json | \
+    jq --arg id "$claim_id" '{理赔ID: $id, 风险评估: .risk_level, 总数字数: .numbers_analyzed}'
+done | jq -s '.' > 理赔风险评估.json
+```
+
 ## 示例
 
 ### 欺诈检测
