@@ -3,7 +3,7 @@ use std::io::Read;
 use crate::common::international::extract_numbers_international;
 
 /// Parse OpenDocument files (.odt, .ods) and extract numbers from content
-pub fn parse_opendocument_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_opendocument_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let extension = file_path.extension()
         .and_then(|ext| ext.to_str())
         .unwrap_or("")
@@ -14,10 +14,10 @@ pub fn parse_opendocument_file(file_path: &Path) -> crate::Result<Vec<f64>> {
         "ods" => {
             // .ods files are already handled by the Excel parser (calamine)
             // Redirect to the existing Excel parser
-            crate::input::formats::excel::parse_excel_file(file_path)
+            crate::common::input::formats::excel::parse_excel_file(file_path)
         },
         _ => {
-            Err(crate::BenfError::ParseError(
+            Err(crate::error::BenfError::ParseError(
                 format!("Unsupported OpenDocument file extension: {}", extension)
             ))
         }
@@ -25,30 +25,30 @@ pub fn parse_opendocument_file(file_path: &Path) -> crate::Result<Vec<f64>> {
 }
 
 /// Parse ODT (OpenDocument Text) files using ZIP extraction and XML parsing
-fn parse_odt_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_odt_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // OpenDocument Text (.odt) files are ZIP archives containing XML files
     // The main content is stored in content.xml
     // Text content is in various elements like <text:p>, <text:span>, etc.
     
     // Attempt basic file validation
     if !file_path.exists() {
-        return Err(crate::BenfError::FileError(
+        return Err(crate::error::BenfError::FileError(
             format!("OpenDocument file not found: {}", file_path.display())
         ));
     }
 
     // Open the ODT file as a ZIP archive
     let file = std::fs::File::open(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to open OpenDocument file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open OpenDocument file: {}", e)))?;
     
     let mut archive = zip::ZipArchive::new(file)
-        .map_err(|e| crate::BenfError::ParseError(format!("Invalid OpenDocument file format (not a ZIP archive): {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid OpenDocument file format (not a ZIP archive): {}", e)))?;
 
     // Look for content.xml (main document content)
     let mut content_xml = None;
     for i in 0..archive.len() {
         let file = archive.by_index(i)
-            .map_err(|e| crate::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e)))?;
+            .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e)))?;
         
         if file.name() == "content.xml" {
             content_xml = Some(i);
@@ -57,46 +57,46 @@ fn parse_odt_file(file_path: &Path) -> crate::Result<Vec<f64>> {
     }
 
     let content_index = content_xml.ok_or_else(|| {
-        crate::BenfError::ParseError("content.xml not found in OpenDocument file".to_string())
+        crate::error::BenfError::ParseError("content.xml not found in OpenDocument file".to_string())
     })?;
 
     // Extract content from content.xml
     let mut file = archive.by_index(content_index)
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to read content.xml: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to read content.xml: {}", e)))?;
     
     let mut contents = String::new();
     file.read_to_string(&mut contents)
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to read content.xml data: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to read content.xml data: {}", e)))?;
 
     // Extract text content from XML
     let text_content = extract_text_from_odt_xml(&contents)?;
 
     if text_content.trim().is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
 
     // Extract numbers using international number processing
     let numbers = extract_numbers_international(&text_content);
     
     if numbers.is_empty() {
-        Err(crate::BenfError::NoNumbersFound)
+        Err(crate::error::BenfError::NoNumbersFound)
     } else {
         Ok(numbers)
     }
 }
 
 /// Extract text content from OpenDocument XML
-fn extract_text_from_odt_xml(xml_content: &str) -> crate::Result<String> {
+fn extract_text_from_odt_xml(xml_content: &str) -> crate::error::Result<String> {
     use regex::Regex;
     
     // OpenDocument text content is in various elements
     // Common text elements: <text:p>, <text:span>, <text:h>, etc.
     let text_regex = Regex::new(r"<text:[^>]*>(.*?)</text:[^>]*>")
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to compile regex: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to compile regex: {}", e)))?;
     
     // Also extract from table cells
     let table_regex = Regex::new(r"<table:[^>]*>(.*?)</table:[^>]*>")
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to compile table regex: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to compile table regex: {}", e)))?;
     
     let mut extracted_text = Vec::new();
     
@@ -160,7 +160,7 @@ mod tests {
         
         // Check error type
         match result {
-            Err(crate::BenfError::FileError(_)) => {
+            Err(crate::error::BenfError::FileError(_)) => {
                 // Expected file error for non-existent file
             },
             _ => panic!("Expected file error for non-existent ODT file"),

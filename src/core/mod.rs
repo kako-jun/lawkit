@@ -65,7 +65,7 @@ pub struct BenfordResult {
 }
 
 impl BenfordResult {
-    pub fn new(dataset_name: String, numbers: &[f64]) -> crate::Result<Self> {
+    pub fn new(dataset_name: String, numbers: &[f64]) -> crate::error::Result<Self> {
         Self::new_with_threshold(dataset_name, numbers, &RiskThreshold::Auto, 5)
     }
 
@@ -74,14 +74,14 @@ impl BenfordResult {
         numbers: &[f64], 
         threshold: &RiskThreshold,
         min_count: usize
-    ) -> crate::Result<Self> {
+    ) -> crate::error::Result<Self> {
         if numbers.is_empty() {
-            return Err(crate::BenfError::NoNumbersFound);
+            return Err(crate::error::BenfError::NoNumbersFound);
         }
         
         // Check minimum count requirement
         if numbers.len() < min_count {
-            return Err(crate::BenfError::InsufficientData(numbers.len()));
+            return Err(crate::error::BenfError::InsufficientData(numbers.len()));
         }
         
         // Issue warning for small datasets but continue analysis

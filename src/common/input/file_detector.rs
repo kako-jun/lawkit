@@ -153,7 +153,7 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
 }
 
 /// Parse file based on detected format
-pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Result<Vec<f64>> {
+pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::error::Result<Vec<f64>> {
     use crate::common::input::formats::*;
 
     match format {
@@ -171,10 +171,10 @@ pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Res
         FileFormat::Text => {
             // Fallback: read as plain text
             let content = std::fs::read_to_string(file_path)
-                .map_err(|e| crate::BenfError::FileError(format!("Failed to read text file: {}", e)))?;
+                .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read text file: {}", e)))?;
             let numbers = extract_numbers_international(&content);
             if numbers.is_empty() {
-                Err(crate::BenfError::NoNumbersFound)
+                Err(crate::error::BenfError::NoNumbersFound)
             } else {
                 Ok(numbers)
             }

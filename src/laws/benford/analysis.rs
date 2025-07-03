@@ -54,6 +54,6 @@ pub fn calculate_digit_distribution(numbers: &[f64]) -> [f64; 9] {
 }
 
 /// Perform Benford's Law analysis on a dataset
-pub fn analyze_benford_law(numbers: &[f64], dataset_name: &str) -> crate::Result<crate::BenfordResult> {
-    crate::BenfordResult::new(dataset_name.to_string(), numbers)
+pub fn analyze_benford_law(numbers: &[f64], dataset_name: &str) -> crate::error::Result<crate::laws::benford::BenfordResult> {
+    crate::laws::benford::BenfordResult::new(dataset_name.to_string(), numbers)
 }

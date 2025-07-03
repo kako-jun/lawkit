@@ -2,88 +2,88 @@ use std::path::Path;
 use crate::common::international::extract_numbers_international;
 
 /// Parse JSON files and extract numbers
-pub fn parse_json_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_json_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read JSON file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read JSON file: {}", e)))?;
 
     parse_json_content(&content)
 }
 
 /// Parse JSON content from string
-pub fn parse_json_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_json_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let json_value: serde_json::Value = serde_json::from_str(content)
-        .map_err(|e| crate::BenfError::ParseError(format!("Invalid JSON: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid JSON: {}", e)))?;
 
     let numbers = extract_numbers_from_json_value(&json_value);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
 }
 
 /// Parse XML files and extract numbers
-pub fn parse_xml_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_xml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read XML file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read XML file: {}", e)))?;
 
     parse_xml_content(&content)
 }
 
 /// Parse XML content from string
-pub fn parse_xml_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_xml_content(content: &str) -> crate::error::Result<Vec<f64>> {
     // Simple XML parsing - extract text content and parse numbers
     // For more complex XML, consider using a proper XML parser
     let text_content = extract_text_from_xml(content);
     let numbers = extract_numbers_international(&text_content);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
 }
 
 /// Parse YAML files and extract numbers
-pub fn parse_yaml_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_yaml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read YAML file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read YAML file: {}", e)))?;
 
     parse_yaml_content(&content)
 }
 
 /// Parse YAML content from string
-pub fn parse_yaml_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_yaml_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let yaml_value: serde_yaml::Value = serde_yaml::from_str(content)
-        .map_err(|e| crate::BenfError::ParseError(format!("Invalid YAML: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid YAML: {}", e)))?;
 
     let numbers = extract_numbers_from_yaml_value(&yaml_value);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
 }
 
 /// Parse TOML files and extract numbers
-pub fn parse_toml_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_toml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read TOML file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read TOML file: {}", e)))?;
 
     parse_toml_content(&content)
 }
 
 /// Parse TOML content from string
-pub fn parse_toml_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_toml_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let toml_value: toml::Value = toml::from_str(content)
-        .map_err(|e| crate::BenfError::ParseError(format!("Invalid TOML: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid TOML: {}", e)))?;
 
     let numbers = extract_numbers_from_toml_value(&toml_value);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)

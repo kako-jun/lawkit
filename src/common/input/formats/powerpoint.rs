@@ -3,7 +3,7 @@ use std::io::Read;
 use crate::common::international::extract_numbers_international;
 
 /// Parse PowerPoint files (.pptx, .ppt) and extract numbers from slide content
-pub fn parse_powerpoint_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_powerpoint_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let extension = file_path.extension()
         .and_then(|ext| ext.to_str())
         .unwrap_or("")
@@ -14,12 +14,12 @@ pub fn parse_powerpoint_file(file_path: &Path) -> crate::Result<Vec<f64>> {
         "ppt" => {
             // .ppt files require different handling (legacy format)
             // For now, return an error suggesting conversion to .pptx
-            Err(crate::BenfError::ParseError(
+            Err(crate::error::BenfError::ParseError(
                 "Legacy .ppt format not supported. Please convert to .pptx format.".to_string()
             ))
         },
         _ => {
-            Err(crate::BenfError::ParseError(
+            Err(crate::error::BenfError::ParseError(
                 format!("Unsupported PowerPoint file extension: {}", extension)
             ))
         }
@@ -27,31 +27,31 @@ pub fn parse_powerpoint_file(file_path: &Path) -> crate::Result<Vec<f64>> {
 }
 
 /// Parse PPTX files using ZIP extraction and XML parsing
-fn parse_pptx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_pptx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // PowerPoint (.pptx) files are ZIP archives containing XML files
     // The slide content is stored in ppt/slides/slide*.xml files
     // Text content is in <a:t> elements within the XML structure
     
     // Attempt basic file validation
     if !file_path.exists() {
-        return Err(crate::BenfError::FileError(
+        return Err(crate::error::BenfError::FileError(
             format!("PowerPoint file not found: {}", file_path.display())
         ));
     }
 
     // Open the PPTX file as a ZIP archive
     let file = std::fs::File::open(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to open PowerPoint file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open PowerPoint file: {}", e)))?;
     
     let mut archive = zip::ZipArchive::new(file)
-        .map_err(|e| crate::BenfError::ParseError(format!("Invalid PowerPoint file format (not a ZIP archive): {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid PowerPoint file format (not a ZIP archive): {}", e)))?;
 
     let mut all_text = String::new();
 
     // Iterate through all files in the ZIP archive
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)
-            .map_err(|e| crate::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e)))?;
+            .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e)))?;
         
         let file_name = file.name().to_string();
         
@@ -59,7 +59,7 @@ fn parse_pptx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
         if file_name.starts_with("ppt/slides/slide") && file_name.ends_with(".xml") {
             let mut contents = String::new();
             file.read_to_string(&mut contents)
-                .map_err(|e| crate::BenfError::ParseError(format!("Failed to read slide XML: {}", e)))?;
+                .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to read slide XML: {}", e)))?;
             
             // Extract text content from XML
             let slide_text = extract_text_from_slide_xml(&contents)?;
@@ -69,27 +69,27 @@ fn parse_pptx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
     }
 
     if all_text.trim().is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
 
     // Extract numbers using international number processing
     let numbers = extract_numbers_international(&all_text);
     
     if numbers.is_empty() {
-        Err(crate::BenfError::NoNumbersFound)
+        Err(crate::error::BenfError::NoNumbersFound)
     } else {
         Ok(numbers)
     }
 }
 
 /// Extract text content from a PowerPoint slide XML
-fn extract_text_from_slide_xml(xml_content: &str) -> crate::Result<String> {
+fn extract_text_from_slide_xml(xml_content: &str) -> crate::error::Result<String> {
     use regex::Regex;
     
     // PowerPoint slide text is contained in <a:t> elements
     // We'll use regex to extract text content from these elements
     let text_regex = Regex::new(r"<a:t[^>]*>(.*?)</a:t>")
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to compile regex: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to compile regex: {}", e)))?;
     
     let mut extracted_text = Vec::new();
     
@@ -129,7 +129,7 @@ mod tests {
         
         // Check error type
         match result {
-            Err(crate::BenfError::FileError(_)) => {
+            Err(crate::error::BenfError::FileError(_)) => {
                 // Expected file error for non-existent file
             },
             _ => panic!("Expected file error for non-existent PowerPoint file"),
@@ -145,7 +145,7 @@ mod tests {
         assert!(result.is_err());
         
         match result {
-            Err(crate::BenfError::ParseError(msg)) => {
+            Err(crate::error::BenfError::ParseError(msg)) => {
                 assert!(msg.contains("Legacy .ppt format not supported"));
             },
             _ => panic!("Expected parse error for .ppt file"),

@@ -3,7 +3,7 @@ use std::path::Path;
 use crate::common::international::extract_numbers_international;
 
 /// Parse Excel files (.xlsx, .xls) and extract numbers
-pub fn parse_excel_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_excel_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let extension = file_path.extension()
         .and_then(|ext| ext.to_str())
         .unwrap_or("")
@@ -20,25 +20,25 @@ pub fn parse_excel_file(file_path: &Path) -> crate::Result<Vec<f64>> {
 }
 
 /// Parse XLSX files specifically
-fn parse_xlsx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_xlsx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let mut workbook: Xlsx<_> = calamine::open_workbook(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to open XLSX file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open XLSX file: {}", e)))?;
 
     extract_numbers_from_xlsx(&mut workbook)
 }
 
 /// Parse XLS files specifically  
-fn parse_xls_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_xls_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let mut workbook: Xls<_> = calamine::open_workbook(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to open XLS file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open XLS file: {}", e)))?;
 
     extract_numbers_from_xls(&mut workbook)
 }
 
 /// Auto-detect Excel format and parse
-fn parse_excel_auto(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_excel_auto(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let workbook = open_workbook_auto(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to open Excel file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open Excel file: {}", e)))?;
 
     match workbook {
         calamine::Sheets::Xlsx(mut xlsx) => extract_numbers_from_xlsx(&mut xlsx),
@@ -49,27 +49,27 @@ fn parse_excel_auto(file_path: &Path) -> crate::Result<Vec<f64>> {
 }
 
 /// Extract numbers from XLSX workbook
-fn extract_numbers_from_xlsx(workbook: &mut Xlsx<std::io::BufReader<std::fs::File>>) -> crate::Result<Vec<f64>> {
+fn extract_numbers_from_xlsx(workbook: &mut Xlsx<std::io::BufReader<std::fs::File>>) -> crate::error::Result<Vec<f64>> {
     extract_numbers_from_workbook(workbook)
 }
 
 /// Extract numbers from XLS workbook
-fn extract_numbers_from_xls(workbook: &mut Xls<std::io::BufReader<std::fs::File>>) -> crate::Result<Vec<f64>> {
+fn extract_numbers_from_xls(workbook: &mut Xls<std::io::BufReader<std::fs::File>>) -> crate::error::Result<Vec<f64>> {
     extract_numbers_from_workbook(workbook)
 }
 
 /// Extract numbers from XLSB workbook
-fn extract_numbers_from_xlsb(workbook: &mut calamine::Xlsb<std::io::BufReader<std::fs::File>>) -> crate::Result<Vec<f64>> {
+fn extract_numbers_from_xlsb(workbook: &mut calamine::Xlsb<std::io::BufReader<std::fs::File>>) -> crate::error::Result<Vec<f64>> {
     extract_numbers_from_workbook(workbook)
 }
 
 /// Extract numbers from ODS workbook
-fn extract_numbers_from_ods(workbook: &mut calamine::Ods<std::io::BufReader<std::fs::File>>) -> crate::Result<Vec<f64>> {
+fn extract_numbers_from_ods(workbook: &mut calamine::Ods<std::io::BufReader<std::fs::File>>) -> crate::error::Result<Vec<f64>> {
     extract_numbers_from_workbook(workbook)
 }
 
 /// Extract numbers from Excel workbook (generic version using Reader trait bound)
-fn extract_numbers_from_workbook<R: Reader<std::io::BufReader<std::fs::File>>>(workbook: &mut R) -> crate::Result<Vec<f64>> {
+fn extract_numbers_from_workbook<R: Reader<std::io::BufReader<std::fs::File>>>(workbook: &mut R) -> crate::error::Result<Vec<f64>> {
     let mut all_numbers = Vec::new();
     
     // Get all worksheet names
@@ -106,7 +106,7 @@ fn extract_numbers_from_workbook<R: Reader<std::io::BufReader<std::fs::File>>>(w
     }
     
     if all_numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(all_numbers)
@@ -128,7 +128,7 @@ mod tests {
         
         // Check error type
         match result {
-            Err(crate::BenfError::FileError(_)) => {
+            Err(crate::error::BenfError::FileError(_)) => {
                 // Expected file error
             },
             _ => panic!("Expected file error for non-existent Excel file"),
