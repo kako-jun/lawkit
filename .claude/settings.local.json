@@ -1,0 +1,83 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo run:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo build:*)",
+      "Bash(ls:*)",
+      "Bash(git checkout:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(cp:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(./target/debug/lawkit:*)",
+      "Bash(./target/release/lawkit:*)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:www.omniglot.com)",
+      "Bash(cat:*)"
+    ],
+    "deny": []
+  },
+  "workflow": {
+    "auto_execute_readonly": true,
+    "readonly_commands": [
+      "grep",
+      "rg",
+      "find",
+      "ls",
+      "cat",
+      "head",
+      "tail",
+      "wc",
+      "file",
+      "stat",
+      "du",
+      "df",
+      "ps",
+      "top",
+      "which",
+      "whereis",
+      "git status",
+      "git log",
+      "git show",
+      "git diff",
+      "git blame",
+      "cargo check",
+      "cargo test --dry-run",
+      "cargo bench --dry-run"
+    ],
+    "require_confirmation": [
+      "git add",
+      "git commit",
+      "git push",
+      "git pull",
+      "git merge",
+      "rm",
+      "mv",
+      "cp",
+      "mkdir",
+      "touch",
+      "chmod",
+      "chown",
+      "cargo run",
+      "cargo build",
+      "cargo install"
+    ],
+    "notes": [
+      "読み取り専用操作(readonly_commands)は確認なしで自動実行",
+      "変更系操作(require_confirmation)は確認を求める",
+      "やりとりは日本語が基本",
+      "lawkitプロジェクト用設定 - 統計法則ツールキット開発環境"
+    ]
+  }
+}
