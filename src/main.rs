@@ -194,6 +194,60 @@ fn main() {
                     .help("Specification limits for quality control (e.g., 8.0,12.0)"))
         )
         .subcommand(
+            Command::new("poisson")
+                .about("Poisson distribution analysis")
+                .arg(clap::Arg::new("input")
+                    .help("Input data (file path or string)")
+                    .index(1))
+                .arg(clap::Arg::new("format")
+                    .long("format")
+                    .value_name("FORMAT")
+                    .help("Output format: text, csv, json, yaml, toml, xml")
+                    .default_value("text"))
+                .arg(clap::Arg::new("quiet")
+                    .long("quiet")
+                    .short('q')
+                    .help("Minimal output (parameters only)")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("verbose")
+                    .long("verbose")
+                    .short('v')
+                    .help("Detailed analysis")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("lang")
+                    .long("lang")
+                    .short('l')
+                    .value_name("LANGUAGE")
+                    .help("Output language: en, ja, zh, hi, ar")
+                    .default_value("auto"))
+                .arg(clap::Arg::new("filter")
+                    .long("filter")
+                    .value_name("RANGE")
+                    .help("Filter numbers by range"))
+                .arg(clap::Arg::new("min-count")
+                    .long("min-count")
+                    .value_name("NUMBER")
+                    .help("Minimum number of data points")
+                    .default_value("10"))
+                .arg(clap::Arg::new("test")
+                    .long("test")
+                    .value_name("TYPE")
+                    .help("Poisson test type: chi-square, ks, variance, all"))
+                .arg(clap::Arg::new("predict")
+                    .long("predict")
+                    .help("Run event probability prediction")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("max-events")
+                    .long("max-events")
+                    .value_name("NUMBER")
+                    .help("Maximum events for prediction")
+                    .default_value("10"))
+                .arg(clap::Arg::new("rare-events")
+                    .long("rare-events")
+                    .help("Run rare events analysis")
+                    .action(clap::ArgAction::SetTrue))
+        )
+        .subcommand(
             Command::new("list")
                 .about("List available statistical laws")
         )
@@ -204,6 +258,7 @@ fn main() {
         Some(("pareto", sub_matches)) => subcommands::pareto::run(sub_matches),
         Some(("zipf", sub_matches)) => subcommands::zipf::run(sub_matches),
         Some(("normal", sub_matches)) => subcommands::normal::run(sub_matches),
+        Some(("poisson", sub_matches)) => subcommands::poisson::run(sub_matches),
         Some(("list", _)) => list_laws(),
         _ => {
             show_help();
@@ -223,6 +278,7 @@ fn list_laws() -> Result<(), LawkitError> {
     println!("  pareto  - Pareto principle (80/20 rule) analysis");
     println!("  zipf    - Zipf's law analysis");
     println!("  normal  - Normal distribution analysis");
+    println!("  poisson - Poisson distribution analysis");
     Ok(())
 }
 
