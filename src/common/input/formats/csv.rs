@@ -2,15 +2,15 @@ use std::path::Path;
 use crate::common::international::extract_numbers_international;
 
 /// Parse CSV/TSV files and extract numbers
-pub fn parse_csv_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_csv_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read CSV file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read CSV file: {}", e)))?;
 
     parse_csv_content(&content)
 }
 
 /// Parse CSV content from string
-pub fn parse_csv_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_csv_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let mut all_numbers = Vec::new();
     
     // Simple CSV parsing - split by lines and then by commas/tabs
@@ -38,7 +38,7 @@ pub fn parse_csv_content(content: &str) -> crate::Result<Vec<f64>> {
     }
     
     if all_numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(all_numbers)

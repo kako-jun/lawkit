@@ -3,7 +3,7 @@ use std::path::Path;
 use crate::common::international::extract_numbers_international;
 
 /// Parse Word files (.docx, .doc) and extract numbers from text content
-pub fn parse_word_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_word_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let extension = file_path.extension()
         .and_then(|ext| ext.to_str())
         .unwrap_or("")
@@ -14,12 +14,12 @@ pub fn parse_word_file(file_path: &Path) -> crate::Result<Vec<f64>> {
         "doc" => {
             // .doc files require different handling (legacy format)
             // For now, return an error suggesting conversion to .docx
-            Err(crate::BenfError::ParseError(
+            Err(crate::error::BenfError::ParseError(
                 "Legacy .doc format not supported. Please convert to .docx format.".to_string()
             ))
         },
         _ => {
-            Err(crate::BenfError::ParseError(
+            Err(crate::error::BenfError::ParseError(
                 format!("Unsupported Word file extension: {}", extension)
             ))
         }
@@ -27,14 +27,14 @@ pub fn parse_word_file(file_path: &Path) -> crate::Result<Vec<f64>> {
 }
 
 /// Parse DOCX files specifically using docx-rs
-fn parse_docx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+fn parse_docx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // Read the DOCX file
     let file_bytes = std::fs::read(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read Word file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read Word file: {}", e)))?;
 
     // Parse the DOCX document
     let doc = read_docx(&file_bytes)
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to parse DOCX file: {:?}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to parse DOCX file: {:?}", e)))?;
 
     // Extract all text content from the document
     let mut all_text = String::new();
@@ -60,7 +60,7 @@ fn parse_docx_file(file_path: &Path) -> crate::Result<Vec<f64>> {
     let numbers = extract_numbers_international(&all_text);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
@@ -81,7 +81,7 @@ mod tests {
         
         // Check error type
         match result {
-            Err(crate::BenfError::FileError(_)) => {
+            Err(crate::error::BenfError::FileError(_)) => {
                 // Expected file error for non-existent file
             },
             _ => panic!("Expected file error for non-existent Word file"),
@@ -97,7 +97,7 @@ mod tests {
         assert!(result.is_err());
         
         match result {
-            Err(crate::BenfError::ParseError(msg)) => {
+            Err(crate::error::BenfError::ParseError(msg)) => {
                 assert!(msg.contains("Legacy .doc format not supported"));
             },
             _ => panic!("Expected parse error for .doc file"),

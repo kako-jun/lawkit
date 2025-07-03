@@ -4,15 +4,15 @@ use crate::common::international::extract_numbers_international;
 use regex::Regex;
 
 /// Parse HTML files and extract numbers from text content
-pub fn parse_html_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_html_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path)
-        .map_err(|e| crate::BenfError::FileError(format!("Failed to read HTML file: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read HTML file: {}", e)))?;
 
     parse_html_content(&content)
 }
 
 /// Parse HTML content from string
-pub fn parse_html_content(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_html_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let _document = Html::parse_document(content);
     
     // First remove script and style elements from the document
@@ -47,14 +47,14 @@ pub fn parse_html_content(content: &str) -> crate::Result<Vec<f64>> {
     let numbers = extract_numbers_international(&all_text);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
 }
 
 /// Parse HTML content from a URL response (for web scraping)
-pub fn parse_html_from_url_response(content: &str) -> crate::Result<Vec<f64>> {
+pub fn parse_html_from_url_response(content: &str) -> crate::error::Result<Vec<f64>> {
     parse_html_content(content)
 }
 
@@ -124,7 +124,7 @@ mod tests {
         let result = parse_html_content(html_content);
         assert!(result.is_err());
         match result {
-            Err(crate::BenfError::NoNumbersFound) => {
+            Err(crate::error::BenfError::NoNumbersFound) => {
                 // Expected behavior for HTML with no numbers
             },
             _ => panic!("Expected NoNumbersFound error for empty HTML"),

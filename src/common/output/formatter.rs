@@ -11,7 +11,7 @@ pub enum OutputFormat {
 }
 
 impl OutputFormat {
-    pub fn from_str(s: &str) -> crate::Result<Self> {
+    pub fn from_str(s: &str) -> crate::error::Result<Self> {
         match s.to_lowercase().as_str() {
             "text" => Ok(OutputFormat::Text),
             "json" => Ok(OutputFormat::Json),
@@ -19,7 +19,7 @@ impl OutputFormat {
             "yaml" => Ok(OutputFormat::Yaml),
             "toml" => Ok(OutputFormat::Toml),
             "xml" => Ok(OutputFormat::Xml),
-            _ => Err(crate::BenfError::InvalidInput(format!("Unsupported format: {}", s))),
+            _ => Err(crate::error::BenfError::InvalidInput(format!("Unsupported format: {}", s))),
         }
     }
 }
@@ -54,8 +54,8 @@ fn format_text(result: &BenfordResult) -> String {
         result.numbers_analyzed,
         result.risk_level,
         match result.risk_level {
-            crate::RiskLevel::Critical => "⚠️",
-            crate::RiskLevel::High => "⚠️",
+            crate::common::risk::RiskLevel::Critical => "⚠️",
+            crate::common::risk::RiskLevel::High => "⚠️",
             _ => "",
         },
         format_distribution_bars(result),

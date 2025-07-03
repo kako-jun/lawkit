@@ -3,16 +3,16 @@ use std::path::Path;
 use crate::common::international::extract_numbers_international;
 
 /// Parse PDF files and extract numbers from text content
-pub fn parse_pdf_file(file_path: &Path) -> crate::Result<Vec<f64>> {
+pub fn parse_pdf_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // Extract text from PDF file path
     let text = extract_text(file_path)
-        .map_err(|e| crate::BenfError::ParseError(format!("Failed to extract text from PDF: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Failed to extract text from PDF: {}", e)))?;
     
     // Extract numbers from the text (including international numerals)
     let numbers = extract_numbers_international(&text);
     
     if numbers.is_empty() {
-        return Err(crate::BenfError::NoNumbersFound);
+        return Err(crate::error::BenfError::NoNumbersFound);
     }
     
     Ok(numbers)
@@ -34,10 +34,10 @@ mod tests {
         
         // Check error type - pdf-extract returns ParseError for non-existent files
         match result {
-            Err(crate::BenfError::ParseError(_)) => {
+            Err(crate::error::BenfError::ParseError(_)) => {
                 // Expected parse error for non-existent file
             },
-            Err(crate::BenfError::FileError(_)) => {
+            Err(crate::error::BenfError::FileError(_)) => {
                 // Also acceptable as file error
             },
             _ => panic!("Expected parse or file error for non-existent PDF file"),

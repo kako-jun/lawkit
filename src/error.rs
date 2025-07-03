@@ -28,3 +28,6 @@ impl fmt::Display for BenfError {
 impl std::error::Error for BenfError {}
 
 pub type Result<T> = std::result::Result<T, BenfError>;
+
+// Lawkit用のエラー型（BenfErrorのエイリアス）
+pub type LawkitError = BenfError;
