@@ -1,5 +1,5 @@
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse CSV/TSV files and extract numbers
 pub fn parse_csv_file(file_path: &Path) -> crate::Result<Vec<f64>> {

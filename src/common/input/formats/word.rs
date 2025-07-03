@@ -1,6 +1,6 @@
 use docx_rs::*;
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse Word files (.docx, .doc) and extract numbers from text content
 pub fn parse_word_file(file_path: &Path) -> crate::Result<Vec<f64>> {

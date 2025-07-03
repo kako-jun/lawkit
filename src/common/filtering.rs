@@ -184,24 +184,24 @@ impl RiskThreshold {
     }
 
     /// Determine risk level based on p-value and this threshold
-    pub fn evaluate_risk(&self, p_value: f64) -> crate::core::RiskLevel {
+    pub fn evaluate_risk(&self, p_value: f64) -> crate::common::risk::RiskLevel {
         if let Some(threshold) = self.p_value_threshold() {
             // Custom threshold evaluation
             if p_value <= threshold {
-                crate::core::RiskLevel::Critical
+                crate::common::risk::RiskLevel::Critical
             } else {
-                crate::core::RiskLevel::Low
+                crate::common::risk::RiskLevel::Low
             }
         } else {
             // Auto mode: use default Benford analysis
             if p_value <= 0.01 {
-                crate::core::RiskLevel::Critical
+                crate::common::risk::RiskLevel::Critical
             } else if p_value <= 0.05 {
-                crate::core::RiskLevel::High
+                crate::common::risk::RiskLevel::High
             } else if p_value <= 0.1 {
-                crate::core::RiskLevel::Medium
+                crate::common::risk::RiskLevel::Medium
             } else {
-                crate::core::RiskLevel::Low
+                crate::common::risk::RiskLevel::Low
             }
         }
     }
@@ -282,13 +282,13 @@ mod tests {
     #[test]
     fn test_risk_threshold_evaluation() {
         let auto = RiskThreshold::Auto;
-        assert_eq!(auto.evaluate_risk(0.005), crate::core::RiskLevel::Critical);
-        assert_eq!(auto.evaluate_risk(0.03), crate::core::RiskLevel::High);
-        assert_eq!(auto.evaluate_risk(0.07), crate::core::RiskLevel::Medium);
-        assert_eq!(auto.evaluate_risk(0.15), crate::core::RiskLevel::Low);
+        assert_eq!(auto.evaluate_risk(0.005), crate::common::risk::RiskLevel::Critical);
+        assert_eq!(auto.evaluate_risk(0.03), crate::common::risk::RiskLevel::High);
+        assert_eq!(auto.evaluate_risk(0.07), crate::common::risk::RiskLevel::Medium);
+        assert_eq!(auto.evaluate_risk(0.15), crate::common::risk::RiskLevel::Low);
 
         let custom = RiskThreshold::Custom(0.02);
-        assert_eq!(custom.evaluate_risk(0.01), crate::core::RiskLevel::Critical);
-        assert_eq!(custom.evaluate_risk(0.03), crate::core::RiskLevel::Low);
+        assert_eq!(custom.evaluate_risk(0.01), crate::common::risk::RiskLevel::Critical);
+        assert_eq!(custom.evaluate_risk(0.03), crate::common::risk::RiskLevel::Low);
     }
 }

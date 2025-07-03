@@ -8,7 +8,7 @@ pub fn convert_international_numerals(text: &str) -> String {
     let mut result = text.to_string();
     
     // Convert Japanese numerals (full-width and kanji)
-    result = crate::core::japanese::convert_japanese_numerals(&result);
+    result = crate::laws::benford::japanese::convert_japanese_numerals(&result);
     
     // Convert Chinese numerals
     result = convert_chinese_numerals(&result);
@@ -139,7 +139,7 @@ pub fn extract_numbers_international(text: &str) -> Vec<f64> {
     let converted = convert_international_numerals(text);
     
     // Then use the existing number extraction logic
-    crate::core::japanese::extract_numbers(&converted)
+    crate::laws::benford::japanese::extract_numbers(&converted)
 }
 
 #[cfg(test)]

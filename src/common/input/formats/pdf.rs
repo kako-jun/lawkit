@@ -1,6 +1,6 @@
 use pdf_extract::extract_text;
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse PDF files and extract numbers from text content
 pub fn parse_pdf_file(file_path: &Path) -> crate::Result<Vec<f64>> {

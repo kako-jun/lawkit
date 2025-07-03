@@ -1,6 +1,6 @@
 use scraper::Html;
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 use regex::Regex;
 
 /// Parse HTML files and extract numbers from text content
