@@ -136,6 +136,64 @@ fn main() {
                     .action(clap::ArgAction::SetTrue))
         )
         .subcommand(
+            Command::new("normal")
+                .about("Normal distribution analysis")
+                .arg(clap::Arg::new("input")
+                    .help("Input data (file path or string)")
+                    .index(1))
+                .arg(clap::Arg::new("format")
+                    .long("format")
+                    .value_name("FORMAT")
+                    .help("Output format: text, csv, json, yaml, toml, xml")
+                    .default_value("text"))
+                .arg(clap::Arg::new("quiet")
+                    .long("quiet")
+                    .short('q')
+                    .help("Minimal output (parameters only)")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("verbose")
+                    .long("verbose")
+                    .short('v')
+                    .help("Detailed analysis with interpretation")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("lang")
+                    .long("lang")
+                    .short('l')
+                    .value_name("LANGUAGE")
+                    .help("Output language: en, ja, zh, hi, ar")
+                    .default_value("auto"))
+                .arg(clap::Arg::new("filter")
+                    .long("filter")
+                    .value_name("RANGE")
+                    .help("Filter numbers by range (e.g., >=100, <1000, 50-500)"))
+                .arg(clap::Arg::new("min-count")
+                    .long("min-count")
+                    .value_name("NUMBER")
+                    .help("Minimum number of data points required for analysis")
+                    .default_value("8"))
+                .arg(clap::Arg::new("test")
+                    .long("test")
+                    .value_name("TYPE")
+                    .help("Run specific normality test: shapiro, anderson, ks, all"))
+                .arg(clap::Arg::new("outliers")
+                    .long("outliers")
+                    .help("Run outlier detection mode")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("outlier-method")
+                    .long("outlier-method")
+                    .value_name("METHOD")
+                    .help("Outlier detection method: zscore, modified, iqr")
+                    .default_value("zscore"))
+                .arg(clap::Arg::new("quality-control")
+                    .long("quality-control")
+                    .help("Run quality control analysis")
+                    .action(clap::ArgAction::SetTrue))
+                .arg(clap::Arg::new("spec-limits")
+                    .long("spec-limits")
+                    .value_name("LOWER,UPPER")
+                    .help("Specification limits for quality control (e.g., 8.0,12.0)"))
+        )
+        .subcommand(
             Command::new("list")
                 .about("List available statistical laws")
         )
@@ -145,6 +203,7 @@ fn main() {
         Some(("benf", sub_matches)) => subcommands::benf::run(sub_matches),
         Some(("pareto", sub_matches)) => subcommands::pareto::run(sub_matches),
         Some(("zipf", sub_matches)) => subcommands::zipf::run(sub_matches),
+        Some(("normal", sub_matches)) => subcommands::normal::run(sub_matches),
         Some(("list", _)) => list_laws(),
         _ => {
             show_help();
@@ -163,6 +222,7 @@ fn list_laws() -> Result<(), LawkitError> {
     println!("  benf    - Benford's law analysis");
     println!("  pareto  - Pareto principle (80/20 rule) analysis");
     println!("  zipf    - Zipf's law analysis");
+    println!("  normal  - Normal distribution analysis");
     Ok(())
 }
 
