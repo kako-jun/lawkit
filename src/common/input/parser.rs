@@ -1,4 +1,4 @@
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 use std::path::Path;
 use super::file_detector::{detect_file_format, parse_file_by_format};
 

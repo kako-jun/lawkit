@@ -1,6 +1,6 @@
 use calamine::{Reader, Xlsx, Xls, open_workbook_auto, DataType};
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse Excel files (.xlsx, .xls) and extract numbers
 pub fn parse_excel_file(file_path: &Path) -> crate::Result<Vec<f64>> {

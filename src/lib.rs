@@ -1,9 +1,15 @@
-pub mod core;
-pub mod input;
-pub mod output;
+pub mod common;
+pub mod laws;
+pub mod subcommands;
 pub mod error;
 
-pub use core::*;
+pub use common::*;
+pub use laws::*;
 pub use error::*;
 
-pub const VERSION: &str = "1.0.0";
+// Re-export commonly used types
+pub use common::risk::RiskLevel;
+pub use common::filtering::RiskThreshold;
+pub use laws::benford::BenfordResult;
+
+pub const VERSION: &str = "2.0.0";

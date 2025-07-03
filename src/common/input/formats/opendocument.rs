@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::io::Read;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse OpenDocument files (.odt, .ods) and extract numbers from content
 pub fn parse_opendocument_file(file_path: &Path) -> crate::Result<Vec<f64>> {

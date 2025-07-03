@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::io::Read;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 /// Parse PowerPoint files (.pptx, .ppt) and extract numbers from slide content
 pub fn parse_powerpoint_file(file_path: &Path) -> crate::Result<Vec<f64>> {

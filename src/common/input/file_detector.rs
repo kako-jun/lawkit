@@ -1,5 +1,5 @@
 use std::path::Path;
-use crate::core::international::extract_numbers_international;
+use crate::common::international::extract_numbers_international;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FileFormat {
@@ -154,7 +154,7 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
 
 /// Parse file based on detected format
 pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::Result<Vec<f64>> {
-    use crate::input::formats::*;
+    use crate::common::input::formats::*;
 
     match format {
         FileFormat::Excel => excel::parse_excel_file(file_path),

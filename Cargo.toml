@@ -1,21 +1,25 @@
 [package]
-name = "benf"
-version = "1.0.0"
+name = "lawkit"
+version = "2.0.0"
 edition = "2024"
 authors = ["kako-jun"]
 license = "MIT"
-description = "A CLI tool for detecting anomalies using Benford's Law with international numeral support (Japanese, Chinese, Arabic)"
+description = "Statistical law analysis toolkit with international number support"
 homepage = "https://github.com/kako-jun/benf"
 repository = "https://github.com/kako-jun/benf"
-keywords = ["benford", "fraud-detection", "statistics", "chinese", "japanese"]
+keywords = ["statistics", "benford", "pareto", "zipf", "audit", "fraud-detection"]
 categories = ["command-line-utilities", "mathematics"]
 
 [[bin]]
-name = "benf"
+name = "lawkit"
 path = "src/main.rs"
 
+[[bin]]
+name = "benf"
+path = "src/bin/benf.rs"
+
 [dependencies]
-clap = { version = "4.0", features = ["derive"] }
+clap = { version = "4.0", features = ["derive", "cargo"] }
 scraper = "0.17"
 calamine = "0.22"
 pdf-extract = "0.7"

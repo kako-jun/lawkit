@@ -1,4 +1,4 @@
-use crate::BenfordResult;
+use crate::laws::benford::BenfordResult;
 
 #[derive(Debug, Clone)]
 pub enum OutputFormat {
