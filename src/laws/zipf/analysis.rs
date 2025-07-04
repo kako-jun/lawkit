@@ -90,7 +90,7 @@ pub fn analyze_numeric_zipf(numbers: &[f64], dataset_name: &str) -> Result<ZipfR
     analyze_zipf_distribution(&frequencies, dataset_name)
 }
 
-/// 複数データソースからの統合Zipf分析
+/// 複数データセットの統合Zipf分析
 pub fn analyze_combined_zipf(datasets: &[(&str, &[f64])]) -> Result<Vec<ZipfResult>> {
     let mut results = Vec::new();
     
@@ -102,78 +102,88 @@ pub fn analyze_combined_zipf(datasets: &[(&str, &[f64])]) -> Result<Vec<ZipfResu
     Ok(results)
 }
 
-/// Zipf分析の品質評価
-pub fn evaluate_zipf_quality(result: &ZipfResult) -> ZipfQualityReport {
-    let exponent_quality = evaluate_exponent_quality(result.zipf_exponent);
-    let correlation_quality = evaluate_correlation_quality(result.correlation_coefficient);
-    let distribution_quality = evaluate_distribution_quality(result.distribution_quality);
+/// Zipf分布の品質評価
+pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
+    let mut quality_metrics = Vec::new();
+    
+    // 指数の理想値からの偏差
+    let exponent_score = calculate_exponent_score(zipf_result.zipf_exponent);
+    quality_metrics.push(QualityMetric {
+        name: "Exponent Quality".to_string(),
+        score: exponent_score,
+        description: format!("指数値: {:.3} (理想値: 1.0)", zipf_result.zipf_exponent),
+    });
+    
+    // 相関係数の評価
+    let correlation_score = zipf_result.correlation_coefficient;
+    quality_metrics.push(QualityMetric {
+        name: "Correlation".to_string(),
+        score: correlation_score,
+        description: format!("相関係数: {:.3}", correlation_score),
+    });
+    
+    // 全体品質スコア
+    let overall_score = (exponent_score + correlation_score) / 2.0;
     
     ZipfQualityReport {
-        overall_score: (exponent_quality + correlation_quality + distribution_quality) / 3.0,
-        exponent_quality,
-        correlation_quality,
-        distribution_quality,
-        recommendations: generate_recommendations(result),
+        overall_score,
+        quality_metrics,
+        compliance_level: determine_compliance_level(overall_score),
     }
 }
 
+/// 指数品質スコアを計算
+fn calculate_exponent_score(exponent: f64) -> f64 {
+    // 理想的なZipf指数は1.0
+    let deviation = (exponent - 1.0).abs();
+    
+    // 偏差に基づくスコア計算
+    if deviation <= 0.1 {
+        1.0
+    } else if deviation <= 0.3 {
+        0.8
+    } else if deviation <= 0.5 {
+        0.6
+    } else if deviation <= 0.7 {
+        0.4
+    } else if deviation <= 1.0 {
+        0.2
+    } else {
+        0.0
+    }
+}
+
+/// 遵守レベルを判定
+fn determine_compliance_level(score: f64) -> String {
+    if score >= 0.8 {
+        "Excellent".to_string()
+    } else if score >= 0.6 {
+        "Good".to_string()
+    } else if score >= 0.4 {
+        "Fair".to_string()
+    } else if score >= 0.2 {
+        "Poor".to_string()
+    } else {
+        "Very Poor".to_string()
+    }
+}
+
+/// 品質メトリック
+#[derive(Debug, Clone)]
+pub struct QualityMetric {
+    pub name: String,
+    pub score: f64,
+    pub description: String,
+}
+
+/// Zipf品質レポート
 #[derive(Debug, Clone)]
 pub struct ZipfQualityReport {
     pub overall_score: f64,
-    pub exponent_quality: f64,
-    pub correlation_quality: f64,
-    pub distribution_quality: f64,
-    pub recommendations: Vec<String>,
+    pub quality_metrics: Vec<QualityMetric>,
+    pub compliance_level: String,
 }
 
-fn evaluate_exponent_quality(exponent: f64) -> f64 {
-    // 理想的なZipf指数は1.0
-    let deviation = (exponent - 1.0).abs();
-    if deviation < 0.1 {
-        1.0
-    } else if deviation < 0.3 {
-        0.8
-    } else if deviation < 0.5 {
-        0.6
-    } else if deviation < 0.8 {
-        0.4
-    } else {
-        0.2
-    }
-}
-
-fn evaluate_correlation_quality(correlation: f64) -> f64 {
-    correlation.abs()
-}
-
-fn evaluate_distribution_quality(quality: f64) -> f64 {
-    quality
-}
-
-fn generate_recommendations(result: &ZipfResult) -> Vec<String> {
-    let mut recommendations = Vec::new();
-    
-    // Zipf指数に基づく推奨
-    if result.zipf_exponent > 1.5 {
-        recommendations.push("急激な集中: 上位項目への過度な集中が見られます".to_string());
-    } else if result.zipf_exponent < 0.5 {
-        recommendations.push("分散傾向: より集中的な分布が期待されます".to_string());
-    }
-    
-    // 相関係数に基づく推奨
-    if result.correlation_coefficient < 0.5 {
-        recommendations.push("Zipf法則からの逸脱: 分布パターンの見直しが必要です".to_string());
-    }
-    
-    // 多様性指数に基づく推奨
-    if result.diversity_index < 1.0 {
-        recommendations.push("低多様性: 項目の多様性向上を検討してください".to_string());
-    } else if result.diversity_index > 4.0 {
-        recommendations.push("高多様性: 重要項目への集中を検討してください".to_string());
-    }
-    
-    recommendations
-}
 
 #[cfg(test)]
 mod tests {

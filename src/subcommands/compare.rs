@@ -1,4 +1,3 @@
-use crate::common::input::parse_input_auto;
 use crate::common::output::{create_output_writer, OutputConfig};
 use crate::error::Result;
 use crate::laws::integration::{
