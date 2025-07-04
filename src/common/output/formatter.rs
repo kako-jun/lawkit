@@ -1,4 +1,7 @@
 use crate::laws::benford::BenfordResult;
+use crate::laws::integration::IntegrationResult; // IntegrationResult をインポート
+use clap::ArgMatches; // clap::ArgMatches をインポート
+use std::io::{self, Write}; // io::Write をインポート
 
 #[derive(Debug, Clone)]
 pub enum OutputFormat {
@@ -21,6 +24,40 @@ impl OutputFormat {
             "xml" => Ok(OutputFormat::Xml),
             _ => Err(crate::error::BenfError::InvalidInput(format!("Unsupported format: {}", s))),
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OutputConfig {
+    pub format: String,
+    pub quiet: bool,
+    pub verbose: bool,
+    pub language: String,
+}
+
+impl OutputConfig {
+    pub fn from_matches(matches: &ArgMatches) -> Self {
+        OutputConfig {
+            format: matches.get_one::<String>("format").unwrap().clone(),
+            quiet: *matches.get_one::<bool>("quiet").unwrap_or(&false),
+            verbose: *matches.get_one::<bool>("verbose").unwrap_or(&false),
+            language: matches.get_one::<String>("lang").unwrap().clone(),
+        }
+    }
+}
+
+pub fn create_output_writer(matches: &ArgMatches) -> crate::error::Result<Box<dyn Write>> {
+    let output_path = matches.get_one::<String>("output"); // output 引数があるか確認
+    
+    if let Some(path) = output_path {
+        if path == "-" {
+            Ok(Box::new(io::stdout()))
+        } else {
+            let file = std::fs::File::create(path)?;
+            Ok(Box::new(file))
+        }
+    } else {
+        Ok(Box::new(io::stdout()))
     }
 }
 
@@ -88,9 +125,9 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
 fn format_json(result: &BenfordResult) -> String {
     format!(
         r#"{{
-  "dataset": "{}",
+  "dataset": "{}"
   "numbers_analyzed": {},
-  "risk_level": "{}",
+  "risk_level": "{}"
   "digits": {{
     "1": {{"observed": {:.1}, "expected": {:.1}, "deviation": {:.1}}},
     "2": {{"observed": {:.1}, "expected": {:.1}, "deviation": {:.1}}},
@@ -108,7 +145,7 @@ fn format_json(result: &BenfordResult) -> String {
     "mad": {:.1}
   }},
   "verdict": "{}"
-}}"#,
+}}"#, 
         result.dataset_name,
         result.numbers_analyzed,
         result.risk_level,

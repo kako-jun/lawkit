@@ -1,4 +1,4 @@
-use crate::common::input::get_numbers_from_input;
+use crate::common::input::parse_input_auto;
 use crate::common::output::{create_output_writer, OutputConfig};
 use crate::error::Result;
 use crate::laws::integration::{
@@ -141,7 +141,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     
     let result = if let Some(laws_str) = matches.get_one::<String>("laws") {
@@ -165,7 +165,7 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     
     let result = analyze_all_laws(&numbers, &dataset_name)?;
@@ -179,7 +179,7 @@ fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
     
@@ -194,7 +194,7 @@ fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     let confidence_level = *matches.get_one::<f64>("confidence-level").unwrap();
     
@@ -209,7 +209,7 @@ fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
     
@@ -224,7 +224,7 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = get_numbers_from_input(matches)?;
+    let numbers = crate::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
     let dataset_name = get_dataset_name(matches);
     
     let analysis_purpose = matches.get_one::<String>("purpose")
@@ -606,7 +606,7 @@ fn output_detailed_law_results(
     if let Some(ref benf_result) = result.benford_result {
         writeln!(writer, "• {}: {:.3} ({})", 
             get_law_name("benf", lang),
-            benf_result.conformity_score,
+            1.0 - (benf_result.mean_absolute_deviation / 100.0),
             format!("{:?}", benf_result.risk_level)
         )?;
     }
@@ -614,7 +614,7 @@ fn output_detailed_law_results(
     if let Some(ref pareto_result) = result.pareto_result {
         writeln!(writer, "• {}: {:.3} ({})", 
             get_law_name("pareto", lang),
-            pareto_result.gini_coefficient,
+            pareto_result.concentration_index,
             format!("{:?}", pareto_result.risk_level)
         )?;
     }
@@ -622,7 +622,7 @@ fn output_detailed_law_results(
     if let Some(ref zipf_result) = result.zipf_result {
         writeln!(writer, "• {}: {:.3} ({})", 
             get_law_name("zipf", lang),
-            zipf_result.goodness_of_fit,
+            zipf_result.distribution_quality,
             format!("{:?}", zipf_result.risk_level)
         )?;
     }
@@ -684,43 +684,43 @@ fn output_alternative_combinations(
 
 // 多言語対応ヘルパー関数
 
-fn get_text(key: &str, lang: &str) -> &'static str {
+fn get_text(key: &str, lang: &str) -> String {
     match (key, lang) {
-        ("integration_title", "ja") => "統合分析結果",
-        ("integration_title", _) => "Integration Analysis Result",
-        ("dataset", "ja") => "データセット",
-        ("dataset", _) => "Dataset",
-        ("numbers_analyzed", "ja") => "解析した数値数",
-        ("numbers_analyzed", _) => "Numbers Analyzed",
-        ("laws_executed", "ja") => "実行法則",
-        ("laws_executed", _) => "Laws Executed",
-        ("integration_metrics", "ja") => "統合評価",
-        ("integration_metrics", _) => "Integration Metrics",
-        ("overall_quality", "ja") => "総合品質スコア",
-        ("overall_quality", _) => "Overall Quality Score",
-        ("consistency", "ja") => "一貫性スコア",
-        ("consistency", _) => "Consistency Score",
-        ("conflicts_detected", "ja") => "矛盾検出",
-        ("conflicts_detected", _) => "Conflicts Detected",
-        ("recommendation_confidence", "ja") => "推奨信頼度",
-        ("recommendation_confidence", _) => "Recommendation Confidence",
-        ("law_results", "ja") => "法則別結果",
-        ("law_results", _) => "Law Results",
-        ("conflicts", "ja") => "矛盾検出",
-        ("conflicts", _) => "Conflicts",
-        ("cause", "ja") => "推定原因",
-        ("cause", _) => "Likely Cause",
-        ("suggestion", "ja") => "推奨対策",
-        ("suggestion", _) => "Suggestion",
-        ("recommendations", "ja") => "推奨",
-        ("recommendations", _) => "Recommendations",
-        ("primary_law", "ja") => "主要法則",
-        ("primary_law", _) => "Primary Law",
-        ("secondary_laws", "ja") => "補助法則",
-        ("secondary_laws", _) => "Secondary Laws",
-        ("rationale", "ja") => "推奨理由",
-        ("rationale", _) => "Rationale",
-        _ => key,
+        ("integration_title", "ja") => "統合分析結果".to_string(),
+        ("integration_title", _) => "Integration Analysis Result".to_string(),
+        ("dataset", "ja") => "データセット".to_string(),
+        ("dataset", _) => "Dataset".to_string(),
+        ("numbers_analyzed", "ja") => "解析した数値数".to_string(),
+        ("numbers_analyzed", _) => "Numbers Analyzed".to_string(),
+        ("laws_executed", "ja") => "実行法則".to_string(),
+        ("laws_executed", _) => "Laws Executed".to_string(),
+        ("integration_metrics", "ja") => "統合評価".to_string(),
+        ("integration_metrics", _) => "Integration Metrics".to_string(),
+        ("overall_quality", "ja") => "総合品質スコア".to_string(),
+        ("overall_quality", _) => "Overall Quality Score".to_string(),
+        ("consistency", "ja") => "一貫性スコア".to_string(),
+        ("consistency", _) => "Consistency Score".to_string(),
+        ("conflicts_detected", "ja") => "矛盾検出".to_string(),
+        ("conflicts_detected", _) => "Conflicts Detected".to_string(),
+        ("recommendation_confidence", "ja") => "推奨信頼度".to_string(),
+        ("recommendation_confidence", _) => "Recommendation Confidence".to_string(),
+        ("law_results", "ja") => "法則別結果".to_string(),
+        ("law_results", _) => "Law Results".to_string(),
+        ("conflicts", "ja") => "矛盾検出".to_string(),
+        ("conflicts", _) => "Conflicts".to_string(),
+        ("cause", "ja") => "推定原因".to_string(),
+        ("cause", _) => "Likely Cause".to_string(),
+        ("suggestion", "ja") => "推奨対策".to_string(),
+        ("suggestion", _) => "Suggestion".to_string(),
+        ("recommendations", "ja") => "推奨".to_string(),
+        ("recommendations", _) => "Recommendations".to_string(),
+        ("primary_law", "ja") => "主要法則".to_string(),
+        ("primary_law", _) => "Primary Law".to_string(),
+        ("secondary_laws", "ja") => "補助法則".to_string(),
+        ("secondary_laws", _) => "Secondary Laws".to_string(),
+        ("rationale", "ja") => "推奨理由".to_string(),
+        ("rationale", _) => "Rationale".to_string(),
+        _ => key.to_string(),
     }
 }
 
