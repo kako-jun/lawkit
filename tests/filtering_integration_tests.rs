@@ -1,6 +1,6 @@
-use crate::common::filtering::{NumberFilter, RiskThreshold, apply_number_filter};
-use crate::laws::benford::BenfordResult;
-use crate::error::BenfError;
+use lawkit::common::filtering::{NumberFilter, RiskThreshold, apply_number_filter};
+use lawkit::laws::benford::BenfordResult;
+use lawkit::error::BenfError;
 use std::str::FromStr;
 
 #[test]

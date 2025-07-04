@@ -1,5 +1,5 @@
 use crate::laws::benford::BenfordResult;
-use crate::laws::integration::IntegrationResult; // IntegrationResult をインポート
+use crate::laws::integration::IntegrationResult;
 use clap::ArgMatches; // clap::ArgMatches をインポート
 use std::io::{self, Write}; // io::Write をインポート
 

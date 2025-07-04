@@ -304,7 +304,7 @@ mod tests {
 
     #[test]
     fn test_outlier_detection() {
-        let numbers = vec![1.0, 2.0, 3.0, 4.0, 5.0, 100.0]; // 100.0は明らかな外れ値
+        let numbers = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 100.0]; // 100.0は明らかな外れ値
         
         let z_result = detect_outliers(&numbers, OutlierDetectionMethod::ZScore).unwrap();
         assert_eq!(z_result.method_name, "Z-Score");
