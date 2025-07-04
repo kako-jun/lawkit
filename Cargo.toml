@@ -7,7 +7,7 @@ license = "MIT"
 description = "Statistical law analysis toolkit with international number support"
 homepage = "https://github.com/kako-jun/benf"
 repository = "https://github.com/kako-jun/benf"
-keywords = ["statistics", "benford", "pareto", "zipf", "audit", "fraud-detection"]
+keywords = ["statistics", "benford", "pareto", "zipf", "audit"]
 categories = ["command-line-utilities", "mathematics"]
 
 [[bin]]
