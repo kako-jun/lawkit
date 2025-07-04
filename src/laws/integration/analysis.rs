@@ -94,8 +94,8 @@ pub fn cross_validate_laws(
             
             validation_results.push(ValidationFold {
                 fold_number: i + 1,
-                train_result,
-                test_result,
+                train_result: train_result.clone(),
+                test_result: test_result.clone(),
                 consistency_score: calculate_fold_consistency(&train_result, &test_result),
             });
         }
@@ -104,7 +104,7 @@ pub fn cross_validate_laws(
     Ok(CrossValidationResult {
         dataset_name: dataset_name.to_string(),
         confidence_level,
-        validation_folds: validation_results,
+        validation_folds: validation_results.clone(),
         overall_stability: calculate_overall_stability(&validation_results),
         stability_assessment: assess_stability(&validation_results),
     })
@@ -126,7 +126,7 @@ pub fn detect_conflicts_detailed(
         dataset_name: dataset_name.to_string(),
         threshold,
         integration_result,
-        detailed_conflicts,
+        detailed_conflicts: detailed_conflicts.clone(),
         conflict_patterns,
         resolution_strategies,
         conflict_severity: assess_conflict_severity(&detailed_conflicts),
@@ -142,7 +142,7 @@ pub fn generate_detailed_recommendations(
     let mut integration_result = analyze_all_laws(numbers, dataset_name)?;
     
     // 分析目的を設定
-    integration_result.data_characteristics.analysis_purpose = analysis_purpose;
+    integration_result.data_characteristics.analysis_purpose = analysis_purpose.clone();
     integration_result.finalize_analysis();
     
     let purpose_specific_recommendations = generate_purpose_recommendations(&integration_result);
@@ -152,7 +152,7 @@ pub fn generate_detailed_recommendations(
     Ok(DetailedRecommendationResult {
         dataset_name: dataset_name.to_string(),
         analysis_purpose,
-        integration_result,
+        integration_result: integration_result.clone(),
         purpose_specific_recommendations,
         combination_analysis,
         effectiveness_scores,
@@ -335,7 +335,7 @@ fn identify_conflict_patterns(detailed_conflicts: &[DetailedConflict]) -> Vec<Co
     for (conflict_type, count) in type_counts {
         if count > 1 {
             patterns.push(ConflictPattern {
-                pattern_type: conflict_type,
+                pattern_type: conflict_type.clone(),
                 frequency: count,
                 severity: calculate_pattern_severity(detailed_conflicts, &conflict_type),
                 description: describe_conflict_pattern(&conflict_type),

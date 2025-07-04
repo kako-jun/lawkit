@@ -49,7 +49,7 @@ pub struct Conflict {
 }
 
 /// 矛盾タイプ
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConflictType {
     DistributionMismatch,   // 分布適合性の不一致
     QualityDisagreement,    // 品質評価の不一致
@@ -188,19 +188,23 @@ impl IntegrationResult {
         match law_name {
             "benf" => {
                 if let LawResult::Benford(r) = result {
-                    self.law_scores.insert("benf".to_string(), r.conformity_score);
+                    // r.conformity_score の代わりに、適切なスコアを使用
+                    // 例えば、MAD (Mean Absolute Deviation) を逆転させたものや、p_value を使用
+                    // ここでは MAD を使用し、値が小さいほど良いので 1.0 - MAD/100.0 のように変換
+                    let score = 1.0 - (r.mean_absolute_deviation / 100.0);
+                    self.law_scores.insert("benf".to_string(), score);
                     self.benford_result = Some(r);
                 }
             },
             "pareto" => {
                 if let LawResult::Pareto(r) = result {
-                    self.law_scores.insert("pareto".to_string(), r.gini_coefficient);
+                    self.law_scores.insert("pareto".to_string(), r.concentration_index);
                     self.pareto_result = Some(r);
                 }
             },
             "zipf" => {
                 if let LawResult::Zipf(r) = result {
-                    self.law_scores.insert("zipf".to_string(), r.goodness_of_fit);
+                    self.law_scores.insert("zipf".to_string(), r.distribution_quality);
                     self.zipf_result = Some(r);
                 }
             },

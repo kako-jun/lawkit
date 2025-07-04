@@ -1,7 +1,6 @@
-use benf::{
-    core::{NumberFilter, RiskThreshold, apply_number_filter, BenfordResult},
-    BenfError,
-};
+use crate::common::filtering::{NumberFilter, RiskThreshold, apply_number_filter};
+use crate::laws::benford::BenfordResult;
+use crate::error::BenfError;
 use std::str::FromStr;
 
 #[test]
