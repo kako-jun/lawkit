@@ -247,6 +247,7 @@ fn main() {
                     .help("Run rare events analysis")
                     .action(clap::ArgAction::SetTrue))
         )
+        .subcommand(subcommands::compare::command())
         .subcommand(
             Command::new("list")
                 .about("List available statistical laws")
@@ -259,6 +260,7 @@ fn main() {
         Some(("zipf", sub_matches)) => subcommands::zipf::run(sub_matches),
         Some(("normal", sub_matches)) => subcommands::normal::run(sub_matches),
         Some(("poisson", sub_matches)) => subcommands::poisson::run(sub_matches),
+        Some(("compare", sub_matches)) => subcommands::compare::run(sub_matches),
         Some(("list", _)) => list_laws(),
         _ => {
             show_help();
@@ -279,6 +281,9 @@ fn list_laws() -> Result<(), LawkitError> {
     println!("  zipf    - Zipf's law analysis");
     println!("  normal  - Normal distribution analysis");
     println!("  poisson - Poisson distribution analysis");
+    println!();
+    println!("Integration commands:");
+    println!("  compare - Compare and integrate multiple statistical laws");
     Ok(())
 }
 
