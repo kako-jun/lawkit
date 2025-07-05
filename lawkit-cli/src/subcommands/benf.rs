@@ -229,7 +229,7 @@ fn print_xml_output(result: &BenfordResult) {
 }
 
 fn get_language(matches: &clap::ArgMatches) -> &str {
-    match matches.get_one::<String>("lang").map(|s| s.as_str()) {
+    match matches.get_one::<String>("language").map(|s| s.as_str()) {
         Some("auto") | None => {
             // OSの言語設定を検出
             let lang = std::env::var("LANG").unwrap_or_default();

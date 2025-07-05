@@ -1,4 +1,4 @@
-use clap::{value_parser, Arg, ArgMatches, Command};
+use clap::{ArgMatches, Command};
 use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;
 use lawkit_core::laws::integration::{
@@ -6,121 +6,17 @@ use lawkit_core::laws::integration::{
     detect_conflicts_detailed, generate_detailed_recommendations, AnalysisPurpose,
 };
 use std::io::Write;
+use crate::common_options;
 
 pub fn command() -> Command {
-    Command::new("compare")
-        .about("複数の統計法則を比較・統合分析")
-        .arg(
-            Arg::new("input")
-                .help("入力データ（ファイルパス、URL、または '-' で標準入力）")
-                .value_name("INPUT")
-                .index(1),
+    common_options::add_compare_options(
+        common_options::add_common_options(
+            common_options::add_input_arg(
+                Command::new("compare")
+                    .about("複数の統計法則を比較・統合分析")
+            )
         )
-        .arg(
-            Arg::new("laws")
-                .long("laws")
-                .short('l')
-                .help("比較対象法則 (benf,pareto,zipf,normal,poisson)")
-                .value_name("LAWS"),
-        )
-        .arg(
-            Arg::new("focus")
-                .long("focus")
-                .short('f')
-                .help("重点分析項目")
-                .value_name("FOCUS")
-                .value_parser(["quality", "concentration", "distribution", "anomaly"]),
-        )
-        .arg(
-            Arg::new("threshold")
-                .long("threshold")
-                .short('t')
-                .help("矛盾検出閾値 (0.0-1.0)")
-                .value_name("THRESHOLD")
-                .value_parser(value_parser!(f64))
-                .default_value("0.5"),
-        )
-        .arg(
-            Arg::new("recommend")
-                .long("recommend")
-                .short('r')
-                .help("最適法則推奨モード")
-                .action(clap::ArgAction::SetTrue),
-        )
-        .arg(
-            Arg::new("report")
-                .long("report")
-                .help("統合レポート生成")
-                .value_name("TYPE")
-                .value_parser(["summary", "detailed", "conflicting"])
-                .default_value("summary"),
-        )
-        .arg(
-            Arg::new("consistency-check")
-                .long("consistency-check")
-                .help("一貫性チェック実行")
-                .action(clap::ArgAction::SetTrue),
-        )
-        .arg(
-            Arg::new("cross-validation")
-                .long("cross-validation")
-                .help("相互検証分析")
-                .action(clap::ArgAction::SetTrue),
-        )
-        .arg(
-            Arg::new("confidence-level")
-                .long("confidence-level")
-                .help("信頼度水準")
-                .value_name("LEVEL")
-                .value_parser(value_parser!(f64))
-                .default_value("0.95"),
-        )
-        .arg(
-            Arg::new("purpose")
-                .long("purpose")
-                .short('p')
-                .help("分析目的")
-                .value_name("PURPOSE")
-                .value_parser([
-                    "quality",
-                    "fraud",
-                    "concentration",
-                    "anomaly",
-                    "distribution",
-                    "general",
-                ]),
-        )
-        // 共通オプション
-        .arg(
-            Arg::new("format")
-                .long("format")
-                .help("出力形式")
-                .value_name("FORMAT")
-                .value_parser(["text", "json", "csv", "yaml", "toml", "xml"])
-                .default_value("text"),
-        )
-        .arg(
-            Arg::new("quiet")
-                .long("quiet")
-                .short('q')
-                .help("最小出力")
-                .action(clap::ArgAction::SetTrue),
-        )
-        .arg(
-            Arg::new("verbose")
-                .long("verbose")
-                .short('v')
-                .help("詳細出力")
-                .action(clap::ArgAction::SetTrue),
-        )
-        .arg(
-            Arg::new("lang")
-                .long("lang")
-                .help("出力言語")
-                .value_name("LANG")
-                .value_parser(["en", "ja", "zh", "hi", "ar", "auto"])
-                .default_value("auto"),
-        )
+    )
 }
 
 pub fn run(matches: &ArgMatches) -> Result<()> {

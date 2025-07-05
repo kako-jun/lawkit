@@ -1,6 +1,7 @@
 pub mod common;
 pub mod error;
 pub mod laws;
+// pub mod generate; // Temporarily disabled for CLI testing
 
 pub use common::*;
 pub use error::*;

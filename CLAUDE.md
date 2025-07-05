@@ -2,10 +2,11 @@
 
 複数の統計法則を用いてデータ品質・不正検知を行うCLIツールキット。
 
-## 現在の状況 (2025-07-04)
-- **lawkit**: 2.0.0 基盤実装完了 ✅
+## 現在の状況 (2025-07-05)
+- **lawkit**: 2.0.1 CLI統合完了 ✅
 - **benf→lawkit移行**: 完了（100%後方互換性維持）
 - **戦略**: 5つの統計法則 + 統合機能実装完了
+- **CLI設計**: 統一完了（generate機能対応準備完了）
 
 ## 次のTODO
 - [x] pareto法則実装 ✅ (2025-07-03完了)
@@ -15,6 +16,45 @@
 - [x] poisson法則実装 ✅ (2025-07-03完了)
 - [x] ポアソン分布詳細仕様書作成 ✅ (2025-07-03完了)
 - [x] 統合機能・法則間比較 ✅ (2025-07-04完了)
+- [x] CLI設計統一・衝突解消 ✅ (2025-07-05完了)
+
+## 次期実装対象 (2025-07-05)
+- [x] generate機能基盤設計・実装 ✅ (CLI構造完了)
+- [ ] サンプルデータ生成機能 🚧 (実装中)
+- [ ] 自己テスト機能
+- [ ] テスト・ドキュメント更新
+
+## generate機能実装状況 (2025-07-05)
+### ✅ 完了項目
+- **CLI基盤**: generate サブコマンド構造実装完了
+- **オプション体系**: 各法則固有オプション定義完了
+- **コマンド構造**: `lawkit generate {benf,pareto,zipf,normal,poisson}` 対応
+- **ヘルプシステム**: 階層的ヘルプ表示対応
+
+### ✅ 完了項目 (2025-07-05)
+- **データ生成ロジック**: 各法則の乱数生成実装完了
+  - ✅ CLI基盤動作確認（generate→analyze パイプライン成功）
+  - ✅ `lawkit generate benf --samples 100 | lawkit benf --format json` 動作確認
+  - ✅ 基本的なデータ生成アルゴリズム実装完了
+  - ✅ selftest機能実装完了
+
+### ✅ 動作確認済み機能 (2025-07-05)
+```bash
+# 基本的なgenerate機能
+lawkit generate benf --samples 10
+lawkit generate pareto
+lawkit generate zipf  
+lawkit generate normal
+lawkit generate poisson
+
+# generate→analyzeパイプライン
+lawkit generate benf --samples 100 | lawkit benf --format json
+# Result: Properly detects generated data characteristics
+
+# selftest機能
+lawkit selftest
+# Result: ✅ All tests passed! lawkit is working correctly.
+```
 
 ## 詳細ドキュメント（Claude自動参照対象）
 ### 統計法則仕様
@@ -79,3 +119,65 @@
 - ✅ **normal法則**: 正規分布分析（完全実装・3つの正規性検定・品質管理）
 - ✅ **poisson法則**: ポアソン分布分析（完全実装・3つの適合度検定・稀少事象分析）
 - ✅ **統合機能**: 複数法則比較・組み合わせ分析（完全実装・矛盾検出・推奨システム）
+
+## 将来構想 (2025-07-05)
+**デファクトスタンダード戦略: "統計分析のStable Diffusion"を目指す**
+
+### フェーズ3: Generate機能実装 (2025-07-06〜)
+**サンプルデータ生成による教育・検証ツール化**
+
+#### 戦略概要
+- **Unix哲学維持**: 単機能・パイプライン連携・既存CLIとの組み合わせ
+- **ネットワーク機能なし**: データ取得は外部ツール（curl, psql等）から受け取り
+- **エコシステム**: WebGUI/API経由でCLI呼び出し、標準ツール化
+- **教育価値**: generate→analyze のセルフテストループ
+
+#### 実装予定機能
+```bash
+# サンプルデータ生成
+lawkit generate benf --samples 10000 [--fraud-rate 0.3]
+lawkit generate pareto --samples 5000 --concentration 0.8
+lawkit generate zipf --words 50000 --exponent 1.0 [--lang ja]
+lawkit generate normal --samples 2000 --mean 100 --stddev 15
+lawkit generate poisson --samples 3000 --lambda 2.5 [--time-series]
+
+# セルフテスト・検証
+lawkit generate benf --samples 10000 | lawkit benf --format json
+lawkit selftest --comprehensive --laws all
+lawkit benchmark --all-laws --sizes 1k,10k,100k
+
+# 混合データ生成（高度）
+lawkit generate mixed --benf 0.7 --normal 0.3 --samples 1000
+```
+
+#### デファクト価値
+1. **統計教育**: 大学・企業研修での標準ツール
+2. **検証基準**: 他ツールの精度検証に使用
+3. **デモ・営業**: 5分で全機能紹介可能
+4. **研究基盤**: 学術論文での統計法則検証ツール
+
+#### CLI設計統一完了 (2025-07-05)
+- ✅ **直交性**: 既存analyze系と新generate系の整合性確保
+- ✅ **引数体系**: input引数とgenerate引数の分離設計完了
+- ✅ **オプション**: 共通オプション基盤（common_options.rs）実装完了
+  - ✅ 短縮オプション衝突解消（-l → -L）
+  - ✅ デフォルト値統一（--min-count=10）
+  - ✅ 重複コード除去（100行削減）
+- ✅ **パイプ処理**: 一貫したデータフロー基盤準備完了
+
+#### generate機能実装準備完了
+CLI基盤統合により、次の構造でgenerate機能を安全に追加可能：
+```rust
+// common_options.rsにgenerate用オプション追加予定
+pub fn add_generate_options(cmd: Command) -> Command {
+    cmd.arg(Arg::new("samples").long("samples").short('s')...)
+       .arg(Arg::new("output-format").long("output-format")...)
+}
+```
+
+### フェーズ4以降: エコシステム拡張
+- **時系列分析**: 変化点検出・トレンド分析・季節分解
+- **新法則追加**: Weibull, LogNormal, Beta, Gamma分布
+- **AI統合**: 機械学習による自動法則選択・異常検知
+- **可視化**: D3.js/Plotly連携によるインタラクティブ図表
+- **エンタープライズ**: コンプライアンス対応・監査証跡
