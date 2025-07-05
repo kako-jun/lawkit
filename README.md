@@ -193,6 +193,83 @@ lawkit poisson --predict --rare-events incident_data.csv
 ```
 Models and predicts discrete event occurrences.
 
+## 🎲 Data Generation & Testing
+
+lawkit includes powerful data generation capabilities for education, testing, and demonstration purposes.
+
+### Generate Sample Data
+
+Create statistically accurate sample data following specific laws:
+
+```bash
+# Generate 1000 Benford's law samples
+lawkit generate benf --samples 1000
+
+# Generate Pareto distribution (80/20 rule)
+lawkit generate pareto --samples 5000 --concentration 0.8
+
+# Generate Zipf distribution with custom parameters
+lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000
+
+# Generate normal distribution data
+lawkit generate normal --samples 1000 --mean 100 --stddev 15
+
+# Generate Poisson event data
+lawkit generate poisson --samples 500 --lambda 2.5
+```
+
+### Generate-to-Analysis Pipeline
+
+Combine generation with analysis for testing and validation:
+
+```bash
+# Test Benford's law detection
+lawkit generate benf --samples 10000 | lawkit benf --format json
+
+# Verify Pareto principle with generated data
+lawkit generate pareto --samples 5000 | lawkit pareto --verbose
+
+# Validate statistical methods
+lawkit generate normal --samples 1000 --mean 50 --stddev 10 | lawkit normal --outliers
+
+# Test with fraud injection
+lawkit generate benf --samples 5000 --fraud-rate 0.2 | lawkit benf --threshold critical
+```
+
+### Self-Testing
+
+Run comprehensive self-tests to verify lawkit functionality:
+
+```bash
+# Run all self-tests
+lawkit selftest
+
+# Test specific functionality
+lawkit generate benf --samples 100 | lawkit benf --quiet
+```
+
+### Educational Use Cases
+
+Perfect for teaching statistical concepts:
+
+```bash
+# Demonstrate central limit theorem
+for i in {1..5}; do
+  lawkit generate normal --samples 1000 --mean 100 --stddev 15 | 
+  lawkit normal --verbose
+done
+
+# Show Pareto principle in action
+lawkit generate pareto --samples 10000 --concentration 0.8 | 
+lawkit pareto --format json | jq '.concentration_ratio'
+
+# Compare different distributions
+lawkit generate benf --samples 1000 > benf_data.txt
+lawkit generate normal --samples 1000 > normal_data.txt
+lawkit compare --laws benf,normal benf_data.txt
+lawkit compare --laws benf,normal normal_data.txt
+```
+
 ## International Numeral Support
 
 ### Supported Number Formats

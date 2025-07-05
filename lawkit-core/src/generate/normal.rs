@@ -1,7 +1,7 @@
 use super::{DataGenerator, GenerateConfig};
 use crate::error::Result;
 use rand::prelude::*;
-use rand_distr::Normal;
+use rand_distr::{Normal, Distribution};
 
 #[derive(Debug, Clone)]
 pub struct NormalGenerator {

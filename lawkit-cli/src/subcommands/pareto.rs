@@ -276,7 +276,7 @@ fn print_xml_output(result: &ParetoResult) {
 }
 
 fn get_language(matches: &clap::ArgMatches) -> &str {
-    match matches.get_one::<String>("lang").map(|s| s.as_str()) {
+    match matches.get_one::<String>("language").map(|s| s.as_str()) {
         Some("auto") | None => {
             let lang = std::env::var("LANG").unwrap_or_default();
             if lang.starts_with("ja") {

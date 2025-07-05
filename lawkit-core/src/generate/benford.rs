@@ -1,6 +1,6 @@
 use super::{DataGenerator, GenerateConfig};
 use crate::error::Result;
-use rand::{Rng, SeedableRng};
+use rand::prelude::*;
 use rand::distributions::{Distribution, Uniform};
 
 #[derive(Debug, Clone)]
