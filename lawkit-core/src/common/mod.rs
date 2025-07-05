@@ -1,6 +1,10 @@
 pub mod filtering;
 pub mod input;
 pub mod international;
+pub mod memory;
+pub mod outliers;
 pub mod output;
+pub mod parallel;
 pub mod risk;
 pub mod statistics;
+pub mod timeseries;

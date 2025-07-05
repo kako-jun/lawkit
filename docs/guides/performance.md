@@ -13,7 +13,68 @@ lawkit is designed to handle various data sizes efficiently:
 
 ## Optimization Strategies
 
-### 1. Sampling for Large Datasets
+### 1. Advanced Outlier Detection
+
+```bash
+# Use LOF (Local Outlier Factor) for sophisticated outlier detection
+lawkit benf data.csv --outlier-method lof --outlier-k 5
+
+# Use Isolation Forest-style anomaly detection
+lawkit benf data.csv --outlier-method isolation --outlier-depth 8
+
+# Use DBSCAN-style density-based outlier detection
+lawkit benf data.csv --outlier-method dbscan --outlier-eps 0.5 --outlier-min-pts 3
+
+# Use ensemble of multiple methods (recommended)
+lawkit benf data.csv --outlier-method ensemble
+```
+
+### 2. Time Series Analysis
+
+```bash
+# Analyze time-based data patterns
+lawkit benf time_series.csv --enable-timeseries --timestamp-column "date"
+
+# Generate forecasts with confidence intervals
+lawkit benf sales_data.csv --forecast-steps 5 --enable-timeseries
+
+# Detect seasonal patterns and trends
+lawkit benf monthly_data.csv --detect-seasonality --enable-timeseries
+
+# Find changepoints in data
+lawkit benf process_data.csv --detect-changepoints --enable-timeseries
+```
+
+### 3. Parallel Processing
+
+```bash
+# Use automatic parallel processing for large datasets
+lawkit compare data.csv --enable-parallel
+
+# Configure specific thread count
+lawkit compare data.csv --parallel-threads 8
+
+# Set chunk size for parallel processing
+lawkit compare data.csv --parallel-chunk-size 10000
+
+# Benchmark parallel vs serial performance
+lawkit compare data.csv --benchmark-parallel
+```
+
+### 4. Memory-Efficient Processing
+
+```bash
+# Use streaming mode for very large files
+lawkit benf massive_file.csv --streaming
+
+# Configure memory limits and chunk sizes
+lawkit benf large_file.csv --memory-limit 512 --chunk-size 5000
+
+# Enable incremental statistics for memory efficiency
+lawkit benf data.csv --incremental-stats
+```
+
+### 5. Traditional Sampling
 
 ```bash
 # Sample 50,000 records from large dataset
@@ -23,27 +84,7 @@ lawkit benf huge_dataset.csv --sample-size 50000
 lawkit benf data.csv --sample-size 10000 --seed 12345
 ```
 
-### 2. Parallel Processing
-
-```bash
-# Use multiple threads
-lawkit compare data.csv --threads 8
-
-# Let lawkit auto-detect optimal threads
-lawkit compare data.csv --threads auto
-```
-
-### 3. Memory Management
-
-```bash
-# Set memory limit (in MB)
-lawkit benf large_file.csv --memory-limit 2048
-
-# Use streaming mode for very large files
-lawkit benf massive_file.csv --streaming
-```
-
-### 4. Column Selection
+### 6. Column Selection
 
 ```bash
 # Analyze only specific columns
@@ -87,6 +128,61 @@ lawkit benf large_data.json --streaming
 # Specify JSON path for nested data
 lawkit benf complex.json --json-path "$.transactions[*].amount"
 ```
+
+## Advanced Analysis Features
+
+### Outlier Detection Methods
+
+lawkit provides multiple sophisticated outlier detection algorithms:
+
+1. **Local Outlier Factor (LOF)**
+   - Detects outliers based on local density
+   - Best for clustered data with varying densities
+   - Parameter: `k` (number of neighbors, default: 5)
+
+2. **Isolation Score**
+   - Based on Isolation Forest principles
+   - Fast for high-dimensional data
+   - Parameter: `max_depth` (tree depth, default: 8)
+
+3. **DBSCAN-style Detection**
+   - Density-based spatial clustering
+   - Good for irregular cluster shapes
+   - Parameters: `eps` (neighborhood size), `min_pts` (minimum points)
+
+4. **Ensemble Method**
+   - Combines multiple algorithms for robust detection
+   - Automatically tunes parameters
+   - Provides consensus-based results
+
+### Time Series Analysis Capabilities
+
+Advanced time series features include:
+
+- **Trend Analysis**: Linear regression with R² scores
+- **Seasonality Detection**: Automatic period identification
+- **Changepoint Detection**: Statistical significance testing
+- **Forecasting**: Confidence intervals and uncertainty quantification
+- **Anomaly Detection**: Context-aware outlier identification
+
+### Parallel Processing Architecture
+
+The parallel processing system provides:
+
+- **Automatic Thread Detection**: Uses available CPU cores
+- **Chunk-based Processing**: Memory-efficient data splitting
+- **Load Balancing**: Work queue distribution
+- **Result Aggregation**: Seamless result combination
+- **Performance Monitoring**: Speedup and efficiency metrics
+
+### Memory Management Features
+
+Memory-efficient processing includes:
+
+- **Streaming Processors**: Handle data larger than RAM
+- **Incremental Statistics**: Welford's online algorithm
+- **Chunk Iterators**: Fixed-memory data processing
+- **Resource Monitoring**: Peak memory tracking
 
 ## Benchmarking
 
@@ -302,14 +398,48 @@ lawkit compare large_data.csv \
 ### Very Large Data (> 1M records)
 
 ```bash
-# Maximum optimization
+# Maximum optimization with advanced features
 lawkit benf huge_data.csv \
   --sample-size 50000 \
-  --threads $(nproc) \
+  --enable-parallel \
+  --parallel-threads $(nproc) \
   --memory-limit 4096 \
   --streaming \
-  --algorithm fast \
-  --cache-enabled
+  --chunk-size 10000 \
+  --outlier-method ensemble \
+  --incremental-stats
+
+# Time series analysis for large datasets
+lawkit benf timeseries_data.csv \
+  --enable-timeseries \
+  --enable-parallel \
+  --memory-limit 2048 \
+  --streaming \
+  --forecast-steps 10
+```
+
+### Advanced Analysis Performance
+
+```bash
+# Optimized outlier detection for large datasets
+lawkit benf data.csv \
+  --outlier-method lof \
+  --outlier-k 10 \
+  --enable-parallel \
+  --parallel-chunk-size 5000
+
+# Memory-efficient time series processing
+lawkit benf timeseries.csv \
+  --enable-timeseries \
+  --streaming \
+  --chunk-size 1000 \
+  --incremental-stats
+
+# Parallel comparison analysis
+lawkit compare datasets/*.csv \
+  --enable-parallel \
+  --parallel-threads 8 \
+  --memory-limit 1024
 ```
 
 ## Troubleshooting Performance Issues

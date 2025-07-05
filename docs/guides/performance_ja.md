@@ -13,7 +13,68 @@ lawkitは様々なデータサイズを効率的に処理するよう設計さ�
 
 ## 最適化戦略
 
-### 1. 大規模データセットのサンプリング
+### 1. 高度な異常値検出
+
+```bash
+# 高度な異常値検出にLOF（Local Outlier Factor）を使用
+lawkit benf data.csv --outlier-method lof --outlier-k 5
+
+# Isolation Forest風の異常検出を使用
+lawkit benf data.csv --outlier-method isolation --outlier-depth 8
+
+# DBSCAN風の密度ベース異常値検出を使用
+lawkit benf data.csv --outlier-method dbscan --outlier-eps 0.5 --outlier-min-pts 3
+
+# 複数手法のアンサンブルを使用（推奨）
+lawkit benf data.csv --outlier-method ensemble
+```
+
+### 2. 時系列分析
+
+```bash
+# 時間ベースのデータパターンを分析
+lawkit benf time_series.csv --enable-timeseries --timestamp-column "date"
+
+# 信頼区間付きの予測を生成
+lawkit benf sales_data.csv --forecast-steps 5 --enable-timeseries
+
+# 季節パターンとトレンドを検出
+lawkit benf monthly_data.csv --detect-seasonality --enable-timeseries
+
+# データの変化点を発見
+lawkit benf process_data.csv --detect-changepoints --enable-timeseries
+```
+
+### 3. 並列処理
+
+```bash
+# 大規模データセットの自動並列処理を使用
+lawkit compare data.csv --enable-parallel
+
+# 特定のスレッド数を設定
+lawkit compare data.csv --parallel-threads 8
+
+# 並列処理のチャンクサイズを設定
+lawkit compare data.csv --parallel-chunk-size 10000
+
+# 並列とシリアル処理のベンチマーク
+lawkit compare data.csv --benchmark-parallel
+```
+
+### 4. メモリ効率的な処理
+
+```bash
+# 非常に大きなファイルでストリーミングモードを使用
+lawkit benf massive_file.csv --streaming
+
+# メモリ制限とチャンクサイズを設定
+lawkit benf large_file.csv --memory-limit 512 --chunk-size 5000
+
+# メモリ効率のための増分統計を有効化
+lawkit benf data.csv --incremental-stats
+```
+
+### 5. 従来のサンプリング
 
 ```bash
 # 大規模データセットから50,000レコードをサンプリング
@@ -23,27 +84,7 @@ lawkit benf huge_dataset.csv --sample-size 50000
 lawkit benf data.csv --sample-size 10000 --seed 12345
 ```
 
-### 2. 並列処理
-
-```bash
-# 複数スレッドを使用
-lawkit compare data.csv --threads 8
-
-# lawkitに最適スレッド数を自動検出させる
-lawkit compare data.csv --threads auto
-```
-
-### 3. メモリ管理
-
-```bash
-# メモリ制限を設定（MB単位）
-lawkit benf large_file.csv --memory-limit 2048
-
-# 非常に大きなファイルでストリーミングモードを使用
-lawkit benf massive_file.csv --streaming
-```
-
-### 4. 列選択
+### 6. 列選択
 
 ```bash
 # 特定の列のみ分析
