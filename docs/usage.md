@@ -336,6 +336,33 @@ lawkit compare --laws all --format json data.csv
 - **Recommendation System**: Suggests the most appropriate statistical law
 - **Meta-Analysis**: Combines insights from multiple perspectives
 
+### Multi-Law Decision Flow
+
+```mermaid
+flowchart TD
+    A[Input Data] --> B{Data Size Check}
+    B -->|< 30 points| C[Use Benford + Pareto]
+    B -->|30-100 points| D[Use Benford + Pareto + Normal]
+    B -->|> 100 points| E[Use All Laws]
+    
+    C --> F[Risk Assessment]
+    D --> F
+    E --> F
+    
+    F --> G{Contradiction Found?}
+    G -->|Yes| H[Flag Inconsistencies]
+    G -->|No| I[Generate Confidence Score]
+    
+    H --> J[Manual Review Required]
+    I --> K{High Confidence?}
+    K -->|Yes| L[Accept Results]
+    K -->|No| M[Additional Analysis Recommended]
+    
+    style F fill:#e1f5fe
+    style H fill:#ffebee
+    style L fill:#e8f5e8
+```
+
 ## Advanced Features
 
 ### Quality Control Analysis

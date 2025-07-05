@@ -81,12 +81,69 @@ lawkit normal --quality-control --spec-limits 8.0,12.0 measurements.csv
 
 ## Architecture
 
+### System Overview
+
+```mermaid
+graph TB
+    subgraph "Core Engine"
+        A[lawkit-core] --> B[Statistical Laws]
+        B --> C[Integration Engine]
+        C --> D[Output Formatters]
+    end
+    
+    subgraph "Interfaces"
+        E[CLI Tool] --> A
+        F[Library API] --> A
+    end
+    
+    subgraph "Statistical Laws"
+        G[Benford's Law] --> B
+        H[Pareto Analysis] --> B
+        I[Zipf's Law] --> B
+        J[Normal Distribution] --> B
+        K[Poisson Distribution] --> B
+    end
+    
+    subgraph "Output"
+        D --> L[Text Display]
+        D --> M[JSON/CSV]
+        D --> N[YAML/TOML/XML]
+    end
+    
+    style A fill:#e1f5fe
+    style C fill:#fff3e0
+```
+
 lawkit is built as a workspace with two main components:
 
 - **lawkit-core**: Core library with statistical analysis algorithms
 - **lawkit-cli**: Command-line interface for interactive use
 
 This design allows lawkit to be used both as a standalone CLI tool and as a library in other Rust applications.
+
+### Multi-Law Integration Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI
+    participant Core
+    participant Laws as Statistical Laws
+    participant Integration
+    participant Output
+    
+    User->>CLI: lawkit compare --laws all data.csv
+    CLI->>Core: Parse input data
+    Core->>Laws: Analyze with each law
+    Laws-->>Core: Return individual results
+    Core->>Integration: Combine & assess
+    Integration->>Integration: Detect contradictions
+    Integration->>Integration: Generate recommendations
+    Integration-->>Core: Integrated analysis
+    Core->>Output: Format results
+    Output-->>CLI: Multi-format output
+    CLI-->>User: Display comprehensive analysis
+```
 
 ## Supported Formats
 
