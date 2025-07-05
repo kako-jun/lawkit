@@ -1,6 +1,4 @@
-use benf::core::extraction::{extract_numbers, filter_benford_valid_numbers};
-use crate::common::fixtures::{NumberExtractionTest, NUMBER_EXTRACTION_TESTS};
-use crate::common::assertions::assert_number_extraction;
+use lawkit::common::input::parser::{extract_numbers, filter_benford_valid_numbers};
 
 #[cfg(test)]
 mod number_extraction_tests {

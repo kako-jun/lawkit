@@ -1,6 +1,5 @@
-use benf::core::japanese::{convert_japanese_numerals, extract_numbers_from_japanese_text};
-use crate::common::fixtures::{JapaneseNumeralTest, JAPANESE_NUMERAL_TESTS};
-use crate::common::assertions::assert_japanese_conversion;
+use lawkit::laws::benford::japanese::{convert_japanese_numerals, extract_numbers_from_japanese_text};
+use crate::test_common::{FULLWIDTH_DIGITS, KANJI_NUMERALS, KANJI_WITH_POSITIONS, MIXED_JAPANESE};
 
 #[cfg(test)]
 mod japanese_numeral_conversion_tests {

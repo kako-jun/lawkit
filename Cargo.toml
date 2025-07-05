@@ -1,24 +1,31 @@
-[package]
-name = "lawkit"
+[workspace]
+resolver = "2"
+members = [
+    "lawkit-core",
+    "lawkit-cli"
+]
+
+[workspace.package]
 version = "2.0.1"
 edition = "2024"
-authors = ["kako-jun"]
+authors = ["kako-jun <kako.jun.42@gmail.com>"]
 license = "MIT"
 description = "Statistical law analysis toolkit with international number support"
-homepage = "https://github.com/kako-jun/benf"
-repository = "https://github.com/kako-jun/benf"
+homepage = "https://github.com/kako-jun/lawkit"
+repository = "https://github.com/kako-jun/lawkit"
+documentation = "https://docs.rs/lawkit-core"
+readme = "README.md"
 keywords = ["statistics", "benford", "pareto", "zipf", "audit"]
-categories = ["command-line-utilities", "mathematics"]
+categories = ["command-line-utilities", "mathematics", "algorithms", "science"]
+exclude = [
+    "test_manual/",
+    "test_threshold.csv",
+    ".github/",
+    "international_numerals_research.md"
+]
+rust-version = "1.70"
 
-[[bin]]
-name = "lawkit"
-path = "src/main.rs"
-
-[[bin]]
-name = "benf"
-path = "src/bin/benf.rs"
-
-[dependencies]
+[workspace.dependencies]
 clap = { version = "4.0", features = ["derive", "cargo"] }
 scraper = "0.17"
 calamine = "0.22"
@@ -33,11 +40,11 @@ regex = "1.0"
 thiserror = "1.0"
 anyhow = "1.0"
 rayon = "1.0"
-
-[dev-dependencies]
 tempfile = "3.0"
 mockito = "1.0"
 pretty_assertions = "1.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+
 
 [profile.release]
 lto = true
