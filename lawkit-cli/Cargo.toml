@@ -1,0 +1,37 @@
+[package]
+name = "lawkit"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Statistical law analysis CLI toolkit with international number support"
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+readme = "../README.md"
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "lawkit"
+path = "src/main.rs"
+
+[[bin]]
+name = "benf"
+path = "src/bin/benf.rs"
+
+[dependencies]
+lawkit-core = { path = "../lawkit-core" }
+clap = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }
+
+# Integration tests configuration
+[[test]]
+name = "integration_tests"
+path = "../tests/integration/integration_tests.rs"

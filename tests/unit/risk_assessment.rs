@@ -1,6 +1,5 @@
-use benf::core::{BenfordResult, RiskLevel};
-use benf::core::risk::{determine_risk_level, assess_data_quality, calculate_confidence_score};
-use crate::common::assertions::{assert_valid_benford_result, assert_risk_level_matches_p_value};
+use lawkit::laws::benford::result::BenfordResult;
+use lawkit::common::risk::{RiskLevel, determine_risk_level, assess_data_quality, calculate_confidence_score};
 
 #[cfg(test)]
 mod risk_level_tests {

@@ -1,13 +1,14 @@
-use benf::core::benford::{
+use lawkit::laws::benford::analysis::{
     calculate_benford_distribution, 
     calculate_chi_square, 
     calculate_first_digit_distribution,
     extract_first_digits,
     BENFORD_EXPECTED_PERCENTAGES
 };
-use benf::core::{BenfordResult, RiskLevel};
-use crate::common::fixtures::{BENFORD_COMPLIANT_DATA, FRAUDULENT_DATA};
-use crate::common::assertions::{
+use lawkit::laws::benford::result::BenfordResult;
+use lawkit::common::risk::RiskLevel;
+use crate::test_common::{BENFORD_COMPLIANT_DATA, FRAUDULENT_DATA};
+use crate::test_common::assertions::{
     assert_valid_benford_result, 
     assert_follows_benford_law, 
     assert_deviates_from_benford_law,

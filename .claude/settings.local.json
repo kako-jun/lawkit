@@ -24,7 +24,10 @@
       "Bash(./target/release/lawkit:*)",
       "WebFetch(domain:en.wikipedia.org)",
       "WebFetch(domain:www.omniglot.com)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(RUST_BACKTRACE=1 cargo test filtering_integration_tests --all-features)",
+      "Bash(RUST_BACKTRACE=1 cargo test filtering --all-features)",
+      "Bash(cargo bench:*)"
     ],
     "deny": []
   },
