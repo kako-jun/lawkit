@@ -50,7 +50,7 @@ impl OutputConfig {
             quiet: *matches.get_one::<bool>("quiet").unwrap_or(&false),
             verbose: *matches.get_one::<bool>("verbose").unwrap_or(&false),
             language: matches
-                .get_one::<String>("lang")
+                .get_one::<String>("language")
                 .unwrap_or(&"auto".to_string())
                 .clone(),
         }
