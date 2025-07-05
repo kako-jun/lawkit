@@ -23,7 +23,7 @@ impl ParetoResult {
         }
 
         // データを降順にソート
-        let mut sorted_numbers: Vec<f64> = numbers.iter().cloned().collect();
+        let mut sorted_numbers: Vec<f64> = numbers.to_vec();
         sorted_numbers.sort_by(|a, b| b.partial_cmp(a).unwrap());
 
         // 80/20原則の検証
@@ -76,6 +76,7 @@ fn calculate_gini_coefficient(sorted_numbers: &[f64]) -> f64 {
 /// ローレンツ曲線のデータポイントを生成
 fn generate_lorenz_curve(sorted_numbers: &[f64]) -> Vec<(f64, f64)> {
     let total_sum: f64 = sorted_numbers.iter().sum();
+    #[allow(unused_assignments)]
     let mut cumulative_population = 0.0;
     let mut cumulative_wealth = 0.0;
     let mut curve_points = Vec::new();

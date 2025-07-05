@@ -1,5 +1,4 @@
 use crate::laws::benford::BenfordResult;
-use crate::laws::integration::IntegrationResult;
 use clap::ArgMatches; // clap::ArgMatches をインポート
 use std::io::{self, Write}; // io::Write をインポート
 
@@ -13,8 +12,10 @@ pub enum OutputFormat {
     Xml,
 }
 
-impl OutputFormat {
-    pub fn from_str(s: &str) -> crate::error::Result<Self> {
+impl std::str::FromStr for OutputFormat {
+    type Err = crate::error::BenfError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "text" => Ok(OutputFormat::Text),
             "json" => Ok(OutputFormat::Json),
@@ -30,6 +31,7 @@ impl OutputFormat {
     }
 }
 
+
 #[derive(Debug, Clone)]
 pub struct OutputConfig {
     pub format: String,
@@ -41,16 +43,23 @@ pub struct OutputConfig {
 impl OutputConfig {
     pub fn from_matches(matches: &ArgMatches) -> Self {
         OutputConfig {
-            format: matches.get_one::<String>("format").unwrap().clone(),
+            format: matches
+                .get_one::<String>("format")
+                .unwrap_or(&"text".to_string())
+                .clone(),
             quiet: *matches.get_one::<bool>("quiet").unwrap_or(&false),
             verbose: *matches.get_one::<bool>("verbose").unwrap_or(&false),
-            language: matches.get_one::<String>("lang").unwrap().clone(),
+            language: matches
+                .get_one::<String>("lang")
+                .unwrap_or(&"auto".to_string())
+                .clone(),
         }
     }
 }
 
 pub fn create_output_writer(matches: &ArgMatches) -> crate::error::Result<Box<dyn Write>> {
-    let output_path = matches.get_one::<String>("output"); // output 引数があるか確認
+    // outputオプションが存在する場合のみチェック
+    let output_path = matches.try_get_one::<String>("output").ok().flatten();
 
     if let Some(path) = output_path {
         if path == "-" {
