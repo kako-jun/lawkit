@@ -33,12 +33,10 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [インストール](user-guide/installation.md) | [インストール（日本語）](user-guide/installation_ja.md)
 - [はじめに](user-guide/getting-started.md) | [はじめに（日本語）](user-guide/getting-started_ja.md)  
 - [設定](user-guide/configuration.md) | [設定（日本語）](user-guide/configuration_ja.md)
-- [使用例](user-guide/examples.md) | [使用例（日本語）](user-guide/examples_ja.md)
+- [使用例](user-guide/examples_ja.md)
 
 ### リファレンス
 - [CLIリファレンス](reference/cli-reference.md) | [CLIリファレンス（日本語）](reference/cli-reference_ja.md)
-- [APIリファレンス](reference/api-reference.md) | [APIリファレンス（日本語）](reference/api-reference_ja.md)
-- [比較表](reference/comparison.md) | [比較表（日本語）](reference/comparison_ja.md)
 
 ### ガイド
 - [統合機能](guides/integrations.md) | [統合機能（日本語）](guides/integrations_ja.md)
@@ -49,7 +47,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [ロードマップ](project/roadmap.md) | [ロードマップ（日本語）](project/roadmap_ja.md)
 
 ### その他
-- [FAQ](faq.md) | [FAQ（日本語）](faq_ja.md)
+- [FAQ](user-guide/faq.md) | [FAQ（日本語）](user-guide/faq_ja.md)
 
 ## サポート
 

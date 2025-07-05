@@ -4,7 +4,8 @@
 
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/lawkit-core.svg)](https://crates.io/crates/lawkit-core)
-[![Documentation](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![Documentation](https://img.shields.io/badge/docs-CLI%20%26%20API-blue)](docs/index.md)
+[![API Documentation](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A next-generation statistical analysis toolkit that detects anomalies, patterns, and insights using multiple statistical laws. Perfect for fraud detection, data quality assessment, and business intelligence.
@@ -901,6 +902,12 @@ curl -sk https://self-signed-site.com/data | benf  # Skip verification
 ```
 
 Benf itself requires no configuration files or environment variables.
+
+## Documentation
+
+For comprehensive documentation, see:
+- 📖 **[Documentation](docs/index.md)** - Complete user guide and API reference
+- 🇯🇵 **[日本語ドキュメント](docs/index_ja.md)** - Japanese documentation
 
 ## Contributing
 

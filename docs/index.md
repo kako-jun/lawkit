@@ -23,9 +23,9 @@ lawkit provides powerful tools for:
 
 ## Quick Links
 
-- [Usage Guide](usage.md) - Complete usage examples and CLI reference
-- [FAQ](faq.md) - Frequently asked questions and troubleshooting
-- [CI/CD Integration](ci-cd.md) - Integration with continuous integration systems
+- [Usage Guide](user-guide/usage.md) - Complete usage examples and CLI reference
+- [FAQ](user-guide/faq.md) - Frequently asked questions and troubleshooting
+- [Integration Guide](guides/integrations.md) - Integration with continuous integration systems
 - [Contributing](../CONTRIBUTING.md) - How to contribute to the project
 
 ## Installation
