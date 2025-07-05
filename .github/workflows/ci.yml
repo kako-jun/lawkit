@@ -38,5 +38,36 @@ jobs:
     - name: Build
       run: cargo build --workspace --verbose
       
-    - name: Run tests
-      run: cargo test --workspace --verbose
+    - name: Run unit tests
+      run: cargo test --workspace --lib --verbose
+      
+    - name: Run integration tests
+      run: cargo test --workspace --test "*" --verbose
+      
+    - name: Test generate functionality
+      run: |
+        # Test basic generate functionality
+        cargo run --bin lawkit -- generate benf --samples 10 --seed 12345 > /tmp/test_benf.txt
+        cargo run --bin lawkit -- benf /tmp/test_benf.txt
+        
+        # Test generate→analyze pipeline
+        cargo run --bin lawkit -- generate normal --samples 50 --mean 100 --stddev 15 --seed 54321 > /tmp/test_normal.txt
+        cargo run --bin lawkit -- normal /tmp/test_normal.txt
+        
+        # Test selftest functionality
+        cargo run --bin lawkit -- selftest
+      
+    - name: Test CLI examples from README
+      run: |
+        # Basic analysis examples
+        echo "1234 5678 9012 3456" | cargo run --bin lawkit -- benf
+        
+        # Generate and analyze workflow
+        cargo run --bin lawkit -- generate benf --samples 100 --seed readme > /tmp/readme_test.txt
+        cargo run --bin lawkit -- benf /tmp/readme_test.txt --format json
+        
+        # Multi-law comparison
+        cargo run --bin lawkit -- compare /tmp/readme_test.txt
+        
+        # List functionality
+        cargo run --bin lawkit -- list

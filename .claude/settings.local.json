@@ -32,7 +32,8 @@
       "Bash(cargo fmt:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo update:*)",
-      "Bash(cargo:*)"
+      "Bash(cargo:*)",
+      "Bash(RUST_BACKTRACE=1 cargo test --test lawkit_subcommands test_lawkit_benf_basic)"
     ],
     "deny": []
   },
