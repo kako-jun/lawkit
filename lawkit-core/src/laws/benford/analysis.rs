@@ -17,12 +17,12 @@ pub fn get_first_digit(number: f64) -> Option<u8> {
     if abs_num < 1.0 {
         return None; // Skip numbers less than 1
     }
-    
+
     let mut digit = abs_num;
     while digit >= 10.0 {
         digit /= 10.0;
     }
-    
+
     let first_digit = digit as u8;
     if (1..=9).contains(&first_digit) {
         Some(first_digit)
@@ -54,6 +54,9 @@ pub fn calculate_digit_distribution(numbers: &[f64]) -> [f64; 9] {
 }
 
 /// Perform Benford's Law analysis on a dataset
-pub fn analyze_benford_law(numbers: &[f64], dataset_name: &str) -> crate::error::Result<crate::laws::benford::BenfordResult> {
+pub fn analyze_benford_law(
+    numbers: &[f64],
+    dataset_name: &str,
+) -> crate::error::Result<crate::laws::benford::BenfordResult> {
     crate::laws::benford::BenfordResult::new(dataset_name.to_string(), numbers)
 }

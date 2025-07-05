@@ -1,11 +1,11 @@
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
+        filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
-        filtering::{NumberFilter, apply_number_filter, RiskThreshold},
     },
-    laws::benford::BenfordResult,
     error::{BenfError, Result},
+    laws::benford::BenfordResult,
 };
 use std::io::{self, Read};
 use std::str::FromStr;
@@ -22,17 +22,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("{}", error_msg);
                     std::process::exit(1);
                 }
-                
+
                 // Apply filtering and custom analysis
-                let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+                let result =
+                    match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 // Output results and exit
                 output_results(&matches, &result);
@@ -52,7 +53,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                
+
                 // Extract numbers from stdin input text with international numeral support
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
@@ -63,17 +64,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         std::process::exit(1);
                     }
                 };
-                
+
                 // Apply filtering and custom analysis
-                let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+                let result =
+                    match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 // Output results and exit
                 output_results(&matches, &result);
@@ -118,10 +120,22 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool, lang: &
 
     println!("{}", localized_text("analysis_results", lang));
     println!();
-    println!("{}: {}", localized_text("dataset", lang), result.dataset_name);
-    println!("{}: {}", localized_text("numbers_analyzed", lang), result.numbers_analyzed);
-    println!("{}: {:?}", localized_text("risk_level", lang), result.risk_level);
-    
+    println!(
+        "{}: {}",
+        localized_text("dataset", lang),
+        result.dataset_name
+    );
+    println!(
+        "{}: {}",
+        localized_text("numbers_analyzed", lang),
+        result.numbers_analyzed
+    );
+    println!(
+        "{}: {:?}",
+        localized_text("risk_level", lang),
+        result.risk_level
+    );
+
     if verbose {
         println!();
         println!("{}:", localized_text("digit_distribution", lang));
@@ -129,24 +143,33 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool, lang: &
             let digit = i + 1;
             let expected = result.expected_distribution[i];
             let deviation = observed - expected;
-            
-            println!("{}: {:.1}% ({}: {:.1}%, {}: {:+.1}%)", 
-                     digit, observed, 
-                     localized_text("expected", lang), expected,
-                     localized_text("deviation", lang), deviation);
+
+            println!(
+                "{}: {:.1}% ({}: {:.1}%, {}: {:+.1}%)",
+                digit,
+                observed,
+                localized_text("expected", lang),
+                expected,
+                localized_text("deviation", lang),
+                deviation
+            );
         }
-        
+
         println!();
         println!("{}:", localized_text("statistical_tests", lang));
-        println!("{}: {:.2} ({}: {:.6})", 
-                 localized_text("chi_square", lang), result.chi_square,
-                 localized_text("p_value", lang), result.p_value);
+        println!(
+            "{}: {:.2} ({}: {:.6})",
+            localized_text("chi_square", lang),
+            result.chi_square,
+            localized_text("p_value", lang),
+            result.p_value
+        );
     }
 }
 
 fn print_json_output(result: &BenfordResult) {
     use serde_json::json;
-    
+
     let output = json!({
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
@@ -155,19 +178,21 @@ fn print_json_output(result: &BenfordResult) {
         "p_value": result.p_value,
         "mean_absolute_deviation": result.mean_absolute_deviation
     });
-    
+
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
 
 fn print_csv_output(result: &BenfordResult) {
     println!("dataset,numbers_analyzed,risk_level,chi_square,p_value,mad");
-    println!("{},{},{:?},{:.6},{:.6},{:.2}",
-             result.dataset_name,
-             result.numbers_analyzed,
-             result.risk_level,
-             result.chi_square,
-             result.p_value,
-             result.mean_absolute_deviation);
+    println!(
+        "{},{},{:?},{:.6},{:.6},{:.2}",
+        result.dataset_name,
+        result.numbers_analyzed,
+        result.risk_level,
+        result.chi_square,
+        result.p_value,
+        result.mean_absolute_deviation
+    );
 }
 
 fn print_yaml_output(result: &BenfordResult) {
@@ -192,7 +217,10 @@ fn print_xml_output(result: &BenfordResult) {
     println!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     println!("<benford_analysis>");
     println!("  <dataset>{}</dataset>", result.dataset_name);
-    println!("  <numbers_analyzed>{}</numbers_analyzed>", result.numbers_analyzed);
+    println!(
+        "  <numbers_analyzed>{}</numbers_analyzed>",
+        result.numbers_analyzed
+    );
     println!("  <risk_level>{:?}</risk_level>", result.risk_level);
     println!("  <chi_square>{:.6}</chi_square>", result.chi_square);
     println!("  <p_value>{:.6}</p_value>", result.p_value);
@@ -205,20 +233,20 @@ fn get_language(matches: &clap::ArgMatches) -> &str {
         Some("auto") | None => {
             // OSの言語設定を検出
             let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") { 
-                "ja" 
-            } else if lang.starts_with("zh") { 
-                "zh" 
+            if lang.starts_with("ja") {
+                "ja"
+            } else if lang.starts_with("zh") {
+                "zh"
             } else if lang.starts_with("hi") {
                 "hi"
             } else if lang.starts_with("ar") {
                 "ar"
-            } else { 
-                "en" 
+            } else {
+                "en"
             }
-        },
+        }
         Some("en") => "en",
-        Some("ja") => "ja", 
+        Some("ja") => "ja",
         Some("zh") => "zh",
         Some("hi") => "hi",
         Some("ar") => "ar",
@@ -244,11 +272,13 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "normal_distribution") => "✅ Normal distribution - data appears natural",
         ("en", "slight_deviation") => "⚠️  Slight deviation - worth monitoring",
         ("en", "significant_deviation") => "🚨 Significant deviation - potential anomaly detected",
-        ("en", "critical_deviation") => "🔍 Significant attention needed - strong evidence of patterns",
+        ("en", "critical_deviation") => {
+            "🔍 Significant attention needed - strong evidence of patterns"
+        }
         ("en", "unsupported_format") => "Error: Unsupported output format",
         ("en", "no_numbers_found") => "Error: No valid numbers found in input",
         ("en", "analysis_error") => "Analysis error",
-        
+
         // 日本語
         ("ja", "analysis_results") => "ベンフォードの法則解析結果",
         ("ja", "dataset") => "データセット",
@@ -264,12 +294,12 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "interpretation") => "解釈",
         ("ja", "normal_distribution") => "✅ 正常な分布 - データは自然に見えます",
         ("ja", "slight_deviation") => "⚠️  軽微な偏差 - 監視が必要です",
-        ("ja", "significant_deviation") => "🚨 有意な偏差 - 異常の可能性があります", 
+        ("ja", "significant_deviation") => "🚨 有意な偏差 - 異常の可能性があります",
         ("ja", "critical_deviation") => "🔍 特に注意が必要 - パターンの強い証拠",
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
-        
+
         // 中国語（简体）
         ("zh", "analysis_results") => "本福德定律分析结果",
         ("zh", "dataset") => "数据集",
@@ -290,7 +320,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("zh", "unsupported_format") => "错误: 不支持的输出格式",
         ("zh", "no_numbers_found") => "错误: 输入中未找到有效数字",
         ("zh", "analysis_error") => "分析错误",
-        
+
         // हिन्दी (Hindi)
         ("hi", "analysis_results") => "बेनफोर्ड के नियम का विश्लेषण परिणाम",
         ("hi", "dataset") => "डेटासेट",
@@ -311,7 +341,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("hi", "unsupported_format") => "त्रुटि: असमर्थित आउटपुट प्रारूप",
         ("hi", "no_numbers_found") => "त्रुटि: इनपुट में कोई वैध संख्या नहीं मिली",
         ("hi", "analysis_error") => "विश्लेषण त्रुटि",
-        
+
         // العربية (Arabic)
         ("ar", "analysis_results") => "نتائج تحليل قانون بنفورد",
         ("ar", "dataset") => "مجموعة البيانات",
@@ -332,7 +362,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ar", "unsupported_format") => "خطأ: تنسيق الإخراج غير مدعوم",
         ("ar", "no_numbers_found") => "خطأ: لم يتم العثور على أرقام صحيحة في الإدخال",
         ("ar", "analysis_error") => "خطأ في التحليل",
-        
+
         // English (Default)
         (_, "analysis_results") => "Benford's Law Analysis Results",
         (_, "dataset") => "Dataset",
@@ -349,7 +379,9 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         (_, "normal_distribution") => "✅ Normal distribution - data appears natural",
         (_, "slight_deviation") => "⚠️  Slight deviation - worth monitoring",
         (_, "significant_deviation") => "🚨 Significant deviation - potential anomaly detected",
-        (_, "critical_deviation") => "🔍 Significant attention needed - strong evidence of patterns",
+        (_, "critical_deviation") => {
+            "🔍 Significant attention needed - strong evidence of patterns"
+        }
         (_, "unsupported_format") => "Error: Unsupported output format",
         (_, "no_numbers_found") => "Error: No valid numbers found in input",
         (_, "analysis_error") => "Analysis error",
@@ -358,25 +390,33 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
 }
 
 /// Analyze numbers with filtering and custom options
-fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<BenfordResult> {
+fn analyze_numbers_with_options(
+    matches: &clap::ArgMatches,
+    dataset_name: String,
+    numbers: &[f64],
+) -> Result<BenfordResult> {
     // Apply number filtering if specified
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
             .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
-        
+
         let filtered = apply_number_filter(numbers, &filter);
-        
+
         // Inform user about filtering results
         if filtered.len() != numbers.len() {
-            eprintln!("フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})", 
-                     numbers.len(), filtered.len(), filter.description());
+            eprintln!(
+                "フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})",
+                numbers.len(),
+                filtered.len(),
+                filter.description()
+            );
         }
-        
+
         filtered
     } else {
         numbers.to_vec()
     };
-    
+
     // Parse custom threshold if specified
     let threshold = if let Some(threshold_str) = matches.get_one::<String>("threshold") {
         if threshold_str == "auto" {
@@ -388,15 +428,16 @@ fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String
     } else {
         RiskThreshold::Auto
     };
-    
+
     // Parse minimum count requirement
     let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
-        min_count_str.parse::<usize>()
+        min_count_str
+            .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
     } else {
         5
     };
-    
+
     // Perform Benford analysis with custom options
     BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
 }

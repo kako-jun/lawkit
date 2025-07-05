@@ -7,12 +7,15 @@ pub fn analyze_pareto_distribution(numbers: &[f64], dataset_name: &str) -> Resul
 }
 
 /// ビジネスパレート分析を実行
-pub fn analyze_business_pareto(numbers: &[f64], dataset_name: &str) -> Result<BusinessParetoAnalysis> {
+pub fn analyze_business_pareto(
+    numbers: &[f64],
+    dataset_name: &str,
+) -> Result<BusinessParetoAnalysis> {
     let pareto_result = analyze_pareto_distribution(numbers, dataset_name)?;
-    
+
     let business_insights = generate_business_insights(&pareto_result);
     let action_recommendations = generate_action_recommendations(&pareto_result);
-    
+
     Ok(BusinessParetoAnalysis {
         pareto_result,
         business_insights,
@@ -23,7 +26,7 @@ pub fn analyze_business_pareto(numbers: &[f64], dataset_name: &str) -> Result<Bu
 /// ビジネス洞察を生成
 fn generate_business_insights(pareto_result: &ParetoResult) -> Vec<BusinessInsight> {
     let mut insights = Vec::new();
-    
+
     // 80/20原則の適合度による洞察
     if pareto_result.pareto_ratio > 0.8 && pareto_result.pareto_ratio < 1.2 {
         insights.push(BusinessInsight {
@@ -32,7 +35,7 @@ fn generate_business_insights(pareto_result: &ParetoResult) -> Vec<BusinessInsig
             impact_level: "High".to_string(),
         });
     }
-    
+
     // 集中度による洞察
     if pareto_result.concentration_index > 0.6 {
         insights.push(BusinessInsight {
@@ -41,14 +44,14 @@ fn generate_business_insights(pareto_result: &ParetoResult) -> Vec<BusinessInsig
             impact_level: "Critical".to_string(),
         });
     }
-    
+
     insights
 }
 
 /// アクション推奨を生成
 fn generate_action_recommendations(pareto_result: &ParetoResult) -> Vec<ActionRecommendation> {
     let mut recommendations = Vec::new();
-    
+
     // 上位20%の影響度に基づく推奨
     if pareto_result.top_20_percent_share > 80.0 {
         recommendations.push(ActionRecommendation {
@@ -57,7 +60,7 @@ fn generate_action_recommendations(pareto_result: &ParetoResult) -> Vec<ActionRe
             expected_impact: "効率的な成果向上が期待できます".to_string(),
         });
     }
-    
+
     recommendations
 }
 
@@ -85,10 +88,6 @@ pub struct BusinessParetoAnalysis {
     pub action_recommendations: Vec<ActionRecommendation>,
 }
 
-
-
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -96,9 +95,11 @@ mod tests {
     #[test]
     fn test_perfect_pareto_distribution() {
         // 80/20分布に近いテストデータ
-        let numbers = vec![100.0, 90.0, 80.0, 70.0, 60.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0];
+        let numbers = vec![
+            100.0, 90.0, 80.0, 70.0, 60.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0,
+        ];
         let result = analyze_pareto_distribution(&numbers, "test").unwrap();
-        
+
         assert_eq!(result.numbers_analyzed, 15);
         assert!(result.top_20_percent_share > 50.0); // 上位20%がかなりの割合を占有
     }
@@ -108,17 +109,22 @@ mod tests {
         // 均等分布（パレート原則に合わない）
         let numbers = vec![10.0; 20]; // 全て同じ値
         let result = analyze_pareto_distribution(&numbers, "uniform").unwrap();
-        
+
         assert_eq!(result.numbers_analyzed, 20);
         assert!((result.top_20_percent_share - 20.0).abs() < 1.0); // 上位20%が約20%を占有
-        assert!(matches!(result.risk_level, crate::common::risk::RiskLevel::Critical));
+        assert!(matches!(
+            result.risk_level,
+            crate::common::risk::RiskLevel::Critical
+        ));
     }
 
     #[test]
     fn test_business_analysis() {
-        let numbers = vec![1000.0, 800.0, 600.0, 400.0, 200.0, 50.0, 40.0, 30.0, 20.0, 10.0];
+        let numbers = vec![
+            1000.0, 800.0, 600.0, 400.0, 200.0, 50.0, 40.0, 30.0, 20.0, 10.0,
+        ];
         let result = analyze_pareto_distribution(&numbers, "sales").unwrap();
-        
+
         assert_eq!(result.dataset_name, "sales");
         assert_eq!(result.numbers_analyzed, 10);
     }
@@ -127,7 +133,7 @@ mod tests {
     fn test_insufficient_data() {
         let numbers = vec![1.0, 2.0]; // 5個未満
         let result = analyze_pareto_distribution(&numbers, "test");
-        
+
         assert!(result.is_err());
     }
 }

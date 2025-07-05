@@ -6,40 +6,42 @@
 /// Convert international numerals to standard Arabic digits
 pub fn convert_international_numerals(text: &str) -> String {
     let mut result = text.to_string();
-    
+
     // Convert Japanese numerals (full-width and kanji)
     result = crate::laws::benford::japanese::convert_japanese_numerals(&result);
-    
+
     // Convert Chinese numerals
     result = convert_chinese_numerals(&result);
-    
+
     // Convert Hindi numerals (Devanagari)
     result = convert_hindi_numerals(&result);
-    
+
     // Convert Arabic-Indic numerals
     result = convert_arabic_numerals(&result);
-    
+
     result
 }
 
 /// Convert Chinese numerals to Arabic numerals
 fn convert_chinese_numerals(text: &str) -> String {
     use regex::Regex;
-    
+
     // Traditional Chinese financial numerals for fraud prevention
     let financial_pattern = Regex::new(r"[壹貳參肆伍陸柒捌玖拾佰仟萬億]+").unwrap();
-    
-    let result = financial_pattern.replace_all(text, |caps: &regex::Captures| {
-        let chinese_num = caps.get(0).unwrap().as_str();
-        match parse_chinese_financial_number(chinese_num) {
-            Ok(arabic_num) => arabic_num.to_string(),
-            Err(_) => chinese_num.to_string(),
-        }
-    }).to_string();
-    
+
+    let result = financial_pattern
+        .replace_all(text, |caps: &regex::Captures| {
+            let chinese_num = caps.get(0).unwrap().as_str();
+            match parse_chinese_financial_number(chinese_num) {
+                Ok(arabic_num) => arabic_num.to_string(),
+                Err(_) => chinese_num.to_string(),
+            }
+        })
+        .to_string();
+
     // Standard Chinese numerals (same as Japanese kanji, already handled in japanese.rs)
     // 一二三四五六七八九十百千万 are processed by the Japanese module
-    
+
     result
 }
 
@@ -85,7 +87,7 @@ fn convert_arabic_numerals(text: &str) -> String {
 fn parse_chinese_financial_number(chinese: &str) -> Result<u64, String> {
     let mut result = 0u64;
     let mut current = 0u64;
-    
+
     for c in chinese.chars() {
         match c {
             '壹' => current = 1,
@@ -98,37 +100,47 @@ fn parse_chinese_financial_number(chinese: &str) -> Result<u64, String> {
             '捌' => current = 8,
             '玖' => current = 9,
             '拾' => {
-                if current == 0 { current = 1; }
+                if current == 0 {
+                    current = 1;
+                }
                 current *= 10;
                 result += current;
                 current = 0;
-            },
+            }
             '佰' => {
-                if current == 0 { current = 1; }
+                if current == 0 {
+                    current = 1;
+                }
                 current *= 100;
                 result += current;
                 current = 0;
-            },
+            }
             '仟' => {
-                if current == 0 { current = 1; }
+                if current == 0 {
+                    current = 1;
+                }
                 current *= 1000;
                 result += current;
                 current = 0;
-            },
+            }
             '萬' => {
-                if current == 0 { current = 1; }
+                if current == 0 {
+                    current = 1;
+                }
                 result = (result + current) * 10000;
                 current = 0;
-            },
+            }
             '億' => {
-                if current == 0 { current = 1; }
+                if current == 0 {
+                    current = 1;
+                }
                 result = (result + current) * 100000000;
                 current = 0;
-            },
+            }
             _ => continue,
         }
     }
-    
+
     result += current;
     Ok(result)
 }
@@ -137,7 +149,7 @@ fn parse_chinese_financial_number(chinese: &str) -> Result<u64, String> {
 pub fn extract_numbers_international(text: &str) -> Vec<f64> {
     // First convert all international numerals to standard Arabic digits
     let converted = convert_international_numerals(text);
-    
+
     // Then use the existing number extraction logic
     crate::laws::benford::japanese::extract_numbers(&converted)
 }

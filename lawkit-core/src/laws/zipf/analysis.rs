@@ -10,27 +10,30 @@ pub fn analyze_zipf_distribution(frequencies: &[f64], dataset_name: &str) -> Res
 /// テキストデータからZipf分析を実行
 pub fn analyze_text_zipf(text: &str, dataset_name: &str) -> Result<ZipfResult> {
     let word_frequencies = extract_word_frequencies(text);
-    let frequencies: Vec<f64> = word_frequencies.into_iter().map(|(_, freq)| freq as f64).collect();
+    let frequencies: Vec<f64> = word_frequencies
+        .into_iter()
+        .map(|(_, freq)| freq as f64)
+        .collect();
     analyze_zipf_distribution(&frequencies, dataset_name)
 }
 
 /// テキストから単語頻度を抽出
 fn extract_word_frequencies(text: &str) -> Vec<(String, usize)> {
     let mut word_counts = HashMap::new();
-    
+
     // 単語分割（日本語・英語・中国語対応）
     let words = tokenize_multilingual_text(text);
-    
+
     for word in words {
         if !word.is_empty() && word.len() > 1 {
             *word_counts.entry(word.to_lowercase()).or_insert(0) += 1;
         }
     }
-    
+
     // 頻度順にソート
     let mut frequencies: Vec<(String, usize)> = word_counts.into_iter().collect();
     frequencies.sort_by(|a, b| b.1.cmp(&a.1));
-    
+
     frequencies
 }
 
@@ -38,7 +41,7 @@ fn extract_word_frequencies(text: &str) -> Vec<(String, usize)> {
 fn tokenize_multilingual_text(text: &str) -> Vec<String> {
     let mut tokens = Vec::new();
     let mut current_token = String::new();
-    
+
     for ch in text.chars() {
         match ch {
             // 英語・数字の処理
@@ -56,9 +59,9 @@ fn tokenize_multilingual_text(text: &str) -> Vec<String> {
                 tokens.push(ch.to_string());
             }
             // 区切り文字
-            ' ' | '\t' | '\n' | '\r' | ',' | '.' | '!' | '?' | ';' | ':' | 
-            '"' | '\'' | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' | 
-            '|' | '@' | '#' | '$' | '%' | '^' | '&' | '*' | '+' | '=' | 
+            ' ' | '\t' | '\n' | '\r' | ',' | '.' | '!' | '?' | ';' | ':' |
+            '"' | '\'' | '(' | ')' | '[' | ']' | '{' | '}' | '/' | '\\' |
+            '|' | '@' | '#' | '$' | '%' | '^' | '&' | '*' | '+' | '=' |
             '<' | '>' | '~' | '`' => {
                 if !current_token.is_empty() {
                     tokens.push(current_token.clone());
@@ -70,11 +73,11 @@ fn tokenize_multilingual_text(text: &str) -> Vec<String> {
             }
         }
     }
-    
+
     if !current_token.is_empty() {
         tokens.push(current_token);
     }
-    
+
     tokens
 }
 
@@ -83,29 +86,29 @@ pub fn analyze_numeric_zipf(numbers: &[f64], dataset_name: &str) -> Result<ZipfR
     // 数値を頻度として扱い、降順にソート
     let mut frequencies = numbers.to_vec();
     frequencies.sort_by(|a, b| b.partial_cmp(a).unwrap());
-    
+
     // 負の値を除去
     frequencies.retain(|&x| x > 0.0);
-    
+
     analyze_zipf_distribution(&frequencies, dataset_name)
 }
 
 /// 複数データセットの統合Zipf分析
 pub fn analyze_combined_zipf(datasets: &[(&str, &[f64])]) -> Result<Vec<ZipfResult>> {
     let mut results = Vec::new();
-    
+
     for (name, data) in datasets {
         let result = analyze_zipf_distribution(data, name)?;
         results.push(result);
     }
-    
+
     Ok(results)
 }
 
 /// Zipf分布の品質評価
 pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
     let mut quality_metrics = Vec::new();
-    
+
     // 指数の理想値からの偏差
     let exponent_score = calculate_exponent_score(zipf_result.zipf_exponent);
     quality_metrics.push(QualityMetric {
@@ -113,7 +116,7 @@ pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
         score: exponent_score,
         description: format!("指数値: {:.3} (理想値: 1.0)", zipf_result.zipf_exponent),
     });
-    
+
     // 相関係数の評価
     let correlation_score = zipf_result.correlation_coefficient;
     quality_metrics.push(QualityMetric {
@@ -121,10 +124,10 @@ pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
         score: correlation_score,
         description: format!("相関係数: {:.3}", correlation_score),
     });
-    
+
     // 全体品質スコア
     let overall_score = (exponent_score + correlation_score) / 2.0;
-    
+
     ZipfQualityReport {
         overall_score,
         quality_metrics,
@@ -136,7 +139,7 @@ pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
 fn calculate_exponent_score(exponent: f64) -> f64 {
     // 理想的なZipf指数は1.0
     let deviation = (exponent - 1.0).abs();
-    
+
     // 偏差に基づくスコア計算
     if deviation <= 0.1 {
         1.0
@@ -184,7 +187,6 @@ pub struct ZipfQualityReport {
     pub compliance_level: String,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -193,7 +195,7 @@ mod tests {
     fn test_text_zipf_analysis() {
         let text = "the quick brown fox jumps over the lazy dog the fox is quick";
         let result = analyze_text_zipf(text, "sample_text").unwrap();
-        
+
         assert!(result.numbers_analyzed > 0);
         assert!(result.unique_items > 0);
         assert!(result.total_observations > 0);
@@ -201,9 +203,11 @@ mod tests {
 
     #[test]
     fn test_numeric_zipf_analysis() {
-        let numbers = vec![1000.0, 500.0, 333.0, 250.0, 200.0, 166.0, 142.0, 125.0, 111.0, 100.0];
+        let numbers = vec![
+            1000.0, 500.0, 333.0, 250.0, 200.0, 166.0, 142.0, 125.0, 111.0, 100.0,
+        ];
         let result = analyze_numeric_zipf(&numbers, "numeric_test").unwrap();
-        
+
         assert_eq!(result.numbers_analyzed, 10);
         assert!(result.zipf_exponent > 0.0);
     }
@@ -212,7 +216,7 @@ mod tests {
     fn test_multilingual_tokenization() {
         let text = "Hello 世界 测试 مرحبا";
         let tokens = tokenize_multilingual_text(text);
-        
+
         assert!(tokens.len() > 0);
         assert!(tokens.contains(&"Hello".to_string()));
         assert!(tokens.contains(&"世".to_string()));
@@ -224,7 +228,7 @@ mod tests {
         let frequencies = vec![100.0, 50.0, 33.0, 25.0, 20.0];
         let result = analyze_zipf_distribution(&frequencies, "test").unwrap();
         let quality_report = evaluate_zipf_quality(&result);
-        
+
         assert!(quality_report.overall_score >= 0.0);
         assert!(quality_report.overall_score <= 1.0);
     }
@@ -233,8 +237,11 @@ mod tests {
     fn test_combined_zipf_analysis() {
         let dataset1 = vec![100.0, 50.0, 33.0, 25.0, 20.0];
         let dataset2 = vec![200.0, 100.0, 66.0, 50.0, 40.0];
-        let datasets = vec![("dataset1", dataset1.as_slice()), ("dataset2", dataset2.as_slice())];
-        
+        let datasets = vec![
+            ("dataset1", dataset1.as_slice()),
+            ("dataset2", dataset2.as_slice()),
+        ];
+
         let results = analyze_combined_zipf(&datasets).unwrap();
         assert_eq!(results.len(), 2);
     }

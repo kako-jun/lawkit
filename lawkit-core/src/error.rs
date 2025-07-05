@@ -1,6 +1,6 @@
+use serde_json;
 use std::fmt;
-use std::io;
-use serde_json; // serde_json をインポート
+use std::io; // serde_json をインポート
 
 #[derive(Debug, Clone)]
 pub enum BenfError {
@@ -10,7 +10,7 @@ pub enum BenfError {
     ParseError(String),
     NoNumbersFound,
     InsufficientData(usize),
-    IoError(String), // 新しいバリアントを追加
+    IoError(String),            // 新しいバリアントを追加
     SerializationError(String), // 新しいバリアントを追加
 }
 
@@ -23,8 +23,12 @@ impl fmt::Display for BenfError {
             BenfError::ParseError(msg) => write!(f, "Parse error: {}", msg),
             BenfError::NoNumbersFound => write!(f, "No numbers found in input"),
             BenfError::InsufficientData(count) => {
-                write!(f, "Insufficient data for analysis: {} numbers (minimum 30 recommended)", count)
-            },
+                write!(
+                    f,
+                    "Insufficient data for analysis: {} numbers (minimum 30 recommended)",
+                    count
+                )
+            }
             BenfError::IoError(msg) => write!(f, "I/O error: {}", msg),
             BenfError::SerializationError(msg) => write!(f, "Serialization error: {}", msg),
         }

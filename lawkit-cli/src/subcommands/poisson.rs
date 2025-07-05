@@ -1,11 +1,15 @@
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
+        filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
-        filtering::{NumberFilter, apply_number_filter},
     },
-    laws::poisson::{analyze_poisson_distribution, test_poisson_fit, predict_event_probabilities, analyze_rare_events, PoissonTest, PoissonResult, PoissonTestResult, EventProbabilityResult, RareEventAnalysis},
     error::{BenfError, Result},
+    laws::poisson::{
+        analyze_poisson_distribution, analyze_rare_events, predict_event_probabilities,
+        test_poisson_fit, EventProbabilityResult, PoissonResult, PoissonTest, PoissonTestResult,
+        RareEventAnalysis,
+    },
 };
 use std::io::{self, Read};
 
@@ -14,15 +18,15 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     if let Some(test_type) = matches.get_one::<String>("test") {
         return run_poisson_test_mode(matches, test_type);
     }
-    
+
     if matches.get_flag("predict") {
         return run_prediction_mode(matches);
     }
-    
+
     if matches.get_flag("rare-events") {
         return run_rare_events_mode(matches);
     }
-    
+
     // 通常のポアソン分布分析モード
     if let Some(input) = matches.get_one::<String>("input") {
         match parse_input_auto(input) {
@@ -33,16 +37,17 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("{}", error_msg);
                     std::process::exit(1);
                 }
-                
-                let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+
+                let result =
+                    match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 output_results(&matches, &result);
                 std::process::exit(result.risk_level.exit_code());
@@ -61,7 +66,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                
+
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
                     Err(e) => {
@@ -71,16 +76,17 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         std::process::exit(1);
                     }
                 };
-                
-                let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+
+                let result =
+                    match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 output_results(&matches, &result);
                 std::process::exit(result.risk_level.exit_code());
@@ -95,21 +101,24 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
 fn run_poisson_test_mode(matches: &ArgMatches, test_type: &str) -> Result<()> {
     let numbers = get_numbers_from_input(matches)?;
-    
+
     let test = match test_type {
         "chi-square" => PoissonTest::ChiSquare,
         "ks" => PoissonTest::KolmogorovSmirnov,
         "variance" => PoissonTest::VarianceTest,
         "all" => PoissonTest::All,
         _ => {
-            eprintln!("Error: Unknown test type '{}'. Available: chi-square, ks, variance, all", test_type);
+            eprintln!(
+                "Error: Unknown test type '{}'. Available: chi-square, ks, variance, all",
+                test_type
+            );
             std::process::exit(2);
         }
     };
-    
+
     let test_result = test_poisson_fit(&numbers, test)?;
     output_poisson_test_result(matches, &test_result);
-    
+
     let exit_code = if test_result.is_poisson { 0 } else { 1 };
     std::process::exit(exit_code);
 }
@@ -117,25 +126,30 @@ fn run_poisson_test_mode(matches: &ArgMatches, test_type: &str) -> Result<()> {
 fn run_prediction_mode(matches: &ArgMatches) -> Result<()> {
     let numbers = get_numbers_from_input(matches)?;
     let result = analyze_poisson_distribution(&numbers, "prediction")?;
-    
-    let max_events = matches.get_one::<String>("max-events")
+
+    let max_events = matches
+        .get_one::<String>("max-events")
         .and_then(|s| s.parse::<u32>().ok())
         .unwrap_or(10);
-    
+
     let prediction_result = predict_event_probabilities(result.lambda, max_events);
     output_prediction_result(matches, &prediction_result);
-    
+
     std::process::exit(0);
 }
 
 fn run_rare_events_mode(matches: &ArgMatches) -> Result<()> {
     let numbers = get_numbers_from_input(matches)?;
     let result = analyze_poisson_distribution(&numbers, "rare_events")?;
-    
+
     let rare_analysis = analyze_rare_events(&numbers, result.lambda);
     output_rare_events_result(matches, &rare_analysis);
-    
-    let exit_code = if rare_analysis.clustering_detected { 2 } else { 0 };
+
+    let exit_code = if rare_analysis.clustering_detected {
+        2
+    } else {
+        0
+    };
     std::process::exit(exit_code);
 }
 
@@ -144,7 +158,8 @@ fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
         parse_input_auto(input)
     } else {
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| BenfError::ParseError(e.to_string()))?;
         parse_text_input(&buffer)
     }
@@ -173,17 +188,39 @@ fn output_results(matches: &clap::ArgMatches, result: &PoissonResult) {
 
 fn output_poisson_test_result(matches: &clap::ArgMatches, result: &PoissonTestResult) {
     let language = get_language(&matches);
-    let format_str = matches.get_one::<String>("format").map(|s| s.as_str()).unwrap_or("text");
-    
+    let format_str = matches
+        .get_one::<String>("format")
+        .map(|s| s.as_str())
+        .unwrap_or("text");
+
     match format_str {
         "text" => {
-            println!("{}: {}", localized_text("poisson_test_result", language), result.test_name);
-            println!("{}: {:.6}", localized_text("test_statistic", language), result.statistic);
-            println!("{}: {:.6}", localized_text("p_value", language), result.p_value);
+            println!(
+                "{}: {}",
+                localized_text("poisson_test_result", language),
+                result.test_name
+            );
+            println!(
+                "{}: {:.6}",
+                localized_text("test_statistic", language),
+                result.statistic
+            );
+            println!(
+                "{}: {:.6}",
+                localized_text("p_value", language),
+                result.p_value
+            );
             println!("λ: {:.3}", result.parameter_lambda);
-            println!("{}: {}", localized_text("is_poisson", language), 
-                if result.is_poisson { localized_text("yes", language) } else { localized_text("no", language) });
-        },
+            println!(
+                "{}: {}",
+                localized_text("is_poisson", language),
+                if result.is_poisson {
+                    localized_text("yes", language)
+                } else {
+                    localized_text("no", language)
+                }
+            );
+        }
         "json" => {
             use serde_json::json;
             let output = json!({
@@ -195,33 +232,49 @@ fn output_poisson_test_result(matches: &clap::ArgMatches, result: &PoissonTestRe
                 "is_poisson": result.is_poisson
             });
             println!("{}", serde_json::to_string_pretty(&output).unwrap());
-        },
+        }
         _ => println!("Unsupported format for Poisson test"),
     }
 }
 
 fn output_prediction_result(matches: &clap::ArgMatches, result: &EventProbabilityResult) {
     let language = get_language(&matches);
-    let format_str = matches.get_one::<String>("format").map(|s| s.as_str()).unwrap_or("text");
-    
+    let format_str = matches
+        .get_one::<String>("format")
+        .map(|s| s.as_str())
+        .unwrap_or("text");
+
     match format_str {
         "text" => {
-            println!("{} (λ = {:.3})", localized_text("event_probability_prediction", language), result.lambda);
-            println!("{}: {}", localized_text("most_likely_count", language), result.most_likely_count);
+            println!(
+                "{} (λ = {:.3})",
+                localized_text("event_probability_prediction", language),
+                result.lambda
+            );
+            println!(
+                "{}: {}",
+                localized_text("most_likely_count", language),
+                result.most_likely_count
+            );
             println!();
-            
+
             for prob in &result.probabilities {
-                println!("P(X = {}) = {:.6} ({}累積: {:.6})", 
-                    prob.event_count, 
+                println!(
+                    "P(X = {}) = {:.6} ({}累積: {:.6})",
+                    prob.event_count,
                     prob.probability,
                     localized_text("cumulative", language),
-                    prob.cumulative_probability);
+                    prob.cumulative_probability
+                );
             }
-            
+
             if result.tail_probability > 0.001 {
-                println!("P(X > {}) = {:.6}", result.max_events, result.tail_probability);
+                println!(
+                    "P(X > {}) = {:.6}",
+                    result.max_events, result.tail_probability
+                );
             }
-        },
+        }
         "json" => {
             use serde_json::json;
             let output = json!({
@@ -238,42 +291,71 @@ fn output_prediction_result(matches: &clap::ArgMatches, result: &EventProbabilit
                 })).collect::<Vec<_>>()
             });
             println!("{}", serde_json::to_string_pretty(&output).unwrap());
-        },
+        }
         _ => println!("Unsupported format for prediction"),
     }
 }
 
 fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnalysis) {
     let language = get_language(&matches);
-    let format_str = matches.get_one::<String>("format").map(|s| s.as_str()).unwrap_or("text");
-    
+    let format_str = matches
+        .get_one::<String>("format")
+        .map(|s| s.as_str())
+        .unwrap_or("text");
+
     match format_str {
         "text" => {
-            println!("{} (λ = {:.3})", localized_text("rare_events_analysis", language), result.lambda);
-            println!("{}: {}", localized_text("total_observations", language), result.total_observations);
+            println!(
+                "{} (λ = {:.3})",
+                localized_text("rare_events_analysis", language),
+                result.lambda
+            );
+            println!(
+                "{}: {}",
+                localized_text("total_observations", language),
+                result.total_observations
+            );
             println!();
-            
+
             println!("{}:", localized_text("rare_event_thresholds", language));
-            println!("  95%: {} ({} {})", result.threshold_95, result.rare_events_95, localized_text("events", language));
-            println!("  99%: {} ({} {})", result.threshold_99, result.rare_events_99, localized_text("events", language));
-            println!("  99.9%: {} ({} {})", result.threshold_999, result.rare_events_999, localized_text("events", language));
-            
+            println!(
+                "  95%: {} ({} {})",
+                result.threshold_95,
+                result.rare_events_95,
+                localized_text("events", language)
+            );
+            println!(
+                "  99%: {} ({} {})",
+                result.threshold_99,
+                result.rare_events_99,
+                localized_text("events", language)
+            );
+            println!(
+                "  99.9%: {} ({} {})",
+                result.threshold_999,
+                result.rare_events_999,
+                localized_text("events", language)
+            );
+
             if !result.extreme_events.is_empty() {
                 println!();
                 println!("{}:", localized_text("extreme_events", language));
                 for event in &result.extreme_events {
-                    println!("  {}: {} {} (P = {:.6})", 
-                        localized_text("index", language), event.index,
+                    println!(
+                        "  {}: {} {} (P = {:.6})",
+                        localized_text("index", language),
+                        event.index,
                         event.event_count,
-                        event.probability);
+                        event.probability
+                    );
                 }
             }
-            
+
             if result.clustering_detected {
                 println!();
                 println!("⚠️ {}", localized_text("clustering_detected", language));
             }
-        },
+        }
         "json" => {
             use serde_json::json;
             let output = json!({
@@ -298,7 +380,7 @@ fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnaly
                 "clustering_detected": result.clustering_detected
             });
             println!("{}", serde_json::to_string_pretty(&output).unwrap());
-        },
+        }
         _ => println!("Unsupported format for rare events analysis"),
     }
 }
@@ -313,44 +395,92 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &
 
     println!("{}", localized_text("poisson_analysis_results", lang));
     println!();
-    println!("{}: {}", localized_text("dataset", lang), result.dataset_name);
-    println!("{}: {}", localized_text("numbers_analyzed", lang), result.numbers_analyzed);
-    println!("{}: {:?}", localized_text("risk_level", lang), result.risk_level);
-    
+    println!(
+        "{}: {}",
+        localized_text("dataset", lang),
+        result.dataset_name
+    );
+    println!(
+        "{}: {}",
+        localized_text("numbers_analyzed", lang),
+        result.numbers_analyzed
+    );
+    println!(
+        "{}: {:?}",
+        localized_text("risk_level", lang),
+        result.risk_level
+    );
+
     println!();
     println!("{}:", localized_text("poisson_parameters", lang));
-    println!("  λ ({}): {:.3}", localized_text("lambda", lang), result.lambda);
-    println!("  {}: {:.3}", localized_text("sample_mean", lang), result.sample_mean);
-    println!("  {}: {:.3}", localized_text("sample_variance", lang), result.sample_variance);
-    println!("  {}: {:.3}", localized_text("variance_ratio", lang), result.variance_ratio);
-    
+    println!(
+        "  λ ({}): {:.3}",
+        localized_text("lambda", lang),
+        result.lambda
+    );
+    println!(
+        "  {}: {:.3}",
+        localized_text("sample_mean", lang),
+        result.sample_mean
+    );
+    println!(
+        "  {}: {:.3}",
+        localized_text("sample_variance", lang),
+        result.sample_variance
+    );
+    println!(
+        "  {}: {:.3}",
+        localized_text("variance_ratio", lang),
+        result.variance_ratio
+    );
+
     if verbose {
         println!();
         println!("{}:", localized_text("goodness_of_fit_tests", lang));
-        println!("  Chi-Square: χ²={:.3}, p={:.3}", result.chi_square_statistic, result.chi_square_p_value);
-        println!("  Kolmogorov-Smirnov: D={:.3}, p={:.3}", result.kolmogorov_smirnov_statistic, result.kolmogorov_smirnov_p_value);
-        
+        println!(
+            "  Chi-Square: χ²={:.3}, p={:.3}",
+            result.chi_square_statistic, result.chi_square_p_value
+        );
+        println!(
+            "  Kolmogorov-Smirnov: D={:.3}, p={:.3}",
+            result.kolmogorov_smirnov_statistic, result.kolmogorov_smirnov_p_value
+        );
+
         println!();
         println!("{}:", localized_text("fit_assessment", lang));
-        println!("  {}: {:.3}", localized_text("goodness_of_fit_score", lang), result.goodness_of_fit_score);
-        println!("  {}: {:.3}", localized_text("poisson_quality", lang), result.poisson_quality);
-        println!("  {}: {:?}", localized_text("distribution_assessment", lang), result.distribution_assessment);
-        
+        println!(
+            "  {}: {:.3}",
+            localized_text("goodness_of_fit_score", lang),
+            result.goodness_of_fit_score
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("poisson_quality", lang),
+            result.poisson_quality
+        );
+        println!(
+            "  {}: {:?}",
+            localized_text("distribution_assessment", lang),
+            result.distribution_assessment
+        );
+
         println!();
         println!("{}:", localized_text("event_probabilities", lang));
         println!("  P(X = 0) = {:.3}", result.probability_zero);
         println!("  P(X = 1) = {:.3}", result.probability_one);
         println!("  P(X ≥ 2) = {:.3}", result.probability_two_or_more);
-        
+
         if result.rare_events_count > 0 {
             println!();
-            println!("{}: {} ({} ≥ {})", 
-                localized_text("rare_events", lang), 
+            println!(
+                "{}: {} ({} ≥ {})",
+                localized_text("rare_events", lang),
                 result.rare_events_count,
                 localized_text("events", lang),
-                result.rare_events_threshold);
+                result.rare_events_threshold
+            );
         }
-        
+
         println!();
         println!("{}:", localized_text("interpretation", lang));
         print_poisson_interpretation(result, lang);
@@ -359,46 +489,56 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &
 
 fn print_poisson_interpretation(result: &PoissonResult, lang: &str) {
     use lawkit_core::laws::poisson::result::PoissonAssessment;
-    
+
     match result.distribution_assessment {
         PoissonAssessment::Excellent => {
             println!("✅ {}", localized_text("excellent_poisson_fit", lang));
             println!("   {}", localized_text("data_follows_poisson", lang));
-        },
+        }
         PoissonAssessment::Good => {
             println!("✅ {}", localized_text("good_poisson_fit", lang));
             println!("   {}", localized_text("acceptable_poisson_fit", lang));
-        },
+        }
         PoissonAssessment::Moderate => {
             println!("⚠️  {}", localized_text("moderate_poisson_fit", lang));
-            println!("   {}", localized_text("some_deviations_from_poisson", lang));
-        },
+            println!(
+                "   {}",
+                localized_text("some_deviations_from_poisson", lang)
+            );
+        }
         PoissonAssessment::Poor => {
             println!("🚨 {}", localized_text("poor_poisson_fit", lang));
-            println!("   {}", localized_text("significant_deviations_from_poisson", lang));
-        },
+            println!(
+                "   {}",
+                localized_text("significant_deviations_from_poisson", lang)
+            );
+        }
         PoissonAssessment::NonPoisson => {
             println!("🔍 {}", localized_text("non_poisson_distribution", lang));
             println!("   {}", localized_text("data_not_poisson", lang));
         }
     }
-    
+
     // 分散/平均比に基づく解釈
     if result.variance_ratio > 1.5 {
         println!("   📊 {}", localized_text("overdispersed", lang));
     } else if result.variance_ratio < 0.7 {
         println!("   📊 {}", localized_text("underdispersed", lang));
     }
-    
+
     // 稀少事象の解釈
     if result.rare_events_count > 0 {
-        println!("   🎯 {}: {}", localized_text("rare_events_detected", lang), result.rare_events_count);
+        println!(
+            "   🎯 {}: {}",
+            localized_text("rare_events_detected", lang),
+            result.rare_events_count
+        );
     }
 }
 
 fn print_json_output(result: &PoissonResult) {
     use serde_json::json;
-    
+
     let output = json!({
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
@@ -429,21 +569,23 @@ fn print_json_output(result: &PoissonResult) {
         },
         "confidence_interval_lambda": result.confidence_interval_lambda
     });
-    
+
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
 
 fn print_csv_output(result: &PoissonResult) {
     println!("dataset,numbers_analyzed,risk_level,lambda,sample_mean,sample_variance,variance_ratio,goodness_of_fit_score");
-    println!("{},{},{:?},{:.3},{:.3},{:.3},{:.3},{:.3}",
-             result.dataset_name,
-             result.numbers_analyzed,
-             result.risk_level,
-             result.lambda,
-             result.sample_mean,
-             result.sample_variance,
-             result.variance_ratio,
-             result.goodness_of_fit_score);
+    println!(
+        "{},{},{:?},{:.3},{:.3},{:.3},{:.3},{:.3}",
+        result.dataset_name,
+        result.numbers_analyzed,
+        result.risk_level,
+        result.lambda,
+        result.sample_mean,
+        result.sample_variance,
+        result.variance_ratio,
+        result.goodness_of_fit_score
+    );
 }
 
 fn print_yaml_output(result: &PoissonResult) {
@@ -465,20 +607,35 @@ fn print_toml_output(result: &PoissonResult) {
     println!("sample_mean = {:.3}", result.sample_mean);
     println!("sample_variance = {:.3}", result.sample_variance);
     println!("variance_ratio = {:.3}", result.variance_ratio);
-    println!("goodness_of_fit_score = {:.3}", result.goodness_of_fit_score);
+    println!(
+        "goodness_of_fit_score = {:.3}",
+        result.goodness_of_fit_score
+    );
 }
 
 fn print_xml_output(result: &PoissonResult) {
     println!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     println!("<poisson_analysis>");
     println!("  <dataset>{}</dataset>", result.dataset_name);
-    println!("  <numbers_analyzed>{}</numbers_analyzed>", result.numbers_analyzed);
+    println!(
+        "  <numbers_analyzed>{}</numbers_analyzed>",
+        result.numbers_analyzed
+    );
     println!("  <risk_level>{:?}</risk_level>", result.risk_level);
     println!("  <lambda>{:.3}</lambda>", result.lambda);
     println!("  <sample_mean>{:.3}</sample_mean>", result.sample_mean);
-    println!("  <sample_variance>{:.3}</sample_variance>", result.sample_variance);
-    println!("  <variance_ratio>{:.3}</variance_ratio>", result.variance_ratio);
-    println!("  <goodness_of_fit_score>{:.3}</goodness_of_fit_score>", result.goodness_of_fit_score);
+    println!(
+        "  <sample_variance>{:.3}</sample_variance>",
+        result.sample_variance
+    );
+    println!(
+        "  <variance_ratio>{:.3}</variance_ratio>",
+        result.variance_ratio
+    );
+    println!(
+        "  <goodness_of_fit_score>{:.3}</goodness_of_fit_score>",
+        result.goodness_of_fit_score
+    );
     println!("</poisson_analysis>");
 }
 
@@ -486,20 +643,20 @@ fn get_language(matches: &clap::ArgMatches) -> &str {
     match matches.get_one::<String>("lang").map(|s| s.as_str()) {
         Some("auto") | None => {
             let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") { 
-                "ja" 
-            } else if lang.starts_with("zh") { 
-                "zh" 
+            if lang.starts_with("ja") {
+                "ja"
+            } else if lang.starts_with("zh") {
+                "zh"
             } else if lang.starts_with("hi") {
                 "hi"
             } else if lang.starts_with("ar") {
                 "ar"
-            } else { 
-                "en" 
+            } else {
+                "en"
             }
-        },
+        }
         Some("en") => "en",
-        Some("ja") => "ja", 
+        Some("ja") => "ja",
         Some("zh") => "zh",
         Some("hi") => "hi",
         Some("ar") => "ar",
@@ -535,7 +692,9 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "moderate_poisson_fit") => "Moderate Poisson distribution fit",
         ("en", "some_deviations_from_poisson") => "Some deviations from Poisson distribution",
         ("en", "poor_poisson_fit") => "Poor Poisson distribution fit",
-        ("en", "significant_deviations_from_poisson") => "Significant deviations from Poisson distribution",
+        ("en", "significant_deviations_from_poisson") => {
+            "Significant deviations from Poisson distribution"
+        }
         ("en", "non_poisson_distribution") => "Non-Poisson distribution",
         ("en", "data_not_poisson") => "Data does not follow Poisson distribution",
         ("en", "overdispersed") => "Distribution is overdispersed",
@@ -559,7 +718,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "unsupported_format") => "Error: Unsupported output format",
         ("en", "no_numbers_found") => "Error: No valid numbers found in input",
         ("en", "analysis_error") => "Analysis error",
-        
+
         // 日本語
         ("ja", "poisson_analysis_results") => "ポアソン分布解析結果",
         ("ja", "dataset") => "データセット",
@@ -610,7 +769,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
-        
+
         // Default English
         (_, "poisson_analysis_results") => "Poisson Distribution Analysis Results",
         (_, "dataset") => "Dataset",
@@ -624,38 +783,47 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
 }
 
 /// Analyze numbers with filtering and custom options
-fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<PoissonResult> {
+fn analyze_numbers_with_options(
+    matches: &clap::ArgMatches,
+    dataset_name: String,
+    numbers: &[f64],
+) -> Result<PoissonResult> {
     // Apply number filtering if specified
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
             .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
-        
+
         let filtered = apply_number_filter(numbers, &filter);
-        
+
         // Inform user about filtering results
         if filtered.len() != numbers.len() {
-            eprintln!("フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})", 
-                     numbers.len(), filtered.len(), filter.description());
+            eprintln!(
+                "フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})",
+                numbers.len(),
+                filtered.len(),
+                filter.description()
+            );
         }
-        
+
         filtered
     } else {
         numbers.to_vec()
     };
-    
+
     // Parse minimum count requirement
     let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
-        min_count_str.parse::<usize>()
+        min_count_str
+            .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
     } else {
-        10  // ポアソン分布分析では最低10個必要
+        10 // ポアソン分布分析では最低10個必要
     };
-    
+
     // Check minimum count requirement
     if filtered_numbers.len() < min_count {
         return Err(BenfError::InsufficientData(filtered_numbers.len()));
     }
-    
+
     // Perform Poisson distribution analysis
     analyze_poisson_distribution(&filtered_numbers, &dataset_name)
 }

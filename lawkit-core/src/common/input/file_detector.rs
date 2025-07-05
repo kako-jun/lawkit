@@ -1,26 +1,27 @@
-use std::path::Path;
 use crate::common::international::extract_numbers_international;
+use std::path::Path;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum FileFormat {
-    Excel,       // .xlsx, .xls
-    Pdf,         // .pdf
-    Word,        // .docx, .doc (future)
-    PowerPoint,  // .pptx, .ppt (future)
+    Excel,        // .xlsx, .xls
+    Pdf,          // .pdf
+    Word,         // .docx, .doc (future)
+    PowerPoint,   // .pptx, .ppt (future)
     OpenDocument, // .ods, .odt (future)
-    Csv,         // .csv
-    Tsv,         // .tsv
-    Json,        // .json
-    Xml,         // .xml
-    Yaml,        // .yaml, .yml
-    Toml,        // .toml
-    Html,        // .html, .htm
-    Text,        // .txt, or fallback
+    Csv,          // .csv
+    Tsv,          // .tsv
+    Json,         // .json
+    Xml,          // .xml
+    Yaml,         // .yaml, .yml
+    Toml,         // .toml
+    Html,         // .html, .htm
+    Text,         // .txt, or fallback
 }
 
 /// Detect file format based on extension and optionally file content
 pub fn detect_file_format(file_path: &Path) -> FileFormat {
-    let extension = file_path.extension()
+    let extension = file_path
+        .extension()
         .and_then(|ext| ext.to_str())
         .unwrap_or("")
         .to_lowercase();
@@ -50,7 +51,7 @@ pub fn detect_file_format(file_path: &Path) -> FileFormat {
 fn detect_format_by_content(file_path: &Path) -> Option<FileFormat> {
     // Read first few bytes to detect file signature
     let bytes = std::fs::read(file_path).ok()?;
-    
+
     if bytes.len() < 4 {
         return None;
     }
@@ -61,7 +62,9 @@ fn detect_format_by_content(file_path: &Path) -> Option<FileFormat> {
         [0x50, 0x4B, 0x03, 0x04] | [0x50, 0x4B, 0x05, 0x06] | [0x50, 0x4B, 0x07, 0x08] => {
             // Could be Excel, Word, or other ZIP-based format
             // Try to read as string and look for content clues
-            if let Ok(partial_content) = String::from_utf8(bytes[0..std::cmp::min(1024, bytes.len())].to_vec()) {
+            if let Ok(partial_content) =
+                String::from_utf8(bytes[0..std::cmp::min(1024, bytes.len())].to_vec())
+            {
                 if partial_content.contains("xl/") {
                     return Some(FileFormat::Excel);
                 } else if partial_content.contains("word/") {
@@ -71,7 +74,7 @@ fn detect_format_by_content(file_path: &Path) -> Option<FileFormat> {
                 }
             }
             Some(FileFormat::Excel) // Default to Excel for ZIP files
-        },
+        }
         // PDF signature
         [0x25, 0x50, 0x44, 0x46] => Some(FileFormat::Pdf), // "%PDF"
         _ => {
@@ -88,14 +91,15 @@ fn detect_format_by_content(file_path: &Path) -> Option<FileFormat> {
 /// Detect format for text-based files
 fn detect_text_format(content: &str) -> Option<FileFormat> {
     let trimmed = content.trim();
-    
+
     if trimmed.is_empty() {
         return None;
     }
 
     // JSON detection
-    if (trimmed.starts_with('{') && trimmed.ends_with('}')) ||
-       (trimmed.starts_with('[') && trimmed.ends_with(']')) {
+    if (trimmed.starts_with('{') && trimmed.ends_with('}'))
+        || (trimmed.starts_with('[') && trimmed.ends_with(']'))
+    {
         if let Ok(_) = serde_json::from_str::<serde_json::Value>(trimmed) {
             return Some(FileFormat::Json);
         }
@@ -116,7 +120,7 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
         let line = line.trim();
         !line.is_empty() && !line.starts_with('#') && line.contains('=') && !line.contains("://")
     });
-    
+
     if has_brackets || has_equals {
         if let Ok(_) = toml::from_str::<toml::Value>(content) {
             return Some(FileFormat::Toml);
@@ -124,11 +128,15 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
     }
 
     // YAML detection (starts with --- or has key: value patterns)
-    if trimmed.starts_with("---") || 
-       content.lines().any(|line| {
-           let line = line.trim();
-           !line.is_empty() && !line.starts_with('#') && line.contains(':') && !line.contains("://")
-       }) {
+    if trimmed.starts_with("---")
+        || content.lines().any(|line| {
+            let line = line.trim();
+            !line.is_empty()
+                && !line.starts_with('#')
+                && line.contains(':')
+                && !line.contains("://")
+        })
+    {
         if let Ok(_) = serde_yaml::from_str::<serde_yaml::Value>(content) {
             return Some(FileFormat::Yaml);
         }
@@ -141,7 +149,7 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
         if comma_count > 0 && lines[1].matches(',').count() == comma_count {
             return Some(FileFormat::Csv);
         }
-        
+
         // TSV detection (tab-separated values)
         let tab_count = lines[0].matches('\t').count();
         if tab_count > 0 && lines[1].matches('\t').count() == tab_count {
@@ -153,7 +161,10 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
 }
 
 /// Parse file based on detected format
-pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::error::Result<Vec<f64>> {
+pub fn parse_file_by_format(
+    file_path: &Path,
+    format: &FileFormat,
+) -> crate::error::Result<Vec<f64>> {
     use crate::common::input::formats::*;
 
     match format {
@@ -170,15 +181,16 @@ pub fn parse_file_by_format(file_path: &Path, format: &FileFormat) -> crate::err
         FileFormat::Html => html::parse_html_file(file_path),
         FileFormat::Text => {
             // Fallback: read as plain text
-            let content = std::fs::read_to_string(file_path)
-                .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read text file: {}", e)))?;
+            let content = std::fs::read_to_string(file_path).map_err(|e| {
+                crate::error::BenfError::FileError(format!("Failed to read text file: {}", e))
+            })?;
             let numbers = extract_numbers_international(&content);
             if numbers.is_empty() {
                 Err(crate::error::BenfError::NoNumbersFound)
             } else {
                 Ok(numbers)
             }
-        },
+        }
         FileFormat::OpenDocument => opendocument::parse_opendocument_file(file_path),
     }
 }
@@ -190,23 +202,59 @@ mod tests {
 
     #[test]
     fn test_format_detection_by_extension() {
-        assert_eq!(detect_file_format(&PathBuf::from("test.xlsx")), FileFormat::Excel);
-        assert_eq!(detect_file_format(&PathBuf::from("data.csv")), FileFormat::Csv);
-        assert_eq!(detect_file_format(&PathBuf::from("config.json")), FileFormat::Json);
-        assert_eq!(detect_file_format(&PathBuf::from("document.pdf")), FileFormat::Pdf);
-        assert_eq!(detect_file_format(&PathBuf::from("page.html")), FileFormat::Html);
-        assert_eq!(detect_file_format(&PathBuf::from("report.docx")), FileFormat::Word);
-        assert_eq!(detect_file_format(&PathBuf::from("legacy.doc")), FileFormat::Word);
+        assert_eq!(
+            detect_file_format(&PathBuf::from("test.xlsx")),
+            FileFormat::Excel
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("data.csv")),
+            FileFormat::Csv
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("config.json")),
+            FileFormat::Json
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("document.pdf")),
+            FileFormat::Pdf
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("page.html")),
+            FileFormat::Html
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("report.docx")),
+            FileFormat::Word
+        );
+        assert_eq!(
+            detect_file_format(&PathBuf::from("legacy.doc")),
+            FileFormat::Word
+        );
     }
 
     #[test]
     fn test_text_format_detection() {
-        assert_eq!(detect_text_format(r#"{"key": "value"}"#), Some(FileFormat::Json));
-        assert_eq!(detect_text_format("<html><body></body></html>"), Some(FileFormat::Html));
-        assert_eq!(detect_text_format("key: value\nother: data"), Some(FileFormat::Yaml));
-        
-        assert_eq!(detect_text_format("key = \"value\"\n[section]"), Some(FileFormat::Toml));
-        
-        assert_eq!(detect_text_format("name,age,city\nJohn,25,NYC"), Some(FileFormat::Csv));
+        assert_eq!(
+            detect_text_format(r#"{"key": "value"}"#),
+            Some(FileFormat::Json)
+        );
+        assert_eq!(
+            detect_text_format("<html><body></body></html>"),
+            Some(FileFormat::Html)
+        );
+        assert_eq!(
+            detect_text_format("key: value\nother: data"),
+            Some(FileFormat::Yaml)
+        );
+
+        assert_eq!(
+            detect_text_format("key = \"value\"\n[section]"),
+            Some(FileFormat::Toml)
+        );
+
+        assert_eq!(
+            detect_text_format("name,age,city\nJohn,25,NYC"),
+            Some(FileFormat::Csv)
+        );
     }
 }

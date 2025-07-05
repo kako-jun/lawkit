@@ -9,7 +9,7 @@ pub fn analyze_normal_distribution(numbers: &[f64], dataset_name: &str) -> Resul
 /// 正規性検定を実行
 pub fn test_normality(numbers: &[f64], test_type: NormalityTest) -> Result<NormalityTestResult> {
     let result = NormalResult::new("normality_test".to_string(), numbers)?;
-    
+
     match test_type {
         NormalityTest::ShapiroWilk => Ok(NormalityTestResult {
             test_name: "Shapiro-Wilk".to_string(),
@@ -34,7 +34,10 @@ pub fn test_normality(numbers: &[f64], test_type: NormalityTest) -> Result<Norma
         }),
         NormalityTest::All => {
             // 複数検定の統合結果
-            let overall_p = (result.shapiro_wilk_p_value + result.anderson_darling_p_value + result.kolmogorov_smirnov_p_value) / 3.0;
+            let overall_p = (result.shapiro_wilk_p_value
+                + result.anderson_darling_p_value
+                + result.kolmogorov_smirnov_p_value)
+                / 3.0;
             Ok(NormalityTestResult {
                 test_name: "Combined Test".to_string(),
                 statistic: result.normality_score,
@@ -47,13 +50,18 @@ pub fn test_normality(numbers: &[f64], test_type: NormalityTest) -> Result<Norma
 }
 
 /// 異常値検出を実行
-pub fn detect_outliers(numbers: &[f64], method: OutlierDetectionMethod) -> Result<OutlierDetectionResult> {
+pub fn detect_outliers(
+    numbers: &[f64],
+    method: OutlierDetectionMethod,
+) -> Result<OutlierDetectionResult> {
     let result = NormalResult::new("outlier_detection".to_string(), numbers)?;
-    
+
     match method {
         OutlierDetectionMethod::ZScore => Ok(OutlierDetectionResult {
             method_name: "Z-Score".to_string(),
-            outliers: result.outliers_z_score.into_iter()
+            outliers: result
+                .outliers_z_score
+                .into_iter()
                 .map(|(idx, val, score)| OutlierInfo {
                     index: idx,
                     value: val,
@@ -65,7 +73,9 @@ pub fn detect_outliers(numbers: &[f64], method: OutlierDetectionMethod) -> Resul
         }),
         OutlierDetectionMethod::ModifiedZScore => Ok(OutlierDetectionResult {
             method_name: "Modified Z-Score".to_string(),
-            outliers: result.outliers_modified_z.into_iter()
+            outliers: result
+                .outliers_modified_z
+                .into_iter()
                 .map(|(idx, val, score)| OutlierInfo {
                     index: idx,
                     value: val,
@@ -77,7 +87,9 @@ pub fn detect_outliers(numbers: &[f64], method: OutlierDetectionMethod) -> Resul
         }),
         OutlierDetectionMethod::IQR => Ok(OutlierDetectionResult {
             method_name: "IQR Method".to_string(),
-            outliers: result.outliers_iqr.into_iter()
+            outliers: result
+                .outliers_iqr
+                .into_iter()
                 .map(|(idx, val)| OutlierInfo {
                     index: idx,
                     value: val,
@@ -91,15 +103,18 @@ pub fn detect_outliers(numbers: &[f64], method: OutlierDetectionMethod) -> Resul
 }
 
 /// 品質管理分析を実行
-pub fn quality_control_analysis(numbers: &[f64], spec_limits: Option<(f64, f64)>) -> Result<QualityControlResult> {
+pub fn quality_control_analysis(
+    numbers: &[f64],
+    spec_limits: Option<(f64, f64)>,
+) -> Result<QualityControlResult> {
     let result = NormalResult::new("quality_control".to_string(), numbers)?;
-    
+
     let (cp, cpk, process_capability) = if let Some((lsl, usl)) = spec_limits {
         let cp = (usl - lsl) / (6.0 * result.std_dev);
         let cpu = (usl - result.mean) / (3.0 * result.std_dev);
         let cpl = (result.mean - lsl) / (3.0 * result.std_dev);
         let cpk = cpu.min(cpl);
-        
+
         let capability = if cpk >= 1.33 {
             ProcessCapability::Excellent
         } else if cpk >= 1.0 {
@@ -109,12 +124,12 @@ pub fn quality_control_analysis(numbers: &[f64], spec_limits: Option<(f64, f64)>
         } else {
             ProcessCapability::Inadequate
         };
-        
+
         (Some(cp), Some(cpk), Some(capability))
     } else {
         (None, None, None)
     };
-    
+
     Ok(QualityControlResult {
         mean: result.mean,
         std_dev: result.std_dev,
@@ -122,24 +137,30 @@ pub fn quality_control_analysis(numbers: &[f64], spec_limits: Option<(f64, f64)>
         cpk,
         process_capability,
         within_spec_percent: spec_limits.map(|(lsl, usl)| {
-            let within_spec_count = numbers.iter()
-                .filter(|&&x| x >= lsl && x <= usl)
-                .count();
+            let within_spec_count = numbers.iter().filter(|&&x| x >= lsl && x <= usl).count();
             (within_spec_count as f64 / numbers.len() as f64) * 100.0
         }),
         three_sigma_limits: result.three_sigma_limits,
-        control_chart_violations: detect_control_chart_violations(numbers, result.mean, result.std_dev),
+        control_chart_violations: detect_control_chart_violations(
+            numbers,
+            result.mean,
+            result.std_dev,
+        ),
     })
 }
 
 /// 管理図違反検出
-fn detect_control_chart_violations(numbers: &[f64], mean: f64, std_dev: f64) -> Vec<ControlChartViolation> {
+fn detect_control_chart_violations(
+    numbers: &[f64],
+    mean: f64,
+    std_dev: f64,
+) -> Vec<ControlChartViolation> {
     let mut violations = Vec::new();
     let ucl = mean + 3.0 * std_dev;
     let lcl = mean - 3.0 * std_dev;
     let uwl = mean + 2.0 * std_dev;
     let lwl = mean - 2.0 * std_dev;
-    
+
     for (i, &value) in numbers.iter().enumerate() {
         if value > ucl || value < lcl {
             violations.push(ControlChartViolation {
@@ -157,23 +178,28 @@ fn detect_control_chart_violations(numbers: &[f64], mean: f64, std_dev: f64) -> 
             });
         }
     }
-    
+
     // 連続点の検出（Western Electric Rules の簡易版）
     detect_run_violations(numbers, mean, std_dev, &mut violations);
-    
+
     violations
 }
 
 /// 連続点違反検出
-fn detect_run_violations(numbers: &[f64], mean: f64, _std_dev: f64, violations: &mut Vec<ControlChartViolation>) {
+fn detect_run_violations(
+    numbers: &[f64],
+    mean: f64,
+    _std_dev: f64,
+    violations: &mut Vec<ControlChartViolation>,
+) {
     let mut consecutive_above = 0;
     let mut consecutive_below = 0;
-    
+
     for (i, &value) in numbers.iter().enumerate() {
         if value > mean {
             consecutive_above += 1;
             consecutive_below = 0;
-            
+
             if consecutive_above >= 7 {
                 violations.push(ControlChartViolation {
                     index: i,
@@ -185,7 +211,7 @@ fn detect_run_violations(numbers: &[f64], mean: f64, _std_dev: f64, violations: 
         } else if value < mean {
             consecutive_below += 1;
             consecutive_above = 0;
-            
+
             if consecutive_below >= 7 {
                 violations.push(ControlChartViolation {
                     index: i,
@@ -293,11 +319,11 @@ mod tests {
     #[test]
     fn test_normality_tests() {
         let numbers = vec![1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 2.0];
-        
+
         let shapiro_result = test_normality(&numbers, NormalityTest::ShapiroWilk).unwrap();
         assert_eq!(shapiro_result.test_name, "Shapiro-Wilk");
         assert!(shapiro_result.statistic >= 0.0);
-        
+
         let all_result = test_normality(&numbers, NormalityTest::All).unwrap();
         assert_eq!(all_result.test_name, "Combined Test");
     }
@@ -305,11 +331,11 @@ mod tests {
     #[test]
     fn test_outlier_detection() {
         let numbers = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 100.0]; // 100.0は明らかな外れ値
-        
+
         let z_result = detect_outliers(&numbers, OutlierDetectionMethod::ZScore).unwrap();
         assert_eq!(z_result.method_name, "Z-Score");
         assert!(!z_result.outliers.is_empty());
-        
+
         let iqr_result = detect_outliers(&numbers, OutlierDetectionMethod::IQR).unwrap();
         assert_eq!(iqr_result.method_name, "IQR Method");
     }
@@ -318,7 +344,7 @@ mod tests {
     fn test_quality_control() {
         let numbers = vec![10.0, 11.0, 9.0, 10.5, 9.5, 10.2, 9.8, 10.3, 9.7, 10.1];
         let spec_limits = (8.0, 12.0);
-        
+
         let qc_result = quality_control_analysis(&numbers, Some(spec_limits)).unwrap();
         assert!(qc_result.cp.is_some());
         assert!(qc_result.cpk.is_some());
@@ -329,7 +355,7 @@ mod tests {
     fn test_process_capability_assessment() {
         let numbers = vec![10.0; 10]; // 完全に一定のデータ
         let spec_limits = (8.0, 12.0);
-        
+
         let qc_result = quality_control_analysis(&numbers, Some(spec_limits)).unwrap();
         // 標準偏差が0に近い場合、Cpは非常に高くなる
         if let Some(cp) = qc_result.cp {

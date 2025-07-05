@@ -1,4 +1,4 @@
-use crate::common::{risk::RiskLevel, filtering::RiskThreshold};
+use crate::common::{filtering::RiskThreshold, risk::RiskLevel};
 use crate::error::{BenfError, Result};
 
 #[derive(Debug, Clone)]
@@ -20,20 +20,20 @@ impl BenfordResult {
     }
 
     pub fn new_with_threshold(
-        dataset_name: String, 
-        numbers: &[f64], 
+        dataset_name: String,
+        numbers: &[f64],
         threshold: &RiskThreshold,
-        min_count: usize
+        min_count: usize,
     ) -> Result<Self> {
         if numbers.is_empty() {
             return Err(BenfError::NoNumbersFound);
         }
-        
+
         // Check minimum count requirement
         if numbers.len() < min_count {
             return Err(BenfError::InsufficientData(numbers.len()));
         }
-        
+
         // Issue warning for small datasets but continue analysis
         if numbers.len() < 30 {
             eprintln!("Warning: {} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.", numbers.len());
@@ -41,13 +41,17 @@ impl BenfordResult {
 
         let digit_distribution = super::analysis::calculate_digit_distribution(numbers);
         let expected_distribution = super::analysis::BENFORD_EXPECTED_PERCENTAGES;
-        let chi_square = crate::common::statistics::calculate_chi_square(&digit_distribution, &expected_distribution);
+        let chi_square = crate::common::statistics::calculate_chi_square(
+            &digit_distribution,
+            &expected_distribution,
+        );
         let p_value = crate::common::statistics::calculate_p_value(chi_square, 8); // 8 degrees of freedom
-        let mean_absolute_deviation = crate::common::statistics::calculate_mad(&digit_distribution, &expected_distribution);
-        
+        let mean_absolute_deviation =
+            crate::common::statistics::calculate_mad(&digit_distribution, &expected_distribution);
+
         // Use custom threshold if provided, otherwise use default logic
         let risk_level = threshold.evaluate_risk(p_value);
-        
+
         let verdict = match risk_level {
             RiskLevel::Low => "NORMAL_DISTRIBUTION".to_string(),
             RiskLevel::Medium => "SLIGHT_DEVIATION".to_string(),
