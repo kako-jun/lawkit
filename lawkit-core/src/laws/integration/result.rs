@@ -530,9 +530,7 @@ impl IntegrationResult {
         let consistency_factor = self.consistency_score;
         let conflict_penalty = self.conflicts_detected as f64 * 0.1;
 
-        ((score_gap + consistency_factor) / 2.0 - conflict_penalty)
-            .max(0.1)
-            .min(1.0)
+        ((score_gap + consistency_factor) / 2.0 - conflict_penalty).clamp(0.1, 1.0)
     }
 
     fn generate_recommendation_rationale(&self, primary: &str, secondary: &[String]) -> String {
@@ -742,7 +740,7 @@ fn detect_outliers(numbers: &[f64]) -> OutlierLevel {
     let outlier_ratio = outlier_count as f64 / numbers.len() as f64;
 
     match outlier_ratio {
-        r if r == 0.0 => OutlierLevel::None,
+        0.0 => OutlierLevel::None,
         r if r < 0.05 => OutlierLevel::Low,
         r if r < 0.1 => OutlierLevel::Moderate,
         r if r < 0.2 => OutlierLevel::High,

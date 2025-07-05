@@ -291,7 +291,7 @@ fn calculate_poisson_quality_score(variance_ratio: f64, mean: f64) -> f64 {
     };
 
     // 平均が適度な値（0.1-10）の場合にボーナス
-    let mean_quality = if mean >= 0.1 && mean <= 10.0 {
+    let mean_quality = if (0.1..=10.0).contains(&mean) {
         1.0
     } else if mean > 10.0 {
         (10.0 / mean).min(1.0)

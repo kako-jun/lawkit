@@ -65,7 +65,7 @@ pub fn detect_outliers(
                 .map(|(idx, val, score)| OutlierInfo {
                     index: idx,
                     value: val,
-                    score: score,
+                    score,
                     is_outlier: score.abs() > 2.5,
                 })
                 .collect(),
@@ -79,7 +79,7 @@ pub fn detect_outliers(
                 .map(|(idx, val, score)| OutlierInfo {
                     index: idx,
                     value: val,
-                    score: score,
+                    score,
                     is_outlier: score.abs() > 3.5,
                 })
                 .collect(),

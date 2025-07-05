@@ -217,7 +217,7 @@ mod tests {
         let text = "Hello 世界 测试 مرحبا";
         let tokens = tokenize_multilingual_text(text);
 
-        assert!(tokens.len() > 0);
+        assert!(!tokens.is_empty());
         assert!(tokens.contains(&"Hello".to_string()));
         assert!(tokens.contains(&"世".to_string()));
         assert!(tokens.contains(&"界".to_string()));

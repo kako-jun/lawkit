@@ -163,7 +163,7 @@ fn calculate_kurtosis(numbers: &[f64], mean: f64, std_dev: f64) -> f64 {
 /// Shapiro-Wilk検定（簡易版）
 fn shapiro_wilk_test(numbers: &[f64]) -> (f64, f64) {
     let n = numbers.len();
-    if n < 8 || n > 5000 {
+    if !(8..=5000).contains(&n) {
         return (0.0, 1.0); // 適用範囲外
     }
 
@@ -364,7 +364,7 @@ fn calculate_normality_score(sw_p: f64, ad_p: f64, ks_p: f64, qq_corr: f64) -> f
     let p_score = (sw_p * 0.4 + ad_p * 0.3 + ks_p * 0.3).min(1.0);
     let corr_score = qq_corr.abs();
 
-    (p_score * 0.6 + corr_score * 0.4).max(0.0).min(1.0)
+    (p_score * 0.6 + corr_score * 0.4).clamp(0.0, 1.0)
 }
 
 /// 分布品質スコア計算
@@ -373,9 +373,7 @@ fn calculate_distribution_quality(skewness: f64, kurtosis: f64, normality_score:
     let skew_score = 1.0 - (skewness.abs() / 2.0).min(1.0);
     let kurt_score = 1.0 - (kurtosis.abs() / 3.0).min(1.0);
 
-    (normality_score * 0.5 + skew_score * 0.25 + kurt_score * 0.25)
-        .max(0.0)
-        .min(1.0)
+    (normality_score * 0.5 + skew_score * 0.25 + kurt_score * 0.25).clamp(0.0, 1.0)
 }
 
 /// Z-scoreによる異常値検出

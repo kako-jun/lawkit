@@ -1,4 +1,4 @@
-use clap::{command, ArgMatches, Command};
+use clap::{command, Command};
 use lawkit_core::error::LawkitError;
 
 mod subcommands;

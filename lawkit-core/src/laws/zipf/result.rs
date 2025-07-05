@@ -190,9 +190,7 @@ fn calculate_distribution_quality(zipf_exponent: f64, correlation: f64) -> f64 {
     let correlation_score = correlation.abs();
 
     // 重み付き平均
-    (exponent_score * 0.6 + correlation_score * 0.4)
-        .max(0.0)
-        .min(1.0)
+    (exponent_score * 0.6 + correlation_score * 0.4).clamp(0.0, 1.0)
 }
 
 /// 集中度指数（Gini係数）を計算

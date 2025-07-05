@@ -17,7 +17,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         match parse_input_auto(input) {
             Ok(numbers) => {
                 if numbers.is_empty() {
-                    let language = get_language(&matches);
+                    let language = get_language(matches);
                     let error_msg = localized_text("no_numbers_found", language);
                     eprintln!("{}", error_msg);
                     std::process::exit(1);
@@ -25,10 +25,10 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
                 // Apply filtering and custom analysis
                 let result =
-                    match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                    match analyze_numbers_with_options(matches, input.to_string(), &numbers) {
                         Ok(result) => result,
                         Err(e) => {
-                            let language = get_language(&matches);
+                            let language = get_language(matches);
                             let error_msg = localized_text("analysis_error", language);
                             eprintln!("{}: {}", error_msg, e);
                             std::process::exit(1);
@@ -36,7 +36,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     };
 
                 // Output results and exit
-                output_results(&matches, &result);
+                output_results(matches, &result);
                 std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
@@ -58,7 +58,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
                     Err(e) => {
-                        let language = get_language(&matches);
+                        let language = get_language(matches);
                         let error_msg = localized_text("analysis_error", language);
                         eprintln!("{}: {}", error_msg, e);
                         std::process::exit(1);
@@ -67,10 +67,10 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
                 // Apply filtering and custom analysis
                 let result =
-                    match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
+                    match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
                         Ok(result) => result,
                         Err(e) => {
-                            let language = get_language(&matches);
+                            let language = get_language(matches);
                             let error_msg = localized_text("analysis_error", language);
                             eprintln!("{}: {}", error_msg, e);
                             std::process::exit(1);
@@ -78,7 +78,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     };
 
                 // Output results and exit
-                output_results(&matches, &result);
+                output_results(matches, &result);
                 std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
@@ -93,15 +93,15 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
-    let language = get_language(&matches);
+    let language = get_language(matches);
 
     match format.as_str() {
-        "text" => print_text_output(&result, quiet, verbose, language),
-        "json" => print_json_output(&result),
-        "csv" => print_csv_output(&result),
-        "yaml" => print_yaml_output(&result),
-        "toml" => print_toml_output(&result),
-        "xml" => print_xml_output(&result),
+        "text" => print_text_output(result, quiet, verbose, language),
+        "json" => print_json_output(result),
+        "csv" => print_csv_output(result),
+        "yaml" => print_yaml_output(result),
+        "toml" => print_toml_output(result),
+        "xml" => print_xml_output(result),
         _ => {
             let error_msg = localized_text("unsupported_format", language);
             eprintln!("{}: {}", error_msg, format);

@@ -51,40 +51,35 @@ impl NumberFilter {
         }
 
         // Check for comparison operators
-        if filter_str.starts_with(">=") {
-            let value_str = &filter_str[2..];
+        if let Some(value_str) = filter_str.strip_prefix(">=") {
             let value = value_str
                 .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '>=': {}", value_str))?;
             return Ok(NumberFilter::GreaterThanOrEqual(value));
         }
 
-        if filter_str.starts_with("<=") {
-            let value_str = &filter_str[2..];
+        if let Some(value_str) = filter_str.strip_prefix("<=") {
             let value = value_str
                 .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '<=': {}", value_str))?;
             return Ok(NumberFilter::LessThanOrEqual(value));
         }
 
-        if filter_str.starts_with('>') {
-            let value_str = &filter_str[1..];
+        if let Some(value_str) = filter_str.strip_prefix('>') {
             let value = value_str
                 .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '>': {}", value_str))?;
             return Ok(NumberFilter::GreaterThan(value));
         }
 
-        if filter_str.starts_with('<') {
-            let value_str = &filter_str[1..];
+        if let Some(value_str) = filter_str.strip_prefix('<') {
             let value = value_str
                 .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '<': {}", value_str))?;
             return Ok(NumberFilter::LessThan(value));
         }
 
-        if filter_str.starts_with('=') {
-            let value_str = &filter_str[1..];
+        if let Some(value_str) = filter_str.strip_prefix('=') {
             let value = value_str
                 .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '=': {}", value_str))?;
@@ -170,7 +165,7 @@ impl FromStr for RiskThreshold {
             _ => {
                 // Try to parse as custom p-value
                 match s.parse::<f64>() {
-                    Ok(p_value) if p_value >= 0.0 && p_value <= 1.0 => {
+                    Ok(p_value) if (0.0..=1.0).contains(&p_value) => {
                         Ok(RiskThreshold::Custom(p_value))
                     },
                     Ok(_) => Err("Custom p-value must be between 0.0 and 1.0".to_string()),

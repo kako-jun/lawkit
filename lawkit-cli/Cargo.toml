@@ -33,5 +33,5 @@ pretty_assertions = { workspace = true }
 
 # Integration tests configuration
 [[test]]
-name = "integration_tests"
-path = "../tests/integration/integration_tests.rs"
+name = "integration"
+path = "../tests/integration/mod.rs"

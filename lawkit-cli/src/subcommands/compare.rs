@@ -260,7 +260,7 @@ fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
 fn get_dataset_name(matches: &ArgMatches) -> String {
     matches
         .get_one::<String>("input")
-        .map(|s| s.clone())
+        .cloned()
         .unwrap_or_else(|| "stdin".to_string())
 }
 
@@ -666,8 +666,9 @@ fn output_cross_validation_result(
     for fold in &result.validation_folds {
         writeln!(
             writer,
-            "  {}: {:.3}",
-            format!("{} {}", get_text("fold", lang), fold.fold_number),
+            "  {} {}: {:.3}",
+            get_text("fold", lang),
+            fold.fold_number,
             fold.consistency_score
         )?;
     }
@@ -734,8 +735,8 @@ fn output_recommendation_result(
     for rec in &result.purpose_specific_recommendations {
         writeln!(
             writer,
-            "• {}: {}",
-            format!("{:?}", rec.purpose),
+            "• {:?}: {}",
+            rec.purpose,
             rec.recommended_laws.join(", ")
         )?;
         writeln!(
@@ -797,50 +798,50 @@ fn output_detailed_law_results(
     if let Some(ref benf_result) = result.benford_result {
         writeln!(
             writer,
-            "• {}: {:.3} ({})",
+            "• {}: {:.3} ({:?})",
             get_law_name("benf", lang),
             1.0 - (benf_result.mean_absolute_deviation / 100.0),
-            format!("{:?}", benf_result.risk_level)
+            benf_result.risk_level
         )?;
     }
 
     if let Some(ref pareto_result) = result.pareto_result {
         writeln!(
             writer,
-            "• {}: {:.3} ({})",
+            "• {}: {:.3} ({:?})",
             get_law_name("pareto", lang),
             pareto_result.concentration_index,
-            format!("{:?}", pareto_result.risk_level)
+            pareto_result.risk_level
         )?;
     }
 
     if let Some(ref zipf_result) = result.zipf_result {
         writeln!(
             writer,
-            "• {}: {:.3} ({})",
+            "• {}: {:.3} ({:?})",
             get_law_name("zipf", lang),
             zipf_result.distribution_quality,
-            format!("{:?}", zipf_result.risk_level)
+            zipf_result.risk_level
         )?;
     }
 
     if let Some(ref normal_result) = result.normal_result {
         writeln!(
             writer,
-            "• {}: {:.3} ({})",
+            "• {}: {:.3} ({:?})",
             get_law_name("normal", lang),
             normal_result.normality_score,
-            format!("{:?}", normal_result.risk_level)
+            normal_result.risk_level
         )?;
     }
 
     if let Some(ref poisson_result) = result.poisson_result {
         writeln!(
             writer,
-            "• {}: {:.3} ({})",
+            "• {}: {:.3} ({:?})",
             get_law_name("poisson", lang),
             poisson_result.goodness_of_fit_score,
-            format!("{:?}", poisson_result.risk_level)
+            poisson_result.risk_level
         )?;
     }
 

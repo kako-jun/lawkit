@@ -29,7 +29,8 @@
       "Bash(RUST_BACKTRACE=1 cargo test filtering --all-features)",
       "Bash(cargo bench:*)",
       "Bash(git push:*)",
-      "Bash(cargo fmt:*)"
+      "Bash(cargo fmt:*)",
+      "Bash(cargo clippy:*)"
     ],
     "deny": []
   },

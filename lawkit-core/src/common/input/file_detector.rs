@@ -97,12 +97,8 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
     }
 
     // JSON detection
-    if (trimmed.starts_with('{') && trimmed.ends_with('}'))
-        || (trimmed.starts_with('[') && trimmed.ends_with(']'))
-    {
-        if let Ok(_) = serde_json::from_str::<serde_json::Value>(trimmed) {
-            return Some(FileFormat::Json);
-        }
+    if ((trimmed.starts_with('{') && trimmed.ends_with('}')) || (trimmed.starts_with('[') && trimmed.ends_with(']'))) && serde_json::from_str::<serde_json::Value>(trimmed).is_ok() {
+        return Some(FileFormat::Json);
     }
 
     // XML/HTML detection
@@ -121,25 +117,19 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
         !line.is_empty() && !line.starts_with('#') && line.contains('=') && !line.contains("://")
     });
 
-    if has_brackets || has_equals {
-        if let Ok(_) = toml::from_str::<toml::Value>(content) {
-            return Some(FileFormat::Toml);
-        }
+    if (has_brackets || has_equals) && toml::from_str::<toml::Value>(content).is_ok() {
+        return Some(FileFormat::Toml);
     }
 
     // YAML detection (starts with --- or has key: value patterns)
-    if trimmed.starts_with("---")
-        || content.lines().any(|line| {
+    if (trimmed.starts_with("---") || content.lines().any(|line| {
             let line = line.trim();
             !line.is_empty()
                 && !line.starts_with('#')
                 && line.contains(':')
                 && !line.contains("://")
-        })
-    {
-        if let Ok(_) = serde_yaml::from_str::<serde_yaml::Value>(content) {
-            return Some(FileFormat::Yaml);
-        }
+        })) && serde_yaml::from_str::<serde_yaml::Value>(content).is_ok() {
+        return Some(FileFormat::Yaml);
     }
 
     // CSV detection (comma-separated values)

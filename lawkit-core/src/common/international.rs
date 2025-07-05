@@ -1,8 +1,6 @@
 /// International numeral conversion module
 /// Supports Chinese, Hindi, and Arabic numerals
-
 // Note: regex is used for Chinese financial numerals in convert_chinese_numerals
-
 /// Convert international numerals to standard Arabic digits
 pub fn convert_international_numerals(text: &str) -> String {
     let mut result = text.to_string();
