@@ -1,5 +1,5 @@
-pub mod result;
 pub mod analysis;
+pub mod result;
 
-pub use result::*;
 pub use analysis::*;
+pub use result::*;

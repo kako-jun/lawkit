@@ -1,19 +1,18 @@
-pub mod excel;
-pub mod pdf;
 pub mod csv;
-pub mod json_xml;
+pub mod excel;
 pub mod html;
-pub mod word;
-pub mod powerpoint;
+pub mod json_xml;
 pub mod opendocument;
+pub mod pdf;
+pub mod powerpoint;
+pub mod word;
 
 // Re-export key functionality for easier imports
-pub use excel::*;
-pub use pdf::*;
 pub use csv::*;
-pub use json_xml::*;
+pub use excel::*;
 pub use html::*;
-pub use word::*;
-pub use powerpoint::*;
+pub use json_xml::*;
 pub use opendocument::*;
-
+pub use pdf::*;
+pub use powerpoint::*;
+pub use word::*;

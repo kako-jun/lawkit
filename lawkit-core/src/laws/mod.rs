@@ -1,6 +1,6 @@
 pub mod benford;
-pub mod pareto;
-pub mod zipf;
-pub mod normal;
-pub mod poisson;
 pub mod integration;
+pub mod normal;
+pub mod pareto;
+pub mod poisson;
+pub mod zipf;

@@ -1,11 +1,11 @@
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
+        filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
-        filtering::{NumberFilter, apply_number_filter},
     },
-    laws::zipf::{analyze_text_zipf, analyze_numeric_zipf, ZipfResult},
     error::{BenfError, Result},
+    laws::zipf::{analyze_numeric_zipf, analyze_text_zipf, ZipfResult},
 };
 use std::io::{self, Read};
 
@@ -14,7 +14,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     if let Some(input) = matches.get_one::<String>("input") {
         // Check if input should be treated as text for word frequency analysis
         let is_text_mode = matches.get_flag("text");
-        
+
         if is_text_mode {
             // Text analysis mode
             match analyze_text_zipf(input, input) {
@@ -39,17 +39,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         eprintln!("{}", error_msg);
                         std::process::exit(1);
                     }
-                    
+
                     // Apply filtering and custom analysis
-                    let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(&matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{}: {}", error_msg, e);
-                            std::process::exit(1);
-                        }
-                    };
+                    let result =
+                        match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                            Ok(result) => result,
+                            Err(e) => {
+                                let language = get_language(&matches);
+                                let error_msg = localized_text("analysis_error", language);
+                                eprintln!("{}: {}", error_msg, e);
+                                std::process::exit(1);
+                            }
+                        };
 
                     // Output results and exit
                     output_results(&matches, &result);
@@ -70,9 +71,9 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                
+
                 let is_text_mode = matches.get_flag("text");
-                
+
                 if is_text_mode {
                     // Text analysis mode
                     match analyze_text_zipf(&buffer, "stdin") {
@@ -98,17 +99,19 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                             std::process::exit(1);
                         }
                     };
-                    
+
                     // Apply filtering and custom analysis
-                    let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(&matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{}: {}", error_msg, e);
-                            std::process::exit(1);
-                        }
-                    };
+                    let result =
+                        match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers)
+                        {
+                            Ok(result) => result,
+                            Err(e) => {
+                                let language = get_language(&matches);
+                                let error_msg = localized_text("analysis_error", language);
+                                eprintln!("{}: {}", error_msg, e);
+                                std::process::exit(1);
+                            }
+                        };
 
                     // Output results and exit
                     output_results(&matches, &result);
@@ -154,26 +157,74 @@ fn print_text_output(result: &ZipfResult, quiet: bool, verbose: bool, lang: &str
 
     println!("{}", localized_text("zipf_analysis_results", lang));
     println!();
-    println!("{}: {}", localized_text("dataset", lang), result.dataset_name);
-    println!("{}: {}", localized_text("numbers_analyzed", lang), result.numbers_analyzed);
-    println!("{}: {:?}", localized_text("risk_level", lang), result.risk_level);
-    
+    println!(
+        "{}: {}",
+        localized_text("dataset", lang),
+        result.dataset_name
+    );
+    println!(
+        "{}: {}",
+        localized_text("numbers_analyzed", lang),
+        result.numbers_analyzed
+    );
+    println!(
+        "{}: {:?}",
+        localized_text("risk_level", lang),
+        result.risk_level
+    );
+
     if verbose {
         println!();
         println!("{}:", localized_text("zipf_metrics", lang));
-        println!("  {}: {:.3}", localized_text("zipf_exponent", lang), result.zipf_exponent);
-        println!("  {}: {:.3}", localized_text("correlation_coefficient", lang), result.correlation_coefficient);
-        println!("  {}: {:.3}", localized_text("distribution_quality", lang), result.distribution_quality);
-        println!("  {}: {:.3}", localized_text("power_law_fit", lang), result.power_law_fit);
-        
+        println!(
+            "  {}: {:.3}",
+            localized_text("zipf_exponent", lang),
+            result.zipf_exponent
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("correlation_coefficient", lang),
+            result.correlation_coefficient
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("distribution_quality", lang),
+            result.distribution_quality
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("power_law_fit", lang),
+            result.power_law_fit
+        );
+
         println!();
         println!("{}:", localized_text("distribution_stats", lang));
-        println!("  {}: {}", localized_text("total_observations", lang), result.total_observations);
-        println!("  {}: {}", localized_text("unique_items", lang), result.unique_items);
-        println!("  {}: {:.1}%", localized_text("top_item_frequency", lang), result.top_item_frequency);
-        println!("  {}: {:.3}", localized_text("concentration_index", lang), result.concentration_index);
-        println!("  {}: {:.3}", localized_text("diversity_index", lang), result.diversity_index);
-        
+        println!(
+            "  {}: {}",
+            localized_text("total_observations", lang),
+            result.total_observations
+        );
+        println!(
+            "  {}: {}",
+            localized_text("unique_items", lang),
+            result.unique_items
+        );
+        println!(
+            "  {}: {:.1}%",
+            localized_text("top_item_frequency", lang),
+            result.top_item_frequency
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("concentration_index", lang),
+            result.concentration_index
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("diversity_index", lang),
+            result.diversity_index
+        );
+
         println!();
         println!("{}:", localized_text("interpretation", lang));
         print_zipf_interpretation(result, lang);
@@ -182,33 +233,33 @@ fn print_text_output(result: &ZipfResult, quiet: bool, verbose: bool, lang: &str
 
 fn print_zipf_interpretation(result: &ZipfResult, lang: &str) {
     use lawkit_core::common::risk::RiskLevel;
-    
+
     match result.risk_level {
         RiskLevel::Low => {
             println!("✅ {}", localized_text("ideal_zipf", lang));
             println!("   {}", localized_text("zipf_law_followed", lang));
-        },
+        }
         RiskLevel::Medium => {
             println!("⚠️  {}", localized_text("slight_zipf_deviation", lang));
             println!("   {}", localized_text("zipf_monitoring_recommended", lang));
-        },
+        }
         RiskLevel::High => {
             println!("🚨 {}", localized_text("significant_zipf_deviation", lang));
             println!("   {}", localized_text("zipf_rebalancing_needed", lang));
-        },
+        }
         RiskLevel::Critical => {
             println!("🔍 {}", localized_text("critical_zipf_deviation", lang));
             println!("   {}", localized_text("zipf_strategy_review_needed", lang));
         }
     }
-    
+
     // Zipf指数に基づく解釈
     if result.zipf_exponent > 1.5 {
         println!("   💡 {}", localized_text("high_concentration_zipf", lang));
     } else if result.zipf_exponent < 0.5 {
         println!("   💡 {}", localized_text("low_concentration_zipf", lang));
     }
-    
+
     // 相関係数に基づく解釈
     if result.correlation_coefficient < 0.5 {
         println!("   📊 {}", localized_text("poor_zipf_fit", lang));
@@ -219,7 +270,7 @@ fn print_zipf_interpretation(result: &ZipfResult, lang: &str) {
 
 fn print_json_output(result: &ZipfResult) {
     use serde_json::json;
-    
+
     let output = json!({
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
@@ -235,20 +286,22 @@ fn print_json_output(result: &ZipfResult) {
         "power_law_fit": result.power_law_fit,
         "rank_frequency_pairs": result.rank_frequency_pairs
     });
-    
+
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
 
 fn print_csv_output(result: &ZipfResult) {
     println!("dataset,numbers_analyzed,risk_level,zipf_exponent,correlation_coefficient,distribution_quality,power_law_fit");
-    println!("{},{},{:?},{:.3},{:.3},{:.3},{:.3}",
-             result.dataset_name,
-             result.numbers_analyzed,
-             result.risk_level,
-             result.zipf_exponent,
-             result.correlation_coefficient,
-             result.distribution_quality,
-             result.power_law_fit);
+    println!(
+        "{},{},{:?},{:.3},{:.3},{:.3},{:.3}",
+        result.dataset_name,
+        result.numbers_analyzed,
+        result.risk_level,
+        result.zipf_exponent,
+        result.correlation_coefficient,
+        result.distribution_quality,
+        result.power_law_fit
+    );
 }
 
 fn print_yaml_output(result: &ZipfResult) {
@@ -256,7 +309,10 @@ fn print_yaml_output(result: &ZipfResult) {
     println!("numbers_analyzed: {}", result.numbers_analyzed);
     println!("risk_level: \"{:?}\"", result.risk_level);
     println!("zipf_exponent: {:.3}", result.zipf_exponent);
-    println!("correlation_coefficient: {:.3}", result.correlation_coefficient);
+    println!(
+        "correlation_coefficient: {:.3}",
+        result.correlation_coefficient
+    );
     println!("distribution_quality: {:.3}", result.distribution_quality);
     println!("power_law_fit: {:.3}", result.power_law_fit);
 }
@@ -266,7 +322,10 @@ fn print_toml_output(result: &ZipfResult) {
     println!("numbers_analyzed = {}", result.numbers_analyzed);
     println!("risk_level = \"{:?}\"", result.risk_level);
     println!("zipf_exponent = {:.3}", result.zipf_exponent);
-    println!("correlation_coefficient = {:.3}", result.correlation_coefficient);
+    println!(
+        "correlation_coefficient = {:.3}",
+        result.correlation_coefficient
+    );
     println!("distribution_quality = {:.3}", result.distribution_quality);
     println!("power_law_fit = {:.3}", result.power_law_fit);
 }
@@ -275,12 +334,27 @@ fn print_xml_output(result: &ZipfResult) {
     println!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     println!("<zipf_analysis>");
     println!("  <dataset>{}</dataset>", result.dataset_name);
-    println!("  <numbers_analyzed>{}</numbers_analyzed>", result.numbers_analyzed);
+    println!(
+        "  <numbers_analyzed>{}</numbers_analyzed>",
+        result.numbers_analyzed
+    );
     println!("  <risk_level>{:?}</risk_level>", result.risk_level);
-    println!("  <zipf_exponent>{:.3}</zipf_exponent>", result.zipf_exponent);
-    println!("  <correlation_coefficient>{:.3}</correlation_coefficient>", result.correlation_coefficient);
-    println!("  <distribution_quality>{:.3}</distribution_quality>", result.distribution_quality);
-    println!("  <power_law_fit>{:.3}</power_law_fit>", result.power_law_fit);
+    println!(
+        "  <zipf_exponent>{:.3}</zipf_exponent>",
+        result.zipf_exponent
+    );
+    println!(
+        "  <correlation_coefficient>{:.3}</correlation_coefficient>",
+        result.correlation_coefficient
+    );
+    println!(
+        "  <distribution_quality>{:.3}</distribution_quality>",
+        result.distribution_quality
+    );
+    println!(
+        "  <power_law_fit>{:.3}</power_law_fit>",
+        result.power_law_fit
+    );
     println!("</zipf_analysis>");
 }
 
@@ -288,20 +362,20 @@ fn get_language(matches: &clap::ArgMatches) -> &str {
     match matches.get_one::<String>("lang").map(|s| s.as_str()) {
         Some("auto") | None => {
             let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") { 
-                "ja" 
-            } else if lang.starts_with("zh") { 
-                "zh" 
+            if lang.starts_with("ja") {
+                "ja"
+            } else if lang.starts_with("zh") {
+                "zh"
             } else if lang.starts_with("hi") {
                 "hi"
             } else if lang.starts_with("ar") {
                 "ar"
-            } else { 
-                "en" 
+            } else {
+                "en"
             }
-        },
+        }
         Some("en") => "en",
-        Some("ja") => "ja", 
+        Some("ja") => "ja",
         Some("zh") => "zh",
         Some("hi") => "hi",
         Some("ar") => "ar",
@@ -343,7 +417,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "unsupported_format") => "Error: Unsupported output format",
         ("en", "no_numbers_found") => "Error: No valid numbers found in input",
         ("en", "analysis_error") => "Analysis error",
-        
+
         // 日本語
         ("ja", "zipf_analysis_results") => "ジップの法則解析結果",
         ("ja", "dataset") => "データセット",
@@ -376,7 +450,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
-        
+
         // Default English
         (_, "zipf_analysis_results") => "Zipf's Law Analysis Results",
         (_, "dataset") => "Dataset",
@@ -390,38 +464,47 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
 }
 
 /// Analyze numbers with filtering and custom options
-fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<ZipfResult> {
+fn analyze_numbers_with_options(
+    matches: &clap::ArgMatches,
+    dataset_name: String,
+    numbers: &[f64],
+) -> Result<ZipfResult> {
     // Apply number filtering if specified
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
             .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
-        
+
         let filtered = apply_number_filter(numbers, &filter);
-        
+
         // Inform user about filtering results
         if filtered.len() != numbers.len() {
-            eprintln!("フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})", 
-                     numbers.len(), filtered.len(), filter.description());
+            eprintln!(
+                "フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})",
+                numbers.len(),
+                filtered.len(),
+                filter.description()
+            );
         }
-        
+
         filtered
     } else {
         numbers.to_vec()
     };
-    
+
     // Parse minimum count requirement
     let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
-        min_count_str.parse::<usize>()
+        min_count_str
+            .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
     } else {
         5
     };
-    
+
     // Check minimum count requirement
     if filtered_numbers.len() < min_count {
         return Err(BenfError::InsufficientData(filtered_numbers.len()));
     }
-    
+
     // Perform Zipf analysis
     analyze_numeric_zipf(&filtered_numbers, &dataset_name)
 }

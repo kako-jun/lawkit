@@ -22,7 +22,10 @@ impl OutputFormat {
             "yaml" => Ok(OutputFormat::Yaml),
             "toml" => Ok(OutputFormat::Toml),
             "xml" => Ok(OutputFormat::Xml),
-            _ => Err(crate::error::BenfError::InvalidInput(format!("Unsupported format: {}", s))),
+            _ => Err(crate::error::BenfError::InvalidInput(format!(
+                "Unsupported format: {}",
+                s
+            ))),
         }
     }
 }
@@ -48,7 +51,7 @@ impl OutputConfig {
 
 pub fn create_output_writer(matches: &ArgMatches) -> crate::error::Result<Box<dyn Write>> {
     let output_path = matches.get_one::<String>("output"); // output 引数があるか確認
-    
+
     if let Some(path) = output_path {
         if path == "-" {
             Ok(Box::new(io::stdout()))
@@ -105,20 +108,20 @@ fn format_text(result: &BenfordResult) -> String {
 
 fn format_distribution_bars(result: &BenfordResult) -> String {
     let mut output = String::new();
-    
+
     for i in 0..9 {
         let digit = i + 1;
         let observed = result.digit_distribution[i];
         let expected = result.expected_distribution[i];
         let bar_length = ((observed / 100.0) * 40.0) as usize;
         let bar = "█".repeat(bar_length);
-        
+
         output.push_str(&format!(
             "{}: {:30} {:.1}% (expected: {:.1}%)\n",
             digit, bar, observed, expected
         ));
     }
-    
+
     output
 }
 
@@ -145,19 +148,37 @@ fn format_json(result: &BenfordResult) -> String {
     "mad": {:.1}
   }},
   "verdict": "{}"
-}}"#, 
+}}"#,
         result.dataset_name,
         result.numbers_analyzed,
         result.risk_level,
-        result.digit_distribution[0], result.expected_distribution[0], result.digit_distribution[0] - result.expected_distribution[0],
-        result.digit_distribution[1], result.expected_distribution[1], result.digit_distribution[1] - result.expected_distribution[1],
-        result.digit_distribution[2], result.expected_distribution[2], result.digit_distribution[2] - result.expected_distribution[2],
-        result.digit_distribution[3], result.expected_distribution[3], result.digit_distribution[3] - result.expected_distribution[3],
-        result.digit_distribution[4], result.expected_distribution[4], result.digit_distribution[4] - result.expected_distribution[4],
-        result.digit_distribution[5], result.expected_distribution[5], result.digit_distribution[5] - result.expected_distribution[5],
-        result.digit_distribution[6], result.expected_distribution[6], result.digit_distribution[6] - result.expected_distribution[6],
-        result.digit_distribution[7], result.expected_distribution[7], result.digit_distribution[7] - result.expected_distribution[7],
-        result.digit_distribution[8], result.expected_distribution[8], result.digit_distribution[8] - result.expected_distribution[8],
+        result.digit_distribution[0],
+        result.expected_distribution[0],
+        result.digit_distribution[0] - result.expected_distribution[0],
+        result.digit_distribution[1],
+        result.expected_distribution[1],
+        result.digit_distribution[1] - result.expected_distribution[1],
+        result.digit_distribution[2],
+        result.expected_distribution[2],
+        result.digit_distribution[2] - result.expected_distribution[2],
+        result.digit_distribution[3],
+        result.expected_distribution[3],
+        result.digit_distribution[3] - result.expected_distribution[3],
+        result.digit_distribution[4],
+        result.expected_distribution[4],
+        result.digit_distribution[4] - result.expected_distribution[4],
+        result.digit_distribution[5],
+        result.expected_distribution[5],
+        result.digit_distribution[5] - result.expected_distribution[5],
+        result.digit_distribution[6],
+        result.expected_distribution[6],
+        result.digit_distribution[6] - result.expected_distribution[6],
+        result.digit_distribution[7],
+        result.expected_distribution[7],
+        result.digit_distribution[7] - result.expected_distribution[7],
+        result.digit_distribution[8],
+        result.expected_distribution[8],
+        result.digit_distribution[8] - result.expected_distribution[8],
         result.chi_square,
         result.p_value,
         result.mean_absolute_deviation,

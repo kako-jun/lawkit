@@ -4,11 +4,11 @@
 use clap::{Arg, Command};
 use lawkit::{
     common::{
+        filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
-        filtering::{NumberFilter, apply_number_filter, RiskThreshold},
     },
-    laws::benford::BenfordResult,
     error::{BenfError, Result},
+    laws::benford::BenfordResult,
 };
 use std::io::{self, Read};
 use std::str::FromStr;
@@ -67,14 +67,15 @@ fn main() {
                     eprintln!("Error: No valid numbers found in input");
                     std::process::exit(1);
                 }
-                
-                let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        eprintln!("Analysis error: {}", e);
-                        std::process::exit(1);
-                    }
-                };
+
+                let result =
+                    match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            eprintln!("Analysis error: {}", e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 output_results(&matches, &result);
                 std::process::exit(result.risk_level.exit_code());
@@ -92,7 +93,7 @@ fn main() {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                
+
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
                     Err(e) => {
@@ -100,14 +101,15 @@ fn main() {
                         std::process::exit(1);
                     }
                 };
-                
-                let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        eprintln!("Analysis error: {}", e);
-                        std::process::exit(1);
-                    }
-                };
+
+                let result =
+                    match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            eprintln!("Analysis error: {}", e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 output_results(&matches, &result);
                 std::process::exit(result.risk_level.exit_code());
@@ -123,11 +125,13 @@ fn main() {
 fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     // 簡易版の出力（main.rsから移植必要）
     let format = matches.get_one::<String>("format").unwrap();
-    
+
     match format.as_str() {
         "json" => {
-            println!("{{\"risk_level\": \"{:?}\", \"numbers_analyzed\": {}}}", 
-                     result.risk_level, result.numbers_analyzed);
+            println!(
+                "{{\"risk_level\": \"{:?}\", \"numbers_analyzed\": {}}}",
+                result.risk_level, result.numbers_analyzed
+            );
         }
         _ => {
             println!("Benford's Law Analysis Results");
@@ -137,7 +141,11 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     }
 }
 
-fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<BenfordResult> {
+fn analyze_numbers_with_options(
+    matches: &clap::ArgMatches,
+    dataset_name: String,
+    numbers: &[f64],
+) -> Result<BenfordResult> {
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
             .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
@@ -145,7 +153,7 @@ fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String
     } else {
         numbers.to_vec()
     };
-    
+
     let threshold = if let Some(threshold_str) = matches.get_one::<String>("threshold") {
         if threshold_str == "auto" {
             RiskThreshold::Auto
@@ -156,13 +164,14 @@ fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String
     } else {
         RiskThreshold::Auto
     };
-    
+
     let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
-        min_count_str.parse::<usize>()
+        min_count_str
+            .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
     } else {
         5
     };
-    
+
     BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
 }

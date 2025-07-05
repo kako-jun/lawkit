@@ -1,11 +1,11 @@
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
+        filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
-        filtering::{NumberFilter, apply_number_filter},
     },
-    laws::pareto::{analyze_pareto_distribution, analyze_business_pareto, ParetoResult},
     error::{BenfError, Result},
+    laws::pareto::{analyze_business_pareto, analyze_pareto_distribution, ParetoResult},
 };
 use std::io::{self, Read};
 
@@ -21,17 +21,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("{}", error_msg);
                     std::process::exit(1);
                 }
-                
+
                 // Apply filtering and custom analysis
-                let result = match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+                let result =
+                    match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 // Output results and exit
                 output_results(&matches, &result);
@@ -51,7 +52,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("Error: No input provided. Use --help for usage information.");
                     std::process::exit(2);
                 }
-                
+
                 // Extract numbers from stdin input text with international numeral support
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
@@ -62,17 +63,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         std::process::exit(1);
                     }
                 };
-                
+
                 // Apply filtering and custom analysis
-                let result = match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
-                    Ok(result) => result,
-                    Err(e) => {
-                        let language = get_language(&matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
-                        std::process::exit(1);
-                    }
-                };
+                let result =
+                    match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(&matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                 // Output results and exit
                 output_results(&matches, &result);
@@ -117,17 +119,41 @@ fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &s
 
     println!("{}", localized_text("pareto_analysis_results", lang));
     println!();
-    println!("{}: {}", localized_text("dataset", lang), result.dataset_name);
-    println!("{}: {}", localized_text("numbers_analyzed", lang), result.numbers_analyzed);
-    println!("{}: {:?}", localized_text("risk_level", lang), result.risk_level);
-    
+    println!(
+        "{}: {}",
+        localized_text("dataset", lang),
+        result.dataset_name
+    );
+    println!(
+        "{}: {}",
+        localized_text("numbers_analyzed", lang),
+        result.numbers_analyzed
+    );
+    println!(
+        "{}: {:?}",
+        localized_text("risk_level", lang),
+        result.risk_level
+    );
+
     if verbose {
         println!();
         println!("{}:", localized_text("pareto_metrics", lang));
-        println!("  {}: {:.1}%", localized_text("top_20_percent_share", lang), result.top_20_percent_share);
-        println!("  {}: {:.3}", localized_text("pareto_ratio", lang), result.pareto_ratio);
-        println!("  {}: {:.3}", localized_text("concentration_index", lang), result.concentration_index);
-        
+        println!(
+            "  {}: {:.1}%",
+            localized_text("top_20_percent_share", lang),
+            result.top_20_percent_share
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("pareto_ratio", lang),
+            result.pareto_ratio
+        );
+        println!(
+            "  {}: {:.3}",
+            localized_text("concentration_index", lang),
+            result.concentration_index
+        );
+
         println!();
         println!("{}:", localized_text("interpretation", lang));
         print_pareto_interpretation(result, lang);
@@ -136,37 +162,52 @@ fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &s
 
 fn print_pareto_interpretation(result: &ParetoResult, lang: &str) {
     use lawkit_core::common::risk::RiskLevel;
-    
+
     match result.risk_level {
         RiskLevel::Low => {
             println!("✅ {}", localized_text("ideal_pareto", lang));
             println!("   {}", localized_text("pareto_80_20_maintained", lang));
-        },
+        }
         RiskLevel::Medium => {
             println!("⚠️  {}", localized_text("slight_pareto_deviation", lang));
-            println!("   {}", localized_text("pareto_monitoring_recommended", lang));
-        },
+            println!(
+                "   {}",
+                localized_text("pareto_monitoring_recommended", lang)
+            );
+        }
         RiskLevel::High => {
-            println!("🚨 {}", localized_text("significant_pareto_deviation", lang));
+            println!(
+                "🚨 {}",
+                localized_text("significant_pareto_deviation", lang)
+            );
             println!("   {}", localized_text("pareto_rebalancing_needed", lang));
-        },
+        }
         RiskLevel::Critical => {
             println!("🔍 {}", localized_text("critical_pareto_deviation", lang));
-            println!("   {}", localized_text("pareto_strategy_review_needed", lang));
+            println!(
+                "   {}",
+                localized_text("pareto_strategy_review_needed", lang)
+            );
         }
     }
-    
+
     // 80/20原則からの偏差説明
     if result.top_20_percent_share > 85.0 {
-        println!("   💡 {}", localized_text("high_concentration_insight", lang));
+        println!(
+            "   💡 {}",
+            localized_text("high_concentration_insight", lang)
+        );
     } else if result.top_20_percent_share < 70.0 {
-        println!("   💡 {}", localized_text("low_concentration_insight", lang));
+        println!(
+            "   💡 {}",
+            localized_text("low_concentration_insight", lang)
+        );
     }
 }
 
 fn print_json_output(result: &ParetoResult) {
     use serde_json::json;
-    
+
     let output = json!({
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
@@ -176,19 +217,23 @@ fn print_json_output(result: &ParetoResult) {
         "top_20_percent_share": result.top_20_percent_share,
         "cumulative_distribution_points": result.cumulative_distribution.len()
     });
-    
+
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
 
 fn print_csv_output(result: &ParetoResult) {
-    println!("dataset,numbers_analyzed,risk_level,pareto_ratio,concentration_index,top_20_percent_share");
-    println!("{},{},{:?},{:.3},{:.3},{:.1}",
-             result.dataset_name,
-             result.numbers_analyzed,
-             result.risk_level,
-             result.pareto_ratio,
-             result.concentration_index,
-             result.top_20_percent_share);
+    println!(
+        "dataset,numbers_analyzed,risk_level,pareto_ratio,concentration_index,top_20_percent_share"
+    );
+    println!(
+        "{},{},{:?},{:.3},{:.3},{:.1}",
+        result.dataset_name,
+        result.numbers_analyzed,
+        result.risk_level,
+        result.pareto_ratio,
+        result.concentration_index,
+        result.top_20_percent_share
+    );
 }
 
 fn print_yaml_output(result: &ParetoResult) {
@@ -213,11 +258,20 @@ fn print_xml_output(result: &ParetoResult) {
     println!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     println!("<pareto_analysis>");
     println!("  <dataset>{}</dataset>", result.dataset_name);
-    println!("  <numbers_analyzed>{}</numbers_analyzed>", result.numbers_analyzed);
+    println!(
+        "  <numbers_analyzed>{}</numbers_analyzed>",
+        result.numbers_analyzed
+    );
     println!("  <risk_level>{:?}</risk_level>", result.risk_level);
     println!("  <pareto_ratio>{:.3}</pareto_ratio>", result.pareto_ratio);
-    println!("  <concentration_index>{:.3}</concentration_index>", result.concentration_index);
-    println!("  <top_20_percent_share>{:.1}</top_20_percent_share>", result.top_20_percent_share);
+    println!(
+        "  <concentration_index>{:.3}</concentration_index>",
+        result.concentration_index
+    );
+    println!(
+        "  <top_20_percent_share>{:.1}</top_20_percent_share>",
+        result.top_20_percent_share
+    );
     println!("</pareto_analysis>");
 }
 
@@ -225,20 +279,20 @@ fn get_language(matches: &clap::ArgMatches) -> &str {
     match matches.get_one::<String>("lang").map(|s| s.as_str()) {
         Some("auto") | None => {
             let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") { 
-                "ja" 
-            } else if lang.starts_with("zh") { 
-                "zh" 
+            if lang.starts_with("ja") {
+                "ja"
+            } else if lang.starts_with("zh") {
+                "zh"
             } else if lang.starts_with("hi") {
                 "hi"
             } else if lang.starts_with("ar") {
                 "ar"
-            } else { 
-                "en" 
+            } else {
+                "en"
             }
-        },
+        }
         Some("en") => "en",
-        Some("ja") => "ja", 
+        Some("ja") => "ja",
         Some("zh") => "zh",
         Some("hi") => "hi",
         Some("ar") => "ar",
@@ -261,17 +315,23 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("en", "ideal_pareto") => "Ideal Pareto distribution - follows 80/20 principle",
         ("en", "pareto_80_20_maintained") => "Top 20% controls approximately 80% of value",
         ("en", "slight_pareto_deviation") => "Slight deviation from Pareto principle",
-        ("en", "pareto_monitoring_recommended") => "Monitoring recommended for distribution balance",
+        ("en", "pareto_monitoring_recommended") => {
+            "Monitoring recommended for distribution balance"
+        }
         ("en", "significant_pareto_deviation") => "Significant deviation from 80/20 principle",
         ("en", "pareto_rebalancing_needed") => "Consider rebalancing strategy",
         ("en", "critical_pareto_deviation") => "Critical deviation from Pareto principle",
         ("en", "pareto_strategy_review_needed") => "Strategy review needed",
-        ("en", "high_concentration_insight") => "High concentration may indicate efficiency but also risk",
-        ("en", "low_concentration_insight") => "Low concentration may indicate missed optimization opportunities",
+        ("en", "high_concentration_insight") => {
+            "High concentration may indicate efficiency but also risk"
+        }
+        ("en", "low_concentration_insight") => {
+            "Low concentration may indicate missed optimization opportunities"
+        }
         ("en", "unsupported_format") => "Error: Unsupported output format",
         ("en", "no_numbers_found") => "Error: No valid numbers found in input",
         ("en", "analysis_error") => "Analysis error",
-        
+
         // 日本語
         ("ja", "pareto_analysis_results") => "パレートの法則（80/20の法則）解析結果",
         ("ja", "dataset") => "データセット",
@@ -295,7 +355,7 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
-        
+
         // Default English
         (_, "pareto_analysis_results") => "Pareto Principle (80/20 Rule) Analysis Results",
         (_, "dataset") => "Dataset",
@@ -309,38 +369,47 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
 }
 
 /// Analyze numbers with filtering and custom options
-fn analyze_numbers_with_options(matches: &clap::ArgMatches, dataset_name: String, numbers: &[f64]) -> Result<ParetoResult> {
+fn analyze_numbers_with_options(
+    matches: &clap::ArgMatches,
+    dataset_name: String,
+    numbers: &[f64],
+) -> Result<ParetoResult> {
     // Apply number filtering if specified
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
             .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
-        
+
         let filtered = apply_number_filter(numbers, &filter);
-        
+
         // Inform user about filtering results
         if filtered.len() != numbers.len() {
-            eprintln!("フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})", 
-                     numbers.len(), filtered.len(), filter.description());
+            eprintln!(
+                "フィルタリング結果: {} 個の数値が {} 個に絞り込まれました ({})",
+                numbers.len(),
+                filtered.len(),
+                filter.description()
+            );
         }
-        
+
         filtered
     } else {
         numbers.to_vec()
     };
-    
+
     // Parse minimum count requirement
     let min_count = if let Some(min_count_str) = matches.get_one::<String>("min-count") {
-        min_count_str.parse::<usize>()
+        min_count_str
+            .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効な最小数値数".to_string()))?
     } else {
         5
     };
-    
+
     // Check minimum count requirement
     if filtered_numbers.len() < min_count {
         return Err(BenfError::InsufficientData(filtered_numbers.len()));
     }
-    
+
     // Perform Pareto analysis
     analyze_pareto_distribution(&filtered_numbers, &dataset_name)
 }

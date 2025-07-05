@@ -1,9 +1,9 @@
-mod result;
 mod analysis;
+mod result;
 
-pub use result::NormalResult;
 pub use analysis::{
-    analyze_normal_distribution, test_normality, detect_outliers, quality_control_analysis,
-    NormalityTest, OutlierDetectionMethod, NormalityTestResult, OutlierDetectionResult, 
-    QualityControlResult, ProcessCapability
+    analyze_normal_distribution, detect_outliers, quality_control_analysis, test_normality,
+    NormalityTest, NormalityTestResult, OutlierDetectionMethod, OutlierDetectionResult,
+    ProcessCapability, QualityControlResult,
 };
+pub use result::NormalResult;

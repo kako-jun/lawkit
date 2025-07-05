@@ -23,7 +23,7 @@ impl NumberFilter {
     /// Parse a filter string into a NumberFilter
     pub fn parse(filter_str: &str) -> Result<Self, String> {
         let filter_str = filter_str.trim();
-        
+
         if filter_str.is_empty() {
             return Ok(NumberFilter::None);
         }
@@ -34,16 +34,18 @@ impl NumberFilter {
             if dash_pos > 0 {
                 let start_str = &filter_str[..dash_pos];
                 let end_str = &filter_str[dash_pos + 1..];
-                
-                let start = start_str.parse::<f64>()
+
+                let start = start_str
+                    .parse::<f64>()
                     .map_err(|_| format!("Invalid start number in range: {}", start_str))?;
-                let end = end_str.parse::<f64>()
+                let end = end_str
+                    .parse::<f64>()
                     .map_err(|_| format!("Invalid end number in range: {}", end_str))?;
-                
+
                 if start >= end {
                     return Err("Range start must be less than end".to_string());
                 }
-                
+
                 return Ok(NumberFilter::Range(start, end));
             }
         }
@@ -51,35 +53,40 @@ impl NumberFilter {
         // Check for comparison operators
         if filter_str.starts_with(">=") {
             let value_str = &filter_str[2..];
-            let value = value_str.parse::<f64>()
+            let value = value_str
+                .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '>=': {}", value_str))?;
             return Ok(NumberFilter::GreaterThanOrEqual(value));
         }
 
         if filter_str.starts_with("<=") {
             let value_str = &filter_str[2..];
-            let value = value_str.parse::<f64>()
+            let value = value_str
+                .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '<=': {}", value_str))?;
             return Ok(NumberFilter::LessThanOrEqual(value));
         }
 
         if filter_str.starts_with('>') {
             let value_str = &filter_str[1..];
-            let value = value_str.parse::<f64>()
+            let value = value_str
+                .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '>': {}", value_str))?;
             return Ok(NumberFilter::GreaterThan(value));
         }
 
         if filter_str.starts_with('<') {
             let value_str = &filter_str[1..];
-            let value = value_str.parse::<f64>()
+            let value = value_str
+                .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '<': {}", value_str))?;
             return Ok(NumberFilter::LessThan(value));
         }
 
         if filter_str.starts_with('=') {
             let value_str = &filter_str[1..];
-            let value = value_str.parse::<f64>()
+            let value = value_str
+                .parse::<f64>()
                 .map_err(|_| format!("Invalid number after '=': {}", value_str))?;
             return Ok(NumberFilter::Equal(value));
         }
@@ -87,7 +94,10 @@ impl NumberFilter {
         // Try to parse as a direct number (equal)
         match filter_str.parse::<f64>() {
             Ok(value) => Ok(NumberFilter::Equal(value)),
-            Err(_) => Err(format!("Invalid filter format: {}. Use formats like: >=100, <1000, 50-500", filter_str)),
+            Err(_) => Err(format!(
+                "Invalid filter format: {}. Use formats like: >=100, <1000, 50-500",
+                filter_str
+            )),
         }
     }
 
@@ -122,7 +132,8 @@ impl NumberFilter {
 pub fn apply_number_filter(numbers: &[f64], filter: &NumberFilter) -> Vec<f64> {
     match filter {
         NumberFilter::None => numbers.to_vec(),
-        _ => numbers.iter()
+        _ => numbers
+            .iter()
             .filter(|&&num| filter.matches(num))
             .copied()
             .collect(),
@@ -138,7 +149,7 @@ pub enum RiskThreshold {
     Low,
     /// Medium threshold (p > 0.1)
     Medium,
-    /// High threshold (p > 0.05) 
+    /// High threshold (p > 0.05)
     High,
     /// Critical threshold (p > 0.01)
     Critical,
@@ -214,15 +225,36 @@ mod tests {
     #[test]
     fn test_number_filter_parsing() {
         // Test various filter formats
-        assert_eq!(NumberFilter::parse(">=100").unwrap(), NumberFilter::GreaterThanOrEqual(100.0));
-        assert_eq!(NumberFilter::parse("<=50").unwrap(), NumberFilter::LessThanOrEqual(50.0));
-        assert_eq!(NumberFilter::parse(">0").unwrap(), NumberFilter::GreaterThan(0.0));
-        assert_eq!(NumberFilter::parse("<1000").unwrap(), NumberFilter::LessThan(1000.0));
-        assert_eq!(NumberFilter::parse("=42").unwrap(), NumberFilter::Equal(42.0));
-        assert_eq!(NumberFilter::parse("100-500").unwrap(), NumberFilter::Range(100.0, 500.0));
-        assert_eq!(NumberFilter::parse("123").unwrap(), NumberFilter::Equal(123.0));
+        assert_eq!(
+            NumberFilter::parse(">=100").unwrap(),
+            NumberFilter::GreaterThanOrEqual(100.0)
+        );
+        assert_eq!(
+            NumberFilter::parse("<=50").unwrap(),
+            NumberFilter::LessThanOrEqual(50.0)
+        );
+        assert_eq!(
+            NumberFilter::parse(">0").unwrap(),
+            NumberFilter::GreaterThan(0.0)
+        );
+        assert_eq!(
+            NumberFilter::parse("<1000").unwrap(),
+            NumberFilter::LessThan(1000.0)
+        );
+        assert_eq!(
+            NumberFilter::parse("=42").unwrap(),
+            NumberFilter::Equal(42.0)
+        );
+        assert_eq!(
+            NumberFilter::parse("100-500").unwrap(),
+            NumberFilter::Range(100.0, 500.0)
+        );
+        assert_eq!(
+            NumberFilter::parse("123").unwrap(),
+            NumberFilter::Equal(123.0)
+        );
         assert_eq!(NumberFilter::parse("").unwrap(), NumberFilter::None);
-        
+
         // Test error cases
         assert!(NumberFilter::parse("invalid").is_err());
         assert!(NumberFilter::parse(">=abc").is_err());
@@ -252,7 +284,7 @@ mod tests {
     #[test]
     fn test_apply_number_filter() {
         let numbers = vec![5.0, 15.0, 25.0, 35.0, 45.0];
-        
+
         let ge20 = NumberFilter::GreaterThanOrEqual(20.0);
         let filtered = apply_number_filter(&numbers, &ge20);
         assert_eq!(filtered, vec![25.0, 35.0, 45.0]);
@@ -268,13 +300,28 @@ mod tests {
 
     #[test]
     fn test_risk_threshold_parsing() {
-        assert_eq!("auto".parse::<RiskThreshold>().unwrap(), RiskThreshold::Auto);
+        assert_eq!(
+            "auto".parse::<RiskThreshold>().unwrap(),
+            RiskThreshold::Auto
+        );
         assert_eq!("low".parse::<RiskThreshold>().unwrap(), RiskThreshold::Low);
-        assert_eq!("medium".parse::<RiskThreshold>().unwrap(), RiskThreshold::Medium);
-        assert_eq!("high".parse::<RiskThreshold>().unwrap(), RiskThreshold::High);
-        assert_eq!("critical".parse::<RiskThreshold>().unwrap(), RiskThreshold::Critical);
-        assert_eq!("0.05".parse::<RiskThreshold>().unwrap(), RiskThreshold::Custom(0.05));
-        
+        assert_eq!(
+            "medium".parse::<RiskThreshold>().unwrap(),
+            RiskThreshold::Medium
+        );
+        assert_eq!(
+            "high".parse::<RiskThreshold>().unwrap(),
+            RiskThreshold::High
+        );
+        assert_eq!(
+            "critical".parse::<RiskThreshold>().unwrap(),
+            RiskThreshold::Critical
+        );
+        assert_eq!(
+            "0.05".parse::<RiskThreshold>().unwrap(),
+            RiskThreshold::Custom(0.05)
+        );
+
         assert!("invalid".parse::<RiskThreshold>().is_err());
         assert!("2.0".parse::<RiskThreshold>().is_err()); // Out of range
     }
@@ -282,13 +329,31 @@ mod tests {
     #[test]
     fn test_risk_threshold_evaluation() {
         let auto = RiskThreshold::Auto;
-        assert_eq!(auto.evaluate_risk(0.005), crate::common::risk::RiskLevel::Critical);
-        assert_eq!(auto.evaluate_risk(0.03), crate::common::risk::RiskLevel::High);
-        assert_eq!(auto.evaluate_risk(0.07), crate::common::risk::RiskLevel::Medium);
-        assert_eq!(auto.evaluate_risk(0.15), crate::common::risk::RiskLevel::Low);
+        assert_eq!(
+            auto.evaluate_risk(0.005),
+            crate::common::risk::RiskLevel::Critical
+        );
+        assert_eq!(
+            auto.evaluate_risk(0.03),
+            crate::common::risk::RiskLevel::High
+        );
+        assert_eq!(
+            auto.evaluate_risk(0.07),
+            crate::common::risk::RiskLevel::Medium
+        );
+        assert_eq!(
+            auto.evaluate_risk(0.15),
+            crate::common::risk::RiskLevel::Low
+        );
 
         let custom = RiskThreshold::Custom(0.02);
-        assert_eq!(custom.evaluate_risk(0.01), crate::common::risk::RiskLevel::Critical);
-        assert_eq!(custom.evaluate_risk(0.03), crate::common::risk::RiskLevel::Low);
+        assert_eq!(
+            custom.evaluate_risk(0.01),
+            crate::common::risk::RiskLevel::Critical
+        );
+        assert_eq!(
+            custom.evaluate_risk(0.03),
+            crate::common::risk::RiskLevel::Low
+        );
     }
 }
