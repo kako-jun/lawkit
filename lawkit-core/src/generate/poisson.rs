@@ -1,7 +1,7 @@
 use super::{DataGenerator, GenerateConfig};
 use crate::error::Result;
 use rand::prelude::*;
-use rand_distr::Poisson;
+use rand_distr::{Poisson, Distribution};
 
 #[derive(Debug, Clone)]
 pub struct PoissonGenerator {
@@ -26,7 +26,7 @@ impl DataGenerator for PoissonGenerator {
             .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid lambda parameter: {}", e)))?;
 
         for _ in 0..config.samples {
-            let value: u32 = poisson.sample(&mut rng);
+            let value = poisson.sample(&mut rng) as u32;
             numbers.push(value);
         }
 

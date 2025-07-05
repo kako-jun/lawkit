@@ -145,52 +145,192 @@ fn main() {
 fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
     match matches.subcommand() {
         Some(("benf", sub_matches)) => {
+            use lawkit_core::generate::{BenfordGenerator, DataGenerator, GenerateConfig};
+            
+            let default_samples = "1000".to_string();
             let samples = sub_matches.get_one::<String>("samples")
-                .unwrap_or(&"1000".to_string())
+                .unwrap_or(&default_samples)
                 .parse::<usize>()
                 .unwrap_or(1000);
+                
+            let default_range = "1,100000".to_string();
+            let range = sub_matches.get_one::<String>("range")
+                .unwrap_or(&default_range);
+                
+            let default_fraud_rate = "0.0".to_string();
+            let fraud_rate = sub_matches.get_one::<String>("fraud-rate")
+                .unwrap_or(&default_fraud_rate)
+                .parse::<f64>()
+                .unwrap_or(0.0);
+                
+            let seed = sub_matches.get_one::<String>("seed")
+                .map(|s| s.parse::<u64>().ok()).flatten();
             
-            println!("Generating {} Benford's law sample data...", samples);
+            let generator = BenfordGenerator::from_range_str(range)
+                .map_err(|e| LawkitError::ParseError(format!("Invalid range: {}", e)))?;
+                
+            let mut config = GenerateConfig::new(samples).with_fraud_rate(fraud_rate);
+            if let Some(seed_val) = seed {
+                config = config.with_seed(seed_val);
+            }
             
-            // Simple demonstration - just output sample numbers that follow log distribution
-            for i in 1..=samples {
-                let value = (i as f64).ln().exp() * 100.0;
-                println!("{:.2}", value);
+            let numbers = generator.generate(&config)
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+            
+            for number in numbers {
+                println!("{:.2}", number);
             }
             Ok(())
         }
-        Some(("pareto", _sub_matches)) => {
-            println!("Generating Pareto distribution sample data...");
-            println!("# Pareto data generation - placeholder implementation");
-            for i in 1..=100 {
-                println!("{}", i * i); // Simple power law approximation
+        Some(("pareto", sub_matches)) => {
+            use lawkit_core::generate::{ParetoGenerator, DataGenerator, GenerateConfig};
+            
+            let default_samples = "1000".to_string();
+            let samples = sub_matches.get_one::<String>("samples")
+                .unwrap_or(&default_samples)
+                .parse::<usize>()
+                .unwrap_or(1000);
+                
+            let default_concentration = "0.8".to_string();
+            let concentration = sub_matches.get_one::<String>("concentration")
+                .unwrap_or(&default_concentration)
+                .parse::<f64>()
+                .unwrap_or(0.8);
+                
+            let default_scale = "1.0".to_string();
+            let scale = sub_matches.get_one::<String>("scale")
+                .unwrap_or(&default_scale)
+                .parse::<f64>()
+                .unwrap_or(1.0);
+                
+            let seed = sub_matches.get_one::<String>("seed")
+                .map(|s| s.parse::<u64>().ok()).flatten();
+            
+            let generator = ParetoGenerator::new(scale, concentration);
+            
+            let mut config = GenerateConfig::new(samples);
+            if let Some(seed_val) = seed {
+                config = config.with_seed(seed_val);
+            }
+            
+            let numbers = generator.generate(&config)
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+            
+            for number in numbers {
+                println!("{:.2}", number);
             }
             Ok(())
         }
-        Some(("zipf", _sub_matches)) => {
-            println!("Generating Zipf's law sample data...");
-            println!("# Zipf data generation - placeholder implementation");
-            for rank in 1..=100 {
-                let frequency = 1000 / rank; // Simple 1/rank distribution
-                println!("rank:{} freq:{}", rank, frequency);
+        Some(("zipf", sub_matches)) => {
+            use lawkit_core::generate::{ZipfGenerator, DataGenerator, GenerateConfig};
+            
+            let default_samples = "1000".to_string();
+            let samples = sub_matches.get_one::<String>("samples")
+                .unwrap_or(&default_samples)
+                .parse::<usize>()
+                .unwrap_or(1000);
+                
+            let default_exponent = "1.0".to_string();
+            let exponent = sub_matches.get_one::<String>("exponent")
+                .unwrap_or(&default_exponent)
+                .parse::<f64>()
+                .unwrap_or(1.0);
+                
+            let default_vocab_size = "10000".to_string();
+            let vocabulary_size = sub_matches.get_one::<String>("vocabulary-size")
+                .unwrap_or(&default_vocab_size)
+                .parse::<usize>()
+                .unwrap_or(10000);
+                
+            let seed = sub_matches.get_one::<String>("seed")
+                .map(|s| s.parse::<u64>().ok()).flatten();
+            
+            let generator = ZipfGenerator::new(exponent, vocabulary_size);
+            
+            let mut config = GenerateConfig::new(samples);
+            if let Some(seed_val) = seed {
+                config = config.with_seed(seed_val);
+            }
+            
+            let numbers = generator.generate(&config)
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+            
+            for number in numbers {
+                println!("{}", number);
             }
             Ok(())
         }
-        Some(("normal", _sub_matches)) => {
-            println!("Generating normal distribution sample data...");
-            println!("# Normal data generation - placeholder implementation");
-            for i in 1..=100 {
-                let value = 100.0 + (i as f64 - 50.0) * 0.3; // Simple approximation
-                println!("{:.2}", value);
+        Some(("normal", sub_matches)) => {
+            use lawkit_core::generate::{NormalGenerator, DataGenerator, GenerateConfig};
+            
+            let default_samples = "1000".to_string();
+            let samples = sub_matches.get_one::<String>("samples")
+                .unwrap_or(&default_samples)
+                .parse::<usize>()
+                .unwrap_or(1000);
+                
+            let default_mean = "0.0".to_string();
+            let mean = sub_matches.get_one::<String>("mean")
+                .unwrap_or(&default_mean)
+                .parse::<f64>()
+                .unwrap_or(0.0);
+                
+            let default_stddev = "1.0".to_string();
+            let stddev = sub_matches.get_one::<String>("stddev")
+                .unwrap_or(&default_stddev)
+                .parse::<f64>()
+                .unwrap_or(1.0);
+                
+            let seed = sub_matches.get_one::<String>("seed")
+                .map(|s| s.parse::<u64>().ok()).flatten();
+            
+            let generator = NormalGenerator::new(mean, stddev);
+            
+            let mut config = GenerateConfig::new(samples);
+            if let Some(seed_val) = seed {
+                config = config.with_seed(seed_val);
+            }
+            
+            let numbers = generator.generate(&config)
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+            
+            for number in numbers {
+                println!("{:.6}", number);
             }
             Ok(())
         }
-        Some(("poisson", _sub_matches)) => {
-            println!("Generating Poisson distribution sample data...");
-            println!("# Poisson data generation - placeholder implementation");
-            for i in 1..=100 {
-                let value = (i % 5) + (i % 3); // Simple discrete distribution
-                println!("{}", value);
+        Some(("poisson", sub_matches)) => {
+            use lawkit_core::generate::{PoissonGenerator, DataGenerator, GenerateConfig};
+            
+            let default_samples = "1000".to_string();
+            let samples = sub_matches.get_one::<String>("samples")
+                .unwrap_or(&default_samples)
+                .parse::<usize>()
+                .unwrap_or(1000);
+                
+            let default_lambda = "2.0".to_string();
+            let lambda = sub_matches.get_one::<String>("lambda")
+                .unwrap_or(&default_lambda)
+                .parse::<f64>()
+                .unwrap_or(2.0);
+                
+            let time_series = sub_matches.get_flag("time-series");
+                
+            let seed = sub_matches.get_one::<String>("seed")
+                .map(|s| s.parse::<u64>().ok()).flatten();
+            
+            let generator = PoissonGenerator::new(lambda, time_series);
+            
+            let mut config = GenerateConfig::new(samples);
+            if let Some(seed_val) = seed {
+                config = config.with_seed(seed_val);
+            }
+            
+            let numbers = generator.generate(&config)
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+            
+            for number in numbers {
+                println!("{}", number);
             }
             Ok(())
         }

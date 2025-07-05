@@ -117,6 +117,83 @@ lawkit poisson --predict --rare-events incident_data.csv
 ```
 離散的イベント発生をモデル化・予測します。
 
+## 🎲 データ生成・テスト機能
+
+lawkitには教育、テスト、デモンストレーション用の強力なデータ生成機能が含まれています。
+
+### サンプルデータの生成
+
+特定の法則に従う統計的に正確なサンプルデータを生成：
+
+```bash
+# ベンフォードの法則に従う1000サンプルを生成
+lawkit generate benf --samples 1000
+
+# パレート分布（80/20の法則）を生成
+lawkit generate pareto --samples 5000 --concentration 0.8
+
+# カスタムパラメータでZipf分布を生成
+lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000
+
+# 正規分布データを生成
+lawkit generate normal --samples 1000 --mean 100 --stddev 15
+
+# ポアソンイベントデータを生成
+lawkit generate poisson --samples 500 --lambda 2.5
+```
+
+### 生成→分析パイプライン
+
+生成と分析を組み合わせてテストと検証を実行：
+
+```bash
+# ベンフォードの法則検出をテスト
+lawkit generate benf --samples 10000 | lawkit benf --format json
+
+# 生成データでパレートの法則を検証
+lawkit generate pareto --samples 5000 | lawkit pareto --verbose
+
+# 統計手法を検証
+lawkit generate normal --samples 1000 --mean 50 --stddev 10 | lawkit normal --outliers
+
+# 不正注入でのテスト
+lawkit generate benf --samples 5000 --fraud-rate 0.2 | lawkit benf --threshold critical
+```
+
+### セルフテスト
+
+lawkit機能の包括的なセルフテストを実行：
+
+```bash
+# 全セルフテストを実行
+lawkit selftest
+
+# 特定機能をテスト
+lawkit generate benf --samples 100 | lawkit benf --quiet
+```
+
+### 教育用途
+
+統計概念の教育に最適：
+
+```bash
+# 中心極限定理の実演
+for i in {1..5}; do
+  lawkit generate normal --samples 1000 --mean 100 --stddev 15 | 
+  lawkit normal --verbose
+done
+
+# パレートの法則の実際の動作を表示
+lawkit generate pareto --samples 10000 --concentration 0.8 | 
+lawkit pareto --format json | jq '.concentration_ratio'
+
+# 異なる分布の比較
+lawkit generate benf --samples 1000 > benf_data.txt
+lawkit generate normal --samples 1000 > normal_data.txt
+lawkit compare --laws benf,normal benf_data.txt
+lawkit compare --laws benf,normal normal_data.txt
+```
+
 ## 国際数字サポート
 
 ### 対応数字形式

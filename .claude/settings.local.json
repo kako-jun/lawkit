@@ -30,7 +30,9 @@
       "Bash(cargo bench:*)",
       "Bash(git push:*)",
       "Bash(cargo fmt:*)",
-      "Bash(cargo clippy:*)"
+      "Bash(cargo clippy:*)",
+      "Bash(cargo update:*)",
+      "Bash(cargo:*)"
     ],
     "deny": []
   },
