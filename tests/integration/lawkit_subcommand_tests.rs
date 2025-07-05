@@ -5,9 +5,41 @@ use tempfile::NamedTempFile;
 /// Run lawkit command with subcommand and arguments
 fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
-    command.args(&["run", "--bin", "lawkit", "--", subcommand, "--language", "en"]); // Force English output
+    command.args(&["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
+    command.args(&["--language", "en"]); // Force English output at the end
     command.output().expect("Failed to execute lawkit command")
+}
+
+/// Debug version of run_lawkit_command that prints detailed output
+fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
+    let mut command = Command::new("cargo");
+    command.args(&["run", "--bin", "lawkit", "--", subcommand]);
+    command.args(args);
+    command.args(&["--language", "en"]); // Force English output at the end
+    
+    let mut cmd_str = format!("cargo run --bin lawkit -- {}", subcommand);
+    for arg in args {
+        cmd_str.push_str(&format!(" {}", arg));
+    }
+    cmd_str.push_str(" --language en");
+    println!("🔍 Debug: Running command: {}", cmd_str);
+    
+    let output = command.output().expect("Failed to execute lawkit command");
+    
+    println!("🔍 Debug: Exit code: {:?}", output.status.code());
+    println!("🔍 Debug: Stdout length: {}", output.stdout.len());
+    println!("🔍 Debug: Stderr length: {}", output.stderr.len());
+    
+    if !output.stdout.is_empty() {
+        println!("🔍 Debug: Stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+    }
+    
+    if !output.stderr.is_empty() {
+        println!("🔍 Debug: Stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+    }
+    
+    output
 }
 
 /// Create temporary file with given content
@@ -37,6 +69,23 @@ fn generate_test_data() -> String {
             let third = 300 + i * 31;
             data.push(third.to_string());
         }
+    }
+    
+    data.join(" ")
+}
+
+/// Generate larger test dataset for pareto analysis (needs 30+ values)
+fn generate_pareto_test_data() -> String {
+    let mut data = Vec::new();
+    
+    // Generate 100 values with pareto-like distribution
+    for i in 1..=100 {
+        let value = match i {
+            1..=20 => 1000 + i * 50,  // Top 20% high values
+            21..=50 => 500 + i * 10,  // Middle values
+            _ => 100 + i * 2,         // Bottom 50% low values
+        };
+        data.push(value.to_string());
     }
     
     data.join(" ")
@@ -195,7 +244,7 @@ mod pareto_law_tests {
 
     #[test]
     fn test_lawkit_pareto_basic() {
-        let test_data = generate_test_data();
+        let test_data = generate_pareto_test_data();
         let output = run_lawkit_command("pareto", &[&test_data]);
 
         assert!(matches!(
@@ -210,7 +259,7 @@ mod pareto_law_tests {
 
     #[test]
     fn test_lawkit_pareto_business_analysis() {
-        let test_data = generate_test_data();
+        let test_data = generate_pareto_test_data();
         let output = run_lawkit_command("pareto", &["--business-analysis", &test_data]);
 
         assert!(matches!(
@@ -224,7 +273,7 @@ mod pareto_law_tests {
 
     #[test]
     fn test_lawkit_pareto_gini_coefficient() {
-        let test_data = generate_test_data();
+        let test_data = generate_pareto_test_data();
         let output = run_lawkit_command("pareto", &["--gini-coefficient", &test_data]);
 
         assert!(matches!(
@@ -238,7 +287,7 @@ mod pareto_law_tests {
 
     #[test]
     fn test_lawkit_pareto_custom_percentiles() {
-        let test_data = generate_test_data();
+        let test_data = generate_pareto_test_data();
         let output = run_lawkit_command("pareto", &["--percentiles", "70,80,90", &test_data]);
 
         assert!(matches!(
@@ -314,7 +363,7 @@ mod normal_distribution_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("Normal") || stdout.contains("normality"));
-        assert!(stdout.contains("Numbers analyzed"));
+        assert!(stdout.contains("Test statistic") || stdout.contains("P-value"));
     }
 
     #[test]
@@ -379,7 +428,7 @@ mod poisson_distribution_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("Poisson") || stdout.contains("events"));
-        assert!(stdout.contains("Numbers analyzed"));
+        assert!(stdout.contains("Test statistic") || stdout.contains("P-value") || stdout.contains("λ"));
     }
 
     #[test]

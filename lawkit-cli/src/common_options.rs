@@ -47,6 +47,33 @@ pub fn add_common_options(cmd: Command) -> Command {
                 .help("Minimum number of data points required for analysis")
                 .default_value("10"),  // 統一されたデフォルト値
         )
+        .arg(
+            Arg::new("parallel")
+                .long("parallel")
+                .short('P')
+                .help("Enable parallel processing")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("threads")
+                .long("threads")
+                .value_name("NUMBER")
+                .help("Number of threads for parallel processing (0 = auto)")
+                .default_value("0"),
+        )
+        .arg(
+            Arg::new("chunk-size")
+                .long("chunk-size")
+                .value_name("SIZE")
+                .help("Chunk size for memory-efficient processing")
+                .default_value("10000"),
+        )
+        .arg(
+            Arg::new("streaming")
+                .long("streaming")
+                .help("Enable streaming mode for large datasets")
+                .action(clap::ArgAction::SetTrue),
+        )
 }
 
 /// input引数を追加（位置引数）
@@ -125,7 +152,7 @@ pub fn add_normal_options(cmd: Command) -> Command {
             Arg::new("outlier-method")
                 .long("outlier-method")
                 .value_name("METHOD")
-                .help("Outlier detection method: zscore, modified_zscore, iqr")
+                .help("Outlier detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble")
                 .default_value("zscore"),
         )
         .arg(
@@ -140,6 +167,19 @@ pub fn add_normal_options(cmd: Command) -> Command {
                 .long("spec-limits")
                 .value_name("LOWER,UPPER")
                 .help("Specification limits for quality control (e.g., 9.5,10.5)"),
+        )
+        .arg(
+            Arg::new("enable-timeseries")
+                .long("enable-timeseries")
+                .help("Enable time series analysis")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("timeseries-window")
+                .long("timeseries-window")
+                .value_name("SIZE")
+                .help("Time series analysis window size")
+                .default_value("10"),
         )
 }
 

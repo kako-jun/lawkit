@@ -3,6 +3,11 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
+        outliers::{
+            detect_outliers_ensemble, detect_outliers_isolation, detect_outliers_lof,
+            detect_outliers_dbscan, AdvancedOutlierResult,
+        },
+        timeseries::{analyze_timeseries, create_timeseries_from_values, TimeSeriesAnalysis},
     },
     error::{BenfError, Result},
     laws::normal::{
@@ -14,17 +19,24 @@ use lawkit_core::{
 use std::io::{self, Read};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // 特殊モードの確認
-    if let Some(test_type) = matches.get_one::<String>("test") {
-        return run_normality_test_mode(matches, test_type);
-    }
-
+    // 特殊モードの確認（フラグベースのモードを優先）
     if matches.get_flag("outliers") {
         return run_outlier_detection_mode(matches);
     }
 
     if matches.get_flag("quality-control") {
         return run_quality_control_mode(matches);
+    }
+
+    if matches.get_flag("enable-timeseries") {
+        return run_timeseries_analysis_mode(matches);
+    }
+
+    // testパラメータが明示的に指定されている場合のみテストモード
+    if let Some(test_type) = matches.get_one::<String>("test") {
+        if test_type != "all" {  // "all"はデフォルトなので通常分析モードで処理
+            return run_normality_test_mode(matches, test_type);
+        }
     }
 
     // 通常の正規分布分析モード
@@ -130,28 +142,77 @@ fn run_outlier_detection_mode(matches: &ArgMatches) -> Result<()> {
         .get_one::<String>("outlier-method")
         .map(|s| s.as_str())
         .unwrap_or("zscore");
-    let method = match method_str {
-        "zscore" => OutlierDetectionMethod::ZScore,
-        "modified" => OutlierDetectionMethod::ModifiedZScore,
-        "iqr" => OutlierDetectionMethod::IQR,
-        _ => {
-            eprintln!(
-                "Error: Unknown outlier detection method '{}'. Available: zscore, modified, iqr",
-                method_str
-            );
-            std::process::exit(2);
+    
+    // 高度な異常値検出手法の処理
+    match method_str {
+        "lof" => {
+            let result = detect_outliers_lof(&numbers, 5)?;
+            output_advanced_outlier_result(matches, &result);
+            let exit_code = if result.outliers.is_empty() { 0 } else { 10 };
+            std::process::exit(exit_code);
         }
-    };
+        "isolation" => {
+            let result = detect_outliers_isolation(&numbers, 8)?;
+            output_advanced_outlier_result(matches, &result);
+            let exit_code = if result.outliers.is_empty() { 0 } else { 10 };
+            std::process::exit(exit_code);
+        }
+        "dbscan" => {
+            let std_dev = calculate_std_dev(&numbers);
+            let eps = std_dev * 0.5;
+            let min_pts = (numbers.len() as f64).sqrt() as usize;
+            let result = detect_outliers_dbscan(&numbers, eps, min_pts)?;
+            output_advanced_outlier_result(matches, &result);
+            let exit_code = if result.outliers.is_empty() { 0 } else { 10 };
+            std::process::exit(exit_code);
+        }
+        "ensemble" => {
+            let result = detect_outliers_ensemble(&numbers)?;
+            output_advanced_outlier_result(matches, &result);
+            let exit_code = if result.outliers.is_empty() { 0 } else { 10 };
+            std::process::exit(exit_code);
+        }
+        _ => {
+            // 既存の異常値検出手法
+            let method = match method_str {
+                "zscore" => OutlierDetectionMethod::ZScore,
+                "modified" | "modified_zscore" => OutlierDetectionMethod::ModifiedZScore,
+                "iqr" => OutlierDetectionMethod::IQR,
+                _ => {
+                    eprintln!(
+                        "Error: Unknown outlier detection method '{}'. Available: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble",
+                        method_str
+                    );
+                    std::process::exit(2);
+                }
+            };
 
-    let outlier_result = detect_outliers(&numbers, method)?;
-    output_outlier_detection_result(matches, &outlier_result);
+            let outlier_result = detect_outliers(&numbers, method)?;
+            output_outlier_detection_result(matches, &outlier_result);
 
-    let exit_code = if outlier_result.outliers.is_empty() {
-        0
-    } else {
-        1
-    };
-    std::process::exit(exit_code);
+            let exit_code = if outlier_result.outliers.is_empty() {
+                0
+            } else {
+                1
+            };
+            std::process::exit(exit_code);
+        }
+    }
+}
+
+fn run_timeseries_analysis_mode(matches: &ArgMatches) -> Result<()> {
+    let numbers = get_numbers_from_input(matches)?;
+    
+    // 数値データを時系列データに変換
+    let timeseries_data = create_timeseries_from_values(&numbers);
+    
+    // 時系列分析を実行
+    let analysis_result = analyze_timeseries(&timeseries_data)?;
+    
+    // 結果を出力
+    output_timeseries_result(matches, &analysis_result);
+    
+    std::process::exit(0);
 }
 
 fn run_quality_control_mode(matches: &ArgMatches) -> Result<()> {
@@ -870,4 +931,111 @@ fn analyze_numbers_with_options(
 
     // Perform normal distribution analysis
     analyze_normal_distribution(&filtered_numbers, &dataset_name)
+}
+
+/// 高度な異常値検出結果の出力
+fn output_advanced_outlier_result(matches: &ArgMatches, result: &AdvancedOutlierResult) {
+    let lang = matches
+        .get_one::<String>("language")
+        .map(|s| s.as_str())
+        .unwrap_or("auto");
+
+    println!("Advanced Outlier Detection Result: {}", result.method_name);
+    println!("Detection rate: {:.3}", result.detection_rate);
+    println!("Threshold: {:.3}", result.threshold);
+    println!("Outliers found: {}", result.outliers.len());
+
+    if !result.outliers.is_empty() {
+        println!("\nOutlier Details:");
+        for outlier in &result.outliers {
+            println!(
+                "  Index {}: Value={:.3}, Score={:.3}, Confidence={:.3}",
+                outlier.index, outlier.value, outlier.outlier_score, outlier.confidence
+            );
+        }
+    }
+
+    if !result.method_params.is_empty() {
+        println!("\nMethod Parameters:");
+        for (param, value) in &result.method_params {
+            println!("  {}: {:.3}", param, value);
+        }
+    }
+}
+
+/// 標準偏差を計算するヘルパー関数
+fn calculate_std_dev(numbers: &[f64]) -> f64 {
+    if numbers.is_empty() {
+        return 0.0;
+    }
+    
+    let mean = numbers.iter().sum::<f64>() / numbers.len() as f64;
+    let variance = numbers.iter()
+        .map(|x| (x - mean).powi(2))
+        .sum::<f64>() / numbers.len() as f64;
+    variance.sqrt()
+}
+
+/// 時系列分析結果の出力
+fn output_timeseries_result(matches: &ArgMatches, result: &TimeSeriesAnalysis) {
+    println!("Time Series Analysis Results");
+    println!("============================");
+    
+    // トレンド分析
+    println!("\nTrend Analysis:");
+    println!("  Slope: {:.6}", result.trend.slope);
+    println!("  R-squared: {:.3}", result.trend.r_squared);
+    println!("  Direction: {:?}", result.trend.direction);
+    println!("  Trend strength: {:.3}", result.trend.trend_strength);
+    
+    // 季節性
+    if result.seasonality.detected {
+        println!("\nSeasonality Detected:");
+        if let Some(period) = result.seasonality.period {
+            println!("  Period: {:.1}", period);
+        }
+        println!("  Strength: {:.3}", result.seasonality.strength);
+    } else {
+        println!("\nNo significant seasonality detected");
+    }
+    
+    // 変化点
+    if !result.changepoints.is_empty() {
+        println!("\nChange Points Detected: {}", result.changepoints.len());
+        for (i, cp) in result.changepoints.iter().enumerate().take(5) {
+            println!(
+                "  {}: Index {}, Significance: {:.2}, Type: {:?}",
+                i + 1, cp.index, cp.significance, cp.change_type
+            );
+        }
+    }
+    
+    // 予測
+    if !result.forecasts.is_empty() {
+        println!("\nForecasts (next {} points):", result.forecasts.len());
+        for (i, forecast) in result.forecasts.iter().enumerate() {
+            println!(
+                "  {}: {:.3} (uncertainty: {:.3})",
+                i + 1, forecast.predicted_value, forecast.uncertainty
+            );
+        }
+    }
+    
+    // 異常値
+    if !result.anomalies.is_empty() {
+        println!("\nAnomalies Detected: {}", result.anomalies.len());
+        for anomaly in result.anomalies.iter().take(10) {
+            println!(
+                "  Index {}: Value={:.3}, Expected={:.3}, Score={:.3}",
+                anomaly.index, anomaly.value, anomaly.expected_value, anomaly.anomaly_score
+            );
+        }
+    }
+    
+    // データ品質
+    println!("\nData Quality Assessment:");
+    println!("  Completeness: {:.1}%", result.statistics.data_quality.completeness * 100.0);
+    println!("  Consistency: {:.1}%", result.statistics.data_quality.consistency * 100.0);
+    println!("  Outlier ratio: {:.1}%", result.statistics.data_quality.outlier_ratio * 100.0);
+    println!("  Noise level: {:.3}", result.statistics.noise_level);
 }
