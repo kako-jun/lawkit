@@ -20,8 +20,8 @@ lawkit provides sophisticated outlier detection algorithms beyond traditional Z-
 LOF detects outliers based on local density compared to neighboring points.
 
 ```bash
-# Basic LOF outlier detection
-lawkit benf financial_data.csv --outlier-method lof
+# Basic LOF outlier detection for normal distribution analysis
+lawkit normal financial_data.csv --outliers --outlier-method lof
 
 # Configure number of neighbors
 lawkit benf data.csv --outlier-method lof --outlier-k 10
@@ -40,8 +40,8 @@ lawkit benf transactions.csv --outlier-method lof --outlier-k 5 --outlier-thresh
 Based on Isolation Forest principles, effective for high-dimensional data.
 
 ```bash
-# Basic isolation-based detection
-lawkit benf dataset.csv --outlier-method isolation
+# Basic isolation-based detection for normal distribution
+lawkit normal dataset.csv --outliers --outlier-method isolation
 
 # Configure tree depth
 lawkit benf data.csv --outlier-method isolation --outlier-depth 10
@@ -80,8 +80,8 @@ lawkit benf dataset.csv --outlier-method dbscan --auto-tune
 Combines multiple algorithms for robust outlier detection.
 
 ```bash
-# Use ensemble of all methods
-lawkit benf data.csv --outlier-method ensemble
+# Use ensemble of all methods for normal distribution
+lawkit normal data.csv --outliers --outlier-method ensemble
 
 # Ensemble with consensus requirement
 lawkit benf financial.csv --outlier-method ensemble --min-consensus 2
@@ -128,11 +128,10 @@ Advanced time-based pattern analysis with forecasting capabilities.
 ### Basic Time Series Analysis
 
 ```bash
-# Analyze time-based data
-lawkit benf sales_data.csv \
+# Analyze time-based data for normal distribution patterns
+lawkit normal sales_data.csv \
   --enable-timeseries \
-  --timestamp-column "date" \
-  --value-column "revenue"
+  --timeseries-window 20
 
 # Automatic timestamp detection
 lawkit benf time_data.csv --enable-timeseries --auto-detect-timestamp

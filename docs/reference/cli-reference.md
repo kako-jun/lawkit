@@ -40,7 +40,7 @@ lawkit benf [OPTIONS] [INPUT]
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Detailed statistics
-- `--lang <LANGUAGE>` - Output language: en, ja, zh, hi, ar (default: auto)
+- `--language <LANGUAGE>` - Output language: en, ja, zh, hi, ar (default: auto)
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
 - `--threshold <LEVEL>` - Custom anomaly detection threshold: low, medium, high, critical (default: auto)
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 5)
@@ -112,18 +112,23 @@ lawkit normal [OPTIONS] [INPUT]
 #### Specific Options
 - `--test <TYPE>` - Normality test: shapiro, anderson, ks, all (default: all)
 - `--outliers` - Enable outlier detection
-- `--outlier-method <METHOD>` - Detection method: zscore, modified, iqr (default: zscore)
+- `--outlier-method <METHOD>` - Detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (default: zscore)
 - `--quality-control` - Enable quality control analysis
 - `--spec-limits <LIMITS>` - Specification limits: "lower,upper"
 - `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
+- `--enable-timeseries` - Enable time series analysis
+- `--timeseries-window <SIZE>` - Time series analysis window size (default: 10)
 
 #### Examples
 ```bash
 # Normality testing
 lawkit normal data.csv --test shapiro
 
-# Outlier detection
-lawkit normal data.csv --outliers --outlier-method iqr
+# Advanced outlier detection
+lawkit normal data.csv --outliers --outlier-method ensemble
+
+# Time series analysis
+lawkit normal timeseries.csv --enable-timeseries --timeseries-window 20
 
 # Quality control
 lawkit normal measurements.csv --quality-control --spec-limits "10,20"
@@ -154,6 +159,61 @@ lawkit poisson data.csv --predict --max-events 15
 
 # Rare event analysis
 lawkit poisson incidents.csv --rare-events
+```
+
+## Generation Commands
+
+### `lawkit generate` - Sample Data Generation
+
+Generate sample data following specific statistical laws for testing and validation.
+
+```bash
+lawkit generate <LAW> [OPTIONS]
+```
+
+#### Available Laws
+- `benf` - Generate Benford's law compliant data
+- `pareto` - Generate Pareto distribution data
+- `zipf` - Generate Zipf's law data
+- `normal` - Generate normal distribution data
+- `poisson` - Generate Poisson distribution data
+
+#### Common Generation Options
+- `--samples <NUMBER>` - Number of samples to generate (default: 1000)
+- `--seed <NUMBER>` - Random seed for reproducible generation
+- `--fraud-rate <RATE>` - Fraud injection rate (0.0-1.0) for testing
+
+#### Law-Specific Options
+
+**Benford Generation:**
+- `--range <MIN,MAX>` - Number range (default: 1,100000)
+
+**Pareto Generation:**
+- `--concentration <RATIO>` - Concentration ratio (default: 0.8)
+- `--scale <NUMBER>` - Scale parameter (default: 1.0)
+
+**Zipf Generation:**
+- `--exponent <NUMBER>` - Zipf exponent (default: 1.0)
+- `--vocabulary-size <NUMBER>` - Vocabulary size (default: 10000)
+
+**Normal Generation:**
+- `--mean <NUMBER>` - Mean (default: 0.0)
+- `--stddev <NUMBER>` - Standard deviation (default: 1.0)
+
+**Poisson Generation:**
+- `--lambda <NUMBER>` - Lambda parameter (default: 2.0)
+- `--time-series` - Generate time-series event data
+
+#### Examples
+```bash
+# Generate Benford's law data
+lawkit generate benf --samples 5000 --range 1,1000000
+
+# Generate Pareto data with 20% fraud
+lawkit generate pareto --samples 2000 --fraud-rate 0.2
+
+# Generate reproducible normal data
+lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 ```
 
 ## Integration Commands
@@ -201,7 +261,11 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
-- `--lang <LANG>` - Output language: en, ja, zh, hi, ar, auto
+- `--language <LANG>` - Output language: en, ja, zh, hi, ar, auto
+- `--parallel` - Enable parallel processing
+- `--threads <NUMBER>` - Number of threads for parallel processing (0 = auto)
+- `--chunk-size <SIZE>` - Chunk size for memory-efficient processing (default: 10000)
+- `--streaming` - Enable streaming mode for large datasets
 
 ### Data Processing
 - `--filter <RANGE>` - Number filtering (>=100, <1000, 50-500)
@@ -288,7 +352,10 @@ lawkit zipf customer_frequency.csv --ranking
 ### Anomaly Detection
 ```bash
 # Multi-method outlier detection
-lawkit normal data.csv --outliers --outlier-method iqr
+lawkit normal data.csv --outliers --outlier-method ensemble
+
+# LOF outlier detection for complex patterns
+lawkit normal data.csv --outliers --outlier-method lof
 
 # Event anomaly analysis
 lawkit poisson incidents.csv --rare-events
