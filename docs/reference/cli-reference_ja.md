@@ -20,6 +20,10 @@ lawkit [サブコマンド] [ファイル] [オプション]
 | `--quiet` | `-q` | 簡潔出力 | `false` |
 | `--help` | `-h` | ヘルプ表示 | - |
 | `--version` | `-V` | バージョン表示 | - |
+| `--parallel` | `-P` | 並列処理を有効化 | false |
+| `--threads` | - | 並列処理スレッド数（0=自動） | 0 |
+| `--chunk-size` | - | メモリ効率処理チャンクサイズ | 10000 |
+| `--streaming` | - | ストリーミングモード | false |
 
 ### 出力形式
 
@@ -170,11 +174,13 @@ lawkit normal [ファイル] [オプション]
 |------------|-----|------|-----------|
 | `--normality-tests` | 文字列 | 正規性検定（shapiro,anderson,ks） | all |
 | `--outliers` | - | 異常値検出 | false |
-| `--outlier-method` | 文字列 | 異常値検出手法（iqr,zscore,isolation） | iqr |
+| `--outlier-method` | 文字列 | 異常値検出手法（iqr,zscore,modified_zscore,lof,isolation,dbscan,ensemble） | iqr |
 | `--control-chart` | - | 管理図データ出力 | false |
 | `--capability` | - | 工程能力評価 | false |
 | `--spec-limits` | 文字列 | 規格限界（下限,上限） | なし |
 | `--confidence` | 数値 | 信頼区間 | 0.95 |
+| `--enable-timeseries` | - | 時系列分析を有効化 | false |
+| `--timeseries-window` | 整数 | 時系列分析ウィンドウサイズ | 10 |
 
 #### 例
 
@@ -182,8 +188,11 @@ lawkit normal [ファイル] [オプション]
 # 基本的な正規性分析
 lawkit normal measurements.csv
 
-# 異常値検出
-lawkit normal quality_data.csv --outliers
+# 高度な異常値検出（アンサンブル手法）
+lawkit normal quality_data.csv --outliers --outlier-method ensemble
+
+# 時系列分析
+lawkit normal timeseries_data.csv --enable-timeseries --timeseries-window 20
 
 # 工程能力評価
 lawkit normal process.csv --capability --spec-limits 98.5,101.5
@@ -230,6 +239,63 @@ lawkit poisson rare_events.csv --goodness-of-fit
 
 # 高信頼度での分析
 lawkit poisson defects.csv --confidence 0.99
+```
+
+### lawkit generate - サンプルデータ生成
+
+**用途**: テスト用データ生成、法則検証、ベンチマーク
+
+```bash
+lawkit generate [法則] [オプション]
+```
+
+#### 利用可能な法則
+- `benf` - ベンフォード法則準拠データ生成
+- `pareto` - パレート分布データ生成
+- `zipf` - Zipf法則データ生成
+- `normal` - 正規分布データ生成
+- `poisson` - ポアソン分布データ生成
+
+#### 共通オプション
+
+| オプション | 型 | 説明 | デフォルト |
+|------------|-----|------|-----------|
+| `--samples` | 整数 | 生成サンプル数 | 1000 |
+| `--seed` | 整数 | 再現可能な乱数シード | なし |
+| `--fraud-rate` | 数値 | 不正注入率（0.0-1.0） | 0.0 |
+
+#### 法則固有オプション
+
+**ベンフォード生成:**
+- `--range` - 数値範囲（例: 1,100000）
+
+**パレート生成:**
+- `--concentration` - 集中度（0.8 = 80/20原則）
+- `--scale` - スケールパラメータ
+
+**Zipf生成:**
+- `--exponent` - Zipf指数
+- `--vocabulary-size` - 語彙サイズ
+
+**正規分布生成:**
+- `--mean` - 平均値
+- `--stddev` - 標準偏差
+
+**ポアソン生成:**
+- `--lambda` - ラムダパラメータ
+- `--time-series` - 時系列イベントデータ生成
+
+#### 例
+
+```bash
+# ベンフォード法則データ生成
+lawkit generate benf --samples 5000 --range 1,1000000
+
+# 不正20%混入パレートデータ
+lawkit generate pareto --samples 2000 --fraud-rate 0.2
+
+# 再現可能な正規分布データ
+lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 ```
 
 ### lawkit compare - 複数法則比較
@@ -358,10 +424,13 @@ lawkit benf huge_file.csv
 lawkit benf large_file.csv --sample-size 50000
 
 # 並列処理
-lawkit compare data.csv --threads 8
+lawkit compare data.csv --parallel --threads 8
 
-# メモリ制限
-lawkit benf big_data.csv --memory-limit 1024
+# ストリーミング処理
+lawkit benf big_data.csv --streaming --chunk-size 50000
+
+# 時系列分析の並列処理
+lawkit normal timeseries.csv --enable-timeseries --parallel
 ```
 
 このリファレンスを使用して、lawkitの全機能を効果的に活用してください。

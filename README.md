@@ -32,6 +32,9 @@ $ lawkit compare --laws all data.csv
 - **⚡ High Performance**: Built in Rust with parallel processing
 - **📊 Rich Output**: Text, JSON, CSV, YAML, TOML, XML formats
 - **🔗 Meta-Chaining**: Analyze trends in statistical patterns over time
+- **🔍 Advanced Outlier Detection**: LOF, Isolation Forest, DBSCAN, Ensemble methods
+- **📈 Time Series Analysis**: Trend detection, seasonality, changepoint analysis
+- **🚀 Memory Efficient**: Streaming mode for large datasets with chunked processing
 
 ## 📊 Performance Benchmarks
 
@@ -246,6 +249,27 @@ lawkit selftest
 
 # Test specific functionality
 lawkit generate benf --samples 100 | lawkit benf --quiet
+```
+
+### Advanced Analysis Features
+
+lawkit 2.0 introduces sophisticated analysis capabilities:
+
+```bash
+# Advanced outlier detection with ensemble methods
+lawkit normal dataset.csv --outliers --outlier-method ensemble
+
+# LOF (Local Outlier Factor) for complex patterns
+lawkit normal financial_data.csv --outliers --outlier-method lof
+
+# Time series analysis for trend detection
+lawkit normal timeseries_data.csv --enable-timeseries --timeseries-window 20
+
+# Parallel processing for large datasets
+lawkit compare large_dataset.csv --parallel --threads 8
+
+# Memory-efficient streaming for huge files
+lawkit benf massive_file.csv --streaming --chunk-size 50000
 ```
 
 ### Educational Use Cases
