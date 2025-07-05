@@ -11,7 +11,7 @@ pub use normal::*;
 pub use poisson::*;
 
 use crate::error::Result;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use rand::rngs::StdRng;
 
 #[derive(Debug, Clone)]
