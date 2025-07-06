@@ -3,7 +3,7 @@ use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;
 use lawkit_core::laws::integration::{
     analyze_all_laws, analyze_selected_laws, compare_laws, cross_validate_laws,
-    detect_conflicts_detailed, generate_detailed_recommendations, AnalysisPurpose,
+    detect_conflicts_detailed, generate_detailed_recommendations, apply_focus_analysis, AnalysisPurpose,
 };
 use std::io::Write;
 use crate::common_options;
@@ -42,14 +42,32 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
 
     let result = if let Some(laws_str) = matches.get_one::<String>("laws") {
         let selected_laws: Vec<String> =
             laws_str.split(',').map(|s| s.trim().to_string()).collect();
-        analyze_selected_laws(&numbers, &dataset_name, &selected_laws)?
+        let mut result = analyze_selected_laws(&numbers, &dataset_name, &selected_laws)?;
+        
+        // Apply focus if provided
+        if let Some(focus) = matches.get_one::<String>("focus") {
+            apply_focus_analysis(&mut result, focus);
+        }
+        
+        result
     } else if let Some(focus) = matches.get_one::<String>("focus") {
         compare_laws(&numbers, &dataset_name, Some(focus))?
     } else {
@@ -65,8 +83,19 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
 
     let result = analyze_all_laws(&numbers, &dataset_name)?;
@@ -80,8 +109,19 @@ fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
 
@@ -96,8 +136,19 @@ fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
     let confidence_level = *matches.get_one::<f64>("confidence-level").unwrap();
 
@@ -112,8 +163,19 @@ fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
 
@@ -128,8 +190,19 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers =
-        lawkit_core::common::input::parse_input_auto(matches.get_one::<String>("input").unwrap())?;
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        lawkit_core::common::input::parse_input_auto(input)?
+    } else {
+        // Read from stdin
+        use std::io::{self, Read};
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)
+            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+        if buffer.trim().is_empty() {
+            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+        }
+        lawkit_core::common::input::parse_text_input(&buffer)?
+    };
     let dataset_name = get_dataset_name(matches);
 
     let analysis_purpose = matches
@@ -220,6 +293,16 @@ fn output_integration_text(
         result.laws_executed.len(),
         result.laws_executed.join(", ")
     )?;
+    
+    if let Some(ref focus) = result.focus {
+        writeln!(
+            writer,
+            "{}: {}",
+            get_text("focus", lang),
+            focus
+        )?;
+    }
+    
     writeln!(writer)?;
 
     writeln!(writer, "{}:", get_text("integration_metrics", lang))?;
@@ -322,6 +405,7 @@ fn output_integration_json(
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
         "laws_executed": result.laws_executed,
+        "focus": result.focus,
         "integration_metrics": {
             "overall_quality_score": result.overall_quality_score,
             "consistency_score": result.consistency_score,
@@ -357,13 +441,14 @@ fn output_integration_csv(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::IntegrationResult,
 ) -> Result<()> {
-    writeln!(writer, "dataset,numbers_analyzed,laws_executed,overall_quality_score,consistency_score,conflicts_detected,primary_law,overall_assessment,risk_level")?;
+    writeln!(writer, "dataset,numbers_analyzed,laws_executed,focus,overall_quality_score,consistency_score,conflicts_detected,primary_law,overall_assessment,risk_level")?;
     writeln!(
         writer,
-        "{},{},{},{:.3},{:.3},{},{},{:?},{:?}",
+        "{},{},{},{},{:.3},{:.3},{},{},{:?},{:?}",
         result.dataset_name,
         result.numbers_analyzed,
         result.laws_executed.len(),
+        result.focus.as_deref().unwrap_or(""),
         result.overall_quality_score,
         result.consistency_score,
         result.conflicts_detected,
@@ -383,6 +468,9 @@ fn output_integration_yaml(
     writeln!(writer, "laws_executed:")?;
     for law in &result.laws_executed {
         writeln!(writer, "  - \"{}\"", law)?;
+    }
+    if let Some(ref focus) = result.focus {
+        writeln!(writer, "focus: \"{}\"", focus)?;
     }
     writeln!(writer, "integration_metrics:")?;
     writeln!(
@@ -853,6 +941,8 @@ fn get_text(key: &str, lang: &str) -> String {
         ("secondary_laws", _) => "Secondary Laws".to_string(),
         ("rationale", "ja") => "推奨理由".to_string(),
         ("rationale", _) => "Rationale".to_string(),
+        ("focus", "ja") => "分析フォーカス".to_string(),
+        ("focus", _) => "Focus".to_string(),
         _ => key.to_string(),
     }
 }

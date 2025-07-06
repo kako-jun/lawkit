@@ -35,7 +35,8 @@
       "Bash(cargo:*)",
       "Bash(RUST_BACKTRACE=1 cargo test --test lawkit_subcommands test_lawkit_benf_basic)",
       "Bash(echo:*)",
-      "Bash(timeout 30 cargo test test_lawkit_generate_benf --test integration -- --nocapture)"
+      "Bash(timeout 30 cargo test test_lawkit_generate_benf --test integration -- --nocapture)",
+      "Bash(timeout 10 cargo run --bin lawkit -- compare test_data.txt)"
     ],
     "deny": []
   },
