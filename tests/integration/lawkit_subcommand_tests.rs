@@ -21,15 +21,15 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
     command.args(args);
     command.args(["--language", "en"]); // Force English output at the end
 
-    let mut cmd_str = format!("cargo run --bin lawkit -- {}", subcommand);
+    let mut cmd_str = format!("cargo run --bin lawkit -- {subcommand}");
     for arg in args {
-        cmd_str.push_str(&format!(" {}", arg));
+        cmd_str.push_str(&format!(" {arg}"));
     }
     // Don't add --language en for commands that don't support it
     if subcommand != "selftest" && subcommand != "list" {
         cmd_str.push_str(" --language en");
     }
-    println!("🔍 Debug: Running command: {}", cmd_str);
+    println!("🔍 Debug: Running command: {cmd_str}");
 
     let output = command.output().expect("Failed to execute lawkit command");
 
@@ -1011,9 +1011,9 @@ mod generate_functionality_tests {
         );
         if !compare_output.status.success() {
             let stderr = String::from_utf8_lossy(&compare_output.stderr);
-            println!("Compare failed with stderr: {}", stderr);
+            println!("Compare failed with stderr: {stderr}");
             let stdout = String::from_utf8_lossy(&compare_output.stdout);
-            println!("Compare stdout: {}", stdout);
+            println!("Compare stdout: {stdout}");
         }
         // Compare command returns exit code based on risk level (0, 10, 11)
         // which is not always 0 even on successful execution
