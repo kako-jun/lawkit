@@ -4,7 +4,7 @@ use std::path::Path;
 /// Parse JSON files and extract numbers
 pub fn parse_json_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read JSON file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read JSON file: {e}"))
     })?;
 
     parse_json_content(&content)
@@ -13,7 +13,7 @@ pub fn parse_json_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Parse JSON content from string
 pub fn parse_json_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let json_value: serde_json::Value = serde_json::from_str(content)
-        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid JSON: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid JSON: {e}")))?;
 
     let numbers = extract_numbers_from_json_value(&json_value);
 
@@ -27,7 +27,7 @@ pub fn parse_json_content(content: &str) -> crate::error::Result<Vec<f64>> {
 /// Parse XML files and extract numbers
 pub fn parse_xml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read XML file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read XML file: {e}"))
     })?;
 
     parse_xml_content(&content)
@@ -50,7 +50,7 @@ pub fn parse_xml_content(content: &str) -> crate::error::Result<Vec<f64>> {
 /// Parse YAML files and extract numbers
 pub fn parse_yaml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read YAML file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read YAML file: {e}"))
     })?;
 
     parse_yaml_content(&content)
@@ -59,7 +59,7 @@ pub fn parse_yaml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Parse YAML content from string
 pub fn parse_yaml_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let yaml_value: serde_yaml::Value = serde_yaml::from_str(content)
-        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid YAML: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid YAML: {e}")))?;
 
     let numbers = extract_numbers_from_yaml_value(&yaml_value);
 
@@ -73,7 +73,7 @@ pub fn parse_yaml_content(content: &str) -> crate::error::Result<Vec<f64>> {
 /// Parse TOML files and extract numbers
 pub fn parse_toml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read TOML file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read TOML file: {e}"))
     })?;
 
     parse_toml_content(&content)
@@ -82,7 +82,7 @@ pub fn parse_toml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Parse TOML content from string
 pub fn parse_toml_content(content: &str) -> crate::error::Result<Vec<f64>> {
     let toml_value: toml::Value = toml::from_str(content)
-        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid TOML: {}", e)))?;
+        .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid TOML: {e}")))?;
 
     let numbers = extract_numbers_from_toml_value(&toml_value);
 

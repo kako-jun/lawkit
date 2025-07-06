@@ -18,8 +18,7 @@ pub fn parse_opendocument_file(file_path: &Path) -> crate::error::Result<Vec<f64
             crate::common::input::formats::excel::parse_excel_file(file_path)
         }
         _ => Err(crate::error::BenfError::ParseError(format!(
-            "Unsupported OpenDocument file extension: {}",
-            extension
+            "Unsupported OpenDocument file extension: {extension}"
         ))),
     }
 }
@@ -40,13 +39,12 @@ fn parse_odt_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 
     // Open the ODT file as a ZIP archive
     let file = std::fs::File::open(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open OpenDocument file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to open OpenDocument file: {e}"))
     })?;
 
     let mut archive = zip::ZipArchive::new(file).map_err(|e| {
         crate::error::BenfError::ParseError(format!(
-            "Invalid OpenDocument file format (not a ZIP archive): {}",
-            e
+            "Invalid OpenDocument file format (not a ZIP archive): {e}"
         ))
     })?;
 
@@ -54,7 +52,7 @@ fn parse_odt_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let mut content_xml = None;
     for i in 0..archive.len() {
         let file = archive.by_index(i).map_err(|e| {
-            crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e))
+            crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {e}"))
         })?;
 
         if file.name() == "content.xml" {
@@ -71,12 +69,12 @@ fn parse_odt_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 
     // Extract content from content.xml
     let mut file = archive.by_index(content_index).map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to read content.xml: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to read content.xml: {e}"))
     })?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents).map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to read content.xml data: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to read content.xml data: {e}"))
     })?;
 
     // Extract text content from XML

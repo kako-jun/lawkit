@@ -178,7 +178,7 @@ pub fn parse_file_by_format(
         FileFormat::Text => {
             // Fallback: read as plain text
             let content = std::fs::read_to_string(file_path).map_err(|e| {
-                crate::error::BenfError::FileError(format!("Failed to read text file: {}", e))
+                crate::error::BenfError::FileError(format!("Failed to read text file: {e}"))
             })?;
             let numbers = extract_numbers_international(&content);
             if numbers.is_empty() {

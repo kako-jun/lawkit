@@ -37,10 +37,10 @@ impl NumberFilter {
 
                 let start = start_str
                     .parse::<f64>()
-                    .map_err(|_| format!("Invalid start number in range: {}", start_str))?;
+                    .map_err(|_| format!("Invalid start number in range: {start_str}"))?;
                 let end = end_str
                     .parse::<f64>()
-                    .map_err(|_| format!("Invalid end number in range: {}", end_str))?;
+                    .map_err(|_| format!("Invalid end number in range: {end_str}"))?;
 
                 if start >= end {
                     return Err("Range start must be less than end".to_string());
@@ -54,35 +54,35 @@ impl NumberFilter {
         if let Some(value_str) = filter_str.strip_prefix(">=") {
             let value = value_str
                 .parse::<f64>()
-                .map_err(|_| format!("Invalid number after '>=': {}", value_str))?;
+                .map_err(|_| format!("Invalid number after '>=': {value_str}"))?;
             return Ok(NumberFilter::GreaterThanOrEqual(value));
         }
 
         if let Some(value_str) = filter_str.strip_prefix("<=") {
             let value = value_str
                 .parse::<f64>()
-                .map_err(|_| format!("Invalid number after '<=': {}", value_str))?;
+                .map_err(|_| format!("Invalid number after '<=': {value_str}"))?;
             return Ok(NumberFilter::LessThanOrEqual(value));
         }
 
         if let Some(value_str) = filter_str.strip_prefix('>') {
             let value = value_str
                 .parse::<f64>()
-                .map_err(|_| format!("Invalid number after '>': {}", value_str))?;
+                .map_err(|_| format!("Invalid number after '>': {value_str}"))?;
             return Ok(NumberFilter::GreaterThan(value));
         }
 
         if let Some(value_str) = filter_str.strip_prefix('<') {
             let value = value_str
                 .parse::<f64>()
-                .map_err(|_| format!("Invalid number after '<': {}", value_str))?;
+                .map_err(|_| format!("Invalid number after '<': {value_str}"))?;
             return Ok(NumberFilter::LessThan(value));
         }
 
         if let Some(value_str) = filter_str.strip_prefix('=') {
             let value = value_str
                 .parse::<f64>()
-                .map_err(|_| format!("Invalid number after '=': {}", value_str))?;
+                .map_err(|_| format!("Invalid number after '=': {value_str}"))?;
             return Ok(NumberFilter::Equal(value));
         }
 
@@ -90,8 +90,7 @@ impl NumberFilter {
         match filter_str.parse::<f64>() {
             Ok(value) => Ok(NumberFilter::Equal(value)),
             Err(_) => Err(format!(
-                "Invalid filter format: {}. Use formats like: >=100, <1000, 50-500",
-                filter_str
+                "Invalid filter format: {filter_str}. Use formats like: >=100, <1000, 50-500"
             )),
         }
     }
@@ -112,12 +111,12 @@ impl NumberFilter {
     /// Get a human-readable description of this filter
     pub fn description(&self) -> String {
         match self {
-            NumberFilter::GreaterThanOrEqual(n) => format!("≥ {}", n),
-            NumberFilter::LessThan(n) => format!("< {}", n),
-            NumberFilter::GreaterThan(n) => format!("> {}", n),
-            NumberFilter::LessThanOrEqual(n) => format!("≤ {}", n),
-            NumberFilter::Equal(n) => format!("= {}", n),
-            NumberFilter::Range(start, end) => format!("{} - {}", start, end),
+            NumberFilter::GreaterThanOrEqual(n) => format!("≥ {n}"),
+            NumberFilter::LessThan(n) => format!("< {n}"),
+            NumberFilter::GreaterThan(n) => format!("> {n}"),
+            NumberFilter::LessThanOrEqual(n) => format!("≤ {n}"),
+            NumberFilter::Equal(n) => format!("= {n}"),
+            NumberFilter::Range(start, end) => format!("{start} - {end}"),
             NumberFilter::None => "All numbers".to_string(),
         }
     }
@@ -169,7 +168,7 @@ impl FromStr for RiskThreshold {
                         Ok(RiskThreshold::Custom(p_value))
                     },
                     Ok(_) => Err("Custom p-value must be between 0.0 and 1.0".to_string()),
-                    Err(_) => Err(format!("Invalid threshold: {}. Use: auto, low, medium, high, critical, or a p-value (0.0-1.0)", s)),
+                    Err(_) => Err(format!("Invalid threshold: {s}. Use: auto, low, medium, high, critical, or a p-value (0.0-1.0)")),
                 }
             }
         }
