@@ -6,7 +6,7 @@ use std::path::Path;
 /// Parse HTML files and extract numbers from text content
 pub fn parse_html_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read HTML file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read HTML file: {e}"))
     })?;
 
     parse_html_content(&content)

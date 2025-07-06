@@ -4,7 +4,7 @@ use std::path::Path;
 /// Parse CSV/TSV files and extract numbers
 pub fn parse_csv_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read CSV file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read CSV file: {e}"))
     })?;
 
     parse_csv_content(&content)

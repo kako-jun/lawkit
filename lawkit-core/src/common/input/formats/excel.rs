@@ -23,7 +23,7 @@ pub fn parse_excel_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Parse XLSX files specifically
 fn parse_xlsx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let mut workbook: Xlsx<_> = calamine::open_workbook(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open XLSX file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to open XLSX file: {e}"))
     })?;
 
     extract_numbers_from_xlsx(&mut workbook)
@@ -32,7 +32,7 @@ fn parse_xlsx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Parse XLS files specifically  
 fn parse_xls_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let mut workbook: Xls<_> = calamine::open_workbook(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open XLS file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to open XLS file: {e}"))
     })?;
 
     extract_numbers_from_xls(&mut workbook)
@@ -41,7 +41,7 @@ fn parse_xls_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 /// Auto-detect Excel format and parse
 fn parse_excel_auto(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     let workbook = open_workbook_auto(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open Excel file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to open Excel file: {e}"))
     })?;
 
     match workbook {
