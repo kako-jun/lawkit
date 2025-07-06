@@ -108,6 +108,24 @@ pub fn add_pareto_options(cmd: Command) -> Command {
                 .help("Concentration threshold (0.0-1.0)")
                 .default_value("0.8"),
         )
+        .arg(
+            Arg::new("gini-coefficient")
+                .long("gini-coefficient")
+                .help("Calculate Gini coefficient for inequality measurement")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("percentiles")
+                .long("percentiles")
+                .value_name("PERCENTILES")
+                .help("Custom percentiles to calculate (e.g., 70,80,90)"),
+        )
+        .arg(
+            Arg::new("business-analysis")
+                .long("business-analysis")
+                .help("Enable business analysis insights")
+                .action(clap::ArgAction::SetTrue),
+        )
 }
 
 /// サブコマンド固有のオプション：Zipf法則

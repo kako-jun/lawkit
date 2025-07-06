@@ -95,7 +95,7 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     let language = get_language(matches);
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose, language),
+        "text" => print_text_output(result, quiet, verbose, language, matches),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
@@ -109,11 +109,12 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     }
 }
 
-fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &str) {
+fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &str, matches: &clap::ArgMatches) {
     if quiet {
         println!("pareto_ratio: {:.3}", result.pareto_ratio);
         println!("concentration_index: {:.3}", result.concentration_index);
         println!("top_20_percent_share: {:.1}%", result.top_20_percent_share);
+        println!("gini_coefficient: {:.3}", result.concentration_index);
         return;
     }
 
@@ -154,9 +155,48 @@ fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &s
             result.concentration_index
         );
 
+        // カスタムパーセンタイルの表示
+        if let Some(ref percentiles) = result.custom_percentiles {
+            println!();
+            println!("{}:", localized_text("custom_percentiles", lang));
+            for (percentile, share) in percentiles {
+                println!("  Top {:.0}%: {:.1}%", percentile, share);
+            }
+        }
+
         println!();
         println!("{}:", localized_text("interpretation", lang));
         print_pareto_interpretation(result, lang);
+    }
+
+    // --gini-coefficient オプションが指定されたときにGini係数を明示的に表示
+    if matches.get_flag("gini-coefficient") {
+        println!();
+        println!("Gini coefficient: {:.3}", result.concentration_index);
+    }
+
+    // --percentiles オプションが指定されたときは常に表示（verboseでなくても）
+    if !verbose && result.custom_percentiles.is_some() {
+        if let Some(ref percentiles) = result.custom_percentiles {
+            println!();
+            println!("{}:", localized_text("custom_percentiles", lang));
+            for (percentile, share) in percentiles {
+                println!("  Top {:.0}%: {:.1}%", percentile, share);
+            }
+        }
+    }
+
+    // --business-analysis オプションが指定されたときにビジネス分析を表示
+    if matches.get_flag("business-analysis") {
+        println!();
+        println!("Business Analysis:");
+        println!("  Concentration level: {:.1}%", result.concentration_index * 100.0);
+        println!("  Business efficiency: {:.1}%", result.pareto_ratio * 100.0);
+        if result.top_20_percent_share > 80.0 {
+            println!("  Recommendation: High concentration indicates good focus");
+        } else {
+            println!("  Recommendation: Consider focusing efforts on high-value activities");
+        }
     }
 }
 
@@ -208,15 +248,21 @@ fn print_pareto_interpretation(result: &ParetoResult, lang: &str) {
 fn print_json_output(result: &ParetoResult) {
     use serde_json::json;
 
-    let output = json!({
+    let mut output = json!({
         "dataset": result.dataset_name,
         "numbers_analyzed": result.numbers_analyzed,
         "risk_level": format!("{:?}", result.risk_level),
         "pareto_ratio": result.pareto_ratio,
         "concentration_index": result.concentration_index,
+        "gini_coefficient": result.concentration_index,
         "top_20_percent_share": result.top_20_percent_share,
         "cumulative_distribution_points": result.cumulative_distribution.len()
     });
+
+    // カスタムパーセンタイルがある場合は追加
+    if let Some(ref percentiles) = result.custom_percentiles {
+        output["custom_percentiles"] = json!(percentiles);
+    }
 
     println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
@@ -355,9 +401,11 @@ fn localized_text(key: &str, lang: &str) -> &'static str {
         ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
         ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
         ("ja", "analysis_error") => "解析エラー",
+        ("ja", "custom_percentiles") => "カスタムパーセンタイル",
 
         // Default English
         (_, "pareto_analysis_results") => "Pareto Principle (80/20 Rule) Analysis Results",
+        (_, "custom_percentiles") => "Custom Percentiles",
         (_, "dataset") => "Dataset",
         (_, "numbers_analyzed") => "Numbers analyzed",
         (_, "risk_level") => "Attention Level",
@@ -411,5 +459,18 @@ fn analyze_numbers_with_options(
     }
 
     // Perform Pareto analysis
-    analyze_pareto_distribution(&filtered_numbers, &dataset_name)
+    let mut result = analyze_pareto_distribution(&filtered_numbers, &dataset_name)?;
+    
+    // カスタムパーセンタイルの処理
+    if let Some(percentiles_str) = matches.get_one::<String>("percentiles") {
+        let percentiles: Vec<f64> = percentiles_str
+            .split(',')
+            .map(|s| s.trim().parse::<f64>())
+            .collect::<std::result::Result<Vec<f64>, _>>()
+            .map_err(|_| BenfError::ParseError("Invalid percentiles format".to_string()))?;
+        
+        result = result.with_custom_percentiles(&percentiles, &filtered_numbers);
+    }
+    
+    Ok(result)
 }

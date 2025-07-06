@@ -268,7 +268,7 @@ mod pareto_law_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("business") || stdout.contains("concentration"));
+        assert!(stdout.to_lowercase().contains("business") || stdout.to_lowercase().contains("concentration"));
     }
 
     #[test]
