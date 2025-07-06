@@ -285,9 +285,7 @@ fn parse_kanji_number(kanji: &str) -> Result<u64, String> {
                             '八' => result_str.push('8'),
                             '九' => result_str.push('9'),
                             '〇' | '零' => result_str.push('0'),
-                            _ => {
-                                return Err(format!("Invalid character in digit sequence: {ch}"))
-                            }
+                            _ => return Err(format!("Invalid character in digit sequence: {ch}")),
                         }
                     }
                     return result_str

@@ -135,7 +135,10 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
         }
         _ => {
             println!("Benford's Law Analysis Results");
-            println!("Numbers analyzed: {numbers_analyzed}", numbers_analyzed = result.numbers_analyzed);
+            println!(
+                "Numbers analyzed: {numbers_analyzed}",
+                numbers_analyzed = result.numbers_analyzed
+            );
             println!("Risk level: {risk_level:?}", risk_level = result.risk_level);
         }
     }

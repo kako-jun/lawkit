@@ -31,9 +31,8 @@ fn parse_xlsx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 
 /// Parse XLS files specifically  
 fn parse_xls_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
-    let mut workbook: Xls<_> = calamine::open_workbook(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open XLS file: {e}"))
-    })?;
+    let mut workbook: Xls<_> = calamine::open_workbook(file_path)
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to open XLS file: {e}")))?;
 
     extract_numbers_from_xls(&mut workbook)
 }
