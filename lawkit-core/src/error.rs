@@ -17,20 +17,19 @@ pub enum BenfError {
 impl fmt::Display for BenfError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            BenfError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
-            BenfError::NetworkError(msg) => write!(f, "Network error: {}", msg),
-            BenfError::FileError(msg) => write!(f, "File error: {}", msg),
-            BenfError::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            BenfError::InvalidInput(msg) => write!(f, "Invalid input: {msg}"),
+            BenfError::NetworkError(msg) => write!(f, "Network error: {msg}"),
+            BenfError::FileError(msg) => write!(f, "File error: {msg}"),
+            BenfError::ParseError(msg) => write!(f, "Parse error: {msg}"),
             BenfError::NoNumbersFound => write!(f, "No numbers found in input"),
             BenfError::InsufficientData(count) => {
                 write!(
                     f,
-                    "Insufficient data for analysis: {} numbers (minimum 30 recommended)",
-                    count
+                    "Insufficient data for analysis: {count} numbers (minimum 30 recommended)"
                 )
             }
-            BenfError::IoError(msg) => write!(f, "I/O error: {}", msg),
-            BenfError::SerializationError(msg) => write!(f, "Serialization error: {}", msg),
+            BenfError::IoError(msg) => write!(f, "I/O error: {msg}"),
+            BenfError::SerializationError(msg) => write!(f, "Serialization error: {msg}"),
         }
     }
 }
