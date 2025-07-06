@@ -20,8 +20,7 @@ pub fn parse_powerpoint_file(file_path: &Path) -> crate::error::Result<Vec<f64>>
             ))
         }
         _ => Err(crate::error::BenfError::ParseError(format!(
-            "Unsupported PowerPoint file extension: {}",
-            extension
+            "Unsupported PowerPoint file extension: {extension}"
         ))),
     }
 }
@@ -42,13 +41,12 @@ fn parse_pptx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 
     // Open the PPTX file as a ZIP archive
     let file = std::fs::File::open(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to open PowerPoint file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to open PowerPoint file: {e}"))
     })?;
 
     let mut archive = zip::ZipArchive::new(file).map_err(|e| {
         crate::error::BenfError::ParseError(format!(
-            "Invalid PowerPoint file format (not a ZIP archive): {}",
-            e
+            "Invalid PowerPoint file format (not a ZIP archive): {e}"
         ))
     })?;
 
@@ -57,7 +55,7 @@ fn parse_pptx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // Iterate through all files in the ZIP archive
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).map_err(|e| {
-            crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {}", e))
+            crate::error::BenfError::ParseError(format!("Failed to read ZIP entry: {e}"))
         })?;
 
         let file_name = file.name().to_string();
@@ -66,7 +64,7 @@ fn parse_pptx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
         if file_name.starts_with("ppt/slides/slide") && file_name.ends_with(".xml") {
             let mut contents = String::new();
             file.read_to_string(&mut contents).map_err(|e| {
-                crate::error::BenfError::ParseError(format!("Failed to read slide XML: {}", e))
+                crate::error::BenfError::ParseError(format!("Failed to read slide XML: {e}"))
             })?;
 
             // Extract text content from XML

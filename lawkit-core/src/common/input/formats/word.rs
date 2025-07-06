@@ -20,8 +20,7 @@ pub fn parse_word_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
             ))
         }
         _ => Err(crate::error::BenfError::ParseError(format!(
-            "Unsupported Word file extension: {}",
-            extension
+            "Unsupported Word file extension: {extension}"
         ))),
     }
 }
@@ -30,12 +29,12 @@ pub fn parse_word_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
 fn parse_docx_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // Read the DOCX file
     let file_bytes = std::fs::read(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read Word file: {}", e))
+        crate::error::BenfError::FileError(format!("Failed to read Word file: {e}"))
     })?;
 
     // Parse the DOCX document
     let doc = read_docx(&file_bytes).map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to parse DOCX file: {:?}", e))
+        crate::error::BenfError::ParseError(format!("Failed to parse DOCX file: {e:?}"))
     })?;
 
     // Extract all text content from the document
