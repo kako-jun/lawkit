@@ -101,12 +101,12 @@ fn extract_text_from_odt_xml(xml_content: &str) -> crate::error::Result<String> 
     // OpenDocument text content is in various elements
     // Common text elements: <text:p>, <text:span>, <text:h>, etc.
     let text_regex = Regex::new(r"<text:[^>]*>(.*?)</text:[^>]*>").map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to compile regex: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to compile regex: {e}"))
     })?;
 
     // Also extract from table cells
     let table_regex = Regex::new(r"<table:[^>]*>(.*?)</table:[^>]*>").map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to compile table regex: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to compile table regex: {e}"))
     })?;
 
     let mut extracted_text = Vec::new();
