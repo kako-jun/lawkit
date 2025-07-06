@@ -1,22 +1,20 @@
+use crate::common_options;
 use clap::{ArgMatches, Command};
 use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;
 use lawkit_core::laws::integration::{
-    analyze_all_laws, analyze_selected_laws, compare_laws, cross_validate_laws,
-    detect_conflicts_detailed, generate_detailed_recommendations, apply_focus_analysis, AnalysisPurpose,
+    analyze_all_laws, analyze_selected_laws, apply_focus_analysis, compare_laws,
+    cross_validate_laws, detect_conflicts_detailed, generate_detailed_recommendations,
+    AnalysisPurpose,
 };
 use std::io::Write;
-use crate::common_options;
 
 pub fn command() -> Command {
-    common_options::add_compare_options(
-        common_options::add_common_options(
-            common_options::add_input_arg(
-                Command::new("compare")
-                    .about("複数の統計法則を比較・統合分析")
-            )
-        )
-    )
+    common_options::add_compare_options(common_options::add_common_options(
+        common_options::add_input_arg(
+            Command::new("compare").about("複数の統計法則を比較・統合分析"),
+        ),
+    ))
 }
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
@@ -48,10 +46,14 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -61,12 +63,12 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
         let selected_laws: Vec<String> =
             laws_str.split(',').map(|s| s.trim().to_string()).collect();
         let mut result = analyze_selected_laws(&numbers, &dataset_name, &selected_laws)?;
-        
+
         // Apply focus if provided
         if let Some(focus) = matches.get_one::<String>("focus") {
             apply_focus_analysis(&mut result, focus);
         }
-        
+
         result
     } else if let Some(focus) = matches.get_one::<String>("focus") {
         compare_laws(&numbers, &dataset_name, Some(focus))?
@@ -89,10 +91,14 @@ fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -115,10 +121,14 @@ fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -142,10 +152,14 @@ fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -169,10 +183,14 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -196,10 +214,14 @@ fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
         // Read from stdin
         use std::io::{self, Read};
         let mut buffer = String::new();
-        io::stdin().read_to_string(&mut buffer)
+        io::stdin()
+            .read_to_string(&mut buffer)
             .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
         if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError("No input data provided".to_string()).into());
+            return Err(lawkit_core::error::BenfError::ParseError(
+                "No input data provided".to_string(),
+            )
+            .into());
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -293,16 +315,11 @@ fn output_integration_text(
         result.laws_executed.len(),
         result.laws_executed.join(", ")
     )?;
-    
+
     if let Some(ref focus) = result.focus {
-        writeln!(
-            writer,
-            "{}: {}",
-            get_text("focus", lang),
-            focus
-        )?;
+        writeln!(writer, "{}: {}", get_text("focus", lang), focus)?;
     }
-    
+
     writeln!(writer)?;
 
     writeln!(writer, "{}:", get_text("integration_metrics", lang))?;

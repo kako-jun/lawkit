@@ -1,7 +1,7 @@
 use super::{DataGenerator, GenerateConfig};
 use crate::error::Result;
 use rand::prelude::*;
-use rand_distr::{Normal, Distribution};
+use rand_distr::{Distribution, Normal};
 
 #[derive(Debug, Clone)]
 pub struct NormalGenerator {
@@ -22,8 +22,9 @@ impl DataGenerator for NormalGenerator {
         let mut rng = config.create_rng();
         let mut numbers = Vec::with_capacity(config.samples);
 
-        let normal = Normal::new(self.mean, self.stddev)
-            .map_err(|e| crate::error::BenfError::ParseError(format!("Invalid normal parameters: {}", e)))?;
+        let normal = Normal::new(self.mean, self.stddev).map_err(|e| {
+            crate::error::BenfError::ParseError(format!("Invalid normal parameters: {}", e))
+        })?;
 
         for _ in 0..config.samples {
             let value = normal.sample(&mut rng);
@@ -42,8 +43,9 @@ impl DataGenerator for NormalGenerator {
 fn inject_normal_fraud(numbers: &mut [f64], fraud_rate: f64, rng: &mut impl Rng) {
     let fraud_count = (numbers.len() as f64 * fraud_rate) as usize;
     let mean = numbers.iter().sum::<f64>() / numbers.len() as f64;
-    let stddev = (numbers.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / numbers.len() as f64).sqrt();
-    
+    let stddev =
+        (numbers.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / numbers.len() as f64).sqrt();
+
     // Add outliers beyond 3 standard deviations
     for _ in 0..fraud_count {
         let index = rng.gen_range(0..numbers.len());
@@ -61,16 +63,16 @@ mod tests {
     fn test_normal_generator() {
         let generator = NormalGenerator::new(100.0, 15.0);
         let config = GenerateConfig::new(1000).with_seed(42);
-        
+
         let result = generator.generate(&config).unwrap();
         assert_eq!(result.len(), 1000);
-        
+
         // Check mean and standard deviation are approximately correct
         let mean = result.iter().sum::<f64>() / result.len() as f64;
         let variance = result.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / result.len() as f64;
         let stddev = variance.sqrt();
-        
-        assert!((mean - 100.0).abs() < 5.0);  // Within 5 units of target mean
+
+        assert!((mean - 100.0).abs() < 5.0); // Within 5 units of target mean
         assert!((stddev - 15.0).abs() < 3.0); // Within 3 units of target stddev
     }
 }

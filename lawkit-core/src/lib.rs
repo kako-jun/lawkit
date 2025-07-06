@@ -1,7 +1,7 @@
 pub mod common;
 pub mod error;
-pub mod laws;
 pub mod generate;
+pub mod laws;
 
 pub use common::*;
 pub use error::*;

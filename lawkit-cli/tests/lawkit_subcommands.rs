@@ -26,23 +26,23 @@ fn create_temp_file_with_content(content: &str) -> NamedTempFile {
 fn generate_test_data() -> String {
     // Generate enough data points for all analyses (minimum 50 for most laws)
     let mut data = Vec::new();
-    
+
     // Generate 50 different numbers following various patterns
     for i in 1..=50 {
         let base = 100 + i * 17; // Create variety in first digits
         data.push(base.to_string());
-        
+
         if i % 3 == 0 {
             let alt = 200 + i * 23;
             data.push(alt.to_string());
         }
-        
+
         if i % 5 == 0 {
             let third = 300 + i * 31;
             data.push(third.to_string());
         }
     }
-    
+
     data.join(" ")
 }
 
@@ -364,31 +364,37 @@ fn test_lawkit_generate_benf() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let lines: Vec<&str> = stdout.lines().collect();
     assert_eq!(lines.len(), 100); // Should generate exactly 100 samples
-    
+
     // Verify all outputs are valid numbers
     for line in lines {
-        assert!(line.parse::<f64>().is_ok(), "Generated data should be valid numbers");
+        assert!(
+            line.parse::<f64>().is_ok(),
+            "Generated data should be valid numbers"
+        );
     }
 }
 
 #[test]
 fn test_generate_to_analyze_pipeline() {
     // Generate Benford data
-    let generate_output = run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "pipeline"]);
+    let generate_output = run_lawkit_command(
+        "generate",
+        &["benf", "--samples", "100", "--seed", "pipeline"],
+    );
     assert!(generate_output.status.success());
-    
+
     let generated_data = String::from_utf8_lossy(&generate_output.stdout);
-    
+
     // Create temp file with generated data
     let temp_file = create_temp_file_with_content(&generated_data);
-    
+
     // Analyze the generated data
     let analyze_output = run_lawkit_command("benf", &[temp_file.path().to_str().unwrap()]);
     assert!(matches!(
         analyze_output.status.code(),
         Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
     ));
-    
+
     let analysis_result = String::from_utf8_lossy(&analyze_output.stdout);
     assert!(analysis_result.contains("Benford"));
     assert!(analysis_result.contains("100")); // Should analyze 100 numbers

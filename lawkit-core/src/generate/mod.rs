@@ -1,18 +1,18 @@
 pub mod benford;
-pub mod pareto;
-pub mod zipf;
 pub mod normal;
+pub mod pareto;
 pub mod poisson;
+pub mod zipf;
 
 pub use benford::*;
-pub use pareto::*;
-pub use zipf::*;
 pub use normal::*;
+pub use pareto::*;
 pub use poisson::*;
+pub use zipf::*;
 
 use crate::error::Result;
-use rand::SeedableRng;
 use rand::rngs::StdRng;
+use rand::SeedableRng;
 
 #[derive(Debug, Clone)]
 pub struct GenerateConfig {
@@ -52,6 +52,6 @@ impl GenerateConfig {
 
 pub trait DataGenerator {
     type Output;
-    
+
     fn generate(&self, config: &GenerateConfig) -> Result<Self::Output>;
 }

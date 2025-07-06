@@ -143,27 +143,34 @@ pub fn analyze_timeseries(data: &[TimeSeriesPoint]) -> Result<TimeSeriesAnalysis
 /// トレンド分析
 fn analyze_trend(timestamps: &[f64], values: &[f64]) -> Result<TrendAnalysis> {
     let n = values.len() as f64;
-    
+
     // 線形回帰でトレンドを計算
     let sum_x: f64 = timestamps.iter().sum();
     let sum_y: f64 = values.iter().sum();
-    let sum_xy: f64 = timestamps.iter().zip(values.iter()).map(|(x, y)| x * y).sum();
+    let sum_xy: f64 = timestamps
+        .iter()
+        .zip(values.iter())
+        .map(|(x, y)| x * y)
+        .sum();
     let sum_x2: f64 = timestamps.iter().map(|x| x * x).sum();
-    
+
     let slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x * sum_x);
     let intercept = (sum_y - slope * sum_x) / n;
-    
+
     // R²を計算
     let mean_y = sum_y / n;
     let ss_tot: f64 = values.iter().map(|y| (y - mean_y).powi(2)).sum();
-    let ss_res: f64 = timestamps.iter().zip(values.iter())
+    let ss_res: f64 = timestamps
+        .iter()
+        .zip(values.iter())
         .map(|(x, y)| {
             let predicted = slope * x + intercept;
             (y - predicted).powi(2)
-        }).sum();
-    
+        })
+        .sum();
+
     let r_squared = 1.0 - (ss_res / ss_tot);
-    
+
     // トレンドの強さと方向を決定
     let trend_strength = r_squared * slope.abs();
     let direction = if slope.abs() < 0.01 {
@@ -173,7 +180,7 @@ fn analyze_trend(timestamps: &[f64], values: &[f64]) -> Result<TrendAnalysis> {
     } else {
         TrendDirection::Decreasing
     };
-    
+
     Ok(TrendAnalysis {
         slope,
         intercept,
@@ -188,7 +195,7 @@ fn detect_seasonality(values: &[f64]) -> Result<SeasonalityAnalysis> {
     let n = values.len();
     let mut best_period = None;
     let mut best_strength = 0.0;
-    
+
     // 可能な周期をテスト（2から n/4まで）
     for period in 2..=(n / 4) {
         let strength = calculate_seasonal_strength(values, period);
@@ -197,14 +204,14 @@ fn detect_seasonality(values: &[f64]) -> Result<SeasonalityAnalysis> {
             best_period = Some(period as f64);
         }
     }
-    
+
     let detected = best_strength > 0.3; // 閾値
     let seasonal_components = if detected {
         calculate_seasonal_components(values, best_period.unwrap() as usize)
     } else {
         vec![0.0; n]
     };
-    
+
     Ok(SeasonalityAnalysis {
         detected,
         period: best_period,
@@ -217,36 +224,41 @@ fn detect_seasonality(values: &[f64]) -> Result<SeasonalityAnalysis> {
 fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangePoint>> {
     let mut changepoints = Vec::new();
     let window_size = (values.len() / 10).max(5).min(20);
-    
+
     for i in window_size..(values.len() - window_size) {
         // 前後のウィンドウで統計量を比較
         let before_window = &values[(i - window_size)..i];
         let after_window = &values[i..(i + window_size)];
-        
+
         let before_mean: f64 = before_window.iter().sum::<f64>() / before_window.len() as f64;
         let after_mean: f64 = after_window.iter().sum::<f64>() / after_window.len() as f64;
-        
-        let before_var: f64 = before_window.iter()
+
+        let before_var: f64 = before_window
+            .iter()
             .map(|x| (x - before_mean).powi(2))
-            .sum::<f64>() / before_window.len() as f64;
-        let after_var: f64 = after_window.iter()
+            .sum::<f64>()
+            / before_window.len() as f64;
+        let after_var: f64 = after_window
+            .iter()
             .map(|x| (x - after_mean).powi(2))
-            .sum::<f64>() / after_window.len() as f64;
-        
+            .sum::<f64>()
+            / after_window.len() as f64;
+
         // 平均の変化を検出
         let mean_change = (after_mean - before_mean).abs();
         let pooled_std = ((before_var + after_var) / 2.0).sqrt();
-        
+
         if pooled_std > 0.0 {
             let significance = mean_change / pooled_std;
-            
-            if significance > 2.0 { // 閾値
+
+            if significance > 2.0 {
+                // 閾値
                 let change_type = if (after_var / before_var).max(before_var / after_var) > 2.0 {
                     ChangeType::VarianceChange
                 } else {
                     ChangeType::LevelShift
                 };
-                
+
                 changepoints.push(ChangePoint {
                     timestamp: timestamps[i],
                     index: i,
@@ -258,12 +270,16 @@ fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangeP
             }
         }
     }
-    
+
     Ok(changepoints)
 }
 
 /// 予測生成
-fn generate_forecasts(timestamps: &[f64], values: &[f64], steps: usize) -> Result<Vec<ForecastPoint>> {
+fn generate_forecasts(
+    timestamps: &[f64],
+    values: &[f64],
+    steps: usize,
+) -> Result<Vec<ForecastPoint>> {
     let trend = analyze_trend(timestamps, values)?;
     let last_timestamp = timestamps.last().unwrap();
     let time_step = if timestamps.len() > 1 {
@@ -271,35 +287,40 @@ fn generate_forecasts(timestamps: &[f64], values: &[f64], steps: usize) -> Resul
     } else {
         1.0
     };
-    
+
     let mut forecasts = Vec::new();
-    
+
     // 残差の標準偏差を計算
-    let residuals: Vec<f64> = timestamps.iter().zip(values.iter())
+    let residuals: Vec<f64> = timestamps
+        .iter()
+        .zip(values.iter())
         .map(|(x, y)| {
             let predicted = trend.slope * x + trend.intercept;
             y - predicted
-        }).collect();
-    
+        })
+        .collect();
+
     let residual_std = {
         let mean_residual = residuals.iter().sum::<f64>() / residuals.len() as f64;
-        let variance = residuals.iter()
+        let variance = residuals
+            .iter()
             .map(|r| (r - mean_residual).powi(2))
-            .sum::<f64>() / residuals.len() as f64;
+            .sum::<f64>()
+            / residuals.len() as f64;
         variance.sqrt()
     };
-    
+
     for i in 1..=steps {
         let future_timestamp = last_timestamp + (i as f64 * time_step);
         let predicted_value = trend.slope * future_timestamp + trend.intercept;
-        
+
         // 信頼区間を計算（簡易版）
         let uncertainty = residual_std * (1.0 + i as f64 * 0.1); // 時間とともに不確実性増加
         let confidence_interval = (
             predicted_value - 1.96 * uncertainty,
             predicted_value + 1.96 * uncertainty,
         );
-        
+
         forecasts.push(ForecastPoint {
             timestamp: future_timestamp,
             predicted_value,
@@ -307,33 +328,35 @@ fn generate_forecasts(timestamps: &[f64], values: &[f64], steps: usize) -> Resul
             uncertainty,
         });
     }
-    
+
     Ok(forecasts)
 }
 
 /// 時系列異常値検出
-fn detect_timeseries_anomalies(timestamps: &[f64], values: &[f64]) -> Result<Vec<TimeSeriesAnomaly>> {
+fn detect_timeseries_anomalies(
+    timestamps: &[f64],
+    values: &[f64],
+) -> Result<Vec<TimeSeriesAnomaly>> {
     let mut anomalies = Vec::new();
     let window_size = (values.len() / 20).max(3).min(10);
-    
+
     for i in window_size..(values.len() - window_size) {
         // 移動平均と移動標準偏差を計算
         let window = &values[(i - window_size)..(i + window_size + 1)];
         let mean: f64 = window.iter().sum::<f64>() / window.len() as f64;
         let std: f64 = {
-            let variance = window.iter()
-                .map(|x| (x - mean).powi(2))
-                .sum::<f64>() / window.len() as f64;
+            let variance =
+                window.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / window.len() as f64;
             variance.sqrt()
         };
-        
+
         if std > 0.0 {
             let z_score = (values[i] - mean) / std;
-            
+
             if z_score.abs() > 3.0 {
                 let expected_value = mean;
                 let anomaly_score = z_score.abs() / 3.0;
-                
+
                 anomalies.push(TimeSeriesAnomaly {
                     timestamp: timestamps[i],
                     index: i,
@@ -345,35 +368,35 @@ fn detect_timeseries_anomalies(timestamps: &[f64], values: &[f64]) -> Result<Vec
             }
         }
     }
-    
+
     Ok(anomalies)
 }
 
 /// 時系列統計計算
 fn calculate_timeseries_statistics(values: &[f64]) -> Result<TimeSeriesStatistics> {
     let n = values.len();
-    
+
     // 自己相関を計算
     let max_lags = (n / 4).min(20);
     let mut autocorrelation = Vec::new();
-    
+
     for lag in 0..max_lags {
         let correlation = calculate_autocorrelation(values, lag);
         autocorrelation.push(correlation);
     }
-    
+
     // 偏自己相関（簡易版）
     let partial_autocorrelation = autocorrelation.clone(); // 簡略化
-    
+
     // 定常性テスト（ADF風）
     let stationarity_test = test_stationarity(values);
-    
+
     // ノイズレベル
     let noise_level = calculate_noise_level(values);
-    
+
     // データ品質
     let data_quality = assess_data_quality(values);
-    
+
     Ok(TimeSeriesStatistics {
         autocorrelation,
         partial_autocorrelation,
@@ -388,33 +411,37 @@ fn calculate_seasonal_strength(values: &[f64], period: usize) -> f64 {
     if period >= values.len() {
         return 0.0;
     }
-    
+
     let mut seasonal_means = vec![0.0; period];
     let mut counts = vec![0; period];
-    
+
     for (i, &value) in values.iter().enumerate() {
         let season_idx = i % period;
         seasonal_means[season_idx] += value;
         counts[season_idx] += 1;
     }
-    
+
     // 平均を計算
     for (i, &count) in counts.iter().enumerate() {
         if count > 0 {
             seasonal_means[i] /= count as f64;
         }
     }
-    
+
     // 季節性の強さを分散で測定
     let overall_mean: f64 = seasonal_means.iter().sum::<f64>() / seasonal_means.len() as f64;
-    let seasonal_variance: f64 = seasonal_means.iter()
+    let seasonal_variance: f64 = seasonal_means
+        .iter()
         .map(|x| (x - overall_mean).powi(2))
-        .sum::<f64>() / seasonal_means.len() as f64;
-    
-    let total_variance: f64 = values.iter()
+        .sum::<f64>()
+        / seasonal_means.len() as f64;
+
+    let total_variance: f64 = values
+        .iter()
         .map(|x| (x - overall_mean).powi(2))
-        .sum::<f64>() / values.len() as f64;
-    
+        .sum::<f64>()
+        / values.len() as f64;
+
     if total_variance > 0.0 {
         seasonal_variance / total_variance
     } else {
@@ -426,26 +453,26 @@ fn calculate_seasonal_components(values: &[f64], period: usize) -> Vec<f64> {
     let mut components = vec![0.0; values.len()];
     let mut seasonal_means = vec![0.0; period];
     let mut counts = vec![0; period];
-    
+
     // 各季節の平均を計算
     for (i, &value) in values.iter().enumerate() {
         let season_idx = i % period;
         seasonal_means[season_idx] += value;
         counts[season_idx] += 1;
     }
-    
+
     for (i, &count) in counts.iter().enumerate() {
         if count > 0 {
             seasonal_means[i] /= count as f64;
         }
     }
-    
+
     // 各データポイントに季節成分を割り当て
     for (i, component) in components.iter_mut().enumerate() {
         let season_idx = i % period;
         *component = seasonal_means[season_idx];
     }
-    
+
     components
 }
 
@@ -453,18 +480,16 @@ fn calculate_autocorrelation(values: &[f64], lag: usize) -> f64 {
     if lag >= values.len() {
         return 0.0;
     }
-    
+
     let n = values.len() - lag;
     let mean: f64 = values.iter().sum::<f64>() / values.len() as f64;
-    
+
     let numerator: f64 = (0..n)
         .map(|i| (values[i] - mean) * (values[i + lag] - mean))
         .sum();
-    
-    let denominator: f64 = values.iter()
-        .map(|x| (x - mean).powi(2))
-        .sum();
-    
+
+    let denominator: f64 = values.iter().map(|x| (x - mean).powi(2)).sum();
+
     if denominator > 0.0 {
         numerator / denominator
     } else {
@@ -483,25 +508,29 @@ fn test_stationarity(values: &[f64]) -> StationarityResult {
             differencing_required: 1,
         };
     }
-    
+
     // 一階差分を計算
-    let diff: Vec<f64> = (1..n).map(|i| values[i] - values[i-1]).collect();
-    
+    let diff: Vec<f64> = (1..n).map(|i| values[i] - values[i - 1]).collect();
+
     // 差分の分散が元データより小さければ定常性あり
     let original_var: f64 = {
         let mean = values.iter().sum::<f64>() / values.len() as f64;
         values.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / values.len() as f64
     };
-    
+
     let diff_var: f64 = {
         let mean = diff.iter().sum::<f64>() / diff.len() as f64;
         diff.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / diff.len() as f64
     };
-    
-    let test_statistic = if original_var > 0.0 { diff_var / original_var } else { 1.0 };
+
+    let test_statistic = if original_var > 0.0 {
+        diff_var / original_var
+    } else {
+        1.0
+    };
     let is_stationary = test_statistic < 0.8;
     let p_value = if is_stationary { 0.01 } else { 0.99 };
-    
+
     StationarityResult {
         is_stationary,
         test_statistic,
@@ -514,45 +543,46 @@ fn calculate_noise_level(values: &[f64]) -> f64 {
     if values.len() < 3 {
         return 0.0;
     }
-    
+
     // 二階差分のRMSでノイズレベルを推定
     let second_diff: Vec<f64> = (2..values.len())
-        .map(|i| values[i] - 2.0 * values[i-1] + values[i-2])
+        .map(|i| values[i] - 2.0 * values[i - 1] + values[i - 2])
         .collect();
-    
+
     let rms: f64 = second_diff.iter().map(|x| x.powi(2)).sum::<f64>() / second_diff.len() as f64;
     rms.sqrt()
 }
 
 fn assess_data_quality(values: &[f64]) -> DataQuality {
     let n = values.len();
-    
+
     // 完全性（NaNや無効値がないことを仮定）
     let completeness = 1.0;
-    
+
     // 一貫性（隣接値の変化率）
     let changes: Vec<f64> = (1..n)
-        .map(|i| ((values[i] - values[i-1]) / values[i-1].abs().max(1e-10)).abs())
+        .map(|i| ((values[i] - values[i - 1]) / values[i - 1].abs().max(1e-10)).abs())
         .collect();
-    
+
     let consistency = 1.0 - (changes.iter().sum::<f64>() / changes.len() as f64).min(1.0);
-    
+
     // 規則性（等間隔性を仮定）
     let regularity = 1.0;
-    
+
     // 外れ値比率（3σ基準）
     let mean = values.iter().sum::<f64>() / n as f64;
     let std = {
         let variance = values.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n as f64;
         variance.sqrt()
     };
-    
-    let outlier_count = values.iter()
+
+    let outlier_count = values
+        .iter()
         .filter(|&&x| (x - mean).abs() > 3.0 * std)
         .count();
-    
+
     let outlier_ratio = outlier_count as f64 / n as f64;
-    
+
     DataQuality {
         completeness,
         consistency,
@@ -563,7 +593,9 @@ fn assess_data_quality(values: &[f64]) -> DataQuality {
 
 /// 数値データから時系列データを作成（タイムスタンプを自動生成）
 pub fn create_timeseries_from_values(values: &[f64]) -> Vec<TimeSeriesPoint> {
-    values.iter().enumerate()
+    values
+        .iter()
+        .enumerate()
         .map(|(i, &value)| TimeSeriesPoint {
             timestamp: i as f64,
             value,
@@ -574,85 +606,117 @@ pub fn create_timeseries_from_values(values: &[f64]) -> Vec<TimeSeriesPoint> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_create_timeseries_from_values() {
         let values = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let timeseries = create_timeseries_from_values(&values);
-        
+
         assert_eq!(timeseries.len(), 5);
         assert_eq!(timeseries[0].value, 1.0);
         assert_eq!(timeseries[0].timestamp, 0.0);
         assert_eq!(timeseries[4].value, 5.0);
         assert_eq!(timeseries[4].timestamp, 4.0);
     }
-    
+
     #[test]
     fn test_analyze_timeseries_basic() {
         // 線形増加データ
         let data = vec![
-            TimeSeriesPoint { timestamp: 0.0, value: 1.0 },
-            TimeSeriesPoint { timestamp: 1.0, value: 2.0 },
-            TimeSeriesPoint { timestamp: 2.0, value: 3.0 },
-            TimeSeriesPoint { timestamp: 3.0, value: 4.0 },
-            TimeSeriesPoint { timestamp: 4.0, value: 5.0 },
-            TimeSeriesPoint { timestamp: 5.0, value: 6.0 },
-            TimeSeriesPoint { timestamp: 6.0, value: 7.0 },
-            TimeSeriesPoint { timestamp: 7.0, value: 8.0 },
-            TimeSeriesPoint { timestamp: 8.0, value: 9.0 },
-            TimeSeriesPoint { timestamp: 9.0, value: 10.0 },
+            TimeSeriesPoint {
+                timestamp: 0.0,
+                value: 1.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 1.0,
+                value: 2.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 2.0,
+                value: 3.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 3.0,
+                value: 4.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 4.0,
+                value: 5.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 5.0,
+                value: 6.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 6.0,
+                value: 7.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 7.0,
+                value: 8.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 8.0,
+                value: 9.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 9.0,
+                value: 10.0,
+            },
         ];
-        
+
         let result = analyze_timeseries(&data).unwrap();
-        
+
         // トレンドテスト
         assert!(result.trend.slope > 0.0); // 正の傾き
         assert!(result.trend.r_squared > 0.9); // 高いR²
         matches!(result.trend.direction, TrendDirection::Increasing);
-        
+
         // 予測テスト
         assert_eq!(result.forecasts.len(), 5);
         assert!(result.forecasts[0].predicted_value > 10.0); // 次の値は10より大きいはず
-        
+
         // 統計テスト
         assert!(result.statistics.autocorrelation.len() > 0);
     }
-    
+
     #[test]
     fn test_analyze_trend() {
         let timestamps = vec![0.0, 1.0, 2.0, 3.0, 4.0];
         let values = vec![1.0, 3.0, 5.0, 7.0, 9.0]; // 明確な線形増加
-        
+
         let trend = analyze_trend(&timestamps, &values).unwrap();
-        
+
         assert!(trend.slope > 1.5); // 約2の傾き
         assert!(trend.slope < 2.5);
         assert!(trend.r_squared > 0.99); // ほぼ完全な線形関係
         matches!(trend.direction, TrendDirection::Increasing);
     }
-    
+
     #[test]
     fn test_detect_seasonality() {
         // 周期4のサイン波様データ
-        let values = vec![0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0];
-        
+        let values = vec![
+            0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0,
+        ];
+
         let seasonality = detect_seasonality(&values).unwrap();
-        
+
         // 季節性が検出されるかテスト
         if seasonality.detected {
             assert!(seasonality.period.unwrap() >= 2.0);
             assert!(seasonality.strength > 0.0);
         }
     }
-    
+
     #[test]
     fn test_detect_changepoints() {
         // 変化点を持つデータ: 最初は1.0付近、後半は10.0付近
         let timestamps = vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
         let values = vec![1.0, 1.1, 0.9, 1.05, 0.95, 10.0, 9.9, 10.1, 9.95, 10.05];
-        
+
         let changepoints = detect_changepoints(&timestamps, &values).unwrap();
-        
+
         // 変化点が検出されるはず（インデックス5付近）
         if changepoints.len() > 0 {
             let major_changepoint = &changepoints[0];
@@ -661,34 +725,34 @@ mod tests {
             assert!(major_changepoint.significance > 2.0);
         }
     }
-    
+
     #[test]
     fn test_generate_forecasts() {
         let timestamps = vec![0.0, 1.0, 2.0, 3.0, 4.0];
         let values = vec![1.0, 2.0, 3.0, 4.0, 5.0]; // 線形増加
-        
+
         let forecasts = generate_forecasts(&timestamps, &values, 3).unwrap();
-        
+
         assert_eq!(forecasts.len(), 3);
-        
+
         // 予測値が増加傾向にあることを確認
         assert!(forecasts[0].predicted_value > 5.0);
         assert!(forecasts[1].predicted_value > forecasts[0].predicted_value);
         assert!(forecasts[2].predicted_value > forecasts[1].predicted_value);
-        
+
         // 信頼区間が設定されていることを確認（区間が存在することのみチェック）
         assert!(forecasts[0].confidence_interval.0 <= forecasts[0].confidence_interval.1);
         assert!(forecasts[0].uncertainty >= 0.0); // 完全な線形データでは0になることもある
     }
-    
+
     #[test]
     fn test_detect_timeseries_anomalies() {
         // 異常値を含むデータ
         let timestamps = vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
         let values = vec![1.0, 2.0, 3.0, 100.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]; // インデックス3が異常値
-        
+
         let anomalies = detect_timeseries_anomalies(&timestamps, &values).unwrap();
-        
+
         // 異常値が検出されるかテスト
         if anomalies.len() > 0 {
             let anomaly = &anomalies[0];
@@ -696,13 +760,13 @@ mod tests {
             matches!(anomaly.anomaly_type, AnomalyType::PointAnomaly);
         }
     }
-    
+
     #[test]
     fn test_calculate_timeseries_statistics() {
         let values = vec![1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 2.0];
-        
+
         let stats = calculate_timeseries_statistics(&values).unwrap();
-        
+
         assert!(stats.autocorrelation.len() > 0);
         assert!(stats.partial_autocorrelation.len() > 0);
         assert!(stats.noise_level >= 0.0);
@@ -710,25 +774,31 @@ mod tests {
         assert!(stats.data_quality.consistency >= 0.0);
         assert!(stats.data_quality.outlier_ratio >= 0.0);
     }
-    
+
     #[test]
     fn test_insufficient_data_error() {
         let data = vec![
-            TimeSeriesPoint { timestamp: 0.0, value: 1.0 },
-            TimeSeriesPoint { timestamp: 1.0, value: 2.0 },
+            TimeSeriesPoint {
+                timestamp: 0.0,
+                value: 1.0,
+            },
+            TimeSeriesPoint {
+                timestamp: 1.0,
+                value: 2.0,
+            },
         ]; // 10未満のデータ点
-        
+
         let result = analyze_timeseries(&data);
         assert!(result.is_err());
     }
-    
+
     #[test]
     fn test_stable_trend_detection() {
         let timestamps = vec![0.0, 1.0, 2.0, 3.0, 4.0];
         let values = vec![5.0, 5.01, 4.99, 5.005, 4.995]; // ほぼ一定
-        
+
         let trend = analyze_trend(&timestamps, &values).unwrap();
-        
+
         matches!(trend.direction, TrendDirection::Stable);
         assert!(trend.slope.abs() < 0.1); // 非常に小さな傾き
     }

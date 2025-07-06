@@ -16,14 +16,14 @@ impl OptimizedFileReader {
         let file = File::open(&path)?;
         let file_size = file.metadata()?.len();
         let buffer_size = Self::optimal_buffer_size(file_size);
-        
+
         Ok(Self {
             reader: Box::new(BufReader::with_capacity(buffer_size, file)),
             file_size: Some(file_size),
             buffer_size,
         })
     }
-    
+
     /// 標準入力からの読み込み
     pub fn from_stdin() -> Self {
         let stdin = std::io::stdin();
@@ -33,27 +33,27 @@ impl OptimizedFileReader {
             buffer_size: 64 * 1024, // デフォルト64KB
         }
     }
-    
+
     /// diffxの経験値に基づく最適バッファサイズ
     fn optimal_buffer_size(file_size: u64) -> usize {
         match file_size {
-            0..=1_000_000 => 8 * 1024,        // 8KB（小ファイル）
-            1_000_001..=10_000_000 => 32 * 1024,     // 32KB（中ファイル）
-            _ => 128 * 1024,                   // 128KB（大ファイル）
+            0..=1_000_000 => 8 * 1024,           // 8KB（小ファイル）
+            1_000_001..=10_000_000 => 32 * 1024, // 32KB（中ファイル）
+            _ => 128 * 1024,                     // 128KB（大ファイル）
         }
     }
-    
+
     /// 大容量ファイルストリーミング判定（diffx 100MB閾値）
     pub fn should_use_streaming(&self) -> bool {
         const MAX_MEMORY_SIZE: u64 = 100 * 1024 * 1024; // 100MB
-        
+
         if let Some(size) = self.file_size {
             size > MAX_MEMORY_SIZE
         } else {
             true // stdin は常にストリーミング
         }
     }
-    
+
     /// ライン単位でのストリーミング読み込み
     pub fn read_lines_streaming<F, T>(&mut self, mut processor: F) -> Result<Vec<T>>
     where
@@ -61,7 +61,7 @@ impl OptimizedFileReader {
     {
         let mut results = Vec::new();
         let mut line = String::new();
-        
+
         loop {
             line.clear();
             match self.reader.read_line(&mut line)? {
@@ -74,19 +74,23 @@ impl OptimizedFileReader {
                 }
             }
         }
-        
+
         Ok(results)
     }
-    
+
     /// バッチ処理（diffxのバッチサイズ最適化）
-    pub fn read_lines_batched<F, T>(&mut self, batch_size: usize, mut processor: F) -> Result<Vec<T>>
+    pub fn read_lines_batched<F, T>(
+        &mut self,
+        batch_size: usize,
+        mut processor: F,
+    ) -> Result<Vec<T>>
     where
         F: FnMut(Vec<String>) -> Result<Vec<T>>,
     {
         let mut results = Vec::new();
         let mut batch = Vec::with_capacity(batch_size);
         let mut line = String::new();
-        
+
         loop {
             line.clear();
             match self.reader.read_line(&mut line)? {
@@ -94,7 +98,7 @@ impl OptimizedFileReader {
                 _ => {
                     let trimmed_line = line.trim_end().to_string();
                     batch.push(trimmed_line);
-                    
+
                     if batch.len() >= batch_size {
                         let mut batch_results = processor(batch)?;
                         results.append(&mut batch_results);
@@ -103,21 +107,21 @@ impl OptimizedFileReader {
                 }
             }
         }
-        
+
         // 残りのバッチを処理
         if !batch.is_empty() {
             let mut batch_results = processor(batch)?;
             results.append(&mut batch_results);
         }
-        
+
         Ok(results)
     }
-    
+
     /// ファイルサイズ情報
     pub fn file_size(&self) -> Option<u64> {
         self.file_size
     }
-    
+
     /// バッファサイズ情報
     pub fn buffer_size(&self) -> usize {
         self.buffer_size
@@ -127,7 +131,7 @@ impl OptimizedFileReader {
 /// メモリ使用量の推定（diffxパターン）
 pub fn estimate_memory_usage_for_processing(file_size: Option<u64>, data_points: usize) -> usize {
     const BASELINE_OVERHEAD: usize = 1024 * 1024; // 1MB基本オーバーヘッド
-    
+
     let file_memory = if let Some(size) = file_size {
         // diffx知見：入力の1.5x-2x使用
         let multiplier = if size > 10_000_000 { 1.5 } else { 2.0 };
@@ -135,25 +139,26 @@ pub fn estimate_memory_usage_for_processing(file_size: Option<u64>, data_points:
     } else {
         data_points * 32 // 推定32バイト/データポイント
     };
-    
+
     file_memory + BASELINE_OVERHEAD
 }
 
 /// 適応的処理戦略選択（diffxの自動最適化パターン）
 #[derive(Debug, Clone)]
 pub enum ProcessingStrategy {
-    InMemory,           // 小データ：メモリ内処理
-    Streaming,          // 大データ：ストリーミング処理
-    BatchedStreaming {  // 超大データ：バッチ化ストリーミング
+    InMemory,  // 小データ：メモリ内処理
+    Streaming, // 大データ：ストリーミング処理
+    BatchedStreaming {
+        // 超大データ：バッチ化ストリーミング
         batch_size: usize,
     },
 }
 
 impl ProcessingStrategy {
     pub fn select_optimal(file_size: Option<u64>, estimated_data_points: usize) -> Self {
-        const SMALL_THRESHOLD: u64 = 1_000_000;      // 1MB
-        const LARGE_THRESHOLD: u64 = 100_000_000;    // 100MB（diffx閾値）
-        
+        const SMALL_THRESHOLD: u64 = 1_000_000; // 1MB
+        const LARGE_THRESHOLD: u64 = 100_000_000; // 100MB（diffx閾値）
+
         if let Some(size) = file_size {
             if size < SMALL_THRESHOLD {
                 ProcessingStrategy::InMemory
@@ -164,7 +169,7 @@ impl ProcessingStrategy {
                 let batch_size = if size > 1_000_000_000 {
                     10000 // 1GB超：大バッチ
                 } else {
-                    5000  // 100MB-1GB：中バッチ
+                    5000 // 100MB-1GB：中バッチ
                 };
                 ProcessingStrategy::BatchedStreaming { batch_size }
             }

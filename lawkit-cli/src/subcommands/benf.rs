@@ -48,21 +48,21 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     } else {
         // Read from stdin - use optimizations only if explicitly requested
         let use_optimize = matches.get_flag("optimize");
-        
+
         if use_optimize {
             // 最適化処理：--optimize フラグ指定時（ストリーミング+並列+メモリ効率化）
             let mut reader = OptimizedFileReader::from_stdin();
-            
+
             if std::env::var("LAWKIT_DEBUG").is_ok() {
                 eprintln!("Debug: Using optimize mode (streaming + memory efficiency)");
             }
-            
+
             let numbers = match reader.read_lines_streaming(|line| {
-                parse_text_input(&line).map(|nums| Some(nums)).or_else(|_| Ok(None))
+                parse_text_input(&line)
+                    .map(|nums| Some(nums))
+                    .or_else(|_| Ok(None))
             }) {
-                Ok(nested_numbers) => {
-                    nested_numbers.into_iter().flatten().collect::<Vec<_>>()
-                }
+                Ok(nested_numbers) => nested_numbers.into_iter().flatten().collect::<Vec<_>>(),
                 Err(e) => {
                     let language = get_language(matches);
                     let error_msg = localized_text("analysis_error", language);
@@ -79,7 +79,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             }
 
             // 分析実行
-            let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
+            let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers)
+            {
                 Ok(result) => result,
                 Err(e) => {
                     let language = get_language(matches);
@@ -121,7 +122,11 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     }
 
                     // Apply filtering and custom analysis
-                    let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
+                    let result = match analyze_numbers_with_options(
+                        matches,
+                        "stdin".to_string(),
+                        &numbers,
+                    ) {
                         Ok(result) => result,
                         Err(e) => {
                             let language = get_language(matches);

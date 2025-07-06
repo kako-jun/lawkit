@@ -5,10 +5,10 @@ use crate::error::Result;
 pub struct ParetoResult {
     pub dataset_name: String,
     pub numbers_analyzed: usize,
-    pub pareto_ratio: f64,                        // 80/20比率の実際値
-    pub concentration_index: f64,                 // 集中度指標（ジニ係数）
-    pub top_20_percent_share: f64,                // 上位20%が占める割合
-    pub cumulative_distribution: Vec<(f64, f64)>, // ローレンツ曲線用データ
+    pub pareto_ratio: f64,                           // 80/20比率の実際値
+    pub concentration_index: f64,                    // 集中度指標（ジニ係数）
+    pub top_20_percent_share: f64,                   // 上位20%が占める割合
+    pub cumulative_distribution: Vec<(f64, f64)>,    // ローレンツ曲線用データ
     pub custom_percentiles: Option<Vec<(f64, f64)>>, // カスタムパーセンタイル (パーセンタイル, シェア)
     pub risk_level: RiskLevel,
 }
@@ -61,15 +61,19 @@ impl ParetoResult {
     pub fn with_custom_percentiles(mut self, percentiles: &[f64], numbers: &[f64]) -> Self {
         let mut sorted_numbers: Vec<f64> = numbers.to_vec();
         sorted_numbers.sort_by(|a, b| b.partial_cmp(a).unwrap());
-        
+
         let total_sum: f64 = sorted_numbers.iter().sum();
-        let custom_percentiles = percentiles.iter().map(|&p| {
-            let top_percent_count = ((sorted_numbers.len() as f64) * (p / 100.0)).ceil() as usize;
-            let top_percent_sum: f64 = sorted_numbers.iter().take(top_percent_count).sum();
-            let top_percent_share = (top_percent_sum / total_sum) * 100.0;
-            (p, top_percent_share)
-        }).collect();
-        
+        let custom_percentiles = percentiles
+            .iter()
+            .map(|&p| {
+                let top_percent_count =
+                    ((sorted_numbers.len() as f64) * (p / 100.0)).ceil() as usize;
+                let top_percent_sum: f64 = sorted_numbers.iter().take(top_percent_count).sum();
+                let top_percent_share = (top_percent_sum / total_sum) * 100.0;
+                (p, top_percent_share)
+            })
+            .collect();
+
         self.custom_percentiles = Some(custom_percentiles);
         self
     }

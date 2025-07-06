@@ -25,7 +25,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
     // testパラメータが明示的に指定されている場合（デフォルト値"all"は通常分析で処理）
     if let Some(test_type) = matches.get_one::<String>("test") {
-        if test_type != "all" {  // "all"以外が明示的に指定された場合のみテストモード
+        if test_type != "all" {
+            // "all"以外が明示的に指定された場合のみテストモード
             return run_poisson_test_mode(matches, test_type);
         }
     }

@@ -20,7 +20,7 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
     command.args(&["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
     command.args(&["--language", "en"]); // Force English output at the end
-    
+
     let mut cmd_str = format!("cargo run --bin lawkit -- {}", subcommand);
     for arg in args {
         cmd_str.push_str(&format!(" {}", arg));
@@ -30,21 +30,27 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
         cmd_str.push_str(" --language en");
     }
     println!("🔍 Debug: Running command: {}", cmd_str);
-    
+
     let output = command.output().expect("Failed to execute lawkit command");
-    
+
     println!("🔍 Debug: Exit code: {:?}", output.status.code());
     println!("🔍 Debug: Stdout length: {}", output.stdout.len());
     println!("🔍 Debug: Stderr length: {}", output.stderr.len());
-    
+
     if !output.stdout.is_empty() {
-        println!("🔍 Debug: Stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+        println!(
+            "🔍 Debug: Stdout:\n{}",
+            String::from_utf8_lossy(&output.stdout)
+        );
     }
-    
+
     if !output.stderr.is_empty() {
-        println!("🔍 Debug: Stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+        println!(
+            "🔍 Debug: Stderr:\n{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
     }
-    
+
     output
 }
 
@@ -60,40 +66,40 @@ fn create_temp_file_with_content(content: &str) -> NamedTempFile {
 fn generate_test_data() -> String {
     // Generate enough data points for all analyses (minimum 50 for most laws)
     let mut data = Vec::new();
-    
+
     // Generate 50 different numbers following various patterns
     for i in 1..=50 {
         let base = 100 + i * 17; // Create variety in first digits
         data.push(base.to_string());
-        
+
         if i % 3 == 0 {
             let alt = 200 + i * 23;
             data.push(alt.to_string());
         }
-        
+
         if i % 5 == 0 {
             let third = 300 + i * 31;
             data.push(third.to_string());
         }
     }
-    
+
     data.join(" ")
 }
 
 /// Generate larger test dataset for pareto analysis (needs 30+ values)
 fn generate_pareto_test_data() -> String {
     let mut data = Vec::new();
-    
+
     // Generate 100 values with pareto-like distribution
     for i in 1..=100 {
         let value = match i {
-            1..=20 => 1000 + i * 50,  // Top 20% high values
-            21..=50 => 500 + i * 10,  // Middle values
-            _ => 100 + i * 2,         // Bottom 50% low values
+            1..=20 => 1000 + i * 50, // Top 20% high values
+            21..=50 => 500 + i * 10, // Middle values
+            _ => 100 + i * 2,        // Bottom 50% low values
         };
         data.push(value.to_string());
     }
-    
+
     data.join(" ")
 }
 
@@ -274,7 +280,10 @@ mod pareto_law_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.to_lowercase().contains("business") || stdout.to_lowercase().contains("concentration"));
+        assert!(
+            stdout.to_lowercase().contains("business")
+                || stdout.to_lowercase().contains("concentration")
+        );
     }
 
     #[test]
@@ -434,7 +443,9 @@ mod poisson_distribution_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("Poisson") || stdout.contains("events"));
-        assert!(stdout.contains("Test statistic") || stdout.contains("P-value") || stdout.contains("λ"));
+        assert!(
+            stdout.contains("Test statistic") || stdout.contains("P-value") || stdout.contains("λ")
+        );
     }
 
     #[test]
@@ -444,7 +455,11 @@ mod poisson_distribution_tests {
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("predict") || stdout.contains("probability") || stdout.contains("Prediction"));
+            assert!(
+                stdout.contains("predict")
+                    || stdout.contains("probability")
+                    || stdout.contains("Prediction")
+            );
         }
     }
 
@@ -475,7 +490,11 @@ mod integration_compare_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("compare") || stdout.contains("integration") || stdout.contains("Integration"));
+        assert!(
+            stdout.contains("compare")
+                || stdout.contains("integration")
+                || stdout.contains("Integration")
+        );
         assert!(stdout.contains("benf") || stdout.contains("Benford"));
     }
 
@@ -564,14 +583,25 @@ mod documentation_examples_tests {
         ));
 
         // Fraud detection mode with high threshold and verbose
-        let output = run_lawkit_command("benf", &["--threshold", "high", "--verbose", "--min-count", "5", csv_path]);
+        let output = run_lawkit_command(
+            "benf",
+            &[
+                "--threshold",
+                "high",
+                "--verbose",
+                "--min-count",
+                "5",
+                csv_path,
+            ],
+        );
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Format output as JSON
-        let output = run_lawkit_command("benf", &["--format", "json", "--min-count", "5", csv_path]);
+        let output =
+            run_lawkit_command("benf", &["--format", "json", "--min-count", "5", csv_path]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -691,7 +721,8 @@ mod generate_functionality_tests {
 
     #[test]
     fn test_lawkit_generate_benf() {
-        let output = run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "12345"]);
+        let output =
+            run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "12345"]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -700,16 +731,30 @@ mod generate_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let lines: Vec<&str> = stdout.lines().collect();
         assert_eq!(lines.len(), 100); // Should generate exactly 100 samples
-        
+
         // Verify all outputs are valid numbers
         for line in lines {
-            assert!(line.parse::<f64>().is_ok(), "Generated data should be valid numbers");
+            assert!(
+                line.parse::<f64>().is_ok(),
+                "Generated data should be valid numbers"
+            );
         }
     }
 
     #[test]
     fn test_lawkit_generate_pareto() {
-        let output = run_lawkit_command("generate", &["pareto", "--samples", "50", "--concentration", "0.8", "--seed", "54321"]);
+        let output = run_lawkit_command(
+            "generate",
+            &[
+                "pareto",
+                "--samples",
+                "50",
+                "--concentration",
+                "0.8",
+                "--seed",
+                "54321",
+            ],
+        );
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -718,17 +763,35 @@ mod generate_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let lines: Vec<&str> = stdout.lines().collect();
         assert_eq!(lines.len(), 50);
-        
+
         // Verify all outputs are valid positive numbers
         for line in lines {
-            let value: f64 = line.parse().expect("Generated data should be valid numbers");
-            assert!(value > 0.0, "Pareto distribution should generate positive values");
+            let value: f64 = line
+                .parse()
+                .expect("Generated data should be valid numbers");
+            assert!(
+                value > 0.0,
+                "Pareto distribution should generate positive values"
+            );
         }
     }
 
     #[test]
     fn test_lawkit_generate_normal() {
-        let output = run_lawkit_command("generate", &["normal", "--samples", "75", "--mean", "100", "--stddev", "15", "--seed", "11111"]);
+        let output = run_lawkit_command(
+            "generate",
+            &[
+                "normal",
+                "--samples",
+                "75",
+                "--mean",
+                "100",
+                "--stddev",
+                "15",
+                "--seed",
+                "11111",
+            ],
+        );
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -737,16 +800,30 @@ mod generate_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let lines: Vec<&str> = stdout.lines().collect();
         assert_eq!(lines.len(), 75);
-        
+
         // Calculate basic statistics to verify normal distribution characteristics
         let values: Vec<f64> = lines.iter().map(|line| line.parse().unwrap()).collect();
         let mean = values.iter().sum::<f64>() / values.len() as f64;
-        assert!((mean - 100.0).abs() < 10.0, "Generated normal data should be centered around mean");
+        assert!(
+            (mean - 100.0).abs() < 10.0,
+            "Generated normal data should be centered around mean"
+        );
     }
 
     #[test]
     fn test_lawkit_generate_poisson() {
-        let output = run_lawkit_command("generate", &["poisson", "--samples", "60", "--lambda", "3.0", "--seed", "22222"]);
+        let output = run_lawkit_command(
+            "generate",
+            &[
+                "poisson",
+                "--samples",
+                "60",
+                "--lambda",
+                "3.0",
+                "--seed",
+                "22222",
+            ],
+        );
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -755,17 +832,35 @@ mod generate_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let lines: Vec<&str> = stdout.lines().collect();
         assert_eq!(lines.len(), 60);
-        
+
         // Verify all outputs are non-negative integers (Poisson characteristic)
         for line in lines {
-            let value: u32 = line.parse().expect("Poisson should generate integer values");
-            assert!(value >= 0, "Poisson distribution should generate non-negative integers");
+            let value: u32 = line
+                .parse()
+                .expect("Poisson should generate integer values");
+            assert!(
+                value >= 0,
+                "Poisson distribution should generate non-negative integers"
+            );
         }
     }
 
     #[test]
     fn test_lawkit_generate_zipf() {
-        let output = run_lawkit_command("generate", &["zipf", "--samples", "40", "--exponent", "1.5", "--vocabulary-size", "1000", "--seed", "33333"]);
+        let output = run_lawkit_command(
+            "generate",
+            &[
+                "zipf",
+                "--samples",
+                "40",
+                "--exponent",
+                "1.5",
+                "--vocabulary-size",
+                "1000",
+                "--seed",
+                "33333",
+            ],
+        );
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -774,29 +869,37 @@ mod generate_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         let lines: Vec<&str> = stdout.lines().collect();
         assert_eq!(lines.len(), 40);
-        
+
         // Verify all outputs are positive integers within vocabulary size
         for line in lines {
-            let value: usize = line.parse().expect("Zipf should generate integer rank values");
-            assert!(value > 0 && value <= 1000, "Zipf ranks should be within vocabulary size");
+            let value: usize = line
+                .parse()
+                .expect("Zipf should generate integer rank values");
+            assert!(
+                value > 0 && value <= 1000,
+                "Zipf ranks should be within vocabulary size"
+            );
         }
     }
 
     #[test]
     fn test_generate_to_analyze_pipeline_benf() {
         // Generate Benford data
-        let generate_output = run_lawkit_command("generate", &["benf", "--samples", "200", "--seed", "pipeline1"]);
+        let generate_output = run_lawkit_command(
+            "generate",
+            &["benf", "--samples", "200", "--seed", "pipeline1"],
+        );
         assert!(generate_output.status.success());
-        
+
         let generated_data = String::from_utf8_lossy(&generate_output.stdout);
-        
+
         // Create temp file with generated data
         let temp_file = create_temp_file_with_content(&generated_data);
-        
+
         // Analyze the generated data
         let analyze_output = run_lawkit_command("benf", &[temp_file.path().to_str().unwrap()]);
         assert!(analyze_output.status.success());
-        
+
         let analysis_result = String::from_utf8_lossy(&analyze_output.stdout);
         assert!(analysis_result.contains("Benford"));
         assert!(analysis_result.contains("200")); // Should analyze 200 numbers
@@ -805,14 +908,27 @@ mod generate_functionality_tests {
     #[test]
     fn test_generate_to_analyze_pipeline_normal() {
         // Generate normal data
-        let generate_output = run_lawkit_command("generate", &["normal", "--samples", "150", "--mean", "50", "--stddev", "10", "--seed", "2022"]);
+        let generate_output = run_lawkit_command(
+            "generate",
+            &[
+                "normal",
+                "--samples",
+                "150",
+                "--mean",
+                "50",
+                "--stddev",
+                "10",
+                "--seed",
+                "2022",
+            ],
+        );
         assert!(generate_output.status.success());
-        
+
         let generated_data = String::from_utf8_lossy(&generate_output.stdout);
-        
+
         // Create temp file with generated data
         let temp_file = create_temp_file_with_content(&generated_data);
-        
+
         // Analyze the generated data
         let analyze_output = run_lawkit_command("normal", &[temp_file.path().to_str().unwrap()]);
         // Normal analysis can return exit codes 0, 10, 11, 12 for different quality levels
@@ -820,7 +936,7 @@ mod generate_functionality_tests {
             analyze_output.status.code(),
             Some(0) | Some(10) | Some(11) | Some(12)
         ));
-        
+
         let analysis_result = String::from_utf8_lossy(&analyze_output.stdout);
         assert!(analysis_result.contains("Normal"));
         assert!(analysis_result.contains("150")); // Should analyze 150 numbers
@@ -829,15 +945,29 @@ mod generate_functionality_tests {
     #[test]
     fn test_generate_fraud_detection_benf() {
         // Generate Benford data with fraud simulation
-        let generate_output = run_lawkit_command("generate", &["benf", "--samples", "300", "--fraud-rate", "0.1", "--seed", "fraud1"]);
+        let generate_output = run_lawkit_command(
+            "generate",
+            &[
+                "benf",
+                "--samples",
+                "300",
+                "--fraud-rate",
+                "0.1",
+                "--seed",
+                "fraud1",
+            ],
+        );
         assert!(generate_output.status.success());
-        
+
         let generated_data = String::from_utf8_lossy(&generate_output.stdout);
         let temp_file = create_temp_file_with_content(&generated_data);
-        
+
         // Analyze with fraud detection sensitivity
-        let analyze_output = run_lawkit_command("benf", &["--threshold", "medium", temp_file.path().to_str().unwrap()]);
-        
+        let analyze_output = run_lawkit_command(
+            "benf",
+            &["--threshold", "medium", temp_file.path().to_str().unwrap()],
+        );
+
         // Should detect some level of deviation due to injected fraud
         assert!(matches!(
             analyze_output.status.code(),
@@ -848,12 +978,14 @@ mod generate_functionality_tests {
     #[test]
     fn test_generate_deterministic_output() {
         // Test that same seed produces same output
-        let output1 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
-        let output2 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
-        
+        let output1 =
+            run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
+        let output2 =
+            run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
+
         assert!(output1.status.success());
         assert!(output2.status.success());
-        
+
         let data1 = String::from_utf8_lossy(&output1.stdout);
         let data2 = String::from_utf8_lossy(&output2.stdout);
         assert_eq!(data1, data2, "Same seed should produce identical output");
@@ -862,17 +994,24 @@ mod generate_functionality_tests {
     #[test]
     fn test_generate_integration_compare() {
         // Generate data for multiple laws
-        let benf_output = run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "1001"]);
-        let normal_output = run_lawkit_command("generate", &["normal", "--samples", "100", "--seed", "1002"]);
-        
+        let benf_output =
+            run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "1001"]);
+        let normal_output = run_lawkit_command(
+            "generate",
+            &["normal", "--samples", "100", "--seed", "1002"],
+        );
+
         assert!(benf_output.status.success());
         assert!(normal_output.status.success());
-        
+
         // Test compare functionality with generated data
         let benf_data = String::from_utf8_lossy(&benf_output.stdout);
         let temp_file = create_temp_file_with_content(&benf_data);
-        
-        let compare_output = debug_run_lawkit_command("compare", &["--laws", "benf,normal", temp_file.path().to_str().unwrap()]);
+
+        let compare_output = debug_run_lawkit_command(
+            "compare",
+            &["--laws", "benf,normal", temp_file.path().to_str().unwrap()],
+        );
         if !compare_output.status.success() {
             let stderr = String::from_utf8_lossy(&compare_output.stderr);
             println!("Compare failed with stderr: {}", stderr);
@@ -881,17 +1020,20 @@ mod generate_functionality_tests {
         }
         // Compare command returns exit code based on risk level (0, 10, 11)
         // which is not always 0 even on successful execution
-        assert!(matches!(
-            compare_output.status.code(),
-            Some(0) | Some(10) | Some(11)
-        ), "Expected compare to return risk-based exit code (0/10/11), got {:?}", compare_output.status.code());
-        
+        assert!(
+            matches!(compare_output.status.code(), Some(0) | Some(10) | Some(11)),
+            "Expected compare to return risk-based exit code (0/10/11), got {:?}",
+            compare_output.status.code()
+        );
+
         let compare_result = String::from_utf8_lossy(&compare_output.stdout);
         // Check that output contains expected content
-        assert!(compare_result.contains("Integration Analysis Result") || 
-                compare_result.contains("Benford's Law") ||
-                compare_result.contains("Normal Distribution"),
-                "Expected compare output to contain analysis results");
+        assert!(
+            compare_result.contains("Integration Analysis Result")
+                || compare_result.contains("Benford's Law")
+                || compare_result.contains("Normal Distribution"),
+            "Expected compare output to contain analysis results"
+        );
     }
 }
 
@@ -910,7 +1052,7 @@ mod selftest_functionality_tests {
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("self-test"));
         assert!(stdout.contains("PASS") || stdout.contains("✅"));
-        
+
         // Should test all 5 laws
         assert!(stdout.contains("benf"));
         // Other laws may be placeholder for now
@@ -925,7 +1067,7 @@ mod selftest_functionality_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        
+
         // Should show completion summary
         assert!(stdout.contains("completed") || stdout.contains("passed"));
         assert!(stdout.contains("5/5") || stdout.contains("tests"));
@@ -974,15 +1116,18 @@ mod error_handling_tests {
         let output = run_lawkit_command("generate", &["benf", "--samples", "0"]);
         assert!(output.status.success());
         assert!(String::from_utf8_lossy(&output.stdout).is_empty());
-        
+
         // Test invalid range (currently returns exit code 0 but shows error message)
         let output = run_lawkit_command("generate", &["benf", "--range", "invalid"]);
         // For now, check error message instead of exit code
         let stderr = String::from_utf8_lossy(&output.stderr);
         assert!(stderr.contains("Error") || stderr.contains("invalid"));
-        
+
         // Test high fraud rate (currently accepted as valid)
-        let output = run_lawkit_command("generate", &["benf", "--fraud-rate", "2.0", "--samples", "5"]);
+        let output = run_lawkit_command(
+            "generate",
+            &["benf", "--fraud-rate", "2.0", "--samples", "5"],
+        );
         assert!(output.status.success());
         // Should generate some output
         assert!(!String::from_utf8_lossy(&output.stdout).is_empty());

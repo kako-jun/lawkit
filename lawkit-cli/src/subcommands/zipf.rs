@@ -101,17 +101,19 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     };
 
                     // Apply filtering and custom analysis
-                    let result =
-                        match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers)
-                        {
-                            Ok(result) => result,
-                            Err(e) => {
-                                let language = get_language(matches);
-                                let error_msg = localized_text("analysis_error", language);
-                                eprintln!("{}: {}", error_msg, e);
-                                std::process::exit(1);
-                            }
-                        };
+                    let result = match analyze_numbers_with_options(
+                        matches,
+                        "stdin".to_string(),
+                        &numbers,
+                    ) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            let language = get_language(matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
 
                     // Output results and exit
                     output_results(matches, &result);

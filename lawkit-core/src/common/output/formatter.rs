@@ -31,7 +31,6 @@ impl std::str::FromStr for OutputFormat {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct OutputConfig {
     pub format: String,
