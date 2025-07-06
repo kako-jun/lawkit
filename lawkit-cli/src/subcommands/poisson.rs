@@ -14,17 +14,20 @@ use lawkit_core::{
 use std::io::{self, Read};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // 特殊モードの確認
-    if let Some(test_type) = matches.get_one::<String>("test") {
-        return run_poisson_test_mode(matches, test_type);
-    }
-
+    // 特殊モードの確認（フラグが明示的に指定された場合を優先）
     if matches.get_flag("predict") {
         return run_prediction_mode(matches);
     }
 
     if matches.get_flag("rare-events") {
         return run_rare_events_mode(matches);
+    }
+
+    // testパラメータが明示的に指定されている場合（デフォルト値"all"は通常分析で処理）
+    if let Some(test_type) = matches.get_one::<String>("test") {
+        if test_type != "all" {  // "all"以外が明示的に指定された場合のみテストモード
+            return run_poisson_test_mode(matches, test_type);
+        }
     }
 
     // 通常のポアソン分布分析モード
