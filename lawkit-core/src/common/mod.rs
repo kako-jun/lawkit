@@ -7,4 +7,5 @@ pub mod output;
 pub mod parallel;
 pub mod risk;
 pub mod statistics;
+pub mod streaming_io;
 pub mod timeseries;

@@ -3,6 +3,7 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
+        streaming_io::{OptimizedFileReader, ProcessingStrategy},
     },
     error::{BenfError, Result},
     laws::benford::BenfordResult,
@@ -45,29 +46,82 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             }
         }
     } else {
-        // Read from stdin
-        let mut buffer = String::new();
-        match io::stdin().read_to_string(&mut buffer) {
-            Ok(_) => {
-                if buffer.trim().is_empty() {
-                    eprintln!("Error: No input provided. Use --help for usage information.");
-                    std::process::exit(2);
+        // Read from stdin - use optimizations only if explicitly requested
+        let use_optimize = matches.get_flag("optimize");
+        
+        if use_optimize {
+            // 最適化処理：--optimize フラグ指定時（ストリーミング+並列+メモリ効率化）
+            let mut reader = OptimizedFileReader::from_stdin();
+            
+            if std::env::var("LAWKIT_DEBUG").is_ok() {
+                eprintln!("Debug: Using optimize mode (streaming + memory efficiency)");
+            }
+            
+            let numbers = match reader.read_lines_streaming(|line| {
+                parse_text_input(&line).map(|nums| Some(nums)).or_else(|_| Ok(None))
+            }) {
+                Ok(nested_numbers) => {
+                    nested_numbers.into_iter().flatten().collect::<Vec<_>>()
                 }
+                Err(e) => {
+                    let language = get_language(matches);
+                    let error_msg = localized_text("analysis_error", language);
+                    eprintln!("{}: {}", error_msg, e);
+                    std::process::exit(1);
+                }
+            };
 
-                // Extract numbers from stdin input text with international numeral support
-                let numbers = match parse_text_input(&buffer) {
-                    Ok(numbers) => numbers,
-                    Err(e) => {
+            if numbers.is_empty() {
+                let language = get_language(matches);
+                let error_msg = localized_text("no_numbers_found", language);
+                eprintln!("{}", error_msg);
+                std::process::exit(1);
+            }
+
+            // 分析実行
+            let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
+                Ok(result) => result,
+                Err(e) => {
+                    let language = get_language(matches);
+                    let error_msg = localized_text("analysis_error", language);
+                    eprintln!("{}: {}", error_msg, e);
+                    std::process::exit(1);
+                }
+            };
+
+            // Output results and exit
+            output_results(matches, &result);
+            std::process::exit(result.risk_level.exit_code());
+        } else {
+            // 従来のメモリ処理：デフォルト
+            let mut buffer = String::new();
+            match io::stdin().read_to_string(&mut buffer) {
+                Ok(_) => {
+                    if buffer.trim().is_empty() {
+                        eprintln!("Error: No input provided. Use --help for usage information.");
+                        std::process::exit(2);
+                    }
+
+                    // Extract numbers from stdin input text with international numeral support
+                    let numbers = match parse_text_input(&buffer) {
+                        Ok(numbers) => numbers,
+                        Err(e) => {
+                            let language = get_language(matches);
+                            let error_msg = localized_text("analysis_error", language);
+                            eprintln!("{}: {}", error_msg, e);
+                            std::process::exit(1);
+                        }
+                    };
+
+                    if numbers.is_empty() {
                         let language = get_language(matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{}: {}", error_msg, e);
+                        let error_msg = localized_text("no_numbers_found", language);
+                        eprintln!("{}", error_msg);
                         std::process::exit(1);
                     }
-                };
 
-                // Apply filtering and custom analysis
-                let result =
-                    match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
+                    // Apply filtering and custom analysis
+                    let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
                         Ok(result) => result,
                         Err(e) => {
                             let language = get_language(matches);
@@ -77,13 +131,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         }
                     };
 
-                // Output results and exit
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error reading from stdin: {}", e);
-                std::process::exit(1);
+                    // Output results and exit
+                    output_results(matches, &result);
+                    std::process::exit(result.risk_level.exit_code());
+                }
+                Err(e) => {
+                    eprintln!("Error reading from stdin: {}", e);
+                    std::process::exit(1);
+                }
             }
         }
     }
