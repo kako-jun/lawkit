@@ -57,11 +57,9 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 eprintln!("Debug: Using optimize mode (streaming + memory efficiency)");
             }
 
-            let numbers = match reader.read_lines_streaming(|line| {
-                parse_text_input(&line)
-                    .map(Some)
-                    .or(Ok(None))
-            }) {
+            let numbers = match reader
+                .read_lines_streaming(|line| parse_text_input(&line).map(Some).or(Ok(None)))
+            {
                 Ok(nested_numbers) => nested_numbers.into_iter().flatten().collect::<Vec<_>>(),
                 Err(e) => {
                     let language = get_language(matches);
