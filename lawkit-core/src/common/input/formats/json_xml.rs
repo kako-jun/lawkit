@@ -26,9 +26,8 @@ pub fn parse_json_content(content: &str) -> crate::error::Result<Vec<f64>> {
 
 /// Parse XML files and extract numbers
 pub fn parse_xml_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
-    let content = std::fs::read_to_string(file_path).map_err(|e| {
-        crate::error::BenfError::FileError(format!("Failed to read XML file: {e}"))
-    })?;
+    let content = std::fs::read_to_string(file_path)
+        .map_err(|e| crate::error::BenfError::FileError(format!("Failed to read XML file: {e}")))?;
 
     parse_xml_content(&content)
 }

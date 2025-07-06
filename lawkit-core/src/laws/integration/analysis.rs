@@ -94,8 +94,7 @@ pub fn cross_validate_laws(
             .collect();
 
         if !train_data.is_empty() && !test_data.is_empty() {
-            let train_result =
-                analyze_all_laws(&train_data, &format!("{dataset_name}_train_{i}"))?;
+            let train_result = analyze_all_laws(&train_data, &format!("{dataset_name}_train_{i}"))?;
             let test_result = analyze_all_laws(test_data, &format!("{dataset_name}_test_{i}"))?;
 
             validation_results.push(ValidationFold {
