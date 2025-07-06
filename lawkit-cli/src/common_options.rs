@@ -48,31 +48,24 @@ pub fn add_common_options(cmd: Command) -> Command {
                 .default_value("10"),  // 統一されたデフォルト値
         )
         .arg(
-            Arg::new("parallel")
-                .long("parallel")
-                .short('P')
-                .help("Enable parallel processing")
+            Arg::new("optimize")
+                .long("optimize")
+                .help("Enable memory and processing optimizations for large datasets")
                 .action(clap::ArgAction::SetTrue),
         )
         .arg(
             Arg::new("threads")
                 .long("threads")
                 .value_name("NUMBER")
-                .help("Number of threads for parallel processing (0 = auto)")
+                .help("Number of threads for parallel processing (0 = auto, used with --optimize)")
                 .default_value("0"),
         )
         .arg(
             Arg::new("chunk-size")
                 .long("chunk-size")
                 .value_name("SIZE")
-                .help("Chunk size for memory-efficient processing")
+                .help("Chunk size for memory-efficient processing (used with --optimize)")
                 .default_value("10000"),
-        )
-        .arg(
-            Arg::new("streaming")
-                .long("streaming")
-                .help("Enable streaming mode for large datasets")
-                .action(clap::ArgAction::SetTrue),
         )
 }
 

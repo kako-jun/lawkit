@@ -21,6 +21,27 @@ impl Default for MemoryConfig {
     }
 }
 
+impl MemoryConfig {
+    /// diffxの知見に基づく適応的チャンクサイズ
+    pub fn adaptive_chunk_size(file_size: u64) -> usize {
+        match file_size {
+            0..=1_000_000 => 1000,      // 1MB以下：小チャンク
+            1_000_001..=10_000_000 => 5000,   // 10MB以下：中チャンク  
+            _ => 10000,                 // 10MB超：大チャンク
+        }
+    }
+    
+    /// diffxパターン：メモリ効率ターゲット（1.5x-2x入力サイズ）
+    pub fn memory_efficiency_target(file_size: u64) -> usize {
+        let mb_size = (file_size / 1024 / 1024) as usize;
+        if mb_size > 100 {
+            mb_size / 2  // 大ファイルでは50%に制限（diffx知見）
+        } else {
+            mb_size * 2  // 小ファイルでは2x許可（diffx知見）
+        }
+    }
+}
+
 /// ストリーミングデータプロセッサ
 pub struct StreamingProcessor<T> {
     buffer: VecDeque<T>,
