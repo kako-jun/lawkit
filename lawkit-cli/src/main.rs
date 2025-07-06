@@ -89,7 +89,7 @@ fn main() {
     };
 
     if let Err(e) = result {
-        eprintln!("Error: {}", e);
+        eprintln!("Error: {e}");
         std::process::exit(1);
     }
 }
@@ -123,7 +123,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
                 .and_then(|s| s.parse::<u64>().ok());
 
             let generator = BenfordGenerator::from_range_str(range)
-                .map_err(|e| LawkitError::ParseError(format!("Invalid range: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Invalid range: {e}")))?;
 
             let mut config = GenerateConfig::new(samples).with_fraud_rate(fraud_rate);
             if let Some(seed_val) = seed {
@@ -132,10 +132,10 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let numbers = generator
                 .generate(&config)
-                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {e}")))?;
 
             for number in numbers {
-                println!("{:.2}", number);
+                println!("{number:.2}");
             }
             Ok(())
         }
@@ -176,10 +176,10 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let numbers = generator
                 .generate(&config)
-                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {e}")))?;
 
             for number in numbers {
-                println!("{:.2}", number);
+                println!("{number:.2}");
             }
             Ok(())
         }
@@ -220,10 +220,10 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let numbers = generator
                 .generate(&config)
-                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {e}")))?;
 
             for number in numbers {
-                println!("{}", number);
+                println!("{number}");
             }
             Ok(())
         }
@@ -264,10 +264,10 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let numbers = generator
                 .generate(&config)
-                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {e}")))?;
 
             for number in numbers {
-                println!("{:.6}", number);
+                println!("{number:.6}");
             }
             Ok(())
         }
@@ -303,10 +303,10 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let numbers = generator
                 .generate(&config)
-                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {}", e)))?;
+                .map_err(|e| LawkitError::ParseError(format!("Generation failed: {e}")))?;
 
             for number in numbers {
-                println!("{}", number);
+                println!("{number}");
             }
             Ok(())
         }
@@ -351,7 +351,7 @@ fn run_selftest() -> Result<(), LawkitError> {
     let total = laws.len();
 
     for law in &laws {
-        print!("Testing {} law... ", law);
+        print!("Testing {law} law... ");
 
         // Simple test: generate data and check if analysis succeeds
         match law {
@@ -368,7 +368,7 @@ fn run_selftest() -> Result<(), LawkitError> {
     }
 
     println!();
-    println!("Self-test completed: {}/{} tests passed", passed, total);
+    println!("Self-test completed: {passed}/{total} tests passed");
 
     if passed == total {
         println!("✅ All tests passed! lawkit is working correctly.");
