@@ -13,7 +13,7 @@ use lawkit::{
 use std::io::{self, Read};
 use std::str::FromStr;
 
-const VERSION: &str = "2.0.0";
+const VERSION: &str = "2.1.0";
 
 fn main() {
     let matches = Command::new("benf")
