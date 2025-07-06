@@ -97,7 +97,10 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
     }
 
     // JSON detection
-    if ((trimmed.starts_with('{') && trimmed.ends_with('}')) || (trimmed.starts_with('[') && trimmed.ends_with(']'))) && serde_json::from_str::<serde_json::Value>(trimmed).is_ok() {
+    if ((trimmed.starts_with('{') && trimmed.ends_with('}'))
+        || (trimmed.starts_with('[') && trimmed.ends_with(']')))
+        && serde_json::from_str::<serde_json::Value>(trimmed).is_ok()
+    {
         return Some(FileFormat::Json);
     }
 
@@ -122,13 +125,16 @@ fn detect_text_format(content: &str) -> Option<FileFormat> {
     }
 
     // YAML detection (starts with --- or has key: value patterns)
-    if (trimmed.starts_with("---") || content.lines().any(|line| {
+    if (trimmed.starts_with("---")
+        || content.lines().any(|line| {
             let line = line.trim();
             !line.is_empty()
                 && !line.starts_with('#')
                 && line.contains(':')
                 && !line.contains("://")
-        })) && serde_yaml::from_str::<serde_yaml::Value>(content).is_ok() {
+        }))
+        && serde_yaml::from_str::<serde_yaml::Value>(content).is_ok()
+    {
         return Some(FileFormat::Yaml);
     }
 

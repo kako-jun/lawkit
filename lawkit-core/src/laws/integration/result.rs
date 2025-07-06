@@ -35,7 +35,7 @@ pub struct IntegrationResult {
     // 統合評価
     pub overall_assessment: OverallAssessment,
     pub risk_level: RiskLevel,
-    
+
     // 分析フォーカス
     pub focus: Option<String>, // 分析フォーカス (quality, concentration, etc.)
 }

@@ -54,34 +54,32 @@ pub fn detect_outliers_lof(numbers: &[f64], k: usize) -> Result<AdvancedOutlierR
             .filter(|(j, _)| *j != i)
             .map(|(_, &other)| (value - other).abs())
             .collect();
-        
+
         distances.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        
+
         if distances.len() >= k {
             let k_distance = distances[k - 1];
-            
+
             // 局所到達可能密度を計算
-            let reachability_distances: Vec<f64> = distances[..k]
-                .iter()
-                .map(|&d| d.max(k_distance))
-                .collect();
-            
+            let reachability_distances: Vec<f64> =
+                distances[..k].iter().map(|&d| d.max(k_distance)).collect();
+
             let lrd = k as f64 / reachability_distances.iter().sum::<f64>();
-            
+
             // LOFスコアを計算（簡易版）
             let lof_score = if lrd > 0.0 {
                 let neighbor_lrds: f64 = distances[..k]
                     .iter()
                     .map(|_| lrd) // 簡略化のため同じLRDを使用
                     .sum();
-                
+
                 (neighbor_lrds / (k as f64)) / lrd
             } else {
                 1.0
             };
-            
+
             lof_scores.push(lof_score);
-            
+
             // 異常値判定（LOF > 1.5を異常値とする）
             if lof_score > 1.5 {
                 outliers.push(AdvancedOutlierInfo {
@@ -102,7 +100,7 @@ pub fn detect_outliers_lof(numbers: &[f64], k: usize) -> Result<AdvancedOutlierR
     }
 
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
-    
+
     Ok(AdvancedOutlierResult {
         method_name: format!("LOF (k={})", k),
         outliers,
@@ -118,17 +116,20 @@ pub fn detect_outliers_lof(numbers: &[f64], k: usize) -> Result<AdvancedOutlierR
 }
 
 /// 分離度ベースの異常値検出（Isolation Forest風）
-pub fn detect_outliers_isolation(numbers: &[f64], max_depth: usize) -> Result<AdvancedOutlierResult> {
+pub fn detect_outliers_isolation(
+    numbers: &[f64],
+    max_depth: usize,
+) -> Result<AdvancedOutlierResult> {
     let mut outliers = Vec::new();
     let avg_path_length = calculate_average_path_length(numbers.len());
-    
+
     for (i, &value) in numbers.iter().enumerate() {
         // 単純な分離パス長を計算
         let path_length = calculate_isolation_path_length(value, numbers, max_depth);
-        
+
         // 異常スコアを計算（パス長が短いほど異常）
         let anomaly_score = 2.0_f64.powf(-path_length / avg_path_length);
-        
+
         // 閾値より高いスコアを異常値とする
         if anomaly_score > 0.6 {
             outliers.push(AdvancedOutlierInfo {
@@ -148,7 +149,7 @@ pub fn detect_outliers_isolation(numbers: &[f64], max_depth: usize) -> Result<Ad
     }
 
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
-    
+
     Ok(AdvancedOutlierResult {
         method_name: format!("Isolation Score (depth={})", max_depth),
         outliers,
@@ -164,17 +165,21 @@ pub fn detect_outliers_isolation(numbers: &[f64], max_depth: usize) -> Result<Ad
 }
 
 /// DBSCAN風の密度ベース異常値検出
-pub fn detect_outliers_dbscan(numbers: &[f64], eps: f64, min_pts: usize) -> Result<AdvancedOutlierResult> {
+pub fn detect_outliers_dbscan(
+    numbers: &[f64],
+    eps: f64,
+    min_pts: usize,
+) -> Result<AdvancedOutlierResult> {
     let mut outliers = Vec::new();
     let mut visited = vec![false; numbers.len()];
     let mut clusters = Vec::new();
-    
+
     for (i, &value) in numbers.iter().enumerate() {
         if visited[i] {
             continue;
         }
         visited[i] = true;
-        
+
         // 近傍点を検索
         let neighbors: Vec<usize> = numbers
             .iter()
@@ -182,17 +187,17 @@ pub fn detect_outliers_dbscan(numbers: &[f64], eps: f64, min_pts: usize) -> Resu
             .filter(|(j, &other)| *j != i && (value - other).abs() <= eps)
             .map(|(j, _)| j)
             .collect();
-        
+
         if neighbors.len() >= min_pts {
             // クラスタを形成
             let mut cluster = vec![i];
             let mut queue = neighbors;
-            
+
             while let Some(neighbor_idx) = queue.pop() {
                 if !visited[neighbor_idx] {
                     visited[neighbor_idx] = true;
                     cluster.push(neighbor_idx);
-                    
+
                     // 近傍点の近傍点も追加
                     let neighbor_neighbors: Vec<usize> = numbers
                         .iter()
@@ -202,18 +207,18 @@ pub fn detect_outliers_dbscan(numbers: &[f64], eps: f64, min_pts: usize) -> Resu
                         })
                         .map(|(j, _)| j)
                         .collect();
-                    
+
                     if neighbor_neighbors.len() >= min_pts {
                         queue.extend(neighbor_neighbors);
                     }
                 }
             }
-            
+
             clusters.push(cluster);
         } else {
             // ノイズ点（異常値候補）
             let density_score = neighbors.len() as f64 / min_pts as f64;
-            
+
             outliers.push(AdvancedOutlierInfo {
                 index: i,
                 value,
@@ -231,7 +236,7 @@ pub fn detect_outliers_dbscan(numbers: &[f64], eps: f64, min_pts: usize) -> Resu
     }
 
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
-    
+
     Ok(AdvancedOutlierResult {
         method_name: format!("DBSCAN Outlier (eps={:.2}, min_pts={})", eps, min_pts),
         outliers,
@@ -251,50 +256,57 @@ pub fn detect_outliers_ensemble(numbers: &[f64]) -> Result<AdvancedOutlierResult
     // 複数の手法を組み合わせ
     let lof_result = detect_outliers_lof(numbers, 5)?;
     let isolation_result = detect_outliers_isolation(numbers, 8)?;
-    
+
     // 自動的にepsとmin_ptsを決定
     let std_dev = {
         let mean = numbers.iter().sum::<f64>() / numbers.len() as f64;
-        let variance = numbers.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / numbers.len() as f64;
+        let variance =
+            numbers.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / numbers.len() as f64;
         variance.sqrt()
     };
     let eps = std_dev * 0.5;
     let min_pts = (numbers.len() as f64).sqrt() as usize;
-    
+
     let dbscan_result = detect_outliers_dbscan(numbers, eps, min_pts)?;
-    
+
     // 全手法の結果を統合
     let mut ensemble_scores: HashMap<usize, (f64, f64, usize)> = HashMap::new();
-    
+
     // 各手法のスコアを集計
     for outlier in &lof_result.outliers {
-        let entry = ensemble_scores.entry(outlier.index).or_insert((0.0, 0.0, 0));
+        let entry = ensemble_scores
+            .entry(outlier.index)
+            .or_insert((0.0, 0.0, 0));
         entry.0 += outlier.outlier_score;
         entry.1 += outlier.confidence;
         entry.2 += 1;
     }
-    
+
     for outlier in &isolation_result.outliers {
-        let entry = ensemble_scores.entry(outlier.index).or_insert((0.0, 0.0, 0));
+        let entry = ensemble_scores
+            .entry(outlier.index)
+            .or_insert((0.0, 0.0, 0));
         entry.0 += outlier.outlier_score;
         entry.1 += outlier.confidence;
         entry.2 += 1;
     }
-    
+
     for outlier in &dbscan_result.outliers {
-        let entry = ensemble_scores.entry(outlier.index).or_insert((0.0, 0.0, 0));
+        let entry = ensemble_scores
+            .entry(outlier.index)
+            .or_insert((0.0, 0.0, 0));
         entry.0 += outlier.outlier_score;
         entry.1 += outlier.confidence;
         entry.2 += 1;
     }
-    
+
     // アンサンブル結果を作成
     let mut outliers = Vec::new();
     for (&index, &(total_score, total_confidence, method_count)) in &ensemble_scores {
         let avg_score = total_score / method_count as f64;
         let avg_confidence = total_confidence / method_count as f64;
         let consensus_strength = method_count as f64 / 3.0; // 3つの手法のうち何個が検出したか
-        
+
         // 複数の手法で検出された場合のみ異常値とする
         if method_count >= 2 {
             outliers.push(AdvancedOutlierInfo {
@@ -313,12 +325,12 @@ pub fn detect_outliers_ensemble(numbers: &[f64]) -> Result<AdvancedOutlierResult
             });
         }
     }
-    
+
     // スコアでソート
     outliers.sort_by(|a, b| b.outlier_score.partial_cmp(&a.outlier_score).unwrap());
 
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
-    
+
     Ok(AdvancedOutlierResult {
         method_name: "Ensemble (LOF + Isolation + DBSCAN)".to_string(),
         outliers,
@@ -347,47 +359,47 @@ fn calculate_average_path_length(n: usize) -> f64 {
 fn calculate_isolation_path_length(value: f64, numbers: &[f64], max_depth: usize) -> f64 {
     let mut depth = 0.0;
     let mut data = numbers.to_vec();
-    
+
     for _ in 0..max_depth {
         if data.len() <= 1 {
             break;
         }
-        
+
         // ランダムな分割点を選択（簡易版）
         let min_val = data.iter().copied().fold(f64::INFINITY, f64::min);
         let max_val = data.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-        
+
         if min_val == max_val {
             break;
         }
-        
+
         let split_point = (min_val + max_val) / 2.0;
-        
+
         if value < split_point {
             data.retain(|&x| x < split_point);
         } else {
             data.retain(|&x| x >= split_point);
         }
-        
+
         depth += 1.0;
-        
+
         if data.len() <= 1 {
             break;
         }
     }
-    
+
     depth
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_lof_outlier_detection() {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 100.0]; // 100.0は明確な異常値
         let result = detect_outliers_lof(&data, 3).unwrap();
-        
+
         // LOFが異常値を検出するかテスト（検出されない場合もある）
         assert_eq!(result.method_name, "LOF (k=3)");
         assert!(result.detection_rate >= 0.0);
@@ -397,47 +409,47 @@ mod tests {
             assert!(result.detection_rate > 0.0);
         }
     }
-    
+
     #[test]
     fn test_isolation_outlier_detection() {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 100.0]; // 100.0は明確な異常値
         let result = detect_outliers_isolation(&data, 8).unwrap();
-        
+
         assert!(result.detection_rate >= 0.0);
         assert_eq!(result.method_name, "Isolation Score (depth=8)");
     }
-    
+
     #[test]
     fn test_dbscan_outlier_detection() {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 100.0]; // 100.0は明確な異常値
         let result = detect_outliers_dbscan(&data, 2.0, 2).unwrap();
-        
+
         assert!(result.detection_rate >= 0.0);
         assert!(result.method_name.contains("DBSCAN"));
     }
-    
+
     #[test]
     fn test_ensemble_outlier_detection() {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 100.0]; // 100.0は明確な異常値
         let result = detect_outliers_ensemble(&data).unwrap();
-        
+
         assert_eq!(result.method_name, "Ensemble (LOF + Isolation + DBSCAN)");
         assert!(result.detection_rate >= 0.0);
     }
-    
+
     #[test]
     fn test_insufficient_data_error() {
         let data = vec![1.0, 2.0]; // k=5に対して不十分
         let result = detect_outliers_lof(&data, 5);
-        
+
         assert!(result.is_err());
     }
-    
+
     #[test]
     fn test_normal_data_low_detection_rate() {
         let data = vec![1.0, 1.1, 0.9, 1.05, 0.95, 1.02, 0.98]; // 正常なデータ
         let result = detect_outliers_ensemble(&data).unwrap();
-        
+
         // 正常データでは異常値検出率が低いはず
         assert!(result.detection_rate < 0.5);
     }

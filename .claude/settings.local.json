@@ -45,7 +45,9 @@
       "Bash(strace:*)",
       "Bash(timeout:*)",
       "Bash(RUST_BACKTRACE=1 cargo test --test integration test_lawkit_pareto_business_analysis -- --nocapture)",
-      "Bash(RUST_BACKTRACE=1 cargo test test_cli_reference_examples)"
+      "Bash(RUST_BACKTRACE=1 cargo test test_cli_reference_examples)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": []
   },

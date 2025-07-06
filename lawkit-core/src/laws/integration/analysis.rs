@@ -234,7 +234,7 @@ fn execute_selected_laws_parallel(
 pub fn apply_focus_analysis(result: &mut IntegrationResult, focus: &str) {
     // Set the focus field
     result.focus = Some(focus.to_string());
-    
+
     match focus {
         "quality" => {
             // 品質重視の重み調整

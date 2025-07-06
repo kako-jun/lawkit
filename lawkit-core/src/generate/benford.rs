@@ -1,7 +1,7 @@
 use super::{DataGenerator, GenerateConfig};
 use crate::error::Result;
-use rand::prelude::*;
 use rand::distributions::{Distribution, Uniform};
+use rand::prelude::*;
 
 #[derive(Debug, Clone)]
 pub struct BenfordGenerator {
@@ -11,7 +11,10 @@ pub struct BenfordGenerator {
 
 impl BenfordGenerator {
     pub fn new(min_value: f64, max_value: f64) -> Self {
-        Self { min_value, max_value }
+        Self {
+            min_value,
+            max_value,
+        }
     }
 
     pub fn from_range_str(range_str: &str) -> Result<Self> {
@@ -19,18 +22,24 @@ impl BenfordGenerator {
         if parts.len() != 2 {
             return Err(crate::error::BenfError::ParseError(
                 "Range must be in format 'min,max'".to_string(),
-            ).into());
+            )
+            .into());
         }
 
-        let min_value: f64 = parts[0].trim().parse()
+        let min_value: f64 = parts[0]
+            .trim()
+            .parse()
             .map_err(|_| crate::error::BenfError::ParseError("Invalid min value".to_string()))?;
-        let max_value: f64 = parts[1].trim().parse()
+        let max_value: f64 = parts[1]
+            .trim()
+            .parse()
             .map_err(|_| crate::error::BenfError::ParseError("Invalid max value".to_string()))?;
 
         if min_value >= max_value {
             return Err(crate::error::BenfError::ParseError(
                 "Min value must be less than max value".to_string(),
-            ).into());
+            )
+            .into());
         }
 
         Ok(Self::new(min_value, max_value))
@@ -66,17 +75,17 @@ impl DataGenerator for BenfordGenerator {
 
 fn inject_fraud(numbers: &mut [f64], fraud_rate: f64, rng: &mut impl Rng) {
     let fraud_count = (numbers.len() as f64 * fraud_rate) as usize;
-    
+
     // Simple fraud injection: bias towards specific digits
     for _ in 0..fraud_count {
         let index = rng.gen_range(0..numbers.len());
         let original = numbers[index];
-        
+
         // Force the number to start with 5 or 6 (common fraud patterns)
         let fraud_digit = if rng.gen_bool(0.5) { 5.0 } else { 6.0 };
         let magnitude = 10_f64.powf(original.log10().floor());
         let fractional_part = original / magnitude - original.trunc() / magnitude;
-        
+
         numbers[index] = fraud_digit * magnitude + fractional_part * magnitude;
     }
 }
@@ -89,10 +98,10 @@ mod tests {
     fn test_benford_generator() {
         let generator = BenfordGenerator::new(1.0, 100000.0);
         let config = GenerateConfig::new(1000).with_seed(42);
-        
+
         let result = generator.generate(&config).unwrap();
         assert_eq!(result.len(), 1000);
-        
+
         // Check that all values are within range
         for &value in &result {
             assert!(value >= 1.0 && value <= 100000.0);

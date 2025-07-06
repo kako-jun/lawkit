@@ -109,7 +109,13 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     }
 }
 
-fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &str, matches: &clap::ArgMatches) {
+fn print_text_output(
+    result: &ParetoResult,
+    quiet: bool,
+    verbose: bool,
+    lang: &str,
+    matches: &clap::ArgMatches,
+) {
     if quiet {
         println!("pareto_ratio: {:.3}", result.pareto_ratio);
         println!("concentration_index: {:.3}", result.concentration_index);
@@ -190,7 +196,10 @@ fn print_text_output(result: &ParetoResult, quiet: bool, verbose: bool, lang: &s
     if matches.get_flag("business-analysis") {
         println!();
         println!("Business Analysis:");
-        println!("  Concentration level: {:.1}%", result.concentration_index * 100.0);
+        println!(
+            "  Concentration level: {:.1}%",
+            result.concentration_index * 100.0
+        );
         println!("  Business efficiency: {:.1}%", result.pareto_ratio * 100.0);
         if result.top_20_percent_share > 80.0 {
             println!("  Recommendation: High concentration indicates good focus");
@@ -460,7 +469,7 @@ fn analyze_numbers_with_options(
 
     // Perform Pareto analysis
     let mut result = analyze_pareto_distribution(&filtered_numbers, &dataset_name)?;
-    
+
     // カスタムパーセンタイルの処理
     if let Some(percentiles_str) = matches.get_one::<String>("percentiles") {
         let percentiles: Vec<f64> = percentiles_str
@@ -468,9 +477,9 @@ fn analyze_numbers_with_options(
             .map(|s| s.trim().parse::<f64>())
             .collect::<std::result::Result<Vec<f64>, _>>()
             .map_err(|_| BenfError::ParseError("Invalid percentiles format".to_string()))?;
-        
+
         result = result.with_custom_percentiles(&percentiles, &filtered_numbers);
     }
-    
+
     Ok(result)
 }
