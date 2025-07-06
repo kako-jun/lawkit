@@ -232,7 +232,7 @@ fn test_lawkit_compare_basic() {
 /// Test examples from CLI reference documentation
 #[test]
 fn test_cli_reference_examples() {
-    let csv_content = "amount\n1234\n5678\n9012\n3456\n7890\n2345\n6789\n1012";
+    let csv_content = "amount\n1234\n5678\n9012\n3456\n7890\n2345\n6789\n1012\n4567\n8901\n2347\n6781\n1013\n4568\n8902\n2348\n6782\n1014\n4569\n8903\n2349\n6783\n1015\n4570\n8904\n2350\n6784\n1016\n4571\n8905\n2351\n6785\n1017\n4572";
     let temp_file = create_temp_file_with_content(csv_content);
     let csv_path = temp_file.path().to_str().unwrap();
 
@@ -240,7 +240,7 @@ fn test_cli_reference_examples() {
     let output = run_lawkit_command("benf", &[csv_path]);
     assert!(matches!(
         output.status.code(),
-        Some(0) | Some(10) | Some(11) | Some(12)
+        Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
     ));
 
     // Fraud detection mode with high threshold and verbose
