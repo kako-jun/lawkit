@@ -72,7 +72,7 @@ fn main() {
                     match analyze_numbers_with_options(&matches, input.to_string(), &numbers) {
                         Ok(result) => result,
                         Err(e) => {
-                            eprintln!("Analysis error: {}", e);
+                            eprintln!("Analysis error: {e}");
                             std::process::exit(1);
                         }
                     };
@@ -81,7 +81,7 @@ fn main() {
                 std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
-                eprintln!("Error processing input '{}': {}", input, e);
+                eprintln!("Error processing input '{input}': {e}");
                 std::process::exit(1);
             }
         }
@@ -97,7 +97,7 @@ fn main() {
                 let numbers = match parse_text_input(&buffer) {
                     Ok(numbers) => numbers,
                     Err(e) => {
-                        eprintln!("Analysis error: {}", e);
+                        eprintln!("Analysis error: {e}");
                         std::process::exit(1);
                     }
                 };
@@ -106,7 +106,7 @@ fn main() {
                     match analyze_numbers_with_options(&matches, "stdin".to_string(), &numbers) {
                         Ok(result) => result,
                         Err(e) => {
-                            eprintln!("Analysis error: {}", e);
+                            eprintln!("Analysis error: {e}");
                             std::process::exit(1);
                         }
                     };
@@ -115,7 +115,7 @@ fn main() {
                 std::process::exit(result.risk_level.exit_code());
             }
             Err(e) => {
-                eprintln!("Error reading from stdin: {}", e);
+                eprintln!("Error reading from stdin: {e}");
                 std::process::exit(1);
             }
         }
@@ -135,8 +135,8 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
         }
         _ => {
             println!("Benford's Law Analysis Results");
-            println!("Numbers analyzed: {}", result.numbers_analyzed);
-            println!("Risk level: {:?}", result.risk_level);
+            println!("Numbers analyzed: {numbers_analyzed}", numbers_analyzed = result.numbers_analyzed);
+            println!("Risk level: {risk_level:?}", risk_level = result.risk_level);
         }
     }
 }
@@ -148,7 +148,7 @@ fn analyze_numbers_with_options(
 ) -> Result<BenfordResult> {
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
-            .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
+            .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {e}")))?;
         apply_number_filter(numbers, &filter)
     } else {
         numbers.to_vec()
@@ -159,7 +159,7 @@ fn analyze_numbers_with_options(
             RiskThreshold::Auto
         } else {
             RiskThreshold::from_str(threshold_str)
-                .map_err(|e| BenfError::ParseError(format!("無効な閾値: {}", e)))?
+                .map_err(|e| BenfError::ParseError(format!("無効な閾値: {e}")))?
         }
     } else {
         RiskThreshold::Auto

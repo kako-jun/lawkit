@@ -346,7 +346,7 @@ fn output_integration_text(
     writeln!(writer, "{}:", get_text("law_results", lang))?;
     for (law, score) in &result.law_scores {
         let law_name = get_law_name(law, lang);
-        writeln!(writer, "  {}: {:.3}", law_name, score)?;
+        writeln!(writer, "  {law_name}: {score:.3}")?;
     }
     writeln!(writer)?;
 
@@ -478,10 +478,10 @@ fn output_integration_yaml(
     writeln!(writer, "numbers_analyzed: {}", result.numbers_analyzed)?;
     writeln!(writer, "laws_executed:")?;
     for law in &result.laws_executed {
-        writeln!(writer, "  - \"{}\"", law)?;
+        writeln!(writer, "  - \"{law}\"")?;
     }
     if let Some(ref focus) = result.focus {
-        writeln!(writer, "focus: \"{}\"", focus)?;
+        writeln!(writer, "focus: \"{focus}\"")?;
     }
     writeln!(writer, "integration_metrics:")?;
     writeln!(
@@ -501,7 +501,7 @@ fn output_integration_yaml(
     )?;
     writeln!(writer, "law_scores:")?;
     for (law, score) in &result.law_scores {
-        writeln!(writer, "  {}: {:.3}", law, score)?;
+        writeln!(writer, "  {law}: {score:.3}")?;
     }
     writeln!(writer, "recommendations:")?;
     writeln!(

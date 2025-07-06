@@ -25,7 +25,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 Err(e) => {
                     let language = get_language(matches);
                     let error_msg = localized_text("analysis_error", language);
-                    eprintln!("{}: {}", error_msg, e);
+                    eprintln!("{error_msg}: {e}");
                     std::process::exit(1);
                 }
             }
@@ -36,7 +36,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     if numbers.is_empty() {
                         let language = get_language(matches);
                         let error_msg = localized_text("no_numbers_found", language);
-                        eprintln!("{}", error_msg);
+                        eprintln!("{error_msg}");
                         std::process::exit(1);
                     }
 
@@ -47,7 +47,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                             Err(e) => {
                                 let language = get_language(matches);
                                 let error_msg = localized_text("analysis_error", language);
-                                eprintln!("{}: {}", error_msg, e);
+                                eprintln!("{error_msg}: {e}");
                                 std::process::exit(1);
                             }
                         };
@@ -57,7 +57,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     std::process::exit(result.risk_level.exit_code());
                 }
                 Err(e) => {
-                    eprintln!("Error processing input '{}': {}", input, e);
+                    eprintln!("Error processing input '{input}': {e}");
                     std::process::exit(1);
                 }
             }
@@ -84,7 +84,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         Err(e) => {
                             let language = get_language(matches);
                             let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{}: {}", error_msg, e);
+                            eprintln!("{error_msg}: {e}");
                             std::process::exit(1);
                         }
                     }
@@ -95,7 +95,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         Err(e) => {
                             let language = get_language(matches);
                             let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{}: {}", error_msg, e);
+                            eprintln!("{error_msg}: {e}");
                             std::process::exit(1);
                         }
                     };
@@ -110,7 +110,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                         Err(e) => {
                             let language = get_language(matches);
                             let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{}: {}", error_msg, e);
+                            eprintln!("{error_msg}: {e}");
                             std::process::exit(1);
                         }
                     };
@@ -121,7 +121,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 }
             }
             Err(e) => {
-                eprintln!("Error reading from stdin: {}", e);
+                eprintln!("Error reading from stdin: {e}");
                 std::process::exit(1);
             }
         }
@@ -143,7 +143,7 @@ fn output_results(matches: &clap::ArgMatches, result: &ZipfResult) {
         "xml" => print_xml_output(result),
         _ => {
             let error_msg = localized_text("unsupported_format", language);
-            eprintln!("{}: {}", error_msg, format);
+            eprintln!("{error_msg}: {format}");
             std::process::exit(2);
         }
     }
@@ -474,7 +474,7 @@ fn analyze_numbers_with_options(
     // Apply number filtering if specified
     let filtered_numbers = if let Some(filter_str) = matches.get_one::<String>("filter") {
         let filter = NumberFilter::parse(filter_str)
-            .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {}", e)))?;
+            .map_err(|e| BenfError::ParseError(format!("無効なフィルタ: {e}")))?;
 
         let filtered = apply_number_filter(numbers, &filter);
 
