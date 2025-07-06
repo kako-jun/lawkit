@@ -469,7 +469,7 @@ mod integration_compare_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("compare") || stdout.contains("integration"));
+        assert!(stdout.contains("compare") || stdout.contains("integration") || stdout.contains("Integration"));
         assert!(stdout.contains("benf") || stdout.contains("Benford"));
     }
 

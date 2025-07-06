@@ -368,6 +368,7 @@ pub fn add_compare_options(cmd: Command) -> Command {
                 .short('t')
                 .help("Conflict detection threshold (0.0-1.0)")
                 .value_name("THRESHOLD")
+                .value_parser(clap::value_parser!(f64))
                 .default_value("0.5"),
         )
         .arg(
@@ -402,6 +403,7 @@ pub fn add_compare_options(cmd: Command) -> Command {
                 .long("confidence-level")
                 .help("Confidence level")
                 .value_name("LEVEL")
+                .value_parser(clap::value_parser!(f64))
                 .default_value("0.95"),
         )
         .arg(
