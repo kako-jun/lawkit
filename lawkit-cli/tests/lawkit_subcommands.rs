@@ -5,10 +5,10 @@ use tempfile::NamedTempFile;
 /// Run lawkit command with subcommand and arguments
 fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
-    command.args(&["run", "--bin", "lawkit", "--", subcommand]);
+    command.args(["run", "--bin", "lawkit", "--", subcommand]);
     // Add --language en for analysis commands that support it (not generate commands)
     if !["--help", "--version", "list", "generate", "selftest"].contains(&subcommand) {
-        command.args(&["--language", "en"]);
+        command.args(["--language", "en"]);
     }
     command.args(args);
     command.output().expect("Failed to execute lawkit command")

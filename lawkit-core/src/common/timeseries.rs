@@ -124,7 +124,7 @@ pub struct DataQuality {
 /// 時系列分析を実行
 pub fn analyze_timeseries(data: &[TimeSeriesPoint]) -> Result<TimeSeriesAnalysis> {
     if data.len() < 10 {
-        return Err(crate::error::BenfError::InsufficientData(data.len()).into());
+        return Err(crate::error::BenfError::InsufficientData(data.len()));
     }
 
     let values: Vec<f64> = data.iter().map(|p| p.value).collect();
@@ -223,7 +223,7 @@ fn detect_seasonality(values: &[f64]) -> Result<SeasonalityAnalysis> {
 /// 変化点検出
 fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangePoint>> {
     let mut changepoints = Vec::new();
-    let window_size = (values.len() / 10).max(5).min(20);
+    let window_size = (values.len() / 10).clamp(5, 20);
 
     for i in window_size..(values.len() - window_size) {
         // 前後のウィンドウで統計量を比較
@@ -338,7 +338,7 @@ fn detect_timeseries_anomalies(
     values: &[f64],
 ) -> Result<Vec<TimeSeriesAnomaly>> {
     let mut anomalies = Vec::new();
-    let window_size = (values.len() / 20).max(3).min(10);
+    let window_size = (values.len() / 20).clamp(3, 10);
 
     for i in window_size..(values.len() - window_size) {
         // 移動平均と移動標準偏差を計算
@@ -677,7 +677,7 @@ mod tests {
         assert!(result.forecasts[0].predicted_value > 10.0); // 次の値は10より大きいはず
 
         // 統計テスト
-        assert!(result.statistics.autocorrelation.len() > 0);
+        assert!(!result.statistics.autocorrelation.is_empty());
     }
 
     #[test]
@@ -718,7 +718,7 @@ mod tests {
         let changepoints = detect_changepoints(&timestamps, &values).unwrap();
 
         // 変化点が検出されるはず（インデックス5付近）
-        if changepoints.len() > 0 {
+        if !changepoints.is_empty() {
             let major_changepoint = &changepoints[0];
             assert!(major_changepoint.index >= 4);
             assert!(major_changepoint.index <= 6);
@@ -754,7 +754,7 @@ mod tests {
         let anomalies = detect_timeseries_anomalies(&timestamps, &values).unwrap();
 
         // 異常値が検出されるかテスト
-        if anomalies.len() > 0 {
+        if !anomalies.is_empty() {
             let anomaly = &anomalies[0];
             assert!(anomaly.value == 100.0 || anomaly.anomaly_score > 3.0);
             matches!(anomaly.anomaly_type, AnomalyType::PointAnomaly);
@@ -767,8 +767,8 @@ mod tests {
 
         let stats = calculate_timeseries_statistics(&values).unwrap();
 
-        assert!(stats.autocorrelation.len() > 0);
-        assert!(stats.partial_autocorrelation.len() > 0);
+        assert!(!stats.autocorrelation.is_empty());
+        assert!(!stats.partial_autocorrelation.is_empty());
         assert!(stats.noise_level >= 0.0);
         assert!(stats.data_quality.completeness > 0.0);
         assert!(stats.data_quality.consistency >= 0.0);

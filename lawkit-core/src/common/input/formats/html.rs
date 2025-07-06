@@ -90,8 +90,8 @@ mod tests {
         assert!(!numbers.is_empty());
 
         // Should extract numbers from text but not from script/style tags
-        assert!(numbers.contains(&1234.56) || numbers.iter().any(|&n| n == 1234.0));
-        assert!(numbers.contains(&567.89) || numbers.iter().any(|&n| n == 567.0));
+        assert!(numbers.contains(&1234.56) || numbers.contains(&1234.0));
+        assert!(numbers.contains(&567.89) || numbers.contains(&567.0));
         assert!(numbers.contains(&123.0));
         assert!(numbers.contains(&456.0));
 

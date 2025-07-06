@@ -120,8 +120,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let seed = sub_matches
                 .get_one::<String>("seed")
-                .map(|s| s.parse::<u64>().ok())
-                .flatten();
+                .and_then(|s| s.parse::<u64>().ok());
 
             let generator = BenfordGenerator::from_range_str(range)
                 .map_err(|e| LawkitError::ParseError(format!("Invalid range: {}", e)))?;
@@ -166,8 +165,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let seed = sub_matches
                 .get_one::<String>("seed")
-                .map(|s| s.parse::<u64>().ok())
-                .flatten();
+                .and_then(|s| s.parse::<u64>().ok());
 
             let generator = ParetoGenerator::new(scale, concentration);
 
@@ -211,8 +209,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let seed = sub_matches
                 .get_one::<String>("seed")
-                .map(|s| s.parse::<u64>().ok())
-                .flatten();
+                .and_then(|s| s.parse::<u64>().ok());
 
             let generator = ZipfGenerator::new(exponent, vocabulary_size);
 
@@ -256,8 +253,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let seed = sub_matches
                 .get_one::<String>("seed")
-                .map(|s| s.parse::<u64>().ok())
-                .flatten();
+                .and_then(|s| s.parse::<u64>().ok());
 
             let generator = NormalGenerator::new(mean, stddev);
 
@@ -296,8 +292,7 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
             let seed = sub_matches
                 .get_one::<String>("seed")
-                .map(|s| s.parse::<u64>().ok())
-                .flatten();
+                .and_then(|s| s.parse::<u64>().ok());
 
             let generator = PoissonGenerator::new(lambda, time_series);
 

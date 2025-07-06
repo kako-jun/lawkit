@@ -936,7 +936,7 @@ fn analyze_numbers_with_options(
 
 /// 高度な異常値検出結果の出力
 fn output_advanced_outlier_result(matches: &ArgMatches, result: &AdvancedOutlierResult) {
-    let lang = matches
+    let _lang = matches
         .get_one::<String>("language")
         .map(|s| s.as_str())
         .unwrap_or("auto");
@@ -976,7 +976,7 @@ fn calculate_std_dev(numbers: &[f64]) -> f64 {
 }
 
 /// 時系列分析結果の出力
-fn output_timeseries_result(matches: &ArgMatches, result: &TimeSeriesAnalysis) {
+fn output_timeseries_result(_matches: &ArgMatches, result: &TimeSeriesAnalysis) {
     println!("Time Series Analysis Results");
     println!("============================");
 

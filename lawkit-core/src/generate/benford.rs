@@ -22,8 +22,7 @@ impl BenfordGenerator {
         if parts.len() != 2 {
             return Err(crate::error::BenfError::ParseError(
                 "Range must be in format 'min,max'".to_string(),
-            )
-            .into());
+            ));
         }
 
         let min_value: f64 = parts[0]
@@ -38,8 +37,7 @@ impl BenfordGenerator {
         if min_value >= max_value {
             return Err(crate::error::BenfError::ParseError(
                 "Min value must be less than max value".to_string(),
-            )
-            .into());
+            ));
         }
 
         Ok(Self::new(min_value, max_value))
@@ -104,7 +102,7 @@ mod tests {
 
         // Check that all values are within range
         for &value in &result {
-            assert!(value >= 1.0 && value <= 100000.0);
+            assert!((1.0..=100000.0).contains(&value));
         }
     }
 

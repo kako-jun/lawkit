@@ -3,7 +3,7 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
-        streaming_io::{OptimizedFileReader, ProcessingStrategy},
+        streaming_io::OptimizedFileReader,
     },
     error::{BenfError, Result},
     laws::benford::BenfordResult,
@@ -59,8 +59,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
             let numbers = match reader.read_lines_streaming(|line| {
                 parse_text_input(&line)
-                    .map(|nums| Some(nums))
-                    .or_else(|_| Ok(None))
+                    .map(Some)
+                    .or(Ok(None))
             }) {
                 Ok(nested_numbers) => nested_numbers.into_iter().flatten().collect::<Vec<_>>(),
                 Err(e) => {

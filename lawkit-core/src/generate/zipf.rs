@@ -110,7 +110,7 @@ mod tests {
 
         // All ranks should be within vocabulary size
         for &rank in &result {
-            assert!(rank >= 1 && rank <= 1000);
+            assert!((1..=1000).contains(&rank));
         }
     }
 }
