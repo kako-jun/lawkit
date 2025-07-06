@@ -553,7 +553,7 @@ impl IntegrationResult {
             String::new()
         };
 
-        format!("{}{}", primary_reason, secondary_reason)
+        format!("{primary_reason}{secondary_reason}")
     }
 
     fn generate_alternative_combinations(&self) -> Vec<LawCombination> {

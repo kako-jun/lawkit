@@ -95,7 +95,7 @@ fn extract_text_from_slide_xml(xml_content: &str) -> crate::error::Result<String
     // PowerPoint slide text is contained in <a:t> elements
     // We'll use regex to extract text content from these elements
     let text_regex = Regex::new(r"<a:t[^>]*>(.*?)</a:t>").map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to compile regex: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to compile regex: {e}"))
     })?;
 
     let mut extracted_text = Vec::new();

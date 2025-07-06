@@ -95,8 +95,8 @@ pub fn cross_validate_laws(
 
         if !train_data.is_empty() && !test_data.is_empty() {
             let train_result =
-                analyze_all_laws(&train_data, &format!("{}_train_{}", dataset_name, i))?;
-            let test_result = analyze_all_laws(test_data, &format!("{}_test_{}", dataset_name, i))?;
+                analyze_all_laws(&train_data, &format!("{dataset_name}_train_{i}"))?;
+            let test_result = analyze_all_laws(test_data, &format!("{dataset_name}_test_{i}"))?;
 
             validation_results.push(ValidationFold {
                 fold_number: i + 1,
@@ -186,8 +186,7 @@ fn execute_laws_parallel(numbers: &[f64], dataset_name: &str) -> Vec<(String, Re
                     analyze_poisson_distribution(numbers, dataset_name).map(LawResult::Poisson)
                 }
                 _ => Err(crate::error::BenfError::InvalidInput(format!(
-                    "Unknown law: {}",
-                    law
+                    "Unknown law: {law}"
                 ))),
             };
             (law.to_string(), result)
@@ -222,8 +221,7 @@ fn execute_selected_laws_parallel(
                     analyze_poisson_distribution(numbers, dataset_name).map(LawResult::Poisson)
                 }
                 _ => Err(crate::error::BenfError::InvalidInput(format!(
-                    "Unknown law: {}",
-                    law
+                    "Unknown law: {law}"
                 ))),
             };
             (law.clone(), result)

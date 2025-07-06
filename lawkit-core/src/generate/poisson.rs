@@ -26,7 +26,7 @@ impl DataGenerator for PoissonGenerator {
         let mut numbers = Vec::with_capacity(config.samples);
 
         let poisson = Poisson::new(self.lambda).map_err(|e| {
-            crate::error::BenfError::ParseError(format!("Invalid lambda parameter: {}", e))
+            crate::error::BenfError::ParseError(format!("Invalid lambda parameter: {e}"))
         })?;
 
         for _ in 0..config.samples {

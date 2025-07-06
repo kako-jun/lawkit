@@ -23,7 +23,7 @@ impl DataGenerator for NormalGenerator {
         let mut numbers = Vec::with_capacity(config.samples);
 
         let normal = Normal::new(self.mean, self.stddev).map_err(|e| {
-            crate::error::BenfError::ParseError(format!("Invalid normal parameters: {}", e))
+            crate::error::BenfError::ParseError(format!("Invalid normal parameters: {e}"))
         })?;
 
         for _ in 0..config.samples {
