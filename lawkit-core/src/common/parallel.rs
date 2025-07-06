@@ -241,7 +241,7 @@ fn calculate_chunk_statistics(data: &[f64]) -> StatisticsChunk {
         let abs_value = value.abs();
         if abs_value >= 1.0 {
             let first_digit = get_first_digit(abs_value);
-            if first_digit >= 1 && first_digit <= 9 {
+            if (1..=9).contains(&first_digit) {
                 first_digit_counts[first_digit - 1] += 1;
             }
         }
@@ -359,9 +359,9 @@ fn analyze_benford_chunk(data: &[f64]) -> BenfordChunkResult {
     let total_valid = stats.first_digit_counts.iter().sum::<usize>();
 
     if total_valid > 0 {
-        for i in 0..9 {
+        for (i, &expected) in expected_proportions.iter().enumerate() {
             let observed_prop = (stats.first_digit_counts[i] as f64 / total_valid as f64) * 100.0;
-            mad += (observed_prop - expected_proportions[i]).abs();
+            mad += (observed_prop - expected).abs();
         }
         mad /= 9.0;
     }

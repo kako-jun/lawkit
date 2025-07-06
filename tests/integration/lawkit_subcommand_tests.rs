@@ -5,11 +5,11 @@ use tempfile::NamedTempFile;
 /// Run lawkit command with subcommand and arguments
 fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
-    command.args(&["run", "--bin", "lawkit", "--", subcommand]);
+    command.args(["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
     // Don't add --language en for commands that don't support it
     if subcommand != "selftest" && subcommand != "list" {
-        command.args(&["--language", "en"]); // Force English output at the end
+        command.args(["--language", "en"]); // Force English output at the end
     }
     command.output().expect("Failed to execute lawkit command")
 }
@@ -17,9 +17,9 @@ fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
 /// Debug version of run_lawkit_command that prints detailed output
 fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
-    command.args(&["run", "--bin", "lawkit", "--", subcommand]);
+    command.args(["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
-    command.args(&["--language", "en"]); // Force English output at the end
+    command.args(["--language", "en"]); // Force English output at the end
 
     let mut cmd_str = format!("cargo run --bin lawkit -- {}", subcommand);
     for arg in args {
@@ -835,13 +835,10 @@ mod generate_functionality_tests {
 
         // Verify all outputs are non-negative integers (Poisson characteristic)
         for line in lines {
-            let value: u32 = line
+            let _value: u32 = line
                 .parse()
                 .expect("Poisson should generate integer values");
-            assert!(
-                value >= 0,
-                "Poisson distribution should generate non-negative integers"
-            );
+            // Poisson distribution always generates non-negative integers (u64 >= 0 is always true)
         }
     }
 

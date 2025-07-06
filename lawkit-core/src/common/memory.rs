@@ -46,18 +46,14 @@ impl MemoryConfig {
 pub struct StreamingProcessor<T> {
     buffer: VecDeque<T>,
     chunk_size: usize,
-    max_buffer_size: usize,
     total_processed: usize,
 }
 
 impl<T> StreamingProcessor<T> {
     pub fn new(config: &MemoryConfig) -> Self {
-        let max_buffer_size = config.max_memory_mb * 1024 * 1024 / std::mem::size_of::<T>();
-
         Self {
             buffer: VecDeque::new(),
             chunk_size: config.chunk_size,
-            max_buffer_size,
             total_processed: 0,
         }
     }
@@ -260,19 +256,10 @@ impl IncrementalStatistics {
 }
 
 /// メモリ効率的なベンフォード分析
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct IncrementalBenford {
     first_digit_counts: [usize; 9],
     total_count: usize,
-}
-
-impl Default for IncrementalBenford {
-    fn default() -> Self {
-        Self {
-            first_digit_counts: [0; 9],
-            total_count: 0,
-        }
-    }
 }
 
 impl IncrementalBenford {
@@ -285,7 +272,7 @@ impl IncrementalBenford {
         let abs_value = value.abs();
         if abs_value >= 1.0 {
             let first_digit = get_first_digit(abs_value);
-            if first_digit >= 1 && first_digit <= 9 {
+            if (1..=9).contains(&first_digit) {
                 self.first_digit_counts[first_digit - 1] += 1;
                 self.total_count += 1;
             }
@@ -301,8 +288,8 @@ impl IncrementalBenford {
 
     /// 他のベンフォード統計と結合
     pub fn merge(&mut self, other: &IncrementalBenford) {
-        for i in 0..9 {
-            self.first_digit_counts[i] += other.first_digit_counts[i];
+        for (i, &other_count) in other.first_digit_counts.iter().enumerate() {
+            self.first_digit_counts[i] += other_count;
         }
         self.total_count += other.total_count;
     }
@@ -318,10 +305,10 @@ impl IncrementalBenford {
         ];
 
         let mut mad = 0.0;
-        for i in 0..9 {
+        for (i, &expected) in expected_proportions.iter().enumerate() {
             let observed_prop =
                 (self.first_digit_counts[i] as f64 / self.total_count as f64) * 100.0;
-            mad += (observed_prop - expected_proportions[i]).abs();
+            mad += (observed_prop - expected).abs();
         }
 
         mad / 9.0
@@ -331,9 +318,8 @@ impl IncrementalBenford {
     pub fn get_distribution(&self) -> [f64; 9] {
         let mut distribution = [0.0; 9];
         if self.total_count > 0 {
-            for i in 0..9 {
-                distribution[i] =
-                    (self.first_digit_counts[i] as f64 / self.total_count as f64) * 100.0;
+            for (i, item) in distribution.iter_mut().enumerate() {
+                *item = (self.first_digit_counts[i] as f64 / self.total_count as f64) * 100.0;
             }
         }
         distribution
@@ -456,13 +442,19 @@ pub struct ResourceMonitor {
     allocation_count: usize,
 }
 
-impl ResourceMonitor {
-    pub fn new() -> Self {
+impl Default for ResourceMonitor {
+    fn default() -> Self {
         Self {
             peak_memory_mb: 0.0,
             current_memory_mb: 0.0,
             allocation_count: 0,
         }
+    }
+}
+
+impl ResourceMonitor {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// メモリ使用量を記録

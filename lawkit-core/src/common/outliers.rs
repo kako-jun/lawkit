@@ -40,7 +40,7 @@ pub struct AdvancedOutlierResult {
 /// LOF (Local Outlier Factor) による異常値検出
 pub fn detect_outliers_lof(numbers: &[f64], k: usize) -> Result<AdvancedOutlierResult> {
     if numbers.len() < k + 1 {
-        return Err(crate::error::BenfError::InsufficientData(numbers.len()).into());
+        return Err(crate::error::BenfError::InsufficientData(numbers.len()));
     }
 
     let mut outliers = Vec::new();
@@ -404,7 +404,7 @@ mod tests {
         assert_eq!(result.method_name, "LOF (k=3)");
         assert!(result.detection_rate >= 0.0);
         // 100.0が検出されるかチェック（検出されない場合はスキップ）
-        if result.outliers.len() > 0 {
+        if !result.outliers.is_empty() {
             // 何かしらの異常値が検出されている
             assert!(result.detection_rate > 0.0);
         }

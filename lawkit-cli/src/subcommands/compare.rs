@@ -52,8 +52,7 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -97,8 +96,7 @@ fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -127,8 +125,7 @@ fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -158,8 +155,7 @@ fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -189,8 +185,7 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
@@ -220,8 +215,7 @@ fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
         if buffer.trim().is_empty() {
             return Err(lawkit_core::error::BenfError::ParseError(
                 "No input data provided".to_string(),
-            )
-            .into());
+            ));
         }
         lawkit_core::common::input::parse_text_input(&buffer)?
     };
