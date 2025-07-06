@@ -7,7 +7,10 @@ fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
     command.args(&["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
-    command.args(&["--language", "en"]); // Force English output at the end
+    // Don't add --language en for commands that don't support it
+    if subcommand != "selftest" && subcommand != "list" {
+        command.args(&["--language", "en"]); // Force English output at the end
+    }
     command.output().expect("Failed to execute lawkit command")
 }
 
@@ -22,7 +25,10 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
     for arg in args {
         cmd_str.push_str(&format!(" {}", arg));
     }
-    cmd_str.push_str(" --language en");
+    // Don't add --language en for commands that don't support it
+    if subcommand != "selftest" && subcommand != "list" {
+        cmd_str.push_str(" --language en");
+    }
     println!("🔍 Debug: Running command: {}", cmd_str);
     
     let output = command.output().expect("Failed to execute lawkit command");
@@ -354,7 +360,7 @@ mod normal_distribution_tests {
     #[test]
     fn test_lawkit_normal_basic() {
         let test_data = generate_test_data();
-        let output = run_lawkit_command("normal", &[&test_data]);
+        let output = run_lawkit_command("normal", &["--verbose", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -363,7 +369,7 @@ mod normal_distribution_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("Normal") || stdout.contains("normality"));
-        assert!(stdout.contains("Test statistic") || stdout.contains("P-value"));
+        assert!(stdout.contains("p=") || stdout.contains("P-value"));
     }
 
     #[test]
@@ -838,8 +844,8 @@ mod generate_functionality_tests {
     #[test]
     fn test_generate_deterministic_output() {
         // Test that same seed produces same output
-        let output1 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "deterministic"]);
-        let output2 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "deterministic"]);
+        let output1 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
+        let output2 = run_lawkit_command("generate", &["benf", "--samples", "10", "--seed", "12345"]);
         
         assert!(output1.status.success());
         assert!(output2.status.success());

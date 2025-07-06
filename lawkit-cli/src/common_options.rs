@@ -215,7 +215,7 @@ pub fn add_poisson_options(cmd: Command) -> Command {
         .arg(
             Arg::new("predict")
                 .long("predict")
-                .short('P')
+                .short('p')
                 .help("Enable probability prediction")
                 .action(clap::ArgAction::SetTrue),
         )
