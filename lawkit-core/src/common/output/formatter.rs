@@ -24,8 +24,7 @@ impl std::str::FromStr for OutputFormat {
             "toml" => Ok(OutputFormat::Toml),
             "xml" => Ok(OutputFormat::Xml),
             _ => Err(crate::error::BenfError::InvalidInput(format!(
-                "Unsupported format: {}",
-                s
+                "Unsupported format: {s}"
             ))),
         }
     }
@@ -125,8 +124,7 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         let bar = "█".repeat(bar_length);
 
         output.push_str(&format!(
-            "{}: {:30} {:.1}% (expected: {:.1}%)\n",
-            digit, bar, observed, expected
+            "{digit}: {bar:30} {observed:.1}% (expected: {expected:.1}%)\n"
         ));
     }
 

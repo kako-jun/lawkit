@@ -6,7 +6,7 @@ use std::path::Path;
 pub fn parse_pdf_file(file_path: &Path) -> crate::error::Result<Vec<f64>> {
     // Extract text from PDF file path
     let text = extract_text(file_path).map_err(|e| {
-        crate::error::BenfError::ParseError(format!("Failed to extract text from PDF: {}", e))
+        crate::error::BenfError::ParseError(format!("Failed to extract text from PDF: {e}"))
     })?;
 
     // Extract numbers from the text (including international numerals)

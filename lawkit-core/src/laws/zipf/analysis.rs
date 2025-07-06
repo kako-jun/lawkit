@@ -122,7 +122,7 @@ pub fn evaluate_zipf_quality(zipf_result: &ZipfResult) -> ZipfQualityReport {
     quality_metrics.push(QualityMetric {
         name: "Correlation".to_string(),
         score: correlation_score,
-        description: format!("相関係数: {:.3}", correlation_score),
+        description: format!("相関係数: {correlation_score:.3}"),
     });
 
     // 全体品質スコア
