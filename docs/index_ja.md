@@ -30,24 +30,24 @@ lawkit compare data.csv --laws benford,pareto,normal
 ## ドキュメント
 
 ### ユーザーガイド
-- [インストール](user-guide/installation.md) | [インストール（日本語）](user-guide/installation_ja.md)
-- [はじめに](user-guide/getting-started.md) | [はじめに（日本語）](user-guide/getting-started_ja.md)  
-- [設定](user-guide/configuration.md) | [設定（日本語）](user-guide/configuration_ja.md)
+- [インストール](user-guide/installation_ja.md)
+- [はじめに](user-guide/getting-started_ja.md)  
+- [設定](user-guide/configuration_ja.md)
 - [使用例](user-guide/examples_ja.md)
 
 ### リファレンス
-- [CLIリファレンス](reference/cli-reference.md) | [CLIリファレンス（日本語）](reference/cli-reference_ja.md)
+- [CLIリファレンス](reference/cli-reference_ja.md)
 
 ### ガイド
-- [統合機能](guides/integrations.md) | [統合機能（日本語）](guides/integrations_ja.md)
-- [パフォーマンス](guides/performance.md) | [パフォーマンス（日本語）](guides/performance_ja.md)
+- [統合機能](guides/integrations_ja.md)
+- [パフォーマンス](guides/performance_ja.md)
 
 ### プロジェクト
-- [変更履歴](project/changelog.md) | [変更履歴（日本語）](project/changelog_ja.md)
-- [ロードマップ](project/roadmap.md) | [ロードマップ（日本語）](project/roadmap_ja.md)
+- [変更履歴](project/changelog_ja.md)
+- [ロードマップ](project/roadmap_ja.md)
 
 ### その他
-- [FAQ](user-guide/faq.md) | [FAQ（日本語）](user-guide/faq_ja.md)
+- [FAQ](user-guide/faq_ja.md)
 
 ## サポート
 

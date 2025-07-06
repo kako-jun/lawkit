@@ -240,7 +240,7 @@ fn analyze_data(numbers: &[f64]) {
 
 ### How do I integrate lawkit with CI/CD pipelines?
 
-See our [CI/CD Integration Guide](ci-cd.md) for examples with:
+See our [Integration Guide](../guides/integrations.md) for examples with:
 - GitHub Actions
 - GitLab CI
 - Jenkins
