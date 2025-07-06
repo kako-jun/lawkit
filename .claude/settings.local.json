@@ -36,7 +36,16 @@
       "Bash(RUST_BACKTRACE=1 cargo test --test lawkit_subcommands test_lawkit_benf_basic)",
       "Bash(echo:*)",
       "Bash(timeout 30 cargo test test_lawkit_generate_benf --test integration -- --nocapture)",
-      "Bash(timeout 10 cargo run --bin lawkit -- compare test_data.txt)"
+      "Bash(timeout 10 cargo run --bin lawkit -- compare test_data.txt)",
+      "Bash(timeout 5 cargo run --bin lawkit -- generate benf --samples 100 --seed compare1)",
+      "Bash(timeout 5 cargo run --bin lawkit -- compare --laws benf,normal test_data.txt)",
+      "Bash(timeout 10 cargo test --release)",
+      "Bash(timeout 30 cargo test --release)",
+      "Bash(timeout 10 cargo run --bin lawkit -- generate benf --samples 100 --seed 12345 --language en)",
+      "Bash(strace:*)",
+      "Bash(timeout:*)",
+      "Bash(RUST_BACKTRACE=1 cargo test --test integration test_lawkit_pareto_business_analysis -- --nocapture)",
+      "Bash(RUST_BACKTRACE=1 cargo test test_cli_reference_examples)"
     ],
     "deny": []
   },
