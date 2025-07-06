@@ -102,7 +102,7 @@ pub fn detect_outliers_lof(numbers: &[f64], k: usize) -> Result<AdvancedOutlierR
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
 
     Ok(AdvancedOutlierResult {
-        method_name: format!("LOF (k={})", k),
+        method_name: format!("LOF (k={k})"),
         outliers,
         threshold: 1.5,
         detection_rate,
@@ -151,7 +151,7 @@ pub fn detect_outliers_isolation(
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
 
     Ok(AdvancedOutlierResult {
-        method_name: format!("Isolation Score (depth={})", max_depth),
+        method_name: format!("Isolation Score (depth={max_depth})"),
         outliers,
         threshold: 0.6,
         detection_rate,
@@ -238,7 +238,7 @@ pub fn detect_outliers_dbscan(
     let detection_rate = outliers.len() as f64 / numbers.len() as f64;
 
     Ok(AdvancedOutlierResult {
-        method_name: format!("DBSCAN Outlier (eps={:.2}, min_pts={})", eps, min_pts),
+        method_name: format!("DBSCAN Outlier (eps={eps:.2}, min_pts={min_pts})"),
         outliers,
         threshold: 1.0 - (min_pts as f64 / 10.0),
         detection_rate,

@@ -124,7 +124,7 @@ fn parse_kanji_number_advanced(kanji: &str) -> Result<u64, String> {
                         '八' | '捌' => 8,
                         '九' | '玖' => 9,
                         '〇' | '零' => 0,
-                        _ => return Err(format!("Invalid digit character: {}", ch)),
+                        _ => return Err(format!("Invalid digit character: {ch}")),
                     };
                     digit_value = digit_value * 10 + digit;
                 }
@@ -162,12 +162,12 @@ fn parse_kanji_number_advanced(kanji: &str) -> Result<u64, String> {
                 '八' | '捌' => result_str.push('8'),
                 '九' | '玖' => result_str.push('9'),
                 '〇' | '零' => result_str.push('0'),
-                _ => return Err(format!("Invalid character in digit sequence: {}", ch)),
+                _ => return Err(format!("Invalid character in digit sequence: {ch}")),
             }
         }
         return result_str
             .parse::<u64>()
-            .map_err(|e| format!("Parse error: {}", e));
+            .map_err(|e| format!("Parse error: {e}"));
     }
 
     // Parse positional notation (e.g., 一千二百三十四)
@@ -218,7 +218,7 @@ fn parse_kanji_number_advanced(kanji: &str) -> Result<u64, String> {
                 total = (total + current) * 10000;
                 current = 0;
             }
-            _ => return Err(format!("Invalid kanji character: {}", ch)),
+            _ => return Err(format!("Invalid kanji character: {ch}")),
         }
         i += 1;
     }
@@ -286,13 +286,13 @@ fn parse_kanji_number(kanji: &str) -> Result<u64, String> {
                             '九' => result_str.push('9'),
                             '〇' | '零' => result_str.push('0'),
                             _ => {
-                                return Err(format!("Invalid character in digit sequence: {}", ch))
+                                return Err(format!("Invalid character in digit sequence: {ch}"))
                             }
                         }
                     }
                     return result_str
                         .parse::<u64>()
-                        .map_err(|e| format!("Parse error: {}", e));
+                        .map_err(|e| format!("Parse error: {e}"));
                 }
             }
         }
@@ -349,7 +349,7 @@ fn parse_kanji_number(kanji: &str) -> Result<u64, String> {
                 result = temp * 10000;
                 current = 0;
             }
-            _ => return Err(format!("Invalid kanji character: {}", ch)),
+            _ => return Err(format!("Invalid kanji character: {ch}")),
         }
         i += 1;
     }
