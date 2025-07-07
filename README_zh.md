@@ -7,14 +7,17 @@
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
 [![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![npm](https://img.shields.io/npm/v/lawkit-js.svg?label=lawkit-js)](https://www.npmjs.com/package/lawkit-js)
+[![PyPI](https://img.shields.io/pypi/v/lawkit-python.svg?label=lawkit-python)](https://pypi.org/project/lawkit-python/)
 [![Documentation](https://img.shields.io/badge/📚%20用户指南-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index_zh.md)
+[![API Reference](https://img.shields.io/badge/🔧%20API%20Reference-docs.rs-blue)](https://docs.rs/lawkit-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 使用多种统计法则检测异常、模式和洞察的下一代统计分析工具包。非常适合欺诈检测、数据质量评估和商业智能。
 
 ```bash
 # 传统工具一次只分析一种模式
-$ benf data.csv  # 仅本福德定律
+$ other-tool data.csv  # 单一统计分析
 
 # lawkit提供全面的多法则分析
 $ lawkit compare --laws all data.csv
@@ -34,26 +37,41 @@ $ lawkit compare --laws all data.csv
 - **⚡ 高性能**: 使用Rust构建，支持并行处理
 - **📊 丰富输出**: 文本、JSON、CSV、YAML、TOML、XML格式
 - **🔗 元链**: 统计模式的时间序列趋势分析
+- **🔍 高级异常值检测**: LOF、隔离森林、DBSCAN、集成方法
+- **📈 时间序列分析**: 趋势检测、季节性、变化点分析
+- **🚀 内存高效**: 大型数据集流式处理模式
 
-## 📊 性能基准
+## 📊 性能
+
+在AMD Ryzen 5 PRO 4650U上的真实基准测试结果：
 
 ```bash
-# 100K数据点基准测试
-# 传统工具逐个分析模式
-benf data.csv                 # 单一统计分析: ~2.1秒
-pareto data.csv               # 另一个单独分析: ~2.1秒
-
-# lawkit高效多模式分析
-lawkit benf data.csv          # 单法则: ~180ms (快11.7倍)
-lawkit compare data.csv       # 多法则分析: ~850ms (比顺序执行快2.5倍)
+# 传统工具一次分析一种模式
+$ other-tool data.csv         # 单一分析: ~2.1秒
+$ lawkit benf data.csv        # 相同分析: ~180ms (快11.7倍)
+$ lawkit compare data.csv     # 多法则分析: ~850ms
 ```
 
-| 数据集大小 | 单法则 | 多法则 | 内存使用 |
-|-----------|--------|-------|----------|
-| 1K点      | 8ms    | 25ms  | 2.1MB    |
-| 10K点     | 45ms   | 180ms | 8.4MB    |
-| 100K点    | 180ms  | 850ms | 32MB     |
-| 1M点      | 2.1秒  | 9.2秒 | 128MB    |
+## 为什么选择lawkit？
+
+传统工具一次只分析一种统计模式。`lawkit`提供全面的多法则分析。
+
+- **整体洞察**: 多个统计法则揭示不同方面
+- **智能建议**: AI支持的分析集成
+- **时间高效**: 多法则并行处理
+- **国际就绪**: 5种语言数字解析
+
+## 🏗️ 工作原理
+
+```mermaid
+graph LR
+    A[数据] --> B[解析和验证]
+    B --> C[多法则分析]
+    C --> D[风险评估]
+    D --> E[建议]
+```
+
+lawkit通过多个统计镜头同时分析您的数据，然后整合结果提供全面的洞察和建议。
 
 ## 🚀 快速开始
 
@@ -84,106 +102,70 @@ lawkit compare --laws all financial_data.csv
 lawkit compare --laws all --filter ">=1000" --format json data.csv
 ```
 
-## 🔍 支持的统计法则
+## 规格
 
-### 1. 本福德定律
-**用例**: 财务数据欺诈检测
+### 支持的统计法则
+
+- **本福德定律**: 财务数据欺诈检测
+- **帕累托分析**: 80/20法则和不平等测量  
+- **齐夫定律**: 频率分析和幂律分布
+- **正态分布**: 质量控制和异常值检测
+- **泊松分布**: 事件发生和稀有事件建模
+
+### 分析类型
+
+- 单法则分析
+- 多法则比较和集成
+- 高级异常值检测（LOF、隔离森林、DBSCAN）
+- 时间序列分析和趋势检测
+- 测试和验证数据生成
+
+### 输出格式
+
+`lawkit`以多种格式输出结果，适用于不同用例：
+
+- **文本格式（默认）**: 人类可读的分析结果
+- **JSON格式**: 用于自动化和集成的机器可读格式
+- **CSV/YAML/TOML/XML**: 各种结构化数据处理格式
+
+## 安装
+
+### CLI工具
+
 ```bash
-lawkit benf transactions.csv --threshold high
-```
-检测可能表明数据操作的不自然数字分布。
+# 从crates.io（推荐）
+cargo install lawkit
 
-### 2. 帕累托分析（80/20法则）
-**用例**: 业务优先级和不平等测量
-```bash
-lawkit pareto customer_revenue.csv --verbose
-```
-识别驱动大部分结果的重要少数。
-
-### 3. 齐夫定律
-**用例**: 频率分析和文本挖掘
-```bash
-lawkit zipf --text document.txt
-lawkit zipf website_traffic.csv
-```
-分析排名和频率的幂律分布。
-
-### 4. 正态分布
-**用例**: 质量控制和异常值检测
-```bash
-lawkit normal --quality-control --spec-limits 9.5,10.5 production.csv
-lawkit normal --outliers process_data.csv
-```
-统计过程控制和异常检测。
-
-### 5. 泊松分布
-**用例**: 事件发生和稀有事件建模
-```bash
-lawkit poisson --predict --rare-events incident_data.csv
-```
-建模和预测离散事件发生。
-
-## 国际数字支持
-
-### 支持的数字格式
-
-#### 1. 全角数字
-```bash
-echo "１２３４５６ ７８９０１２" | lawkit benf
+# 从发布版本
+wget https://github.com/kako-jun/lawkit/releases/latest/download/lawkit-linux-x86_64.tar.gz
+tar -xzf lawkit-linux-x86_64.tar.gz
 ```
 
-#### 2. 汉数字（基本）
+### 包集成
+
 ```bash
-echo "一二三四五六七八九" | lawkit benf
-```
+# Node.js集成
+npm install lawkit-js
 
-#### 3. 汉数字（位置记数法）
-```bash
-echo "一千二百三十四 五千六百七十八 九万一千二百" | lawkit benf
-```
-
-#### 4. 混合模式
-```bash
-echo "销售123万元 费用45万6千元 利润78万９千元" | lawkit benf
-```
-
-### 转换规则
-
-| 汉字 | 数字 | 备注 |
-|------|------|------|
-| 一 | 1 | 基本数字 |
-| 十 | 10 | 十位 |
-| 百 | 100 | 百位 |
-| 千 | 1000 | 千位 |
-| 万 | 10000 | 万位 |
-| 一千二百三十四 | 1234 | 位置记数法 |
-
-### 印地语数字（हिन्दी अंक）
-```bash
-# 天城文数字
-echo "१२३४५६ ७८९०१२" | lawkit benf --lang hi
-```
-
-### 阿拉伯数字（الأرقام العربية）
-```bash  
-# 东阿拉伯-印度数字
-echo "١٢٣٤٥٦ ٧٨٩٠١٢" | lawkit benf --lang ar
+# Python集成
+pip install lawkit-python
+lawkit-download-binary  # 下载CLI二进制文件
 ```
 
 ## 文档
 
-有关全面文档，请参阅：
-- 📖 **[中文文档](docs/index_zh.md)** - 完整用户指南和API参考
+有关全面的指南、示例和API文档：
+
+📚 **[用户指南](https://github.com/kako-jun/lawkit/tree/main/docs/index_zh.md)** - 安装、使用和示例  
+🔧 **[CLI参考](https://github.com/kako-jun/lawkit/tree/main/docs/reference/cli-reference_zh.md)** - 完整的命令文档  
+📊 **[统计法则指南](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/examples_zh.md)** - 详细的分析示例  
+⚡ **[性能指南](https://github.com/kako-jun/lawkit/tree/main/docs/guides/performance_zh.md)** - 优化和大型数据集  
+🌍 **[国际支持](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/configuration_zh.md)** - 多语言数字解析
 
 ## 贡献
 
-有关开发指南，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。
+我们欢迎贡献！详情请参阅我们的[贡献指南](CONTRIBUTING.md)。
 
 ## 许可证
 
-MIT许可证 - 请参阅[LICENSE](LICENSE)文件。
-
-## 参考资料
-
-- [本福德定律 - 维基百科](https://zh.wikipedia.org/wiki/本福特定律)
-- [使用本福德定律进行欺诈检测](https://example.com/benford-fraud)
+此项目根据MIT许可证授权 - 详情请参阅[LICENSE](LICENSE)文件。
