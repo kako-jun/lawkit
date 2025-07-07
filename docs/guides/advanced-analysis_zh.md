@@ -230,8 +230,8 @@ DATA_DIR="$1"
 RESULTS_DIR="batch_analysis_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$RESULTS_DIR"
 
-# 并行处理所有文件
-find "$DATA_DIR" -name "*.csv" | parallel -j8 --eta "
+# 批量处理所有文件
+find "$DATA_DIR" -name "*.csv" | xargs -P 8 -I {} bash -c "
     echo '处理文件: {}'
     
     # 创建文件特定的结果目录

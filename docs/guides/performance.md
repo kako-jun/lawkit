@@ -218,7 +218,6 @@ for size in 1000 5000 10000 50000; do
     time lawkit benf large_dataset.csv --sample-size $size --quiet
 done
 
-# Test different thread counts
 # Performance comparison
 echo "Testing standard mode:"
 time lawkit compare data.csv --quiet

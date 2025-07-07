@@ -151,14 +151,8 @@ lawkit benf small_data.csv --min-count 10
 **A:** 使用流式处理：
 
 ```bash
-# 启用流式处理
-lawkit benf large_file.csv --streaming
-
-# 调整块大小
-lawkit benf large_file.csv --streaming --chunk-size 10000
-
-# 限制内存使用
-lawkit benf large_file.csv --memory-limit 1GB
+# 启用性能优化
+lawkit benf large_file.csv --optimize
 ```
 
 ### Q: 如何加速分析？
@@ -166,9 +160,6 @@ lawkit benf large_file.csv --memory-limit 1GB
 **A:** 几种优化方法：
 
 ```bash
-# 并行处理
-lawkit compare data.csv --parallel --threads 8
-
 # 启用优化模式
 lawkit benf data.csv --optimize
 
@@ -176,7 +167,7 @@ lawkit benf data.csv --optimize
 lawkit benf data.csv --quiet
 
 # 批量处理
-find . -name "*.csv" | parallel lawkit benf
+find . -name "*.csv" | xargs -I {} lawkit benf {}
 ```
 
 ### Q: 分析卡住或很慢怎么办？
@@ -194,9 +185,9 @@ find . -name "*.csv" | parallel lawkit benf
    lawkit benf your_file.csv --debug
    ```
 
-3. 尝试流式处理：
+3. 尝试性能优化：
    ```bash
-   lawkit benf your_file.csv --streaming --verbose
+   lawkit benf your_file.csv --optimize --verbose
    ```
 
 ## 输出和格式

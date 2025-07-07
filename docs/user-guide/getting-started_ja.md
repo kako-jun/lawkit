@@ -182,7 +182,7 @@ lawkit pareto sales.csv --threshold 0.95
 lawkit benf large_data.csv --sample-size 10000
 
 # 並列処理のスレッド数指定
-lawkit compare data.csv --threads 4
+lawkit compare data.csv --optimize
 ```
 
 ## よく使われるワークフロー

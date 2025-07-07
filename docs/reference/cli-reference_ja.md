@@ -69,7 +69,7 @@ lawkit benf expenses.csv --confidence 0.99
 lawkit benf transactions.csv --min-value 1000 --max-value 100000
 
 # 日本語対応
-lawkit benf 会計データ.csv --language ja
+lawkit benf 会計データ.csv --optimize
 
 # JSON出力
 lawkit benf data.csv --output json
@@ -128,7 +128,7 @@ lawkit zipf [ファイル] [オプション]
 | `--max-words` | 整数 | 最大単語数 | 1000 |
 | `--case-sensitive` | - | 大文字小文字を区別 | false |
 | `--remove-stopwords` | - | ストップワードを除去 | true |
-| `--language` | 文字列 | テキスト言語 | auto |
+| `--optimize` | フラグ | 最適化モード | false |
 
 #### 例
 
@@ -137,7 +137,7 @@ lawkit zipf [ファイル] [オプション]
 lawkit zipf document.txt
 
 # 日本語テキスト分析
-lawkit zipf 文書.txt --language ja
+lawkit zipf 文書.txt --optimize
 
 # 高頻度単語のみ抽出
 lawkit zipf text.txt --min-frequency 10
@@ -413,13 +413,13 @@ lawkit benf huge_file.csv
 lawkit benf large_file.csv --sample-size 50000
 
 # 並列処理
-lawkit compare data.csv --parallel --threads 8
+lawkit compare data.csv --optimize
 
 # ストリーミング処理
-lawkit benf big_data.csv --streaming --chunk-size 50000
+lawkit benf big_data.csv --optimize
 
 # 時系列分析の並列処理
-lawkit normal timeseries.csv --enable-timeseries --parallel
+lawkit normal timeseries.csv --enable-timeseries --optimize
 ```
 
 このリファレンスを使用して、lawkitの全機能を効果的に活用してください。

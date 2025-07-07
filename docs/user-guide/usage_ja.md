@@ -34,7 +34,7 @@ lawkit <サブコマンド> [オプション] <入力>
 ### 共通オプション
 
 - `--format <フォーマット>` - 出力形式 (text, json, csv, yaml, toml, xml)
-- `--lang <言語>` - 出力言語 (en, ja, zh, hi, ar, auto)
+- `--optimize` - 最適化モード有効化 (true/false)
 - `--quiet` - 最小限の出力
 - `--verbose` - 詳細分析
 - `--filter <範囲>` - データの範囲フィルタ
@@ -96,7 +96,7 @@ lawkit zipf --text document.txt
 lawkit zipf --verbose city_populations.csv
 
 # 多言語テキスト分析
-lawkit zipf --text --lang ja japanese_text.txt
+lawkit zipf --text japanese_text.txt --optimize
 ```
 
 **使用例:**
@@ -290,15 +290,11 @@ lawkit benf --min-count 100 data.csv
 ### 言語選択
 
 ```bash
-# 自動検出（デフォルト）
-lawkit benf --lang auto data.csv
+# 最適化モード（デフォルト）
+lawkit benf data.csv --optimize
 
-# 特定言語
-lawkit benf --lang en data.csv    # 英語
-lawkit benf --lang ja data.csv    # 日本語
-lawkit benf --lang zh data.csv    # 中国語
-lawkit benf --lang hi data.csv    # ヒンディー語
-lawkit benf --lang ar data.csv    # アラビア語
+# 最適化モード
+lawkit benf data.csv --optimize    # 高速処理有効化
 ```
 
 ### 国際数字
@@ -402,7 +398,7 @@ lawkit poisson --predict --max-events 20 incidents.csv
 lawkit zipf --text document.txt
 
 # 多言語テキスト処理
-lawkit zipf --text --lang ja japanese_document.txt
+lawkit zipf --text japanese_document.txt --optimize
 ```
 
 ## 使用例別
@@ -440,7 +436,7 @@ lawkit poisson --verbose --test all defect_counts.csv
 lawkit zipf --text --verbose document.txt
 
 # 多言語文書分析
-lawkit zipf --text --lang auto multilingual_doc.txt
+lawkit zipf --text multilingual_doc.txt --optimize
 ```
 
 ### ビジネスインテリジェンス
