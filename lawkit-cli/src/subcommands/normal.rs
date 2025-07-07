@@ -367,8 +367,8 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
             println!("Standard Deviation: {:.3}", result.std_dev);
 
             if let (Some(cp), Some(cpk)) = (result.cp, result.cpk) {
-                println!("Cp: {:.3}", cp);
-                println!("Cpk: {:.3}", cpk);
+                println!("Cp: {cp:.3}");
+                println!("Cpk: {cpk:.3}");
 
                 if let Some(ref capability) = result.process_capability {
                     let cap_text = match capability {
@@ -377,12 +377,12 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
                         ProcessCapability::Poor => "Poor",
                         ProcessCapability::Inadequate => "Inadequate",
                     };
-                    println!("Process Capability: {}", cap_text);
+                    println!("Process Capability: {cap_text}");
                 }
             }
 
             if let Some(within_spec) = result.within_spec_percent {
-                println!("Within Specification: {:.1}%", within_spec);
+                println!("Within Specification: {within_spec:.1}%");
             }
         }
         "json" => {
