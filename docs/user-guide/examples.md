@@ -11,7 +11,7 @@ Practical usage examples of lawkit based on real-world use cases.
 lawkit benf expenses_2024.csv --columns "Amount" --output json
 
 # Detailed analysis with verbose output
-lawkit benf expenses_2024.csv --language en --verbose
+lawkit benf expenses_2024.csv --verbose
 
 # Comprehensive analysis with multiple laws
 lawkit compare expenses_2024.csv --laws benford,normal --detect-conflicts
@@ -68,7 +68,7 @@ lawkit normal seasonal_demand.csv --quality-control --verbose
 
 ```bash
 # Word frequency analysis
-lawkit zipf website_content.txt --language en --top-words 100
+lawkit zipf website_content.txt --top-words 100
 
 # Content distribution analysis
 lawkit zipf blog_posts.txt --min-count 5 --correlation 0.8
@@ -191,20 +191,111 @@ pipeline {
 
 ```bash
 # Enable streaming for large files
-lawkit benf large_dataset.csv --optimize --min-count 1000
+lawkit benf large_dataset.csv --min-count 1000
 
 # Parallel processing for multiple files
-find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {} --optimize
+find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
 ```
 
 ### Memory-Efficient Analysis
 
 ```bash
 # Process 100GB+ datasets efficiently
-lawkit benf huge_data.csv --optimize --format json | jq '.risk_level'
+lawkit benf huge_data.csv --format json | jq '.risk_level'
 
 # Streaming analysis with real-time output
-tail -f live_data.log | lawkit benf --optimize --quiet
+tail -f live_data.log | lawkit benf --quiet
+```
+
+## 5. Generate and Self-Testing Examples
+
+### Case: Data Generation for Testing and Education
+
+```bash
+# Generate Benford's Law samples for fraud detection testing
+lawkit generate benf --samples 10000 --seed 42 > benf_test_data.txt
+
+# Test our detection capability
+lawkit benf benf_test_data.txt --format json
+
+# Generate with fraud injection for validation
+lawkit generate benf --samples 5000 --fraud-rate 0.3 > fraud_data.txt
+lawkit benf fraud_data.txt --threshold critical
+```
+
+### Case: Statistical Education and Demonstration
+
+```bash
+# Demonstrate Central Limit Theorem
+for i in {1..5}; do
+  echo "Sample $i:"
+  lawkit generate normal --samples 1000 --mean 100 --stddev 15 | 
+  lawkit normal --verbose | grep "Mean:"
+done
+
+# Show Pareto Principle (80/20 rule)
+lawkit generate pareto --samples 10000 --concentration 0.8 | 
+lawkit pareto --business-analysis --format json | 
+jq '.pareto_analysis.concentration_ratio'
+
+# Validate Zipf's Law in generated text
+lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000 | 
+lawkit zipf --text --format json | 
+jq '.correlation_coefficient'
+```
+
+### Case: Method Validation and Cross-Testing
+
+```bash
+# Generate and immediately analyze pipeline
+lawkit generate poisson --samples 1000 --lambda 2.5 | 
+lawkit poisson --predict --format json
+
+# Cross-validation between laws
+lawkit generate normal --samples 5000 --mean 50 --stddev 10 > normal_data.txt
+lawkit compare normal_data.txt --laws normal,benf,zipf --detect-conflicts
+
+# Comprehensive self-testing
+lawkit selftest --comprehensive
+
+# Performance testing with generated data
+time lawkit generate benf --samples 100000 | lawkit benf --quiet
+```
+
+### Case: Continuous Integration Testing
+
+```bash
+#!/bin/bash
+# CI/CD test script using generated data
+
+echo "Running statistical accuracy tests..."
+
+# Test 1: Benford's Law accuracy
+BENF_RESULT=$(lawkit generate benf --samples 10000 --seed 123 | 
+              lawkit benf --format json | jq -r '.risk_level')
+if [ "$BENF_RESULT" != "Low" ]; then
+    echo "❌ Benford test failed: Expected Low risk, got $BENF_RESULT"
+    exit 1
+fi
+
+# Test 2: Normal distribution detection
+NORMAL_RESULT=$(lawkit generate normal --samples 1000 --mean 0 --stddev 1 | 
+                lawkit normal --test shapiro --format json | jq -r '.is_normal')
+if [ "$NORMAL_RESULT" != "true" ]; then
+    echo "❌ Normal test failed: Expected true, got $NORMAL_RESULT"
+    exit 1
+fi
+
+# Test 3: Poisson parameter estimation
+LAMBDA_RESULT=$(lawkit generate poisson --samples 5000 --lambda 3.0 | 
+                lawkit poisson --format json | jq -r '.lambda')
+LAMBDA_DIFF=$(echo "$LAMBDA_RESULT - 3.0" | bc -l | tr -d '-')
+if (( $(echo "$LAMBDA_DIFF > 0.2" | bc -l) )); then
+    echo "❌ Poisson test failed: Lambda estimation off by $LAMBDA_DIFF"
+    exit 1
+fi
+
+echo "✅ All statistical accuracy tests passed"
 ```
 
 ## Configuration Examples

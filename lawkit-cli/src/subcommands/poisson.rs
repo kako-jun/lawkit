@@ -61,17 +61,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let numbers = match parse_text_input(&buffer) {
         Ok(numbers) => numbers,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
 
     if numbers.is_empty() {
-        let language = get_language(matches);
-        let error_msg = localized_text("no_numbers_found", language);
-        eprintln!("{error_msg}");
+        eprintln!("Error: No valid numbers found in input");
         std::process::exit(1);
     }
 
@@ -83,9 +79,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
         Ok(result) => result,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
@@ -168,25 +162,22 @@ fn output_results(matches: &clap::ArgMatches, result: &PoissonResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
-    let language = get_language(matches);
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose, language),
+        "text" => print_text_output(result, quiet, verbose),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
         "toml" => print_toml_output(result),
         "xml" => print_xml_output(result),
         _ => {
-            let error_msg = localized_text("unsupported_format", language);
-            eprintln!("{error_msg}: {format}");
+            eprintln!("Error: Unsupported output format: {format}");
             std::process::exit(2);
         }
     }
 }
 
 fn output_poisson_test_result(matches: &clap::ArgMatches, result: &PoissonTestResult) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -194,30 +185,13 @@ fn output_poisson_test_result(matches: &clap::ArgMatches, result: &PoissonTestRe
 
     match format_str {
         "text" => {
-            println!(
-                "{}: {}",
-                localized_text("poisson_test_result", language),
-                result.test_name
-            );
-            println!(
-                "{}: {:.6}",
-                localized_text("test_statistic", language),
-                result.statistic
-            );
-            println!(
-                "{}: {:.6}",
-                localized_text("p_value", language),
-                result.p_value
-            );
+            println!("Poisson Test Result: {}", result.test_name);
+            println!("Test statistic: {:.6}", result.statistic);
+            println!("P-value: {:.6}", result.p_value);
             println!("λ: {:.3}", result.parameter_lambda);
             println!(
-                "{}: {}",
-                localized_text("is_poisson", language),
-                if result.is_poisson {
-                    localized_text("yes", language)
-                } else {
-                    localized_text("no", language)
-                }
+                "Is Poisson: {}",
+                if result.is_poisson { "Yes" } else { "No" }
             );
         }
         "json" => {
@@ -237,7 +211,6 @@ fn output_poisson_test_result(matches: &clap::ArgMatches, result: &PoissonTestRe
 }
 
 fn output_prediction_result(matches: &clap::ArgMatches, result: &EventProbabilityResult) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -245,25 +218,14 @@ fn output_prediction_result(matches: &clap::ArgMatches, result: &EventProbabilit
 
     match format_str {
         "text" => {
-            println!(
-                "{} (λ = {:.3})",
-                localized_text("event_probability_prediction", language),
-                result.lambda
-            );
-            println!(
-                "{}: {}",
-                localized_text("most_likely_count", language),
-                result.most_likely_count
-            );
+            println!("Event Probability Prediction (λ = {:.3})", result.lambda);
+            println!("Most likely count: {}", result.most_likely_count);
             println!();
 
             for prob in &result.probabilities {
                 println!(
-                    "P(X = {}) = {:.6} ({}累積: {:.6})",
-                    prob.event_count,
-                    prob.probability,
-                    localized_text("cumulative", language),
-                    prob.cumulative_probability
+                    "P(X = {}) = {:.6} (cumulative: {:.6})",
+                    prob.event_count, prob.probability, prob.cumulative_probability
                 );
             }
 
@@ -296,7 +258,6 @@ fn output_prediction_result(matches: &clap::ArgMatches, result: &EventProbabilit
 }
 
 fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnalysis) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -304,55 +265,38 @@ fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnaly
 
     match format_str {
         "text" => {
-            println!(
-                "{} (λ = {:.3})",
-                localized_text("rare_events_analysis", language),
-                result.lambda
-            );
-            println!(
-                "{}: {}",
-                localized_text("total_observations", language),
-                result.total_observations
-            );
+            println!("Rare Events Analysis (λ = {:.3})", result.lambda);
+            println!("Total observations: {}", result.total_observations);
             println!();
 
-            println!("{}:", localized_text("rare_event_thresholds", language));
+            println!("Rare Event Thresholds:");
             println!(
-                "  95%: {} ({} {})",
-                result.threshold_95,
-                result.rare_events_95,
-                localized_text("events", language)
+                "  95%: {} ({} events)",
+                result.threshold_95, result.rare_events_95
             );
             println!(
-                "  99%: {} ({} {})",
-                result.threshold_99,
-                result.rare_events_99,
-                localized_text("events", language)
+                "  99%: {} ({} events)",
+                result.threshold_99, result.rare_events_99
             );
             println!(
-                "  99.9%: {} ({} {})",
-                result.threshold_999,
-                result.rare_events_999,
-                localized_text("events", language)
+                "  99.9%: {} ({} events)",
+                result.threshold_999, result.rare_events_999
             );
 
             if !result.extreme_events.is_empty() {
                 println!();
-                println!("{}:", localized_text("extreme_events", language));
+                println!("Extreme Events:");
                 for event in &result.extreme_events {
                     println!(
-                        "  {}: {} {} (P = {:.6})",
-                        localized_text("index", language),
-                        event.index,
-                        event.event_count,
-                        event.probability
+                        "  Index: {} {} (P = {:.6})",
+                        event.index, event.event_count, event.probability
                     );
                 }
             }
 
             if result.clustering_detected {
                 println!();
-                println!("⚠️ {}", localized_text("clustering_detected", language));
+                println!("⚠️ Event clustering detected");
             }
         }
         "json" => {
@@ -384,7 +328,7 @@ fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnaly
     }
 }
 
-fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &str) {
+fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool) {
     if quiet {
         println!("lambda: {:.3}", result.lambda);
         println!("variance_ratio: {:.3}", result.variance_ratio);
@@ -392,50 +336,22 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &
         return;
     }
 
-    println!("{}", localized_text("poisson_analysis_results", lang));
+    println!("Poisson Distribution Analysis Results");
     println!();
-    println!(
-        "{}: {}",
-        localized_text("dataset", lang),
-        result.dataset_name
-    );
-    println!(
-        "{}: {}",
-        localized_text("numbers_analyzed", lang),
-        result.numbers_analyzed
-    );
-    println!(
-        "{}: {:?}",
-        localized_text("risk_level", lang),
-        result.risk_level
-    );
+    println!("Dataset: {}", result.dataset_name);
+    println!("Numbers analyzed: {}", result.numbers_analyzed);
+    println!("Quality Level: {:?}", result.risk_level);
 
     println!();
-    println!("{}:", localized_text("poisson_parameters", lang));
-    println!(
-        "  λ ({}): {:.3}",
-        localized_text("lambda", lang),
-        result.lambda
-    );
-    println!(
-        "  {}: {:.3}",
-        localized_text("sample_mean", lang),
-        result.sample_mean
-    );
-    println!(
-        "  {}: {:.3}",
-        localized_text("sample_variance", lang),
-        result.sample_variance
-    );
-    println!(
-        "  {}: {:.3}",
-        localized_text("variance_ratio", lang),
-        result.variance_ratio
-    );
+    println!("Poisson Parameters:");
+    println!("  λ (rate parameter): {:.3}", result.lambda);
+    println!("  Sample mean: {:.3}", result.sample_mean);
+    println!("  Sample variance: {:.3}", result.sample_variance);
+    println!("  Variance/Mean ratio: {:.3}", result.variance_ratio);
 
     if verbose {
         println!();
-        println!("{}:", localized_text("goodness_of_fit_tests", lang));
+        println!("Goodness of Fit Tests:");
         println!(
             "  Chi-Square: χ²={:.3}, p={:.3}",
             result.chi_square_statistic, result.chi_square_p_value
@@ -446,25 +362,19 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &
         );
 
         println!();
-        println!("{}:", localized_text("fit_assessment", lang));
+        println!("Fit Assessment:");
         println!(
-            "  {}: {:.3}",
-            localized_text("goodness_of_fit_score", lang),
+            "  Goodness of fit score: {:.3}",
             result.goodness_of_fit_score
         );
+        println!("  Poisson quality: {:.3}", result.poisson_quality);
         println!(
-            "  {}: {:.3}",
-            localized_text("poisson_quality", lang),
-            result.poisson_quality
-        );
-        println!(
-            "  {}: {:?}",
-            localized_text("distribution_assessment", lang),
+            "  Distribution assessment: {:?}",
             result.distribution_assessment
         );
 
         println!();
-        println!("{}:", localized_text("event_probabilities", lang));
+        println!("Event Probabilities:");
         println!("  P(X = 0) = {:.3}", result.probability_zero);
         println!("  P(X = 1) = {:.3}", result.probability_one);
         println!("  P(X ≥ 2) = {:.3}", result.probability_two_or_more);
@@ -472,66 +382,53 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, lang: &
         if result.rare_events_count > 0 {
             println!();
             println!(
-                "{}: {} ({} ≥ {})",
-                localized_text("rare_events", lang),
-                result.rare_events_count,
-                localized_text("events", lang),
-                result.rare_events_threshold
+                "Rare events: {} (events ≥ {})",
+                result.rare_events_count, result.rare_events_threshold
             );
         }
 
         println!();
-        println!("{}:", localized_text("interpretation", lang));
-        print_poisson_interpretation(result, lang);
+        println!("Interpretation:");
+        print_poisson_interpretation(result);
     }
 }
 
-fn print_poisson_interpretation(result: &PoissonResult, lang: &str) {
+fn print_poisson_interpretation(result: &PoissonResult) {
     use lawkit_core::laws::poisson::result::PoissonAssessment;
 
     match result.distribution_assessment {
         PoissonAssessment::Excellent => {
-            println!("✅ {}", localized_text("excellent_poisson_fit", lang));
-            println!("   {}", localized_text("data_follows_poisson", lang));
+            println!("✅ Excellent Poisson distribution fit");
+            println!("   Data closely follows Poisson distribution");
         }
         PoissonAssessment::Good => {
-            println!("✅ {}", localized_text("good_poisson_fit", lang));
-            println!("   {}", localized_text("acceptable_poisson_fit", lang));
+            println!("✅ Good Poisson distribution fit");
+            println!("   Acceptable fit to Poisson distribution");
         }
         PoissonAssessment::Moderate => {
-            println!("⚠️  {}", localized_text("moderate_poisson_fit", lang));
-            println!(
-                "   {}",
-                localized_text("some_deviations_from_poisson", lang)
-            );
+            println!("⚠️  Moderate Poisson distribution fit");
+            println!("   Some deviations from Poisson distribution");
         }
         PoissonAssessment::Poor => {
-            println!("🚨 {}", localized_text("poor_poisson_fit", lang));
-            println!(
-                "   {}",
-                localized_text("significant_deviations_from_poisson", lang)
-            );
+            println!("🚨 Poor Poisson distribution fit");
+            println!("   Significant deviations from Poisson distribution");
         }
         PoissonAssessment::NonPoisson => {
-            println!("🔍 {}", localized_text("non_poisson_distribution", lang));
-            println!("   {}", localized_text("data_not_poisson", lang));
+            println!("🔍 Non-Poisson distribution");
+            println!("   Data does not follow Poisson distribution");
         }
     }
 
     // 分散/平均比に基づく解釈
     if result.variance_ratio > 1.5 {
-        println!("   📊 {}", localized_text("overdispersed", lang));
+        println!("   📊 Distribution is overdispersed");
     } else if result.variance_ratio < 0.7 {
-        println!("   📊 {}", localized_text("underdispersed", lang));
+        println!("   📊 Distribution is underdispersed");
     }
 
     // 稀少事象の解釈
     if result.rare_events_count > 0 {
-        println!(
-            "   🎯 {}: {}",
-            localized_text("rare_events_detected", lang),
-            result.rare_events_count
-        );
+        println!("   🎯 Rare events detected: {}", result.rare_events_count);
     }
 }
 
@@ -636,149 +533,6 @@ fn print_xml_output(result: &PoissonResult) {
         result.goodness_of_fit_score
     );
     println!("</poisson_analysis>");
-}
-
-fn get_language(matches: &clap::ArgMatches) -> &str {
-    match matches.get_one::<String>("language").map(|s| s.as_str()) {
-        Some("auto") | None => {
-            let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") {
-                "ja"
-            } else if lang.starts_with("zh") {
-                "zh"
-            } else if lang.starts_with("hi") {
-                "hi"
-            } else if lang.starts_with("ar") {
-                "ar"
-            } else {
-                "en"
-            }
-        }
-        Some("en") => "en",
-        Some("ja") => "ja",
-        Some("zh") => "zh",
-        Some("hi") => "hi",
-        Some("ar") => "ar",
-        Some(_) => "en",
-    }
-}
-
-fn localized_text(key: &str, lang: &str) -> &'static str {
-    match (lang, key) {
-        // English
-        ("en", "poisson_analysis_results") => "Poisson Distribution Analysis Results",
-        ("en", "dataset") => "Dataset",
-        ("en", "numbers_analyzed") => "Numbers analyzed",
-        ("en", "risk_level") => "Quality Level",
-        ("en", "poisson_parameters") => "Poisson Parameters",
-        ("en", "lambda") => "rate parameter",
-        ("en", "sample_mean") => "Sample mean",
-        ("en", "sample_variance") => "Sample variance",
-        ("en", "variance_ratio") => "Variance/Mean ratio",
-        ("en", "goodness_of_fit_tests") => "Goodness of Fit Tests",
-        ("en", "fit_assessment") => "Fit Assessment",
-        ("en", "goodness_of_fit_score") => "Goodness of fit score",
-        ("en", "poisson_quality") => "Poisson quality",
-        ("en", "distribution_assessment") => "Distribution assessment",
-        ("en", "event_probabilities") => "Event Probabilities",
-        ("en", "rare_events") => "Rare events",
-        ("en", "events") => "events",
-        ("en", "interpretation") => "Interpretation",
-        ("en", "excellent_poisson_fit") => "Excellent Poisson distribution fit",
-        ("en", "data_follows_poisson") => "Data closely follows Poisson distribution",
-        ("en", "good_poisson_fit") => "Good Poisson distribution fit",
-        ("en", "acceptable_poisson_fit") => "Acceptable fit to Poisson distribution",
-        ("en", "moderate_poisson_fit") => "Moderate Poisson distribution fit",
-        ("en", "some_deviations_from_poisson") => "Some deviations from Poisson distribution",
-        ("en", "poor_poisson_fit") => "Poor Poisson distribution fit",
-        ("en", "significant_deviations_from_poisson") => {
-            "Significant deviations from Poisson distribution"
-        }
-        ("en", "non_poisson_distribution") => "Non-Poisson distribution",
-        ("en", "data_not_poisson") => "Data does not follow Poisson distribution",
-        ("en", "overdispersed") => "Distribution is overdispersed",
-        ("en", "underdispersed") => "Distribution is underdispersed",
-        ("en", "rare_events_detected") => "Rare events detected",
-        ("en", "poisson_test_result") => "Poisson Test Result",
-        ("en", "test_statistic") => "Test statistic",
-        ("en", "p_value") => "P-value",
-        ("en", "is_poisson") => "Is Poisson",
-        ("en", "yes") => "Yes",
-        ("en", "no") => "No",
-        ("en", "event_probability_prediction") => "Event Probability Prediction",
-        ("en", "most_likely_count") => "Most likely count",
-        ("en", "cumulative") => "cumulative",
-        ("en", "rare_events_analysis") => "Rare Events Analysis",
-        ("en", "total_observations") => "Total observations",
-        ("en", "rare_event_thresholds") => "Rare Event Thresholds",
-        ("en", "extreme_events") => "Extreme Events",
-        ("en", "index") => "Index",
-        ("en", "clustering_detected") => "Event clustering detected",
-        ("en", "unsupported_format") => "Error: Unsupported output format",
-        ("en", "no_numbers_found") => "Error: No valid numbers found in input",
-        ("en", "analysis_error") => "Analysis error",
-
-        // 日本語
-        ("ja", "poisson_analysis_results") => "ポアソン分布解析結果",
-        ("ja", "dataset") => "データセット",
-        ("ja", "numbers_analyzed") => "解析した数値数",
-        ("ja", "risk_level") => "品質レベル",
-        ("ja", "poisson_parameters") => "ポアソンパラメータ",
-        ("ja", "lambda") => "発生率パラメータ",
-        ("ja", "sample_mean") => "標本平均",
-        ("ja", "sample_variance") => "標本分散",
-        ("ja", "variance_ratio") => "分散/平均比",
-        ("ja", "goodness_of_fit_tests") => "適合度検定",
-        ("ja", "fit_assessment") => "適合度評価",
-        ("ja", "goodness_of_fit_score") => "適合度スコア",
-        ("ja", "poisson_quality") => "ポアソン品質",
-        ("ja", "distribution_assessment") => "分布評価",
-        ("ja", "event_probabilities") => "イベント発生確率",
-        ("ja", "rare_events") => "稀少事象",
-        ("ja", "events") => "事象",
-        ("ja", "interpretation") => "解釈",
-        ("ja", "excellent_poisson_fit") => "優れたポアソン分布適合",
-        ("ja", "data_follows_poisson") => "データはポアソン分布に良く従っています",
-        ("ja", "good_poisson_fit") => "良いポアソン分布適合",
-        ("ja", "acceptable_poisson_fit") => "ポアソン分布への許容できる適合",
-        ("ja", "moderate_poisson_fit") => "中程度のポアソン分布適合",
-        ("ja", "some_deviations_from_poisson") => "ポアソン分布からの軽微な偏差",
-        ("ja", "poor_poisson_fit") => "不十分なポアソン分布適合",
-        ("ja", "significant_deviations_from_poisson") => "ポアソン分布からの有意な偏差",
-        ("ja", "non_poisson_distribution") => "非ポアソン分布",
-        ("ja", "data_not_poisson") => "データはポアソン分布に従いません",
-        ("ja", "overdispersed") => "分布は過分散です",
-        ("ja", "underdispersed") => "分布は過少分散です",
-        ("ja", "rare_events_detected") => "稀少事象が検出されました",
-        ("ja", "poisson_test_result") => "ポアソン検定結果",
-        ("ja", "test_statistic") => "検定統計量",
-        ("ja", "p_value") => "p値",
-        ("ja", "is_poisson") => "ポアソン分布か",
-        ("ja", "yes") => "はい",
-        ("ja", "no") => "いいえ",
-        ("ja", "event_probability_prediction") => "イベント発生確率予測",
-        ("ja", "most_likely_count") => "最頻発生数",
-        ("ja", "cumulative") => "累積",
-        ("ja", "rare_events_analysis") => "稀少事象分析",
-        ("ja", "total_observations") => "総観測数",
-        ("ja", "rare_event_thresholds") => "稀少事象閾値",
-        ("ja", "extreme_events") => "極端事象",
-        ("ja", "index") => "インデックス",
-        ("ja", "clustering_detected") => "事象クラスタリングが検出されました",
-        ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
-        ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
-        ("ja", "analysis_error") => "解析エラー",
-
-        // Default English
-        (_, "poisson_analysis_results") => "Poisson Distribution Analysis Results",
-        (_, "dataset") => "Dataset",
-        (_, "numbers_analyzed") => "Numbers analyzed",
-        (_, "risk_level") => "Quality Level",
-        (_, "unsupported_format") => "Error: Unsupported output format",
-        (_, "no_numbers_found") => "Error: No valid numbers found in input",
-        (_, "analysis_error") => "Analysis error",
-        (_, _) => "Unknown message",
-    }
 }
 
 /// Analyze numbers with filtering and custom options

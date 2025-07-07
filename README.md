@@ -253,7 +253,7 @@ lawkit generate benf --samples 100 | lawkit benf --quiet
 
 ### Advanced Analysis Features
 
-lawkit 2.0 introduces sophisticated analysis capabilities:
+lawkit 2.1 introduces sophisticated analysis capabilities:
 
 ```bash
 # Advanced outlier detection with ensemble methods

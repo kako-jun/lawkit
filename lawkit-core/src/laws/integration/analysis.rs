@@ -394,35 +394,35 @@ fn generate_resolution_strategies(
     for conflict in detailed_conflicts {
         let strategy = match conflict.base_conflict.conflict_type {
             ConflictType::DistributionMismatch => ResolutionStrategy {
-                strategy_name: "分布タイプ適合化".to_string(),
+                strategy_name: "Distribution Type Optimization".to_string(),
                 priority: Priority::High,
                 steps: vec![
-                    "データタイプ（連続/離散）を確認".to_string(),
-                    "最適な分布法則を選択".to_string(),
-                    "不適切な法則の結果を除外".to_string(),
+                    "Check data type (continuous/discrete)".to_string(),
+                    "Select optimal distribution law".to_string(),
+                    "Exclude inappropriate law results".to_string(),
                 ],
-                expected_outcome: "分布適合性の向上".to_string(),
+                expected_outcome: "Improved distribution compatibility".to_string(),
                 confidence: 0.85,
             },
             ConflictType::QualityDisagreement => ResolutionStrategy {
-                strategy_name: "品質評価統合".to_string(),
+                strategy_name: "Quality Assessment Integration".to_string(),
                 priority: Priority::Medium,
                 steps: vec![
-                    "ベンフォード法則を品質評価の基準とする".to_string(),
-                    "他法則は補助的評価として利用".to_string(),
-                    "総合品質スコアで最終判定".to_string(),
+                    "Use Benford's Law as quality assessment baseline".to_string(),
+                    "Utilize other laws as supplementary evaluation".to_string(),
+                    "Make final decision with comprehensive quality score".to_string(),
                 ],
-                expected_outcome: "一貫した品質評価".to_string(),
+                expected_outcome: "Consistent quality assessment".to_string(),
                 confidence: 0.75,
             },
             _ => ResolutionStrategy {
-                strategy_name: "総合評価重視".to_string(),
+                strategy_name: "Comprehensive Evaluation Focus".to_string(),
                 priority: Priority::Low,
                 steps: vec![
-                    "複数法則の結果を総合的に判断".to_string(),
-                    "矛盾点は補完情報として活用".to_string(),
+                    "Judge results from multiple laws comprehensively".to_string(),
+                    "Utilize contradictory points as complementary information".to_string(),
                 ],
-                expected_outcome: "包括的分析結果".to_string(),
+                expected_outcome: "Comprehensive analysis results".to_string(),
                 confidence: 0.6,
             },
         };
@@ -593,7 +593,7 @@ fn assess_conflict_impact(_conflict: &Conflict, _result: &IntegrationResult) -> 
     ImpactLevel::Medium
 }
 fn perform_root_cause_analysis(_conflict: &Conflict, _result: &IntegrationResult) -> String {
-    "分析中".to_string()
+    "Under analysis".to_string()
 }
 fn calculate_conflict_confidence_interval(
     _conflict: &Conflict,
@@ -608,7 +608,7 @@ fn calculate_pattern_severity(
     0.5
 }
 fn describe_conflict_pattern(_conflict_type: &ConflictType) -> String {
-    "パターン分析中".to_string()
+    "Pattern analysis in progress".to_string()
 }
 fn calculate_synergy_score(_law_a: &str, _law_b: &str, _result: &IntegrationResult) -> f64 {
     0.5

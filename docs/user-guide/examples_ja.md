@@ -11,7 +11,7 @@
 lawkit benf expenses_2024.csv --columns "金額" --output json
 
 # 詳細分析（日本語数字対応）
-lawkit benf expenses_2024.csv --language ja --verbose
+lawkit benf expenses_2024.csv  --verbose
 
 # 複数法則での包括分析
 lawkit compare expenses_2024.csv --laws benford,normal --detect-conflicts
@@ -98,7 +98,7 @@ lawkit poisson defect_history.csv --forecast 30 --confidence 0.95
 
 ```bash
 # 日本語テキストの分析
-lawkit zipf customer_feedback.txt --language ja --min-frequency 3
+lawkit zipf customer_feedback.txt  --min-frequency 3
 
 # キーワード頻度の抽出
 lawkit zipf reviews.txt --max-words 100 --output json
@@ -108,8 +108,7 @@ lawkit zipf reviews.txt --max-words 100 --output json
 
 ```bash
 # 複数言語対応分析
-lawkit zipf social_posts.txt --language auto
-
+lawkit zipf social_posts.txt 
 # トレンド分析用データ出力
 lawkit zipf tweets.txt --output csv --columns "単語,頻度,順位"
 ```

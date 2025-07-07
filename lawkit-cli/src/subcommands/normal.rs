@@ -293,30 +293,10 @@ fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTe
 
     match format_str {
         "text" => {
-            println!(
-                "{}: {}",
-                "English Text",
-                result.test_name
-            );
-            println!(
-                "{}: {:.6}",
-                "English Text",
-                result.statistic
-            );
-            println!(
-                "{}: {:.6}",
-                "English Text",
-                result.p_value
-            );
-            println!(
-                "{}: {}",
-                "English Text",
-                if result.is_normal {
-                    "English Text"
-                } else {
-                    "English Text"
-                }
-            );
+            println!("Test: {}", result.test_name);
+            println!("Statistic: {:.6}", result.statistic);
+            println!("P-value: {:.6}", result.p_value);
+            println!("Is Normal: {}", if result.is_normal { "Yes" } else { "No" });
         }
         "json" => {
             use serde_json::json;
@@ -333,7 +313,6 @@ fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTe
             &NormalResult::new("test".to_string(), &[0.0; 10]).unwrap(),
             false,
             false,
-           
         ),
     }
 }
@@ -346,27 +325,13 @@ fn output_outlier_detection_result(matches: &clap::ArgMatches, result: &OutlierD
 
     match format_str {
         "text" => {
-            println!(
-                "{}: {}",
-                "English Text",
-                result.method_name
-            );
-            println!(
-                "{}: {}",
-                "English Text",
-                result.outliers.len()
-            );
+            println!("Method: {}", result.method_name);
+            println!("Outliers found: {}", result.outliers.len());
 
             if !result.outliers.is_empty() {
-                println!("\n{}:", "English Text");
+                println!("\nOutlier Details:");
                 for outlier in &result.outliers {
-                    println!(
-                        "  {}: {} ({}: {:.3})",
-                        "English Text",
-                        outlier.index,
-                        "English Text",
-                        outlier.value
-                    );
+                    println!("  Index: {} (Value: {:.3})", outlier.index, outlier.value);
                 }
             }
         }
@@ -397,39 +362,27 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
 
     match format_str {
         "text" => {
-            println!("{}", "English Text");
-            println!("{}: {:.3}", "English Text", result.mean);
-            println!(
-                "{}: {:.3}",
-                "English Text",
-                result.std_dev
-            );
+            println!("Quality Control Analysis");
+            println!("Mean: {:.3}", result.mean);
+            println!("Standard Deviation: {:.3}", result.std_dev);
 
             if let (Some(cp), Some(cpk)) = (result.cp, result.cpk) {
-                println!("{}: {:.3}", "English Text", cp);
-                println!("{}: {:.3}", "English Text", cpk);
+                println!("Cp: {:.3}", cp);
+                println!("Cpk: {:.3}", cpk);
 
                 if let Some(ref capability) = result.process_capability {
                     let cap_text = match capability {
-                        ProcessCapability::Excellent => "English Text",
-                        ProcessCapability::Adequate => "English Text",
-                        ProcessCapability::Poor => "English Text",
-                        ProcessCapability::Inadequate => "English Text",
+                        ProcessCapability::Excellent => "Excellent",
+                        ProcessCapability::Adequate => "Adequate",
+                        ProcessCapability::Poor => "Poor",
+                        ProcessCapability::Inadequate => "Inadequate",
                     };
-                    println!(
-                        "{}: {}",
-                        "English Text",
-                        cap_text
-                    );
+                    println!("Process Capability: {}", cap_text);
                 }
             }
 
             if let Some(within_spec) = result.within_spec_percent {
-                println!(
-                    "{}: {:.1}%",
-                    "English Text",
-                    within_spec
-                );
+                println!("Within Specification: {:.1}%", within_spec);
             }
         }
         "json" => {
@@ -457,51 +410,23 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
         return;
     }
 
-    println!("{}", "Normal Distribution Analysis Results");
+    println!("Normal Distribution Analysis Results");
     println!();
-    println!(
-        "{}: {}",
-        "Dataset",
-        result.dataset_name
-    );
-    println!(
-        "{}: {}",
-        "Numbers analyzed",
-        result.numbers_analyzed
-    );
-    println!(
-        "{}: {:?}",
-        "Quality Level",
-        result.risk_level
-    );
+    println!("Dataset: {}", result.dataset_name);
+    println!("Numbers analyzed: {}", result.numbers_analyzed);
+    println!("Quality Level: {:?}", result.risk_level);
 
     println!();
     println!("Distribution Parameters:");
-    println!("  {}: {:.3}", "English Text", result.mean);
-    println!(
-        "  {}: {:.3}",
-        "English Text",
-        result.std_dev
-    );
-    println!(
-        "  {}: {:.3}",
-        "English Text",
-        result.variance
-    );
-    println!(
-        "  {}: {:.3}",
-        "English Text",
-        result.skewness
-    );
-    println!(
-        "  {}: {:.3}",
-        "English Text",
-        result.kurtosis
-    );
+    println!("  Mean: {:.3}", result.mean);
+    println!("  Standard Deviation: {:.3}", result.std_dev);
+    println!("  Variance: {:.3}", result.variance);
+    println!("  Skewness: {:.3}", result.skewness);
+    println!("  Kurtosis: {:.3}", result.kurtosis);
 
     if verbose {
         println!();
-        println!("Distribution Parameters:");
+        println!("Normality Tests:");
         println!(
             "  Shapiro-Wilk: W={:.3}, p={:.3}",
             result.shapiro_wilk_statistic, result.shapiro_wilk_p_value
@@ -516,51 +441,30 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
         );
 
         println!();
-        println!("Distribution Parameters:");
-        println!(
-            "  {}: {:.3}",
-            "English Text",
-            result.normality_score
-        );
-        println!(
-            "  {}: {:.3}",
-            "English Text",
-            result.qq_correlation
-        );
-        println!(
-            "  {}: {:.3}",
-            "English Text",
-            result.distribution_quality
-        );
+        println!("Quality Metrics:");
+        println!("  Normality Score: {:.3}", result.normality_score);
+        println!("  QQ Correlation: {:.3}", result.qq_correlation);
+        println!("  Distribution Quality: {:.3}", result.distribution_quality);
 
         if !result.outliers_z_score.is_empty() {
             println!();
-            println!("Distribution Parameters:");
+            println!("Outlier Detection:");
+            println!("  Z-score: {} outliers", result.outliers_z_score.len());
             println!(
-                "  Z-score: {} {}",
-                result.outliers_z_score.len(),
-                "English Text"
+                "  Modified Z-score: {} outliers",
+                result.outliers_modified_z.len()
             );
-            println!(
-                "  Modified Z-score: {} {}",
-                result.outliers_modified_z.len(),
-                "English Text"
-            );
-            println!(
-                "  IQR method: {} {}",
-                result.outliers_iqr.len(),
-                "English Text"
-            );
+            println!("  IQR method: {} outliers", result.outliers_iqr.len());
         }
 
         println!();
-        println!("Distribution Parameters:");
+        println!("Sigma Coverage:");
         println!("  1σ: {:.1}%", result.within_1_sigma_percent);
         println!("  2σ: {:.1}%", result.within_2_sigma_percent);
         println!("  3σ: {:.1}%", result.within_3_sigma_percent);
 
         println!();
-        println!("Distribution Parameters:");
+        println!("Interpretation:");
         print_normal_interpretation(result);
     }
 }
@@ -570,45 +474,41 @@ fn print_normal_interpretation(result: &NormalResult) {
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ {}", "English Text");
-            println!("   {}", "English Text");
+            println!("✅ Data follows normal distribution well");
+            println!("   Suitable for standard statistical analysis");
         }
         RiskLevel::Medium => {
-            println!("⚠️  {}", "English Text");
-            println!("   {}", "English Text");
+            println!("⚠️  Data shows some deviation from normality");
+            println!("   Consider robust statistical methods");
         }
         RiskLevel::High => {
-            println!("🚨 {}", "English Text");
-            println!("   {}", "English Text");
+            println!("🚨 Data significantly deviates from normality");
+            println!("   Non-parametric methods recommended");
         }
         RiskLevel::Critical => {
-            println!("🔍 {}", "English Text");
-            println!("   {}", "English Text");
+            println!("🔍 Data shows extreme deviation from normality");
+            println!("   Requires special handling and investigation");
         }
     }
 
     // 歪度・尖度に基づく解釈
     if result.skewness.abs() > 1.0 {
         if result.skewness > 0.0 {
-            println!("   📊 {}", "English Text");
+            println!("   📊 Data is right-skewed (positive skewness)");
         } else {
-            println!("   📊 {}", "English Text");
+            println!("   📊 Data is left-skewed (negative skewness)");
         }
     }
 
     if result.kurtosis > 1.0 {
-        println!("   📈 {}", "English Text");
+        println!("   📈 Data has heavy tails (high kurtosis)");
     } else if result.kurtosis < -1.0 {
-        println!("   📉 {}", "English Text");
+        println!("   📉 Data has light tails (low kurtosis)");
     }
 
     // 異常値の解釈
     if !result.outliers_z_score.is_empty() {
-        println!(
-            "   🎯 {}: {}",
-            "English Text",
-            result.outliers_z_score.len()
-        );
+        println!("   🎯 Outliers detected: {}", result.outliers_z_score.len());
     }
 }
 
@@ -720,7 +620,6 @@ fn print_xml_output(result: &NormalResult) {
     println!("</normal_analysis>");
 }
 
-
 /// Analyze numbers with filtering and custom options
 fn analyze_numbers_with_options(
     matches: &clap::ArgMatches,
@@ -768,12 +667,7 @@ fn analyze_numbers_with_options(
 }
 
 /// 高度な異常値検出結果の出力
-fn output_advanced_outlier_result(matches: &ArgMatches, result: &AdvancedOutlierResult) {
-    let _lang = matches
-        .get_one::<String>("language")
-        .map(|s| s.as_str())
-        .unwrap_or("auto");
-
+fn output_advanced_outlier_result(_matches: &ArgMatches, result: &AdvancedOutlierResult) {
     println!("Advanced Outlier Detection Result: {}", result.method_name);
     println!("Detection rate: {:.3}", result.detection_rate);
     println!("Threshold: {:.3}", result.threshold);

@@ -35,7 +35,6 @@ pub struct OutputConfig {
     pub format: String,
     pub quiet: bool,
     pub verbose: bool,
-    pub language: String,
 }
 
 impl OutputConfig {
@@ -47,10 +46,6 @@ impl OutputConfig {
                 .clone(),
             quiet: *matches.get_one::<bool>("quiet").unwrap_or(&false),
             verbose: *matches.get_one::<bool>("verbose").unwrap_or(&false),
-            language: matches
-                .get_one::<String>("language")
-                .unwrap_or(&"auto".to_string())
-                .clone(),
         }
     }
 }

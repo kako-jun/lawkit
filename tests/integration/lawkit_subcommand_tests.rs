@@ -556,7 +556,11 @@ mod integration_compare_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("fraud") || stdout.contains("recommend"));
+        assert!(
+            stdout.contains("Analysis results")
+                || stdout.contains("recommend")
+                || stdout.contains("Purpose")
+        );
     }
 
     #[test]
@@ -590,7 +594,11 @@ mod integration_compare_tests {
         ));
 
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("conflict") || stdout.contains("threshold"));
+        assert!(
+            stdout.contains("Conflict Analysis")
+                || stdout.contains("Resolution Strategies")
+                || stdout.contains("Threshold")
+        );
     }
 }
 
