@@ -160,8 +160,8 @@ mod tests {
                     // Should extract numbers from the test Excel file
                     assert!(!numbers.is_empty(), "Should extract at least some numbers");
 
-                    println!("Extracted {} numbers from Excel file", numbers.len());
-                    println!("All extracted numbers: {:?}", numbers);
+                    println!("Extracted {count} numbers from Excel file", count=numbers.len());
+                    println!("All extracted numbers: {numbers:?}");
 
                     // Expected numbers from our actual test data (from CSV):
                     // 1234567.89, 234567.12, 567890.34, 123456.78, 890123.45,
@@ -185,8 +185,8 @@ mod tests {
                     // Should extract around 10-12 numbers (amounts + possibly years from dates)
                     assert!(
                         numbers.len() >= 10,
-                        "Should extract at least 10 numbers, got {}",
-                        numbers.len()
+                        "Should extract at least 10 numbers, got {count}",
+                        count=numbers.len()
                     );
 
                     println!(
@@ -196,15 +196,13 @@ mod tests {
                 Err(e) => {
                     // If the test file is missing or corrupt, that's also a valid test result
                     println!(
-                        "Excel parsing failed (expected if test file is missing): {}",
-                        e
+                        "Excel parsing failed (expected if test file is missing): {e}"
                     );
                 }
             }
         } else {
             println!(
-                "Test Excel file not found at {:?}, skipping real file test",
-                test_path
+                "Test Excel file not found at {test_path:?}, skipping real file test"
             );
         }
     }
