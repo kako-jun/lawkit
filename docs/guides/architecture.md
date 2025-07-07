@@ -197,19 +197,19 @@ All implementations are validated against:
 - **Subcommand Structure**: `lawkit <law> [options] <input>`
 - **Configuration Management**: CLI arguments and configuration files
 - **Error Handling**: Comprehensive error reporting and recovery
-- **Internationalization**: Multi-language output support
+- **International Number Support**: Automatic recognition of 5 language number formats
 
 ### Library Integration
 
 - **Rust Crate**: Core functionality as `lawkit-core`
 - **Node.js Package**: `lawkit-js` with automatic binary download
 - **Python Package**: `lawkit-python` with CLI integration
-- **WebAssembly**: Browser-compatible statistical analysis
+- **WebAssembly**: Browser-compatible statistical analysis (planned)
 
-### API Design
+### Future Extensions (Planned)
 
-- **RESTful Endpoints**: HTTP API for web integration
-- **GraphQL Support**: Flexible query interface
+- **RESTful API**: HTTP API for web integration
+- **GraphQL Support**: Flexible query interface  
 - **WebSocket Streaming**: Real-time analysis updates
 - **Authentication**: Token-based access control
 
