@@ -1,9 +1,13 @@
 # 変更履歴
 
-lawkitの重要な変更はすべてこのファイルに記録されます。
+**注意**: このファイルはルートディレクトリに移動されました。最新の変更履歴は [/CHANGELOG.md](../../CHANGELOG.md) をご覧ください。
+
+lawkitの重要な変更はすべてメインの変更履歴ファイルに記録されます。
 
 形式は[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)に基づき、
 このプロジェクトは[セマンティックバージョニング](https://semver.org/spec/v2.0.0.html)に従います。
+
+最新の変更履歴とリリースノートは [/CHANGELOG.md](../../CHANGELOG.md) をご覧ください。
 
 ## [未リリース]
 
