@@ -47,7 +47,7 @@ jobs:
     - name: Test generate functionality
       run: |
         # Test basic generate functionality
-        cargo run --bin lawkit -- generate benf --samples 10 --seed 12345 > /tmp/test_benf.txt
+        cargo run --bin lawkit -- generate benf --samples 35 --seed 12345 > /tmp/test_benf.txt
         cargo run --bin lawkit -- benf /tmp/test_benf.txt
         
         # Test generate→analyze pipeline
