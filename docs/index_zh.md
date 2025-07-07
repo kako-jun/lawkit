@@ -44,7 +44,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [高级分析](guides/advanced-analysis_zh.md)
 
 ### 项目信息
-- [更新日志](project/changelog_zh.md)
+- [更新日志](../CHANGELOG.md)
 - [路线图](project/roadmap_zh.md)
 
 ### 其他
