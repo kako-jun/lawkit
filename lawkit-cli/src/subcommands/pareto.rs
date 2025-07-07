@@ -2,90 +2,75 @@ use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
-        input::{parse_input_auto, parse_text_input},
+        input::parse_text_input,
     },
     error::{BenfError, Result},
     laws::pareto::{analyze_pareto_distribution, ParetoResult},
 };
-use std::io::{self, Read};
+use crate::common_options::{get_optimized_reader, setup_optimization_config};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // Determine input source based on arguments
-    if let Some(input) = matches.get_one::<String>("input") {
-        // Use auto-detection for file vs string input
-        match parse_input_auto(input) {
-            Ok(numbers) => {
-                if numbers.is_empty() {
-                    let language = get_language(matches);
-                    let error_msg = localized_text("no_numbers_found", language);
-                    eprintln!("{error_msg}");
-                    std::process::exit(1);
-                }
+    // 最適化設定をセットアップ
+    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
 
-                // Apply filtering and custom analysis
-                let result =
-                    match analyze_numbers_with_options(matches, input.to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{error_msg}: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                // Output results and exit
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error processing input '{input}': {e}");
-                std::process::exit(1);
-            }
+    // 最適化された入力読み込み
+    let input_data = if let Some(input) = matches.get_one::<String>("input") {
+        if input == "-" {
+            get_optimized_reader(None, use_optimize)
+        } else {
+            get_optimized_reader(Some(input), use_optimize)
         }
     } else {
-        // Read from stdin
-        let mut buffer = String::new();
-        match io::stdin().read_to_string(&mut buffer) {
-            Ok(_) => {
-                if buffer.trim().is_empty() {
-                    eprintln!("Error: No input provided. Use --help for usage information.");
-                    std::process::exit(2);
-                }
+        get_optimized_reader(None, use_optimize)
+    };
 
-                // Extract numbers from stdin input text with international numeral support
-                let numbers = match parse_text_input(&buffer) {
-                    Ok(numbers) => numbers,
-                    Err(e) => {
-                        let language = get_language(matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{error_msg}: {e}");
-                        std::process::exit(1);
-                    }
-                };
-
-                // Apply filtering and custom analysis
-                let result =
-                    match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{error_msg}: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                // Output results and exit
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error reading from stdin: {e}");
-                std::process::exit(1);
-            }
+    let buffer = match input_data {
+        Ok(data) => data,
+        Err(e) => {
+            eprintln!("Error reading input: {e}");
+            std::process::exit(1);
         }
+    };
+
+    if buffer.trim().is_empty() {
+        eprintln!("Error: No input provided. Use --help for usage information.");
+        std::process::exit(2);
     }
+
+    let numbers = match parse_text_input(&buffer) {
+        Ok(numbers) => numbers,
+        Err(e) => {
+            let language = get_language(matches);
+            let error_msg = localized_text("analysis_error", language);
+            eprintln!("{error_msg}: {e}");
+            std::process::exit(1);
+        }
+    };
+
+    if numbers.is_empty() {
+        let language = get_language(matches);
+        let error_msg = localized_text("no_numbers_found", language);
+        eprintln!("{error_msg}");
+        std::process::exit(1);
+    }
+
+    let dataset_name = matches
+        .get_one::<String>("input")
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| "stdin".to_string());
+
+    let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
+        Ok(result) => result,
+        Err(e) => {
+            let language = get_language(matches);
+            let error_msg = localized_text("analysis_error", language);
+            eprintln!("{error_msg}: {e}");
+            std::process::exit(1);
+        }
+    };
+
+    output_results(matches, &result);
+    std::process::exit(result.risk_level.exit_code())
 }
 
 fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
