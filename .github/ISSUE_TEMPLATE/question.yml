@@ -1,0 +1,135 @@
+name: ❓ Question / Help
+description: Ask a question about using lawkit for statistical analysis
+title: "[Question]: "
+labels: ["question", "help-wanted"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using lawkit? We're here to help!
+        
+        **Before asking:**
+        - Check our [documentation](https://github.com/kako-jun/lawkit/tree/main/docs)
+        - Look at [existing discussions](https://github.com/kako-jun/lawkit/discussions)
+        - Search [existing issues](https://github.com/kako-jun/lawkit/issues)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know about lawkit?
+      placeholder: How do I...? What is the best way to...? Why does...?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic Area
+      description: What is your question about?
+      options:
+        - Benford's Law Analysis
+        - Pareto Principle (80/20 rule)
+        - Zipf's Law Analysis
+        - Normal Distribution Testing
+        - Poisson Distribution Analysis
+        - Multi-law Comparison
+        - Data Generation
+        - Installation/Setup
+        - Data Formats/Input
+        - Output Interpretation
+        - Performance/Optimization
+        - Integration (Python/Node.js)
+        - Best Practices
+        - Statistical Theory
+        - Fraud Detection Use Cases
+        - Audit Applications
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context / Background
+      description: |
+        Provide context about what you're trying to achieve.
+        What type of data are you analyzing? What's your use case?
+      placeholder: |
+        I'm working on...
+        My data contains...
+        I want to achieve...
+
+  - type: textarea
+    id: what_tried
+    attributes:
+      label: What You've Tried
+      description: What have you already attempted? Include commands if applicable.
+      placeholder: |
+        I tried:
+        ```bash
+        lawkit benf mydata.csv
+        ```
+        
+        But I'm not sure about...
+
+  - type: textarea
+    id: expected_outcome
+    attributes:
+      label: Expected Outcome
+      description: What result or understanding are you looking for?
+      placeholder: I expect to understand... / I want to achieve...
+
+  - type: input
+    id: lawkit_version
+    attributes:
+      label: lawkit Version
+      description: Run `lawkit --version` (if applicable)
+      placeholder: "lawkit 2.1.0"
+
+  - type: dropdown
+    id: experience_level
+    attributes:
+      label: Experience Level
+      description: How familiar are you with statistical analysis?
+      options:
+        - Beginner (new to statistical analysis)
+        - Intermediate (some statistics background)
+        - Advanced (experienced with statistical methods)
+        - Expert (professional statistician/analyst)
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      description: How urgent is this question?
+      options:
+        - Low (learning/exploring)
+        - Medium (working on a project)
+        - High (blocking important work)
+        - Critical (urgent deadline)
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: |
+        Any other details that might help us answer your question:
+        - Sample data (anonymized)
+        - Error messages
+        - Screenshots
+        - Links to relevant documentation
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched the documentation and existing issues
+          required: true
+        - label: I have provided sufficient context for my question
+          required: true
+        - label: I understand this is for lawkit-specific questions
+          required: true
