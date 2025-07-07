@@ -276,8 +276,7 @@ cat raw_data.csv | \
 # 性能比较
 time lawkit benf large_dataset.csv
 time lawkit benf large_dataset.csv --parallel --threads 8
-time lawkit benf large_dataset.csv --streaming --optimize
-
+time lawkit benf large_dataset.csv --streaming 
 # 内存使用分析
 /usr/bin/time -v lawkit benf huge_file.csv --streaming --memory-monitor
 ```
@@ -291,8 +290,7 @@ time lawkit benf large_dataset.csv --streaming --optimize
 lawkit benf large_file.csv --streaming --chunk-size 1000
 
 # 性能优化
-lawkit compare *.csv --parallel --threads 4 --optimize
-
+lawkit compare *.csv --parallel --threads 4 
 # 编码问题
 lawkit benf data.csv --input-encoding utf-8 --debug
 

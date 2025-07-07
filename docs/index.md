@@ -23,9 +23,22 @@ lawkit provides powerful tools for:
 
 ## Quick Links
 
-- [Usage Guide](user-guide/usage.md) - Complete usage examples and CLI reference
+### User Guide
+- [Installation](user-guide/installation.md) - Setup and installation instructions
+- [Getting Started](user-guide/getting-started.md) - Quick start guide
+- [Configuration](user-guide/configuration.md) - Configuration options
+- [Examples](user-guide/examples.md) - Practical usage examples and industry cases
 - [FAQ](user-guide/faq.md) - Frequently asked questions and troubleshooting
-- [Integration Guide](guides/integrations.md) - Integration with continuous integration systems
+
+### Reference
+- [CLI Reference](reference/cli-reference.md) - Complete command documentation
+
+### Guides
+- [Integration Guide](guides/integrations.md) - CI/CD and automation integration
+- [Performance Guide](guides/performance.md) - Optimization techniques
+- [Advanced Analysis](guides/advanced-analysis.md) - Advanced analysis features
+
+### Project
 - [Contributing](../CONTRIBUTING.md) - How to contribute to the project
 
 ## Installation
@@ -72,8 +85,8 @@ lawkit compare --laws benf,pareto data.csv
 # Filter data and output JSON
 lawkit benf --filter ">=100,<10000" --format json data.csv
 
-# Japanese language output
-lawkit pareto --lang ja data.csv
+# Generate sample data and analyze
+lawkit generate benf --samples 1000 | lawkit benf --format json
 
 # Quality control analysis
 lawkit normal --quality-control --spec-limits 8.0,12.0 measurements.csv

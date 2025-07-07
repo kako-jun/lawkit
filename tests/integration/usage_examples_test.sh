@@ -312,6 +312,162 @@ else
     print_fail "Automation workflow simulation failed"
 fi
 
+# Test 16: Generate command functionality
+print_test "Generate command functionality"
+LAWKIT="../../../target/release/lawkit"
+if [ ! -f "$LAWKIT" ]; then
+    print_fail "lawkit executable not found at $LAWKIT"
+else
+    # Test generate benf
+    if $LAWKIT generate benf --samples 100 --seed 42 >/dev/null 2>&1; then
+        print_pass "Generate benf command works"
+    else
+        print_fail "Generate benf command failed"
+    fi
+fi
+
+# Test 17: Generate to analyze pipeline
+print_test "Generate to analyze pipeline"
+if [ -f "$LAWKIT" ]; then
+    pipeline_result=$($LAWKIT generate benf --samples 100 --seed 42 | $LAWKIT benf --min-count 10 --format json 2>/dev/null | grep -c '"risk_level"' || echo "0")
+    if [ "$pipeline_result" -gt 0 ]; then
+        print_pass "Generate to analyze pipeline works"
+    else
+        print_fail "Generate to analyze pipeline failed"
+    fi
+else
+    print_fail "lawkit executable not found for pipeline test"
+fi
+
+# Test 18: Multi-law compare functionality
+print_test "Multi-law compare functionality"
+if [ -f "$LAWKIT" ]; then
+    compare_result=$($LAWKIT compare audit-sample/sample1.csv --laws benford,pareto --min-count 5 --format json 2>/dev/null | grep -c '"analysis_results"' || echo "0")
+    if [ "$compare_result" -gt 0 ]; then
+        print_pass "Multi-law compare works"
+    else
+        print_fail "Multi-law compare failed"
+    fi
+else
+    print_fail "lawkit executable not found for compare test"
+fi
+
+# Test 19: Pareto analysis functionality
+print_test "Pareto analysis functionality"
+if [ -f "$LAWKIT" ]; then
+    pareto_result=$($LAWKIT pareto audit-sample/sample1.csv --gini-coefficient --min-count 5 --format json 2>/dev/null | grep -c '"gini_coefficient"' || echo "0")
+    if [ "$pareto_result" -gt 0 ]; then
+        print_pass "Pareto analysis with Gini coefficient works"
+    else
+        print_fail "Pareto analysis with Gini coefficient failed"
+    fi
+else
+    print_fail "lawkit executable not found for pareto test"
+fi
+
+# Test 20: Normal distribution analysis
+print_test "Normal distribution analysis"
+if [ -f "$LAWKIT" ]; then
+    normal_result=$($LAWKIT normal audit-sample/sample1.csv --verbose --min-count 5 2>/dev/null | grep -c "Test statistic\|Mean\|Standard deviation" || echo "0")
+    if [ "$normal_result" -gt 0 ]; then
+        print_pass "Normal distribution analysis works"
+    else
+        print_fail "Normal distribution analysis failed"
+    fi
+else
+    print_fail "lawkit executable not found for normal test"
+fi
+
+# Test 21: Poisson distribution analysis
+print_test "Poisson distribution analysis"
+if [ -f "$LAWKIT" ]; then
+    poisson_result=$($LAWKIT poisson audit-sample/sample1.csv --predict --min-count 5 2>/dev/null | grep -c "Lambda\|Prediction" || echo "0")
+    if [ "$poisson_result" -gt 0 ]; then
+        print_pass "Poisson distribution analysis works"
+    else
+        print_fail "Poisson distribution analysis failed"
+    fi
+else
+    print_fail "lawkit executable not found for poisson test"
+fi
+
+# Test 22: Generate all statistical laws
+print_test "Generate all statistical laws"
+if [ -f "$LAWKIT" ]; then
+    generate_tests=0
+    for law in benf pareto zipf normal poisson; do
+        if $LAWKIT generate "$law" --samples 50 --seed 42 >/dev/null 2>&1; then
+            generate_tests=$((generate_tests + 1))
+        fi
+    done
+    if [ "$generate_tests" -eq 5 ]; then
+        print_pass "All 5 statistical law generators work"
+    else
+        print_fail "Generate functions failed ($generate_tests/5 working)"
+    fi
+else
+    print_fail "lawkit executable not found for generate test"
+fi
+
+# Test 23: Selftest functionality
+print_test "Selftest functionality"
+if [ -f "$LAWKIT" ]; then
+    if $LAWKIT selftest 2>/dev/null | grep -q "passed\|✅\|working correctly"; then
+        print_pass "Selftest functionality works"
+    else
+        print_fail "Selftest functionality failed"
+    fi
+else
+    print_fail "lawkit executable not found for selftest"
+fi
+
+# Test 24: Output format validation
+print_test "Output format validation"
+if [ -f "$LAWKIT" ]; then
+    format_tests=0
+    for format in json csv yaml; do
+        if $LAWKIT benf audit-sample/sample1.csv --format "$format" --min-count 5 >/dev/null 2>&1; then
+            format_tests=$((format_tests + 1))
+        fi
+    done
+    if [ "$format_tests" -eq 3 ]; then
+        print_pass "All output formats work ($format_tests/3)"
+    else
+        print_fail "Output format validation failed ($format_tests/3 working)"
+    fi
+else
+    print_fail "lawkit executable not found for format test"
+fi
+
+# Test 25: Documentation examples validation
+print_test "Documentation examples validation"
+if [ -f "$LAWKIT" ]; then
+    doc_tests=0
+    
+    # Test comprehensive data quality assessment
+    if $LAWKIT compare audit-sample/sample1.csv --laws benford,pareto,normal --min-count 5 --format json >/dev/null 2>&1; then
+        doc_tests=$((doc_tests + 1))
+    fi
+    
+    # Test business analysis with Pareto
+    if $LAWKIT pareto audit-sample/sample1.csv --business-analysis --min-count 5 >/dev/null 2>&1; then
+        doc_tests=$((doc_tests + 1))
+    fi
+    
+    # Test quality control with Normal
+    if $LAWKIT normal audit-sample/sample1.csv --quality-control --min-count 5 >/dev/null 2>&1; then
+        doc_tests=$((doc_tests + 1))
+    fi
+    
+    if [ "$doc_tests" -eq 3 ]; then
+        print_pass "Documentation examples validation passed ($doc_tests/3)"
+    else
+        print_fail "Documentation examples validation failed ($doc_tests/3 working)"
+    fi
+else
+    print_fail "lawkit executable not found for documentation test"
+fi
+
 # Summary
 echo -e "\n${YELLOW}=== Test Summary ===${NC}"
 echo "Tests run: $TESTS_RUN"

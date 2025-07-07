@@ -337,7 +337,7 @@ impl IntegrationResult {
     ) -> Conflict {
         let conflict_type = self.classify_conflict_type(&law_a, &law_b);
         let description = format!(
-            "{}と{}の評価が大きく異なります (差: {:.3})",
+            "{} and {} show significantly different evaluations (difference: {:.3})",
             law_a,
             law_b,
             (score_a - score_b).abs()
@@ -374,15 +374,16 @@ impl IntegrationResult {
     ) -> String {
         match (&self.data_characteristics.data_type, law_a, law_b) {
             (DataType::Discrete, "normal", "poisson") if score_a < score_b => {
-                "離散データに正規分布を適用したため".to_string()
+                "Normal distribution applied to discrete data".to_string()
             }
             (DataType::Continuous, "poisson", "normal") if score_a < score_b => {
-                "連続データにポアソン分布を適用したため".to_string()
+                "Poisson distribution applied to continuous data".to_string()
             }
             (_, "benf", _) if score_a > score_b => {
-                "データに自然性があるが、他の分布特性が異なる".to_string()
+                "Data shows naturalness but different distribution characteristics".to_string()
             }
-            _ => "データの複合的特性により法則適用範囲が異なる".to_string(),
+            _ => "Laws have different applicability ranges due to complex data characteristics"
+                .to_string(),
         }
     }
 
@@ -394,15 +395,15 @@ impl IntegrationResult {
     ) -> String {
         match conflict_type {
             ConflictType::DistributionMismatch => {
-                "データタイプに最適な分布を選択してください".to_string()
+                "Select the optimal distribution for your data type".to_string()
             }
             ConflictType::QualityDisagreement => {
-                "品質監査にはベンフォード法則を重視してください".to_string()
+                "For quality auditing, prioritize Benford's Law".to_string()
             }
             ConflictType::ScaleIncompatibility => {
-                "データのスケール特性を確認してください".to_string()
+                "Check the scale characteristics of your data".to_string()
             }
-            _ => "複数の法則を併用して総合的に判断してください".to_string(),
+            _ => "Use multiple laws in combination for comprehensive analysis".to_string(),
         }
     }
 
@@ -539,16 +540,19 @@ impl IntegrationResult {
 
     fn generate_recommendation_rationale(&self, primary: &str, secondary: &[String]) -> String {
         let primary_reason = match primary {
-            "benf" => "データの自然性と品質に優れているため",
-            "pareto" => "集中度分析に最適なため",
-            "zipf" => "頻度分布特性に適合しているため",
-            "normal" => "正規性が確認されるため",
-            "poisson" => "イベント発生パターンに適合するため",
-            _ => "総合的な適合度が高いため",
+            "benf" => "excellent data naturalness and quality",
+            "pareto" => "optimal for concentration analysis",
+            "zipf" => "good fit for frequency distribution characteristics",
+            "normal" => "normality confirmed",
+            "poisson" => "matches event occurrence patterns",
+            _ => "high overall compatibility",
         };
 
         let secondary_reason = if !secondary.is_empty() {
-            format!("、{}との併用で補完的分析が可能", secondary.join("・"))
+            format!(
+                ", complementary analysis possible with {}",
+                secondary.join(" and ")
+            )
         } else {
             String::new()
         };
@@ -559,33 +563,35 @@ impl IntegrationResult {
     fn generate_alternative_combinations(&self) -> Vec<LawCombination> {
         let mut combinations = Vec::new();
 
-        // 品質監査組み合わせ
+        // Quality audit combination
         if self.law_scores.contains_key("benf") && self.law_scores.contains_key("normal") {
             combinations.push(LawCombination {
                 laws: vec!["benf".to_string(), "normal".to_string()],
-                purpose: "品質監査".to_string(),
+                purpose: "Quality Audit".to_string(),
                 effectiveness_score: 0.85,
-                description: "ベンフォード法則で自然性、正規分布で統計的品質を評価".to_string(),
+                description: "Benford's Law for naturalness, Normal distribution for statistical quality assessment".to_string(),
             });
         }
 
-        // 集中度分析組み合わせ
+        // Concentration analysis combination
         if self.law_scores.contains_key("pareto") && self.law_scores.contains_key("zipf") {
             combinations.push(LawCombination {
                 laws: vec!["pareto".to_string(), "zipf".to_string()],
-                purpose: "集中度分析".to_string(),
+                purpose: "Concentration Analysis".to_string(),
                 effectiveness_score: 0.8,
-                description: "パレート法則で80/20原則、Zipf法則で順位分布を分析".to_string(),
+                description:
+                    "Pareto principle for 80/20 rule, Zipf's Law for rank distribution analysis"
+                        .to_string(),
             });
         }
 
-        // 異常検知組み合わせ
+        // Anomaly detection combination
         if self.law_scores.contains_key("normal") && self.law_scores.contains_key("poisson") {
             combinations.push(LawCombination {
                 laws: vec!["normal".to_string(), "poisson".to_string()],
-                purpose: "異常検知".to_string(),
+                purpose: "Anomaly Detection".to_string(),
                 effectiveness_score: 0.75,
-                description: "正規分布で外れ値、ポアソン分布で稀少事象を検出".to_string(),
+                description: "Normal distribution for outliers, Poisson distribution for rare event detection".to_string(),
             });
         }
 
