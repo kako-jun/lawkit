@@ -70,6 +70,9 @@ lawkit benf accounting.csv --threshold critical --mad-threshold 2.0
 # 特定列分析
 lawkit benf sales.csv --columns "revenue,profit" --verbose
 
+# 繁体字金融数字支持（防伪大写）
+echo "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾" | lawkit benf
+
 # 过滤小额交易
 lawkit benf transactions.csv --filter ">=1000" --format json
 ```

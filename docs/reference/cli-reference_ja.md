@@ -71,6 +71,9 @@ lawkit benf transactions.csv --min-value 1000 --max-value 100000
 # 日本語対応
 lawkit benf 会計データ.csv --optimize
 
+# 中国語繁体字金融数字
+echo "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾" | lawkit benf
+
 # JSON出力
 lawkit benf data.csv --output json
 ```
