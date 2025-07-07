@@ -358,9 +358,6 @@ flowchart TD
     K -->|Yes| L[Accept Results]
     K -->|No| M[Additional Analysis Recommended]
     
-    style F fill:#e1f5fe
-    style H fill:#ffebee
-    style L fill:#e8f5e8
 ```
 
 ## Advanced Features

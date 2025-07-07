@@ -94,9 +94,6 @@ graph TB
         M --> P[Integration APIs]
     end
     
-    style J fill:#e1f5fe
-    style K fill:#fff3e0
-    style L fill:#f3e5f5
 ```
 
 ### Meta-Chaining: Advanced Pattern Tracking
@@ -126,11 +123,6 @@ graph LR
         M --> |"Fraud Progression"| T4[Security Alerts]
     end
     
-    style M fill:#e8f5e8
-    style T1 fill:#fff3e0
-    style T2 fill:#ffebee
-    style T3 fill:#e3f2fd
-    style T4 fill:#fce4ec
 ```
 
 ## 🚀 Quick Start
