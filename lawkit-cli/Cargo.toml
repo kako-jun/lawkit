@@ -22,6 +22,10 @@ path = "src/main.rs"
 name = "benf"
 path = "src/bin/benf.rs"
 
+[[bin]]
+name = "pareto"
+path = "src/bin/pareto.rs"
+
 [dependencies]
 lawkit-core = { version = "2.1.0", path = "../lawkit-core" }
 clap = { workspace = true }

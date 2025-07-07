@@ -14,6 +14,10 @@ fn main() {
         println!("benf {VERSION}");
         println!("A CLI tool for detecting anomalies using Benford's Law with international numeral support");
         println!("Part of lawkit statistical analysis toolkit");
+        println!();
+        println!("For full statistical analysis capabilities, install lawkit:");
+        println!("  cargo install lawkit");
+        println!("  https://github.com/kako-jun/lawkit");
         exit(0);
     }
     
@@ -28,8 +32,21 @@ fn main() {
         println!("USAGE:");
         println!("    benf [OPTIONS] [INPUT]");
         println!();
-        println!("For detailed help, run:");
+        println!("INSTALLATION:");
+        println!("    This command requires 'lawkit' to be installed:");
+        println!("    cargo install lawkit");
+        println!();
+        println!("For detailed help and more statistical laws, run:");
         println!("    lawkit benf --help");
+        println!("    lawkit --help    # See all available statistical laws");
+        println!();
+        println!("LAWKIT FEATURES:");
+        println!("    - Benford's Law (fraud detection)");
+        println!("    - Pareto Principle (80/20 analysis)");
+        println!("    - Zipf's Law (power-law distribution)");
+        println!("    - Normal Distribution (outlier detection)");
+        println!("    - Poisson Distribution (rare events)");
+        println!("    - Multi-law comparison and analysis");
         exit(0);
     }
     
@@ -59,9 +76,11 @@ fn main() {
         }
         Err(e) => {
             eprintln!("Error: Failed to execute lawkit benf: {}", e);
-            eprintln!("Make sure 'lawkit' is installed and available in PATH");
+            eprintln!();
+            eprintln!("This command requires 'lawkit' to be installed.");
+            eprintln!("Install with: cargo install lawkit");
+            eprintln!("Or download from: https://github.com/kako-jun/lawkit/releases");
             exit(127);
         }
     }
 }
-

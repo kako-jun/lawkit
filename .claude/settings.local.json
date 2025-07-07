@@ -53,7 +53,8 @@
       "Bash(./ci-local.sh:*)",
       "Bash(tree:*)",
       "Bash(python test:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(gh workflow run:*)"
     ],
     "deny": []
   },
