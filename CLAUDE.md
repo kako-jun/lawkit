@@ -94,17 +94,17 @@
 ## 🔧 **詳細ドキュメント（Claude自動参照対象）**
 
 ### 統計法則仕様
-- **[BENF_FEATURES.md](.claude/BENF_FEATURES.md)** - benf機能仕様
-- **[PARETO_FEATURES.md](.claude/PARETO_FEATURES.md)** - pareto機能仕様
-- **[ZIPF_FEATURES.md](.claude/ZIPF_FEATURES.md)** - zipf機能仕様
-- **[NORMAL_FEATURES.md](.claude/NORMAL_FEATURES.md)** - normal機能仕様
-- **[POISSON_FEATURES.md](.claude/POISSON_FEATURES.md)** - poisson機能仕様
-- **[INTEGRATION_FEATURES.md](.claude/INTEGRATION_FEATURES.md)** - 統合機能仕様
+- **[benf-features.md](.claude/benf-features.md)** - benf機能仕様
+- **[pareto-features.md](.claude/pareto-features.md)** - pareto機能仕様
+- **[zipf-features.md](.claude/zipf-features.md)** - zipf機能仕様
+- **[normal-features.md](.claude/normal-features.md)** - normal機能仕様
+- **[poisson-features.md](.claude/poisson-features.md)** - poisson機能仕様
+- **[integration-features.md](.claude/integration-features.md)** - 統合機能仕様
 
 ### 設計ドキュメント
-- **[LAWKIT_INTEGRATION.md](.claude/LAWKIT_INTEGRATION.md)** - 法則間統合仕様
-- **[LAWKIT_STRATEGY.md](.claude/LAWKIT_STRATEGY.md)** - 統合戦略
-- **[LAWKIT_ARCHITECTURE.md](.claude/LAWKIT_ARCHITECTURE.md)** - 統合基盤設計
+- **[lawkit-integration.md](.claude/lawkit-integration.md)** - 法則間統合仕様
+- **[lawkit-strategy.md](.claude/lawkit-strategy.md)** - 統合戦略
+- **[lawkit-architecture.md](.claude/lawkit-architecture.md)** - 統合基盤設計
 
 ## 🚀 **フェーズ4以降: エコシステム拡張**
 - **時系列分析**: 変化点検出・トレンド分析・季節分解

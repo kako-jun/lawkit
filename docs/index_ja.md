@@ -39,6 +39,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [CLIリファレンス](reference/cli-reference_ja.md)
 
 ### ガイド
+- [アーキテクチャガイド](guides/architecture_ja.md) - システム設計とアーキテクチャ概要
 - [統合機能](guides/integrations_ja.md)
 - [パフォーマンス](guides/performance_ja.md)
 
