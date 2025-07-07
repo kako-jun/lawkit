@@ -58,7 +58,7 @@ fn main() {
             }
         }
         Err(e) => {
-            eprintln!("Error: Failed to execute lawkit pareto: {}", e);
+            eprintln!("Error: Failed to execute lawkit pareto: {e}");
             eprintln!("Make sure 'lawkit' is installed and available in PATH");
             exit(127);
         }
