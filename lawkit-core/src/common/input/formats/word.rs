@@ -117,7 +117,10 @@ mod tests {
                     // Should extract numbers from the test Word file
                     assert!(!numbers.is_empty(), "Should extract at least some numbers");
 
-                    println!("Extracted {count} numbers from Word file", count=numbers.len());
+                    println!(
+                        "Extracted {count} numbers from Word file",
+                        count = numbers.len()
+                    );
                     println!("All extracted numbers: {numbers:?}");
 
                     // Note: The extract_numbers_international function treats comma-separated
@@ -141,22 +144,18 @@ mod tests {
                     assert!(
                         numbers.len() >= 30,
                         "Should extract at least 30 numbers, got {count}",
-                        count=numbers.len()
+                        count = numbers.len()
                     );
 
                     println!("✅ Word parsing test passed! Extracted financial report data.");
                 }
                 Err(e) => {
                     // If the test file is missing or corrupt, that's also a valid test result
-                    println!(
-                        "Word parsing failed (expected if test file is missing): {e}"
-                    );
+                    println!("Word parsing failed (expected if test file is missing): {e}");
                 }
             }
         } else {
-            println!(
-                "Test Word file not found at {test_path:?}, skipping real file test"
-            );
+            println!("Test Word file not found at {test_path:?}, skipping real file test");
         }
     }
 }

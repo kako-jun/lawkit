@@ -187,7 +187,10 @@ mod tests {
             let result = parse_opendocument_file(&test_path);
             match result {
                 Ok(numbers) => {
-                    println!("✅ ODT parsing succeeded! Found {count} numbers", count=numbers.len());
+                    println!(
+                        "✅ ODT parsing succeeded! Found {count} numbers",
+                        count = numbers.len()
+                    );
                     assert!(
                         !numbers.is_empty(),
                         "Should extract at least some numbers from ODT"
@@ -196,7 +199,7 @@ mod tests {
                     // Print first few numbers for verification
                     println!(
                         "First 10 numbers: {first_10:?}",
-                        first_10=numbers.iter().take(10).collect::<Vec<_>>()
+                        first_10 = numbers.iter().take(10).collect::<Vec<_>>()
                     );
                 }
                 Err(e) => {
@@ -205,9 +208,7 @@ mod tests {
                 }
             }
         } else {
-            println!(
-                "Test ODT file not found at {test_path:?}, skipping real file test"
-            );
+            println!("Test ODT file not found at {test_path:?}, skipping real file test");
         }
     }
 
@@ -268,7 +269,7 @@ mod tests {
                 Ok(numbers) => {
                     println!(
                         "✅ ODS parsing (via Excel parser) succeeded! Found {count} numbers",
-                        count=numbers.len()
+                        count = numbers.len()
                     );
                 }
                 Err(e) => {
