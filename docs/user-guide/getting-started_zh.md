@@ -156,6 +156,9 @@ lawkit支持多种数字格式：
 # 中文数字
 echo "一千二百三十四 五千六百七十八" | lawkit benf
 
+# 繁体字金融数字（防伪大写）
+echo "壹萬貳仟參佰肆拾伍" | lawkit benf
+
 # 全角数字
 echo "１２３４ ５６７８" | lawkit benf
 

@@ -98,6 +98,11 @@ lawkit normal measurements.csv
 lawkit compare --laws benf,pareto data.csv
 lawkit compare --laws all financial_data.csv
 
+# 国際数字対応
+echo "壹萬貳仟參佰肆拾伍" | lawkit benf    # 中国語繁体字金融数字
+echo "五万六千七百八十九" | lawkit benf    # 日本語漢数字
+echo "１２３４５６" | lawkit benf          # 全角数字
+
 # フィルタリング付き高度分析
 lawkit compare --laws all --filter ">=1000" --format json data.csv
 ```

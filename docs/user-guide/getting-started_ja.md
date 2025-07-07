@@ -161,6 +161,12 @@ echo "１２３４５６ ７８９０" | lawkit benf
 
 # 中国語数字も自動認識されます
 echo "一千二百三十四" | lawkit benf
+
+# 中国語繁体字（旧字体）金融数字も対応
+echo "壹萬貳仟參佰肆拾伍" | lawkit benf
+
+# 日本語漢数字も自動認識
+echo "五万六千七百八十九" | lawkit benf
 ```
 
 ## 高度な機能

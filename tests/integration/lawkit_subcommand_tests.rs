@@ -1487,6 +1487,24 @@ mod error_handling_tests {
     }
 
     #[test]
+    fn test_traditional_chinese_financial_numerals() {
+        // Test traditional Chinese financial numerals (anti-fraud numerals)
+        // From documentation examples in Japanese and Chinese guides
+        
+        let traditional_data = "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾 参拾萬 肆萬 伍萬 陸萬 柒萬 捌萬 玖萬 拾萬";
+        
+        let output = run_lawkit_command("benf", &[traditional_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+        
+        // Test that the traditional numerals are properly recognized as numbers
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Numbers analyzed: 10"));
+    }
+
+    #[test]
     fn test_japanese_getting_started_examples() {
         // Test examples from Japanese getting started guide (getting-started_ja.md)
 
