@@ -3,9 +3,9 @@
 > **🔍 多法则统计分析工具包 - 发现隐藏模式，自信检测异常**
 
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
-[![Crates.io](https://img.shields.io/crates/v/lawkit-core.svg)](https://crates.io/crates/lawkit-core)
-[![Documentation](https://img.shields.io/badge/docs-CLI%20%26%20API-blue)](docs/index.md)
-[![API Documentation](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
+[![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![Documentation](https://img.shields.io/badge/📚%20用户指南-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index_zh.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 使用多种统计法则检测异常、模式和洞察的下一代统计分析工具包。非常适合欺诈检测、数据质量评估和商业智能。

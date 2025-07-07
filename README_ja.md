@@ -3,9 +3,9 @@
 > **🔍 多法則統計分析ツールキット - 隠れたパターンを発見し、確信を持って異常を検知**
 
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
-[![Crates.io](https://img.shields.io/crates/v/lawkit-core.svg)](https://crates.io/crates/lawkit-core)
-[![Documentation](https://img.shields.io/badge/docs-CLI%20%26%20API-blue)](docs/index_ja.md)
-[![API Documentation](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
+[![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![Documentation](https://img.shields.io/badge/📚%20ユーザーガイド-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index_ja.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 複数の統計法則を使用して異常、パターン、洞察を検出する次世代統計分析ツールキット。不正検知、データ品質評価、ビジネスインテリジェンスに最適。
