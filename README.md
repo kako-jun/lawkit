@@ -27,7 +27,7 @@ $ lawkit compare --laws all data.csv
 ## ✨ Key Features
 
 - **🎯 Multi-Law Analysis**: Benford, Pareto, Zipf, Normal, Poisson distributions
-- **🌍 International Support**: Numbers in English, Japanese, Chinese, Hindi, Arabic
+- **🌍 International Input**: Parse numbers in English, Japanese, Chinese, Hindi, Arabic formats
 - **🤖 Smart Integration**: Compare multiple laws for comprehensive insights
 - **⚡ High Performance**: Built in Rust with parallel processing
 - **📊 Rich Output**: Text, JSON, CSV, YAML, TOML, XML formats
@@ -356,28 +356,16 @@ Current implementation supports basic Chinese numerals that are identical to Jap
 - **Traditional**: 萬 (10,000) vs Japanese 万
 - **Regional variants**: Traditional vs Simplified Chinese
 
-### Hindi Numerals (हिन्दी अंक)
-```bash
-# Devanagari numerals
-echo "१२३४५६ ७८९०१२" | benf --lang hi
-```
+### Other Numeral Systems
 
-### Arabic Numerals (الأرقام العربية)
-```bash  
-# Eastern Arabic-Indic numerals
-echo "١٢٣٤٥٦ ٧٨٩٠١٢" | benf --lang ar
-```
+lawkit focuses on the most widely used numeral systems in international business and financial analysis:
 
-### Other Numeral Systems (Future Support)
+- **Core Support**: English (ASCII), Japanese (full-width, kanji), Chinese (simplified/traditional)
+- **Additional Input**: Hindi (Devanagari), Arabic (Eastern Arabic-Indic numerals)  
+- **Business Focus**: International accounting standards, cross-border financial analysis
+- **Output Language**: English (for maximum compatibility and searchability)
 
-#### Additional Scripts (Planned)
-- **Persian**: ۰۱۲۳۴۵۶۷۸۹ (Iran, Afghanistan)
-- **Bengali**: ০১২৩৪৫৬৭৮৯ (Bangladesh)
-- **Tamil**: ௦௧௨௩௪௫௬௭௮௯ (Tamil Nadu)
-- **Thai**: ๐๑๒๓๔๕๖๗๘๙ (Thailand)
-- **Myanmar**: ၀၁၂၃၄၅၆၇၈၉ (Myanmar)
-
-> **Note**: International numeral support continues expanding based on user demand. Current priority: Japanese/Chinese/Hindi/Arabic financial document analysis.
+> **Note**: Input supports all major numeral systems globally. Documentation focuses on primary business markets (English/Japanese/Chinese). Output standardized to English for international compatibility.
 
 ## Installation
 
@@ -430,7 +418,7 @@ Priority: File > String > Pipe
 | `--format <FORMAT>` | Output format: text, csv, json, yaml, toml, xml |
 | `--quiet` | Minimal output (numbers only) |
 | `--verbose` | Detailed statistics |
-| `--lang <LANGUAGE>` | Output language: en, ja, zh, hi, ar (default: auto) |
+| `--input-encoding <ENCODING>` | Input character encoding (default: auto-detect) |
 | `--filter <RANGE>` | Filter numbers (e.g., `--filter ">=100"`) |
 | `--threshold <LEVEL>` | Alert threshold: low, medium, high, critical |
 | `--min-count <NUMBER>` | Minimum number of data points required for analysis |
@@ -686,7 +674,7 @@ if jq -e '.risk_level == "Critical"' >/dev/null; then
     -d '{"alert": "Critical fraud pattern in daily orders", "timestamp": "'$(date -Iseconds)'"}'
 fi
 
-# International data source aggregation
+# International financial data analysis
 declare -A REGIONS=([us]="api.us.finance.com" [eu]="api.eu.finance.com" [asia]="api.asia.finance.com")
 for region in "${!REGIONS[@]}"; do
     echo "Processing $region region..."
@@ -1007,8 +995,9 @@ Benf itself requires no configuration files or environment variables.
 ## Documentation
 
 For comprehensive documentation, see:
-- 📖 **[Documentation](docs/index.md)** - Complete user guide and API reference
+- 📖 **[English Documentation](docs/index.md)** - Complete user guide and API reference  
 - 🇯🇵 **[日本語ドキュメント](docs/index_ja.md)** - Japanese documentation
+- 🇨🇳 **[中文文档](README.zh.md)** - Chinese documentation
 
 ## Contributing
 

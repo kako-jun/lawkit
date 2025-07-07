@@ -15,9 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation (changelog, roadmap)
 
 ### Changed
+- **Documentation**: Reduced documentation languages from 5 to 3 (English, Japanese, Chinese)
+- **Strategic Focus**: Removed Arabic and Hindi documentation for cost efficiency
+- **Input Support**: **Unchanged** - Continues parsing all international number formats (EN/JA/ZH/HI/AR)
+- **Output Language**: CLI output standardized to English for international compatibility
 - Documentation structure now matches diffx sibling project
 - FAQ moved to user-guide subdirectory
 - All docs organized into proper subdirectories
+
+### Removed
+- Arabic (README.ar.md) and Hindi (README.hi.md) documentation files
+- Unused language-specific CLI output options
 
 ## [2.0.1] - 2024-07-05
 
