@@ -3,6 +3,11 @@ set -e
 
 echo "🔄 Running complete CI simulation locally..."
 
+# Set same environment as GitHub CI
+export CARGO_TERM_COLOR=always
+export CARGO_INCREMENTAL=0
+export CARGO_HOME="$HOME/.cargo"
+
 echo "📝 Step 1: Check formatting"
 cargo fmt --all --check
 

@@ -43,7 +43,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [パフォーマンス](guides/performance_ja.md)
 
 ### プロジェクト
-- [変更履歴](project/changelog_ja.md)
+- [変更履歴](../CHANGELOG.md)
 - [ロードマップ](project/roadmap_ja.md)
 
 ### その他
