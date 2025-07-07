@@ -2,16 +2,50 @@ use std::io::Write;
 use std::process::Command;
 use tempfile::NamedTempFile;
 
-/// Run lawkit command with subcommand and arguments
+/// Run lawkit command with subcommand and arguments, using test data as stdin
 fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
     command.args(["run", "--bin", "lawkit", "--", subcommand]);
-    command.args(args);
+
+    // Separate test data from other arguments
+    let mut test_data = String::new();
+    let mut command_args = Vec::new();
+
+    for arg in args {
+        // If arg looks like test data (contains numbers), use it as stdin
+        if arg.chars().any(|c| c.is_ascii_digit()) && arg.len() > 20 {
+            test_data = arg.to_string();
+        } else {
+            command_args.push(*arg);
+        }
+    }
+
+    command.args(&command_args);
+
     // Don't add --language en for commands that don't support it
     if subcommand != "selftest" && subcommand != "list" {
         command.args(["--language", "en"]); // Force English output at the end
     }
-    command.output().expect("Failed to execute lawkit command")
+    // Set LANG environment variable to ensure English output
+    command.env("LANG", "en_US.UTF-8");
+
+    // Set stdin if we have test data
+    if !test_data.is_empty() {
+        use std::process::Stdio;
+        command.stdin(Stdio::piped());
+        command.stdout(Stdio::piped());
+        command.stderr(Stdio::piped());
+
+        let mut child = command.spawn().expect("Failed to spawn lawkit command");
+
+        if let Some(mut stdin) = child.stdin.take() {
+            write!(stdin, "{test_data}").expect("Failed to write to stdin");
+        }
+
+        child.wait_with_output().expect("Failed to get output")
+    } else {
+        command.output().expect("Failed to execute lawkit command")
+    }
 }
 
 /// Debug version of run_lawkit_command that prints detailed output
@@ -20,6 +54,8 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
     command.args(["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
     command.args(["--language", "en"]); // Force English output at the end
+                                        // Set LANG environment variable to ensure English output
+    command.env("LANG", "en_US.UTF-8");
 
     let mut cmd_str = format!("cargo run --bin lawkit -- {subcommand}");
     for arg in args {

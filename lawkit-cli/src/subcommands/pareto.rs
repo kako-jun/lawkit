@@ -1,3 +1,4 @@
+use crate::common_options::{get_optimized_reader, setup_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
@@ -7,7 +8,6 @@ use lawkit_core::{
     error::{BenfError, Result},
     laws::pareto::{analyze_pareto_distribution, ParetoResult},
 };
-use crate::common_options::{get_optimized_reader, setup_optimization_config};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // 最適化設定をセットアップ

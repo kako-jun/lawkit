@@ -53,13 +53,13 @@ fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
     };
 
     let data = buffer.map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-    
+
     if data.trim().is_empty() {
         return Err(lawkit_core::error::BenfError::ParseError(
             "No input data provided".to_string(),
         ));
     }
-    
+
     lawkit_core::common::input::parse_text_input(&data)
 }
 
