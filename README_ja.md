@@ -2,6 +2,8 @@
 
 > **🔍 多法則統計分析ツールキット - 隠れたパターンを発見し、確信を持って異常を検知**
 
+[English README](README.md) | [日本語版 README](README_ja.md) | [中文版 README](README_zh.md)
+
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
 [![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
