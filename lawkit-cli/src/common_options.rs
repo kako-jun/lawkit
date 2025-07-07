@@ -26,14 +26,6 @@ pub fn add_common_options(cmd: Command) -> Command {
             .action(clap::ArgAction::SetTrue),
     )
     .arg(
-        Arg::new("language")
-            .long("language")
-            .short('L') // -l から -L に変更（衝突回避）
-            .value_name("LANGUAGE")
-            .help("Output language: en, ja, zh, hi, ar, auto")
-            .default_value("auto"),
-    )
-    .arg(
         Arg::new("filter")
             .long("filter")
             .value_name("RANGE")
