@@ -653,11 +653,11 @@ mod documentation_examples_tests {
     fn test_configuration_examples() {
         let test_data = generate_test_data();
 
-        // Japanese output
-        let output = run_lawkit_command("benf", &["--language", "ja", &test_data]);
+        // English output (unified)
+        let output = run_lawkit_command("benf", &[&test_data]);
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("ベンフォード") || stdout.contains("解析"));
+            assert!(stdout.contains("Benford") || stdout.contains("analysis"));
         }
 
         // YAML format

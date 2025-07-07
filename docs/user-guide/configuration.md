@@ -141,9 +141,6 @@ lawkit compare data.csv --recommend --purpose fraud
 ## Environment Variables
 
 ```bash
-# Default language
-export LAWKIT_LANG=ja
-
 # Default output format
 export LAWKIT_FORMAT=json
 

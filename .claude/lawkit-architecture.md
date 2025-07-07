@@ -40,16 +40,47 @@ src/
 ### メインコマンド
 ```bash
 lawkit --help                          # 全体ヘルプ
-lawkit --list                          # 利用可能な法則一覧
+lawkit list                            # 利用可能な法則一覧
 lawkit --version                       # バージョン情報
+lawkit selftest                        # セルフテスト実行
 ```
 
-### 法則別サブコマンド
+### 法則別サブコマンド（分析系）
 ```bash
 lawkit benf data.xlsx --format json    # ベンフォード法則
 lawkit pareto sales.csv --format json  # パレート法則（80/20）
 lawkit zipf text.txt --format json     # ジップ法則（単語頻度）
+lawkit normal measurements.csv --format json  # 正規分布分析
 lawkit poisson logs.txt --format json  # ポアソン分布（イベント頻度）
+```
+
+### 統合分析機能
+```bash
+lawkit compare data.csv --laws "benf,pareto" --format json  # 複数法則比較
+lawkit compare data.csv --recommend --purpose fraud        # 推奨分析
+lawkit compare data.csv --consistency-check                # 整合性チェック
+```
+
+### データ生成機能（教育・検証用）
+```bash
+lawkit generate benf --samples 1000 --seed 42             # ベンフォード生成
+lawkit generate pareto --concentration 0.8 --samples 500  # パレート生成
+lawkit generate zipf --exponent 1.0 --vocabulary-size 1000  # ジップ生成
+lawkit generate normal --mean 100 --stddev 15 --samples 1000  # 正規分布生成
+lawkit generate poisson --lambda 2.5 --time-series --samples 1000  # ポアソン生成
+```
+
+### 高度分析オプション
+```bash
+lawkit normal data.csv --outliers --outlier-method ensemble  # 高度異常値検出
+lawkit normal data.csv --enable-timeseries --timeseries-window 20  # 時系列分析
+lawkit benf large_data.csv --optimize                              # 大規模データ最適化
+```
+
+### パイプライン連携（generate→analyze）
+```bash
+lawkit generate benf --samples 10000 | lawkit benf --format json  # 生成→分析
+lawkit generate normal --mean 50 --stddev 10 | lawkit normal --verbose  # 検証用
 ```
 
 ### 後方互換性
@@ -60,18 +91,22 @@ benf data.xlsx --format json           # 従来通り動作
 
 ## 共通基盤の再利用
 ### benf実装資産の活用
-1. **国際数字処理エンジン**: 5文字体系対応を全法則で共用
+1. **国際数字処理エンジン**: 5文字体系対応を全法則で共用（入力処理）
 2. **ファイル形式パーサー**: Excel/PDF/Word等を全法則で利用
-3. **多言語出力システム**: 5言語対応を統一
-4. **CLI引数システム**: --format, --lang, --threshold等の共通化
+3. **CLI出力システム**: 英語統一（戦略的言語削減完了）
+4. **CLI引数システム**: --format, --quiet, --verbose, --threshold等の共通化
 5. **エラーハンドリング**: 統一エラー型・終了コード
+6. **高度分析基盤**: 異常値検出・時系列分析・並列処理・メモリ効率化
+7. **データ生成エンジン**: 教育・検証・テスト用途のサンプル生成
 
 ### 法則固有実装
 各法則は独自の分析ロジックのみ実装：
-- **benford**: 先頭桁分布分析
-- **pareto**: 80/20分布分析  
-- **zipf**: 単語頻度分布分析
-- **poisson**: イベント発生間隔分析
+- **benford**: 先頭桁分布分析・不正検知・MAD計算
+- **pareto**: 80/20分布分析・ジニ係数・ビジネス洞察・集中度評価
+- **zipf**: 単語頻度分布分析・べき乗法則・テキスト分析・多言語対応
+- **normal**: 正規性検定・異常値検出・品質管理・時系列分析
+- **poisson**: イベント発生分析・稀少事象・確率予測・適合度検定
+- **compare**: 複数法則統合・矛盾検出・推奨システム・目的別分析
 
 ## trait-based設計
 ### 統一インターフェース
@@ -109,19 +144,30 @@ impl StatisticalLaw for ParetoLaw {
 
 ## 引数互換性管理
 ### 共通引数（全法則対応）
-- `--format`: 出力形式（text/json/csv/yaml/toml/xml）
-- `--lang`: 多言語出力（en/ja/zh/hi/ar）
-- `--quiet/--verbose`: 出力詳細度
-- `--threshold`: リスク評価閾値
+- `--format` (-f): 出力形式（text/json/csv/yaml/toml/xml）
+- `--quiet` (-q): 最小出力
+- `--verbose` (-v): 詳細出力
+- `--filter`: 数値範囲フィルタ（例: >=100, <1000, 50-500）
+- `--min-count` (-c): 最小データ数 [default: 10]
+- `--optimize`: 大規模データセット最適化
 
-### 条件付き引数
-- `--filter`: 数値系法則のみ（benf/pareto/poisson）
-- `--min-count`: 全法則対応（最小データ数）
+### 削除された引数（戦略的言語削減）
+- `--language` / `--lang`: CLI出力英語統一により削除
+- 入力数字処理: 5言語対応継続（英/日/中/印/アラブ）
+
+### 高度分析機能
+- `--outliers` (-O): 異常値検出
+- `--outlier-method`: 異常値検出手法（zscore/modified_zscore/iqr/lof/isolation/dbscan/ensemble）
+- `--enable-timeseries`: 時系列分析
+- `--timeseries-window`: 時系列分析ウィンドウサイズ [default: 10]
 
 ### 法則固有引数
-- `--benf-*`: ベンフォード法則専用
-- `--pareto-*`: パレート法則専用
-- `--zipf-*`: ジップ法則専用
+- **benf**: `--threshold` (-t) - 異常検知閾値
+- **pareto**: `--concentration` (-C), `--gini-coefficient`, `--percentiles`, `--business-analysis`
+- **zipf**: `--text` (-T), `--words` (-w)
+- **normal**: `--test` (-T), `--quality-control` (-Q), `--spec-limits`
+- **poisson**: `--test` (-T), `--predict` (-p), `--max-events`, `--rare-events` (-R)
+- **compare**: `--laws` (-l), `--focus` (-F), `--recommend` (-r), `--report`, `--consistency-check`, `--cross-validation`, `--confidence-level`, `--purpose` (-p)
 
 ## 統合出力形式
 ### 統一JSON Schema
@@ -143,32 +189,45 @@ impl StatisticalLaw for ParetoLaw {
 }
 ```
 
-### 比較・分析機能（将来実装）
+### 比較・分析機能（実装完了）
 ```bash
 # 複数法則による多角的分析
-lawkit benf data.csv --format json > benf.json
-lawkit pareto data.csv --format json > pareto.json
-lawkit compare benf.json pareto.json  # 結果比較
+lawkit compare data.csv --laws "benf,pareto" --format json    # 直接比較
+lawkit compare data.csv --recommend --purpose fraud          # 推奨分析
+lawkit compare data.csv --consistency-check --threshold 0.7  # 整合性チェック
 
-# 組み合わせ分析
-lawkit analyze data.csv --laws "benf,pareto" --format json
+# クロスバリデーション・詳細分析
+lawkit compare data.csv --cross-validation --confidence-level 0.95
+lawkit compare data.csv --report detailed --focus quality
+
+# データ生成→分析パイプライン
+lawkit generate benf --samples 10000 | lawkit benf --format json
+lawkit generate pareto --concentration 0.8 | lawkit compare --laws "pareto,normal"
 ```
 
-## 移行戦略
-### Phase 1: 基盤構築
-1. 既存benfコードのcommon/laws構造への再編成
-2. サブコマンドアーキテクチャ実装
-3. `lawkit benf` = 既存benf（100%互換）
+## 移行戦略（完了記録）
+### ✅ Phase 1: 基盤構築（完了）
+1. ✅ 既存benfコードのcommon/laws構造への再編成
+2. ✅ サブコマンドアーキテクチャ実装
+3. ✅ `lawkit benf` = 既存benf（100%互換）
 
-### Phase 2: 第二法則実装
-1. pareto実装（確保済みドメイン活用）
-2. 統合テスト・品質保証
-3. ドキュメント更新
+### ✅ Phase 2: 法則実装（完了）
+1. ✅ pareto実装（80/20分析・ジニ係数・ビジネス洞察）
+2. ✅ zipf実装（単語頻度・べき乗法則・テキスト分析）
+3. ✅ normal実装（正規性検定・異常値検出・品質管理）
+4. ✅ poisson実装（イベント発生・稀少事象・確率予測）
 
-### Phase 3: 競合対抗
-1. zipf実装（既存zipfコマンド競合対策）
-2. poisson実装（既存poissonコマンド競合対策）
-3. 統合機能（比較・組み合わせ分析）
+### ✅ Phase 3: 統合・高度機能（完了）
+1. ✅ compare実装（複数法則比較・矛盾検出・推奨システム）
+2. ✅ generate実装（教育・検証用データ生成）
+3. ✅ 高度分析機能（異常値検出・時系列・並列処理）
+4. ✅ 戦略的言語削減（CLI英語統一・5言語入力対応継続）
+
+### ✅ Phase 4: 品質保証・リリース準備（完了）
+1. ✅ CI/CD完全正常化（179テスト全通過）
+2. ✅ パッケージ公開（npm・PyPI対応）
+3. ✅ GitHub基盤整備（Issue/PRテンプレート）
+4. ✅ ドキュメント整備（3言語対応・使用例追加）
 
 ## エコシステム戦略
 ### 個別コマンド戦略

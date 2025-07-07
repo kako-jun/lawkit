@@ -154,7 +154,7 @@ lawkit poisson incident_reports.csv --rare-events --predict
 
 ```bash
 # 流式处理大文件
-lawkit benf huge_dataset.csv --streaming --chunk-size 100000 --parallel
+lawkit benf huge_dataset.csv --optimize
 
 # 内存优化分析
 lawkit compare large_files/*.csv --optimize --memory-limit 2GB
@@ -275,10 +275,10 @@ cat raw_data.csv | \
 ```bash
 # 性能比较
 time lawkit benf large_dataset.csv
-time lawkit benf large_dataset.csv --parallel --threads 8
-time lawkit benf large_dataset.csv --streaming 
+time lawkit benf large_dataset.csv --optimize
+time lawkit benf large_dataset.csv --optimize 
 # 内存使用分析
-/usr/bin/time -v lawkit benf huge_file.csv --streaming --memory-monitor
+/usr/bin/time -v lawkit benf huge_file.csv --optimize
 ```
 
 ## 故障排除示例
@@ -287,10 +287,10 @@ time lawkit benf large_dataset.csv --streaming
 
 ```bash
 # 内存不足
-lawkit benf large_file.csv --streaming --chunk-size 1000
+lawkit benf large_file.csv --optimize
 
 # 性能优化
-lawkit compare *.csv --parallel --threads 4 
+lawkit compare *.csv --optimize 
 # 编码问题
 lawkit benf data.csv --input-encoding utf-8 --debug
 

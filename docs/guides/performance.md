@@ -48,30 +48,26 @@ lawkit benf process_data.csv --detect-changepoints --enable-timeseries
 ### 3. Parallel Processing
 
 ```bash
-# Use automatic parallel processing for large datasets
-lawkit compare data.csv --enable-parallel
+# Enable optimizations for large datasets (includes parallel processing)
+lawkit compare data.csv --optimize
 
-# Configure specific thread count
-lawkit compare data.csv --parallel-threads 8
-
-# Set chunk size for parallel processing
-lawkit compare data.csv --parallel-chunk-size 10000
-
-# Benchmark parallel vs serial performance
-lawkit compare data.csv --benchmark-parallel
+# Performance comparison
+time lawkit compare data.csv          # Standard processing
+time lawkit compare data.csv --optimize  # Optimized processing
 ```
 
 ### 4. Memory-Efficient Processing
 
 ```bash
-# Use streaming mode for very large files
-lawkit benf massive_file.csv --streaming
+# Enable optimizations for memory-efficient processing
+lawkit benf massive_file.csv --optimize
 
-# Configure memory limits and chunk sizes
-lawkit benf large_file.csv --memory-limit 512 --chunk-size 5000
+# For very large datasets (optimizations include memory management)
+lawkit benf large_file.csv --optimize
 
-# Enable incremental statistics for memory efficiency
-lawkit benf data.csv --incremental-stats
+# Standard processing vs optimized
+lawkit benf data.csv          # Standard mode
+lawkit benf data.csv --optimize  # Optimized mode
 ```
 
 ### 5. Traditional Sampling
@@ -122,8 +118,8 @@ lawkit benf large_workbook.xlsx --max-rows 100000
 
 **JSON files:**
 ```bash
-# Use streaming parser for large JSON
-lawkit benf large_data.json --streaming
+# Use optimized processing for large JSON
+lawkit benf large_data.json --optimize
 
 # Specify JSON path for nested data
 lawkit benf complex.json --json-path "$.transactions[*].amount"

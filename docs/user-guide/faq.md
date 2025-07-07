@@ -177,32 +177,37 @@ lawkit automatically recognizes various number formats:
 ```bash
 # These are all recognized as 1234.56:
 echo "1,234.56" | lawkit benf    # English
-echo "１，２３４．５６" | lawkit benf --lang ja  # Japanese
-echo "१,२३४.५६" | lawkit benf --lang hi    # Hindi
+echo "１，２３４．５６" | lawkit benf  # Japanese numbers (auto-detected)
+echo "१,२३४.५६" | lawkit benf    # Hindi numbers (auto-detected)
 ```
 
 ### Can I analyze text in non-English languages?
 
-Yes! lawkit supports Unicode text analysis:
+Yes! lawkit supports Unicode text analysis with automatic language detection:
 
 ```bash
-# Japanese text analysis
-lawkit zipf --text --lang ja japanese_document.txt
+# Japanese text analysis (automatic language detection)
+lawkit zipf --text japanese_document.txt
 
-# Chinese text analysis
-lawkit zipf --text --lang zh chinese_text.txt
+# Chinese text analysis (automatic language detection)
+lawkit zipf --text chinese_text.txt
 
-# Auto-detection
-lawkit zipf --text --lang auto multilingual_doc.txt
+# Multilingual documents (automatic language detection)
+lawkit zipf --text multilingual_doc.txt
 ```
 
-### How do I change the output language?
+### What languages does lawkit support?
 
-Use the `--lang` parameter:
+lawkit provides English output unified across all analysis, with automatic recognition of international number formats:
 ```bash
-lawkit benf --lang ja data.csv  # Japanese output
-lawkit benf --lang zh data.csv  # Chinese output
-lawkit benf --lang auto data.csv  # Auto-detect
+# English output (unified)
+lawkit benf data.csv
+
+# International numbers automatically recognized
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
+echo "१२३४५६" | lawkit benf        # Hindi numbers
+echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
 ```
 
 ## Integration and Advanced Features
