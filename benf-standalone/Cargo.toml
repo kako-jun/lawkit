@@ -1,0 +1,23 @@
+[workspace]
+
+[package]
+name = "benf"
+version = "2.1.0"
+edition = "2021"
+authors = ["kako-jun"]
+license = "MIT"
+description = "Benford's Law analysis CLI - convenience wrapper for lawkit benf"
+homepage = "https://github.com/kako-jun/lawkit"
+repository = "https://github.com/kako-jun/lawkit"
+documentation = "https://docs.rs/lawkit-core"
+readme = "README.md"
+keywords = ["benford", "fraud-detection", "statistics", "audit", "lawkit"]
+categories = ["command-line-utilities", "mathematics", "science"]
+rust-version = "1.75"
+
+[[bin]]
+name = "benf"
+path = "src/main.rs"
+
+[dependencies]
+# No dependencies - this is a lightweight wrapper that calls lawkit

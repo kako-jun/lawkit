@@ -45,9 +45,13 @@ $ lawkit compare --laws all data.csv
 
 ```bash
 # Benchmark on 100K data points
-Traditional single-law tools: ~2.1s
-lawkit (single law):         ~180ms (11.7x faster)
-lawkit (multi-law compare):  ~850ms (2.5x faster than sequential)
+# Traditional tools analyze one pattern at a time
+benf data.csv                 # Single statistical analysis: ~2.1s
+pareto data.csv               # Another separate analysis: ~2.1s
+
+# lawkit analyzes multiple patterns efficiently
+lawkit benf data.csv          # Single law: ~180ms (11.7x faster)  
+lawkit compare data.csv       # Multi-law analysis: ~850ms (2.5x faster than sequential)
 ```
 
 | Dataset Size | Single Law | Multi-Law | Memory Usage |
@@ -130,7 +134,7 @@ graph LR
 ### Installation
 
 ```bash
-# Install from crates.io
+# Statistical analysis toolkit (recommended)
 cargo install lawkit
 
 # Or download pre-built binaries

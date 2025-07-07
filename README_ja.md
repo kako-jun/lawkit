@@ -37,9 +37,13 @@ $ lawkit compare --laws all data.csv
 
 ```bash
 # 100Kデータポイントでのベンチマーク
-従来の単一法則ツール: ~2.1秒
-lawkit (単一法則):     ~180ms (11.7倍高速)
-lawkit (多法則比較):   ~850ms (逐次実行より2.5倍高速)
+# 従来ツールは1つのパターンを個別に分析
+benf data.csv                 # 単一統計分析: ~2.1秒
+pareto data.csv               # 別の個別分析: ~2.1秒
+
+# lawkitは複数パターンを効率的に分析
+lawkit benf data.csv          # 単一法則: ~180ms (11.7倍高速)
+lawkit compare data.csv       # 多法則分析: ~850ms (逐次実行より2.5倍高速)
 ```
 
 | データセットサイズ | 単一法則 | 多法則 | メモリ使用量 |
@@ -54,7 +58,7 @@ lawkit (多法則比較):   ~850ms (逐次実行より2.5倍高速)
 ### インストール
 
 ```bash
-# crates.ioからインストール
+# 統計分析ツールキット（推奨）
 cargo install lawkit
 
 # または事前ビルドバイナリをダウンロード

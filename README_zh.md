@@ -37,9 +37,13 @@ $ lawkit compare --laws all data.csv
 
 ```bash
 # 100K数据点基准测试
-传统单法则工具: ~2.1秒
-lawkit (单法则):  ~180ms (快11.7倍)
-lawkit (多法则比较): ~850ms (比顺序执行快2.5倍)
+# 传统工具逐个分析模式
+benf data.csv                 # 单一统计分析: ~2.1秒
+pareto data.csv               # 另一个单独分析: ~2.1秒
+
+# lawkit高效多模式分析
+lawkit benf data.csv          # 单法则: ~180ms (快11.7倍)
+lawkit compare data.csv       # 多法则分析: ~850ms (比顺序执行快2.5倍)
 ```
 
 | 数据集大小 | 单法则 | 多法则 | 内存使用 |
@@ -54,7 +58,7 @@ lawkit (多法则比较): ~850ms (比顺序执行快2.5倍)
 ### 安装
 
 ```bash
-# 从crates.io安装
+# 统计分析工具包（推荐）
 cargo install lawkit
 
 # 或下载预构建二进制文件
