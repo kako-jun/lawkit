@@ -48,7 +48,9 @@
       "Bash(RUST_BACKTRACE=1 cargo test test_cli_reference_examples)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
-      "Bash(./target/release/benf:*)"
+      "Bash(./target/release/benf:*)",
+      "Bash(chmod:*)",
+      "Bash(./ci-local.sh:*)"
     ],
     "deny": []
   },
