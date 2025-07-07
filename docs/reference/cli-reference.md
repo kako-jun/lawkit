@@ -40,7 +40,6 @@ lawkit benf [OPTIONS] [INPUT]
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Detailed statistics
-- `--language <LANGUAGE>` - Output language: en, ja, zh, hi, ar (default: auto)
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
 - `--threshold <LEVEL>` - Custom anomaly detection threshold: low, medium, high, critical (default: auto)
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 5)
@@ -261,7 +260,6 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
-- `--language <LANG>` - Output language: en, ja, zh, hi, ar, auto
 - `--parallel` - Enable parallel processing
 - `--threads <NUMBER>` - Number of threads for parallel processing (0 = auto)
 - `--chunk-size <SIZE>` - Chunk size for memory-efficient processing (default: 10000)

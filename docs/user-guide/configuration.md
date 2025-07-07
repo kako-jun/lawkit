@@ -13,10 +13,9 @@
 lawkit benf data.csv --format json
 lawkit benf data.csv --format yaml
 
-# Language support
-lawkit benf data.csv --lang ja    # Japanese
-lawkit benf data.csv --lang zh    # Chinese
-lawkit benf data.csv --lang auto  # Auto-detect
+# International number support (automatic recognition)
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
 
 # Verbosity
 lawkit benf data.csv --quiet     # Minimal output

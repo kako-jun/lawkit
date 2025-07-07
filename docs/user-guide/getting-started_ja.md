@@ -45,8 +45,8 @@ lawkit pareto sales.csv --gini
 # テキストファイルの分析
 lawkit zipf document.txt
 
-# 複数言語対応
-lawkit zipf japanese_text.txt --language ja
+# テキスト分析
+lawkit zipf japanese_text.txt
 
 # 最小出現回数を指定
 lawkit zipf text.txt --min-frequency 5
@@ -153,20 +153,14 @@ lawkit benf data.csv --output xml
 lawkitは以下の言語に対応しています：
 
 ```bash
-# 日本語
-lawkit benf data.csv --language ja
+# 英語出力（デフォルト統一）
+lawkit benf data.csv
 
-# 英語（デフォルト）
-lawkit benf data.csv --language en
+# 日本語数字は自動認識されます
+echo "１２３４５６ ７８９０" | lawkit benf
 
-# 中国語
-lawkit benf data.csv --language zh
-
-# ヒンディー語
-lawkit benf data.csv --language hi
-
-# アラビア語
-lawkit benf data.csv --language ar
+# 中国語数字も自動認識されます
+echo "一千二百三十四" | lawkit benf
 ```
 
 ## 高度な機能
@@ -214,7 +208,7 @@ lawkit normal suspicious_data.csv --outliers
 lawkit pareto monthly_sales.csv --gini
 
 # 顧客分析
-lawkit zipf customer_feedback.txt --language ja
+lawkit zipf customer_feedback.txt
 ```
 
 ## 次のステップ
