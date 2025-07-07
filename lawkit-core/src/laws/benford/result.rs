@@ -36,7 +36,7 @@ impl BenfordResult {
 
         // Issue warning for small datasets but continue analysis
         if numbers.len() < 30 {
-            eprintln!("Warning: {} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.", numbers.len());
+            eprintln!("Warning: {numbers_analyzed} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.", numbers_analyzed=numbers.len());
         }
 
         let digit_distribution = super::analysis::calculate_digit_distribution(numbers);

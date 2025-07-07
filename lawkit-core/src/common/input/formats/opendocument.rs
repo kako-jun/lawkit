@@ -187,7 +187,7 @@ mod tests {
             let result = parse_opendocument_file(&test_path);
             match result {
                 Ok(numbers) => {
-                    println!("✅ ODT parsing succeeded! Found {} numbers", numbers.len());
+                    println!("✅ ODT parsing succeeded! Found {count} numbers", count=numbers.len());
                     assert!(
                         !numbers.is_empty(),
                         "Should extract at least some numbers from ODT"
@@ -195,19 +195,18 @@ mod tests {
 
                     // Print first few numbers for verification
                     println!(
-                        "First 10 numbers: {:?}",
-                        numbers.iter().take(10).collect::<Vec<_>>()
+                        "First 10 numbers: {first_10:?}",
+                        first_10=numbers.iter().take(10).collect::<Vec<_>>()
                     );
                 }
                 Err(e) => {
-                    println!("ODT parsing failed: {}", e);
+                    println!("ODT parsing failed: {e}");
                     // For now, we'll allow this to fail as the test file might not exist
                 }
             }
         } else {
             println!(
-                "Test ODT file not found at {:?}, skipping real file test",
-                test_path
+                "Test ODT file not found at {test_path:?}, skipping real file test"
             );
         }
     }
@@ -236,7 +235,7 @@ mod tests {
         assert!(text.contains("1,234,567"));
         assert!(text.contains("2,345,678"));
         assert!(text.contains("345"));
-        println!("Extracted ODT text: {}", text);
+        println!("Extracted ODT text: {text}");
     }
 
     #[test]
@@ -246,7 +245,7 @@ mod tests {
         assert!(result.contains("1,000,000"));
         assert!(result.contains("500,000"));
         assert!(!result.contains("<text:span"));
-        println!("Inner text: {}", result);
+        println!("Inner text: {result}");
     }
 
     #[test]
@@ -268,12 +267,12 @@ mod tests {
             match result {
                 Ok(numbers) => {
                     println!(
-                        "✅ ODS parsing (via Excel parser) succeeded! Found {} numbers",
-                        numbers.len()
+                        "✅ ODS parsing (via Excel parser) succeeded! Found {count} numbers",
+                        count=numbers.len()
                     );
                 }
                 Err(e) => {
-                    println!("ODS parsing failed: {}", e);
+                    println!("ODS parsing failed: {e}");
                     // This might fail if file doesn't exist, which is fine for testing
                 }
             }

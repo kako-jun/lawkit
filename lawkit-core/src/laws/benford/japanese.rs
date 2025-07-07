@@ -395,7 +395,7 @@ mod tests {
 
         // Test positional notation
         let result = convert_kanji_numerals("一千二百三十四");
-        println!("Testing '一千二百三十四' -> '{}'", result);
+        println!("Testing '一千二百三十四' -> '{result}'");
         assert_eq!(result, "1234");
 
         assert_eq!(convert_kanji_numerals("五万六千七百八十九"), "56789");
@@ -424,7 +424,7 @@ mod tests {
     fn test_mixed_conversion() {
         let result = convert_japanese_numerals("売上１２３万円 経費四五六万円");
         println!("Input: '売上１２３万円 経費四五六万円'");
-        println!("Result: '{}'", result);
+        println!("Result: '{result}'");
         assert!(result.contains("123"));
         assert!(result.contains("456"));
     }

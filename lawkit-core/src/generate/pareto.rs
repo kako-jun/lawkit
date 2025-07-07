@@ -112,8 +112,7 @@ mod tests {
         // This is mathematically correct for the concentration definition we're using
         assert!(
             (alpha - 0.878).abs() < 0.1,
-            "Expected alpha ~0.878, got {}",
-            alpha
+            "Expected alpha ~0.878, got {alpha}"
         );
     }
 }

@@ -169,8 +169,8 @@ mod tests {
             match result {
                 Ok(numbers) => {
                     println!(
-                        "✅ PowerPoint parsing succeeded! Found {} numbers",
-                        numbers.len()
+                        "✅ PowerPoint parsing succeeded! Found {count} numbers",
+                        count=numbers.len()
                     );
                     assert!(
                         !numbers.is_empty(),
@@ -179,20 +179,19 @@ mod tests {
 
                     // Print first few numbers for verification
                     println!(
-                        "First 10 numbers: {:?}",
-                        numbers.iter().take(10).collect::<Vec<_>>()
+                        "First 10 numbers: {first_10:?}",
+                        first_10=numbers.iter().take(10).collect::<Vec<_>>()
                     );
                 }
                 Err(e) => {
-                    println!("PowerPoint parsing failed: {}", e);
+                    println!("PowerPoint parsing failed: {e}");
                     // For now, we'll allow this to fail as the implementation is new
                     // In the future, this should be changed to assert!(false)
                 }
             }
         } else {
             println!(
-                "Test PowerPoint file not found at {:?}, skipping real file test",
-                test_path
+                "Test PowerPoint file not found at {test_path:?}, skipping real file test"
             );
         }
     }
@@ -220,7 +219,7 @@ mod tests {
         let text = result.unwrap();
         assert!(text.contains("1,234,567"));
         assert!(text.contains("2,345,678"));
-        println!("Extracted text: {}", text);
+        println!("Extracted text: {text}");
     }
 
     #[test]
