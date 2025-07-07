@@ -1,9 +1,13 @@
 # 更新日志
 
-本文档记录lawkit的所有重要变更。
+**注意**: 此文件已移至根目录。请查看 [/CHANGELOG.md](../../CHANGELOG.md) 获取最新更新日志。
+
+lawkit的所有重要变更都记录在主更新日志文件中。
 
 格式基于[保持更新日志](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目遵循[语义化版本](https://semver.org/lang/zh-CN/)规范。
+
+请查看主更新日志文件 [/CHANGELOG.md](../../CHANGELOG.md) 获取所有版本历史和发布说明。
 
 ## [未发布]
 
