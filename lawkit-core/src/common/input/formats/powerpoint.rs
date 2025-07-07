@@ -170,7 +170,7 @@ mod tests {
                 Ok(numbers) => {
                     println!(
                         "✅ PowerPoint parsing succeeded! Found {count} numbers",
-                        count=numbers.len()
+                        count = numbers.len()
                     );
                     assert!(
                         !numbers.is_empty(),
@@ -180,7 +180,7 @@ mod tests {
                     // Print first few numbers for verification
                     println!(
                         "First 10 numbers: {first_10:?}",
-                        first_10=numbers.iter().take(10).collect::<Vec<_>>()
+                        first_10 = numbers.iter().take(10).collect::<Vec<_>>()
                     );
                 }
                 Err(e) => {
@@ -190,9 +190,7 @@ mod tests {
                 }
             }
         } else {
-            println!(
-                "Test PowerPoint file not found at {test_path:?}, skipping real file test"
-            );
+            println!("Test PowerPoint file not found at {test_path:?}, skipping real file test");
         }
     }
 

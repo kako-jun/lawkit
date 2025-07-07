@@ -57,7 +57,10 @@ mod tests {
                     // Should extract numbers from the test PDF file
                     assert!(!numbers.is_empty(), "Should extract at least some numbers");
 
-                    println!("Extracted {count} numbers from PDF file", count=numbers.len());
+                    println!(
+                        "Extracted {count} numbers from PDF file",
+                        count = numbers.len()
+                    );
                     println!("All extracted numbers: {numbers:?}");
 
                     // Expected numbers from our financial report:
@@ -79,22 +82,18 @@ mod tests {
                     assert!(
                         numbers.len() >= 20,
                         "Should extract at least 20 numbers, got {count}",
-                        count=numbers.len()
+                        count = numbers.len()
                     );
 
                     println!("✅ PDF parsing test passed! Extracted financial report data.");
                 }
                 Err(e) => {
                     // If the test file is missing or corrupt, that's also a valid test result
-                    println!(
-                        "PDF parsing failed (expected if test file is missing): {e}"
-                    );
+                    println!("PDF parsing failed (expected if test file is missing): {e}");
                 }
             }
         } else {
-            println!(
-                "Test PDF file not found at {test_path:?}, skipping real file test"
-            );
+            println!("Test PDF file not found at {test_path:?}, skipping real file test");
         }
     }
 }
