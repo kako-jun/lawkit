@@ -163,7 +163,14 @@ Advanced time series features include:
 
 ### Parallel Processing Architecture
 
-The parallel processing system provides:
+The unified `--optimize` flag automatically provides:
+
+- **Automatic Thread Detection**: Uses available CPU cores efficiently
+- **Memory Management**: Streams large files and manages memory usage
+- **Parallel Processing**: Distributes work across available resources
+- **Intelligent Chunking**: Processes data in optimal sizes
+
+This single flag eliminates the need for users to understand complex performance tuning parameters.
 
 - **Automatic Thread Detection**: Uses available CPU cores
 - **Chunk-based Processing**: Memory-efficient data splitting
@@ -192,9 +199,9 @@ lawkit benf data.csv --benchmark
 lawkit benf data.csv --profile-memory
 
 # Compare different configurations
-lawkit benf data.csv --benchmark --threads 1
-lawkit benf data.csv --benchmark --threads 4
-lawkit benf data.csv --benchmark --threads 8
+time lawkit benf data.csv          # Standard processing
+time lawkit benf data.csv --optimize  # Optimized processing
+time lawkit benf large_data.csv --optimize  # Large dataset optimization
 ```
 
 ### Custom Benchmarks
@@ -212,10 +219,11 @@ for size in 1000 5000 10000 50000; do
 done
 
 # Test different thread counts
-for threads in 1 2 4 8; do
-    echo "Testing threads: $threads"
-    time lawkit compare data.csv --threads $threads --quiet
-done
+# Performance comparison
+echo "Testing standard mode:"
+time lawkit compare data.csv --quiet
+echo "Testing optimized mode:"
+time lawkit compare data.csv --optimize --quiet
 ```
 
 ## Memory Usage Optimization
@@ -228,16 +236,16 @@ done
 # Limit memory usage
 memory_limit = 1024  # MB
 
-# Use streaming for large files
-streaming_threshold = 100000  # rows
+# Use optimizations for large files
+optimization_threshold = 100000  # rows
 
 # Cache settings
 cache_enabled = true
 cache_size = 512  # MB
 
 [processing]
-# Chunk size for streaming
-chunk_size = 10000
+# Optimization configuration
+optimize_large_datasets = true
 
 # Buffer size for file I/O
 buffer_size = 8192
@@ -262,14 +270,15 @@ lawkit benf data2.csv
 ### Thread Configuration
 
 ```bash
-# CPU-intensive analysis with maximum threads
-lawkit compare data.csv --threads $(nproc)
+# Optimized analysis for large datasets
+lawkit compare data.csv --optimize
 
-# Balanced approach (leave some cores free)
-lawkit compare data.csv --threads $(($(nproc) - 2))
+# Standard processing for comparison
+lawkit compare data.csv
 
-# Single-threaded for consistency
-lawkit benf data.csv --threads 1
+# Performance comparison
+time lawkit benf data.csv
+time lawkit benf data.csv --optimize
 ```
 
 ### Algorithm Selection
@@ -293,11 +302,11 @@ lawkit benf data.csv --algorithm balanced
 # Use memory mapping for large files
 lawkit benf huge_file.csv --mmap
 
-# Streaming mode for files larger than memory
-lawkit benf massive_file.csv --streaming
+# Optimized mode for files larger than memory
+lawkit benf massive_file.csv --optimize
 
-# Parallel file reading
-lawkit benf data.csv --parallel-io
+# Optimized file processing
+lawkit benf data.csv --optimize
 ```
 
 ### Output Optimization
@@ -321,11 +330,11 @@ lawkit compare data.csv --compress-output
 # Cache remote files locally
 lawkit benf https://example.com/data.csv --cache-remote
 
-# Streaming for large remote files
-lawkit benf https://example.com/huge.csv --streaming
+# Optimized processing for large remote files
+lawkit benf https://example.com/huge.csv --optimize
 
-# Parallel download chunks
-lawkit benf https://example.com/data.csv --parallel-download
+# Optimized download processing
+lawkit benf https://example.com/data.csv --optimize
 ```
 
 ## Performance Monitoring
@@ -365,7 +374,7 @@ perf report
 ```bash
 # Minimal overhead configuration
 lawkit benf small_data.csv \
-  --threads 1 \
+  --quiet \
   --no-cache \
   --algorithm fast
 ```
@@ -375,7 +384,7 @@ lawkit benf small_data.csv \
 ```bash
 # Balanced configuration
 lawkit compare medium_data.csv \
-  --threads 4 \
+  --optimize \
   --cache-enabled \
   --algorithm balanced
 ```
@@ -385,10 +394,8 @@ lawkit compare medium_data.csv \
 ```bash
 # Optimized for large datasets
 lawkit compare large_data.csv \
-  --threads 8 \
-  --memory-limit 2048 \
-  --sample-size 100000 \
-  --streaming
+  --optimize \
+  --sample-size 100000
 ```
 
 ### Very Large Data (> 1M records)
@@ -397,20 +404,16 @@ lawkit compare large_data.csv \
 # Maximum optimization with advanced features
 lawkit benf huge_data.csv \
   --sample-size 50000 \
-  --enable-parallel \
-  --parallel-threads $(nproc) \
+  --optimize \
   --memory-limit 4096 \
-  --streaming \
-  --chunk-size 10000 \
   --outlier-method ensemble \
   --incremental-stats
 
 # Time series analysis for large datasets
 lawkit benf timeseries_data.csv \
   --enable-timeseries \
-  --enable-parallel \
+  --optimize \
   --memory-limit 2048 \
-  --streaming \
   --forecast-steps 10
 ```
 
@@ -421,20 +424,17 @@ lawkit benf timeseries_data.csv \
 lawkit benf data.csv \
   --outlier-method lof \
   --outlier-k 10 \
-  --enable-parallel \
-  --parallel-chunk-size 5000
+  --optimize
 
 # Memory-efficient time series processing
 lawkit benf timeseries.csv \
   --enable-timeseries \
-  --streaming \
-  --chunk-size 1000 \
+  --optimize \
   --incremental-stats
 
 # Parallel comparison analysis
 lawkit compare datasets/*.csv \
-  --enable-parallel \
-  --parallel-threads 8 \
+  --optimize \
   --memory-limit 1024
 ```
 
@@ -444,8 +444,8 @@ lawkit compare datasets/*.csv \
 
 1. **Slow file reading**
    ```bash
-   # Solution: Use streaming mode
-   lawkit benf data.csv --streaming
+   # Solution: Use optimization mode
+   lawkit benf data.csv --optimize
    ```
 
 2. **High memory usage**
