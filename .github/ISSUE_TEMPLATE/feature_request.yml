@@ -1,0 +1,138 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for lawkit
+title: "[Feature]: "
+labels: ["enhancement", "feature-request"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! 
+        Feature requests help us make lawkit more useful for statistical analysis and fraud detection.
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: I would like lawkit to support...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case / Problem
+      description: What problem does this feature solve? How would you use it?
+      placeholder: |
+        This would be useful for...
+        Currently I have to...
+        This feature would help with...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - New Statistical Law (e.g., Weibull, Gamma, Beta)
+        - Data Input/Output (new formats, sources)
+        - Analysis Enhancement (better algorithms, accuracy)
+        - Visualization (charts, graphs, reports)
+        - Performance Improvement
+        - CLI/UX Enhancement
+        - API/Integration (Python, Node.js)
+        - Documentation/Examples
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How do you envision this feature working?
+      placeholder: |
+        The feature could work like this:
+        1. User runs `lawkit newlaw data.csv`
+        2. lawkit analyzes...
+        3. Output shows...
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Provide examples of how this feature would be used
+      placeholder: |
+        ```bash
+        # Example command
+        lawkit newfeature data.csv --option value
+        
+        # Expected output
+        Analysis Result: ...
+        ```
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered alternative solutions or workarounds?
+      placeholder: |
+        Currently I use...
+        Other tools that do this...
+        Workarounds I've tried...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical (blocking my work)
+        - High (significantly improves my workflow)
+        - Medium (nice to have)
+        - Low (minor improvement)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit from this feature?
+      options:
+        - Fraud Analysts
+        - Auditors
+        - Data Scientists
+        - Financial Analysts
+        - Researchers
+        - Quality Control Specialists
+        - General Users
+        - Developers/Integrators
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context, screenshots, or links about the feature request.
+        - Links to research papers or documentation
+        - Similar features in other tools
+        - Any technical considerations
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid creating duplicates
+          required: true
+        - label: This feature aligns with lawkit's purpose (statistical law analysis)
+          required: true
+        - label: I have provided clear use cases and examples
+          required: true

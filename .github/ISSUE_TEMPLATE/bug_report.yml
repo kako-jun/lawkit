@@ -1,0 +1,167 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in lawkit
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! 
+        This helps us improve lawkit for everyone.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: When I run lawkit with..., I expected..., but instead...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide step-by-step instructions to reproduce the issue
+      placeholder: |
+        1. Run `lawkit benf data.csv --format json`
+        2. Observe the output...
+        3. Expected: ...
+        4. Actual: ...
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: input_data
+    attributes:
+      label: Input Data (if applicable)
+      description: |
+        If possible, provide minimal example data that reproduces the issue.
+        Please ensure no sensitive data is included.
+      placeholder: |
+        ```csv
+        amount
+        123.45
+        456.78
+        789.12
+        ```
+        
+        Or command used:
+        ```bash
+        lawkit benf data.csv --format json
+        ```
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: lawkit should output...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include any error messages.
+      placeholder: |
+        lawkit outputs:
+        ```
+        Error: ...
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    id: command
+    attributes:
+      label: Affected Command
+      description: Which lawkit command is affected?
+      options:
+        - benf (Benford's Law)
+        - pareto (Pareto Principle)
+        - zipf (Zipf's Law)
+        - normal (Normal Distribution)
+        - poisson (Poisson Distribution)
+        - compare (Multi-law comparison)
+        - generate (Data generation)
+        - selftest (Self-test)
+        - Other / Multiple commands
+    validations:
+      required: true
+
+  - type: input
+    id: lawkit_version
+    attributes:
+      label: lawkit Version
+      description: Run `lawkit --version`
+      placeholder: "lawkit 2.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation Method
+      description: How did you install lawkit?
+      options:
+        - Cargo (cargo install lawkit)
+        - Binary download from GitHub Releases
+        - npm (lawkit-js)
+        - pip (lawkit-python)
+        - Built from source
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS Version
+      description: Specific OS version (e.g., Ubuntu 22.04, macOS 13.0, Windows 11)
+      placeholder: "Ubuntu 22.04"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context about the problem here.
+        - Are you using any special configuration?
+        - Does this happen with specific data types/formats?
+        - Any workarounds you've found?
+        - Related to fraud detection, audit, or specific statistical analysis?
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid creating duplicates
+          required: true
+        - label: I have provided all the requested information above
+          required: true
+        - label: I can reproduce this issue consistently
+          required: true
+        - label: I have removed any sensitive data from my examples
+          required: true
