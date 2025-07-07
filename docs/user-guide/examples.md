@@ -68,10 +68,10 @@ lawkit normal seasonal_demand.csv --quality-control --verbose
 
 ```bash
 # Word frequency analysis
-lawkit zipf website_content.txt --top-words 100
+lawkit zipf website_content.txt --text --words 100
 
 # Content distribution analysis
-lawkit zipf blog_posts.txt --min-count 5 --correlation 0.8
+lawkit zipf blog_posts.txt --text --min-count 10
 ```
 
 **Use Cases**:

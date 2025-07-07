@@ -42,7 +42,7 @@ lawkit benf [OPTIONS] [INPUT]
 - `--verbose, -v` - Detailed statistics
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
 - `--threshold <LEVEL>` - Custom anomaly detection threshold: low, medium, high, critical (default: auto)
-- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 5)
+- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
 
 #### Examples
 ```bash
@@ -75,7 +75,7 @@ lawkit pareto [OPTIONS] [INPUT]
 lawkit pareto sales.csv --business-analysis
 
 # Custom percentiles
-lawkit pareto data.csv --percentiles "70,80,90"
+lawkit pareto data.csv --percentiles 70,80,90
 ```
 
 ### `lawkit zipf` - Zipf's Law Analysis
@@ -87,17 +87,16 @@ lawkit zipf [OPTIONS] [INPUT]
 ```
 
 #### Specific Options
-- `--text-analysis` - Enable text/word frequency analysis
-- `--ranking` - Analyze ranking distributions
-- `--correlation-method <METHOD>` - Correlation calculation method
+- `--text, -T` - Enable text analysis mode
+- `--words, -w <NUMBER>` - Maximum number of words to analyze in text mode (default: 1000)
 
 #### Examples
 ```bash
 # Text frequency analysis
-lawkit zipf document.txt --text-analysis
+lawkit zipf document.txt --text
 
-# Numeric ranking
-lawkit zipf rankings.csv --ranking
+# Numeric ranking with custom word limit
+lawkit zipf rankings.csv --text --words 500
 ```
 
 ### `lawkit normal` - Normal Distribution Analysis
@@ -114,7 +113,6 @@ lawkit normal [OPTIONS] [INPUT]
 - `--outlier-method <METHOD>` - Detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (default: zscore)
 - `--quality-control` - Enable quality control analysis
 - `--spec-limits <LIMITS>` - Specification limits: "lower,upper"
-- `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
 - `--enable-timeseries` - Enable time series analysis
 - `--timeseries-window <SIZE>` - Time series analysis window size (default: 10)
 
@@ -130,7 +128,7 @@ lawkit normal data.csv --outliers --outlier-method ensemble
 lawkit normal timeseries.csv --enable-timeseries --timeseries-window 20
 
 # Quality control
-lawkit normal measurements.csv --quality-control --spec-limits "10,20"
+lawkit normal measurements.csv --quality-control --spec-limits 10,20
 ```
 
 ### `lawkit poisson` - Poisson Distribution Analysis
@@ -144,9 +142,8 @@ lawkit poisson [OPTIONS] [INPUT]
 #### Specific Options
 - `--test <TYPE>` - Poisson test: chi-square, ks, variance, all (default: all)
 - `--predict` - Enable event probability prediction
-- `--max-events <COUNT>` - Maximum events for prediction (default: 10)
+- `--max-events <COUNT>` - Maximum events for prediction (default: 20)
 - `--rare-events` - Enable rare event analysis
-- `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
 
 #### Examples
 ```bash
@@ -260,14 +257,11 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
-- `--parallel` - Enable parallel processing
-- `--threads <NUMBER>` - Number of threads for parallel processing (0 = auto)
-- `--chunk-size <SIZE>` - Chunk size for memory-efficient processing (default: 10000)
-- `--streaming` - Enable streaming mode for large datasets
+- `--optimize` - Enable memory and processing optimizations for large datasets
 
 ### Data Processing
 - `--filter <RANGE>` - Number filtering (>=100, <1000, 50-500)
-- `--min-count <NUMBER>` - Minimum data points required
+- `--min-count <NUMBER>` - Minimum data points required (default: 10)
 
 ## Input Formats
 
@@ -335,16 +329,16 @@ lawkit compare suspicious_data.csv --purpose fraud --recommend
 lawkit compare dataset.csv --purpose quality --report detailed
 
 # Focus on normality
-lawkit normal dataset.csv --test all --confidence-level 0.99
+lawkit normal dataset.csv --test all
 ```
 
 ### Business Intelligence
 ```bash
 # 80/20 analysis
-lawkit pareto sales.csv --business-analysis --percentiles "80,90,95"
+lawkit pareto sales.csv --business-analysis --percentiles 80,90,95
 
 # Customer analysis
-lawkit zipf customer_frequency.csv --ranking
+lawkit zipf customer_frequency.csv --text
 ```
 
 ### Anomaly Detection

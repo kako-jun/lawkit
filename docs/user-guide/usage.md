@@ -34,7 +34,7 @@ lawkit <SUBCOMMAND> [OPTIONS] <INPUT>
 ### Common Options
 
 - `--format <FORMAT>` - Output format (text, json, csv, yaml, toml, xml)
-- `--lang <LANGUAGE>` - Output language (en, ja, zh, hi, ar, auto)
+- `--optimize` - Enable optimizations for large datasets
 - `--quiet` - Minimal output
 - `--verbose` - Detailed analysis
 - `--filter <RANGE>` - Filter data by range
@@ -95,8 +95,8 @@ lawkit zipf --text document.txt
 # Analyze numerical data
 lawkit zipf --verbose city_populations.csv
 
-# Multi-language text analysis
-lawkit zipf --text --lang ja japanese_text.txt
+# Multi-language text analysis (automatic language detection)
+lawkit zipf --text japanese_text.txt
 ```
 
 **Use Cases:**
@@ -287,18 +287,17 @@ lawkit benf --min-count 100 data.csv
 
 ## Multi-language Support
 
-### Language Selection
+### International Number Recognition
 
 ```bash
-# Auto-detect (default)
-lawkit benf --lang auto data.csv
+# English output (unified across all analysis)
+lawkit benf data.csv
 
-# Specific languages
-lawkit benf --lang en data.csv    # English
-lawkit benf --lang ja data.csv    # Japanese
-lawkit benf --lang zh data.csv    # Chinese
-lawkit benf --lang hi data.csv    # Hindi
-lawkit benf --lang ar data.csv    # Arabic
+# International numbers are automatically recognized
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
+echo "१२३४५६" | lawkit benf        # Hindi numbers
+echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
 ```
 
 ### International Numbers
@@ -401,8 +400,8 @@ lawkit poisson --predict --max-events 20 incidents.csv
 # Word frequency analysis
 lawkit zipf --text document.txt
 
-# Multi-language text processing
-lawkit zipf --text --lang ja japanese_document.txt
+# Multi-language text processing (automatic language detection)
+lawkit zipf --text japanese_document.txt
 ```
 
 ## Examples by Use Case
@@ -439,8 +438,8 @@ lawkit poisson --verbose --test all defect_counts.csv
 # Zipf's law on word frequencies
 lawkit zipf --text --verbose document.txt
 
-# Multi-language document analysis
-lawkit zipf --text --lang auto multilingual_doc.txt
+# Multi-language document analysis (automatic language detection)
+lawkit zipf --text multilingual_doc.txt
 ```
 
 ### Business Intelligence
