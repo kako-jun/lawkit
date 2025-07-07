@@ -1,159 +1,106 @@
 # Roadmap
 
-This document outlines the future development plans for lawkit.
+This document outlines realistic future development plans for lawkit.
 
-## Version 2.1 (Q1 2025)
+## Near-term Goals (Q1-Q2 2025)
 
-### Performance Enhancements
-- [ ] **Streaming Analysis**: True streaming for files larger than memory
-- [ ] **GPU Acceleration**: CUDA/OpenCL support for large-scale computations
-- [ ] **Parallel Processing**: Enhanced multi-threading for all statistical laws
-- [ ] **Memory Optimization**: Reduced memory footprint for large datasets
+### Package Distribution
+- [x] **Rust crates.io**: Core and CLI packages published
+- [ ] **npm package**: JavaScript wrapper completion and publication  
+- [ ] **PyPI package**: Python wrapper completion and publication
+- [ ] **Homebrew formula**: macOS package manager support
 
-### New Statistical Laws
-- [ ] **Chi-Square Law**: Goodness-of-fit testing
-- [ ] **Power Law**: Scale-free network analysis
-- [ ] **Weibull Distribution**: Reliability and survival analysis
-- [ ] **Gamma Distribution**: Continuous probability distributions
+### Additional Statistical Laws
+- [ ] **Weibull Distribution**: Reliability and survival analysis (moderate priority)
+- [ ] **Log-Normal Distribution**: Financial and environmental data analysis
+- [ ] **Beta Distribution**: Probability modeling (if community interest)
 
-### Extended Format Support
-- [ ] **Apache Parquet**: Columnar storage format
-- [ ] **Apache Arrow**: In-memory columnar format
-- [ ] **HDF5**: Scientific data format
-- [ ] **Database Connectors**: Direct SQL database analysis
+### Documentation & Quality
+- [ ] **Performance benchmarks**: Publish detailed performance comparisons
+- [ ] **Tutorial videos**: Basic usage demonstrations
+- [ ] **API documentation**: Complete API reference hosting
+- [ ] **Integration examples**: Real-world usage patterns
 
-## Version 2.2 (Q2 2025)
+## Medium-term Possibilities (Q3-Q4 2025)
 
-### Machine Learning Integration
-- [ ] **Anomaly Detection**: ML-based outlier detection
-- [ ] **Pattern Recognition**: Automated pattern discovery
-- [ ] **Predictive Analytics**: Forecasting based on statistical laws
-- [ ] **Model Training**: Custom model training for specific domains
+### Enhanced Features (if there's demand)
+- [ ] **Configuration files**: YAML/TOML configuration support
+- [ ] **Batch processing**: Multi-file analysis workflows
+- [ ] **Report generation**: PDF/HTML summary reports
+- [ ] **Simple visualization**: Basic chart generation
 
-### Visualization
-- [ ] **Interactive Charts**: Web-based visualization dashboard
-- [ ] **Export Formats**: SVG, PNG, PDF chart exports
-- [ ] **Real-time Monitoring**: Live data analysis and visualization
-- [ ] **Custom Dashboards**: Configurable analysis dashboards
+### Platform Support
+- [ ] **Windows ARM**: Native ARM64 Windows binaries
+- [ ] **Docker containers**: Official container images
+- [ ] **CI/CD integration**: GitHub Actions, GitLab CI examples
 
-### API Enhancements
-- [ ] **REST API Server**: HTTP API for remote analysis
-- [ ] **WebAssembly**: Browser-based analysis
-- [ ] **Python Bindings**: Native Python integration
-- [ ] **R Package**: R language integration
-
-## Version 2.3 (Q3 2025)
-
-### Advanced Analytics
-- [ ] **Time Series Analysis**: Temporal pattern detection
-- [ ] **Correlation Analysis**: Multi-variate relationships
-- [ ] **Regression Analysis**: Statistical modeling
-- [ ] **Cluster Analysis**: Data grouping and segmentation
-
-### Domain-Specific Features
-- [ ] **Financial Fraud**: Enhanced financial crime detection
-- [ ] **Scientific Data**: Research data validation
-- [ ] **Quality Control**: Manufacturing and process control
-- [ ] **Audit Tools**: Professional audit workflows
-
-### Cloud Integration
-- [ ] **AWS Integration**: S3, Lambda, CloudWatch support
-- [ ] **Google Cloud**: Cloud Storage and BigQuery support
-- [ ] **Azure Integration**: Blob Storage and Azure Functions
-- [ ] **Kubernetes**: Container orchestration support
-
-## Version 3.0 (Q4 2025)
-
-### Platform Evolution
-- [ ] **Plugin System**: Third-party law implementations
-- [ ] **Scripting Engine**: Lua/Python scripting support
-- [ ] **Workflow Engine**: Complex analysis pipelines
-- [ ] **Configuration Management**: Advanced configuration system
-
-### Enterprise Features
-- [ ] **Role-Based Access**: User permission system
-- [ ] **Audit Logging**: Comprehensive activity logs
-- [ ] **Compliance Tools**: Regulatory compliance support
-- [ ] **Multi-tenancy**: Shared instance support
-
-### Performance & Scalability
-- [ ] **Distributed Computing**: Cluster-based analysis
-- [ ] **Cloud-Native**: Serverless function support
-- [ ] **Auto-scaling**: Dynamic resource allocation
-- [ ] **Caching**: Intelligent result caching
+### Community Features
+- [ ] **Plugin system**: Simple extension mechanism (if needed)
+- [ ] **Custom thresholds**: User-defined risk levels
+- [ ] **Output templates**: Customizable report formats
 
 ## Long-term Vision (2026+)
 
-### Artificial Intelligence
-- [ ] **LLM Integration**: Natural language query interface
-- [ ] **Automated Insights**: AI-generated analysis reports
-- [ ] **Smart Recommendations**: Context-aware suggestions
-- [ ] **Adaptive Learning**: Self-improving analysis algorithms
+### Research Areas (exploratory)
+- [ ] **Time series analysis**: Trend and seasonality detection improvements
+- [ ] **Multi-dimensional analysis**: Correlation between multiple laws
+- [ ] **Domain-specific optimizations**: Finance, manufacturing, research use cases
 
-### Research & Development
-- [ ] **New Statistical Laws**: Cutting-edge statistical methods
-- [ ] **Academic Partnerships**: University research collaboration
-- [ ] **Open Science**: Research dataset publication
-- [ ] **Standards Development**: Industry standard contributions
+### Ecosystem Integration (community-driven)
+- [ ] **Database connectors**: Direct SQL analysis (if requested)
+- [ ] **Cloud storage**: S3/GCS integration (if needed)
+- [ ] **Notebook integration**: Jupyter/Observable support
 
-### Ecosystem Expansion
-- [ ] **Certification Program**: Professional lawkit certification
-- [ ] **Training Materials**: Educational courses and materials
-- [ ] **Community Platform**: User forums and knowledge sharing
-- [ ] **Marketplace**: Third-party tools and extensions
+## Development Philosophy
 
-## Community Contributions
+### Realistic Approach
+- **Focus on core competency**: Statistical law analysis
+- **Maintain simplicity**: UNIX philosophy of doing one thing well
+- **Community-driven priorities**: Features based on actual user needs
+- **Quality over quantity**: Robust implementation over feature count
 
-We welcome community contributions to help achieve these goals:
+### What We Won't Do
+- **Over-engineering**: Complex enterprise features without clear demand
+- **Feature creep**: Adding features that don't serve the core mission
+- **Platform lock-in**: Proprietary or vendor-specific implementations
+- **Bloatware**: Heavy dependencies or complex installation requirements
 
-### How to Contribute
-- **Feature Requests**: Submit issues for new features
-- **Code Contributions**: Pull requests for implementations
+## Contributing
+
+### Priority Areas for Contributors
+1. **Bug reports and fixes**: Most valuable contribution
+2. **Documentation improvements**: Examples, guides, tutorials
+3. **Performance optimizations**: Memory usage, speed improvements
+4. **New statistical laws**: Well-researched mathematical implementations
+5. **Platform support**: Testing on different systems
+
+### How to Get Involved
+- **GitHub Issues**: Report bugs or suggest features
+- **Pull Requests**: Code contributions welcome
 - **Documentation**: Help improve guides and examples
 - **Testing**: Beta testing of new features
-- **Feedback**: User experience and performance feedback
+- **Feedback**: Real-world usage reports
 
-### Priority Areas
-1. **New Statistical Laws**: Implementation of additional laws
-2. **Performance Optimization**: Speed and memory improvements
-3. **Format Support**: New file format parsers
-4. **Documentation**: Usage examples and tutorials
-5. **Integration**: Connectors for popular tools
+## Release Philosophy
 
-## Technology Stack Evolution
+### Stable Releases
+- **Semantic versioning**: Clear version number meaning
+- **Backward compatibility**: Maintain CLI compatibility
+- **Thorough testing**: Comprehensive test coverage
+- **Documentation updates**: Always accompany feature releases
 
-### Current Stack
-- **Core**: Rust for performance and safety
-- **CLI**: clap for command-line interface
-- **Parsing**: serde for data serialization
-- **Math**: statrs for statistical computations
+### Release Cadence
+- **Bug fixes**: As needed (patch versions)
+- **Minor features**: Quarterly if ready (minor versions)
+- **Major changes**: Yearly at most (major versions)
 
-### Future Additions
-- **GPU**: cudf, rapids for GPU acceleration
-- **Web**: wasm-bindgen for WebAssembly
-- **Visualization**: plotly.js, d3.js for charts
-- **ML**: candle, tch for machine learning
-- **Cloud**: tokio, hyper for async networking
+## Current Status
 
-## Release Schedule
+lawkit 2.1.0 represents a mature, stable statistical analysis toolkit. Future development will focus on:
 
-| Version | Target Date | Focus Area |
-|---------|-------------|------------|
-| 2.1.0   | Q1 2025     | Performance & New Laws |
-| 2.1.5   | Q1 2025     | Bug fixes & improvements |
-| 2.2.0   | Q2 2025     | ML & Visualization |
-| 2.2.5   | Q2 2025     | API & Integration |
-| 2.3.0   | Q3 2025     | Advanced Analytics |
-| 2.3.5   | Q3 2025     | Cloud & Enterprise |
-| 3.0.0   | Q4 2025     | Platform Evolution |
+1. **Stability and performance** over new features
+2. **Community needs** over ambitious roadmaps
+3. **Quality implementations** over rapid feature addition
+4. **Real-world utility** over theoretical completeness
 
-## Feedback
-
-We value your feedback on this roadmap:
-
-- **GitHub Issues**: Feature requests and suggestions
-- **Discussions**: Community input on priorities
-- **Surveys**: Periodic user needs assessment
-- **Direct Contact**: Maintainer communication
-
-This roadmap is subject to change based on user feedback, technical constraints, and market needs. We're committed to building the most comprehensive statistical analysis platform while maintaining the simplicity and performance that makes lawkit valuable.
+This roadmap is intentionally conservative and will evolve based on actual user needs rather than speculative features.
