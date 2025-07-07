@@ -2,7 +2,7 @@
 
 > **🔍 Multi-law statistical analysis toolkit - Uncover hidden patterns and detect anomalies with confidence**
 
-[日本語版 README](README_ja.md) | [中文版 README](README_zh.md) | [English README](README.md)
+[English README](README.md) | [日本語版 README](README_ja.md) | [中文版 README](README_zh.md)
 
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)

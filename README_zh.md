@@ -2,6 +2,8 @@
 
 > **🔍 多法则统计分析工具包 - 发现隐藏模式，自信检测异常**
 
+[English README](README.md) | [日本語版 README](README_ja.md) | [中文版 README](README_zh.md)
+
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
 [![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
