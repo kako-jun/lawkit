@@ -52,20 +52,6 @@ pub fn add_common_options(cmd: Command) -> Command {
             .help("Enable memory and processing optimizations for large datasets")
             .action(clap::ArgAction::SetTrue),
     )
-    .arg(
-        Arg::new("threads")
-            .long("threads")
-            .value_name("NUMBER")
-            .help("Number of threads for parallel processing (0 = auto, used with --optimize)")
-            .default_value("0"),
-    )
-    .arg(
-        Arg::new("chunk-size")
-            .long("chunk-size")
-            .value_name("SIZE")
-            .help("Chunk size for memory-efficient processing (used with --optimize)")
-            .default_value("10000"),
-    )
 }
 
 /// input引数を追加（位置引数）
