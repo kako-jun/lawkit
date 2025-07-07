@@ -1,0 +1,44 @@
+{
+  "name": "lawkit-js",
+  "version": "2.1.0",
+  "description": "A Node.js wrapper for the lawkit CLI tool - statistical law analysis toolkit for fraud detection, data quality assessment, and audit compliance.",
+  "keywords": ["statistics", "benford", "pareto", "zipf", "normal", "poisson", "fraud-detection", "data-quality", "audit", "compliance", "cli", "statistical-analysis", "financial-analysis"],
+  "main": "index.js",
+  "bin": {
+    "lawkit": "./index.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/download-binary.js",
+    "test": "node test.js",
+    "examples": "node examples.js",
+    "verify": "node index.js --help"
+  },
+  "author": "kako-jun <kako.jun.42@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/kako-jun/lawkit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kako-jun/lawkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kako-jun/lawkit/issues"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "index.js",
+    "scripts/download-binary.js",
+    "bin/",
+    "README.md"
+  ],
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

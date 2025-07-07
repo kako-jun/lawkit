@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lawkit-python"
+version = "2.1.0"
+description = "Python wrapper for lawkit - Statistical law analysis toolkit for fraud detection and data quality assessment"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "kako-jun", email = "kako.jun.42@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+    "Topic :: Utilities"
+]
+keywords = [
+    "statistics",
+    "benford",
+    "pareto",
+    "zipf",
+    "normal",
+    "poisson",
+    "fraud-detection",
+    "audit",
+    "compliance",
+    "data-quality",
+    "forensic-accounting",
+    "statistical-analysis",
+    "outlier-detection",
+    "anomaly-detection"
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/kako-jun/lawkit"
+Repository = "https://github.com/kako-jun/lawkit"
+Issues = "https://github.com/kako-jun/lawkit/issues"
+Documentation = "https://github.com/kako-jun/lawkit/tree/main/docs"
+
+[project.optional-dependencies]
+dev = [
+    "pytest >= 6.0",
+    "pytest-cov",
+    "pytest-asyncio",
+    "black",
+    "isort",
+    "mypy",
+    "ruff",
+    "types-requests"
+]
+
+[project.scripts]
+lawkit-download-binary = "lawkit.installer:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lawkit"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/README.md"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "YTT", "ANN", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "ISC", "ICN", "G", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "ERA", "PGH", "PL", "TRY", "NPY", "RUF"]
+ignore = ["ANN101", "ANN102", "COM812", "ISC001"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
