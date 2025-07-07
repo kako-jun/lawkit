@@ -58,7 +58,7 @@ fn main() {
             }
         }
         Err(e) => {
-            eprintln!("Error: Failed to execute lawkit benf: {}", e);
+            eprintln!("Error: Failed to execute lawkit benf: {e}");
             eprintln!("Make sure 'lawkit' is installed and available in PATH");
             exit(127);
         }
