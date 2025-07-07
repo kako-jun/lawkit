@@ -26,7 +26,7 @@ time lawkit benf large_dataset.csv
 # 结果: 25.3s
 
 # 优化模式
-time lawkit benf large_dataset.csv --optimize --parallel --streaming
+time lawkit benf large_dataset.csv --optimize --optimize --optimize
 # 结果: 8.7s (2.9x 提升)
 ```
 
@@ -36,13 +36,13 @@ time lawkit benf large_dataset.csv --optimize --parallel --streaming
 
 ```bash
 # 自动检测CPU核心数
-lawkit compare data.csv --parallel
+lawkit compare data.csv --optimize
 
 # 手动设置线程数
-lawkit compare data.csv --parallel --threads 16
+lawkit compare data.csv --optimize --optimize 16
 
 # 适应系统负载
-lawkit compare data.csv --parallel --load-balance
+lawkit compare data.csv --optimize --load-balance
 ```
 
 ### 批量并行处理
@@ -57,7 +57,7 @@ parallel -j+0 --eta --bar 'lawkit benf {} --optimize --format json > {.}.result'
 
 # 内存友好的批量处理
 find ./data -name "*.csv" | \
-parallel -j4 --memfree 2G 'lawkit benf {} --streaming --format json'
+parallel -j4 --memfree 2G 'lawkit benf {} --optimize --format json'
 ```
 
 ### 分布式处理
@@ -69,7 +69,7 @@ parallel --sshloginfile servers.txt --transferfile {} \
 
 # 使用SSH集群
 parallel --ssh 'ssh -x' --sshlogin server1,server2,server3 \
-'lawkit benf {} --parallel --format json' ::: large_files/*.csv
+'lawkit benf {} --optimize --format json' ::: large_files/*.csv
 ```
 
 ## 内存优化
@@ -78,13 +78,13 @@ parallel --ssh 'ssh -x' --sshlogin server1,server2,server3 \
 
 ```bash
 # 启用流式处理
-lawkit benf huge_file.csv --streaming
+lawkit benf huge_file.csv --optimize
 
 # 调整块大小
-lawkit benf huge_file.csv --streaming --chunk-size 50000
+lawkit benf huge_file.csv --optimize --optimize 50000
 
 # 内存限制
-lawkit benf huge_file.csv --streaming --memory-limit 1GB
+lawkit benf huge_file.csv --optimize --memory-limit 1GB
 ```
 
 ### 内存使用监控
@@ -134,7 +134,7 @@ gzip -cd compressed_data.csv.gz | lawkit benf --format json
 
 # SSD优化
 # 将临时文件放在SSD上
-TMPDIR=/ssd/tmp lawkit benf huge_file.csv --streaming
+TMPDIR=/ssd/tmp lawkit benf huge_file.csv --optimize
 ```
 
 ### 输出优化
@@ -231,13 +231,13 @@ cache:
 
 ```bash
 # 直接处理URL
-lawkit benf https://example.com/data.csv --streaming
+lawkit benf https://example.com/data.csv --optimize
 
 # 优化网络传输
-lawkit benf https://example.com/data.csv.gz --decompress --streaming
+lawkit benf https://example.com/data.csv.gz --decompress --optimize
 
 # 并行下载和分析
-curl -s https://example.com/data.csv | lawkit benf --streaming --format json
+curl -s https://example.com/data.csv | lawkit benf --optimize --format json
 ```
 
 ### 分布式数据源
@@ -252,7 +252,7 @@ parallel -j8 "curl -s {} | lawkit benf --format json" ::: \
 # 负载均衡处理
 for endpoint in api1 api2 api3; do
   curl -s "https://$endpoint.com/data" | \
-  lawkit benf --streaming --format json > "$endpoint.result" &
+  lawkit benf --optimize --format json > "$endpoint.result" &
 done
 wait
 ```
@@ -364,9 +364,9 @@ echo "=== Performance Test Started: $(date) ==="
 # 测试不同配置
 configs=(
     "--format json"
-    "--format json --parallel"
-    "--format json --parallel --optimize"
-    "--format json --parallel --optimize --streaming"
+    "--format json --optimize"
+    "--format json --optimize --optimize"
+    "--format json --optimize --optimize --optimize"
 )
 
 for config in "${configs[@]}"; do
@@ -421,13 +421,13 @@ for size in "${sizes[@]}"; do
     standard_time=$(time -p lawkit benf "$file" 2>&1 | grep real | awk '{print $2}')
     
     # 并行模式
-    parallel_time=$(time -p lawkit benf "$file" --parallel 2>&1 | grep real | awk '{print $2}')
+    parallel_time=$(time -p lawkit benf "$file" --optimize 2>&1 | grep real | awk '{print $2}')
     
     # 优化模式
-    optimized_time=$(time -p lawkit benf "$file" --optimize --parallel 2>&1 | grep real | awk '{print $2}')
+    optimized_time=$(time -p lawkit benf "$file" --optimize --optimize 2>&1 | grep real | awk '{print $2}')
     
     # 流式模式
-    streaming_time=$(time -p lawkit benf "$file" --streaming --optimize 2>&1 | grep real | awk '{print $2}')
+    streaming_time=$(time -p lawkit benf "$file" --optimize --optimize 2>&1 | grep real | awk '{print $2}')
     
     echo "$size,$standard_time,$parallel_time,$optimized_time,$streaming_time"
 done
@@ -459,7 +459,7 @@ lawkit benf slow_file.csv --debug --profile --verbose
 #### 内存不足
 ```bash
 # 解决方案：启用流式处理
-lawkit benf huge_file.csv --streaming --chunk-size 10000
+lawkit benf huge_file.csv --optimize --optimize 10000
 
 # 或者增加交换空间
 sudo fallocate -l 4G /swapfile
@@ -471,7 +471,7 @@ sudo swapon /swapfile
 #### CPU瓶颈
 ```bash
 # 解决方案：减少线程数
-lawkit benf data.csv --threads 2
+lawkit benf data.csv --optimize 2
 
 # 或者使用nice优先级
 nice -n 10 lawkit benf data.csv
