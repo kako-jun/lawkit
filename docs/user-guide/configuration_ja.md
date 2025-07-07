@@ -18,8 +18,7 @@ lawkitは以下の場所で設定ファイルを検索します：
 [general]
 # デフォルト出力形式
 default_output = "json"
-# デフォルト言語
-default_language = "ja"
+# 注: 出力言語は英語で統一されています
 # 並列処理のスレッド数
 threads = 4
 
