@@ -39,6 +39,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [CLI参考](reference/cli-reference_zh.md)
 
 ### 指南
+- [架构指南](guides/architecture_zh.md) - 系统设计和架构概述
 - [集成功能](guides/integrations_zh.md)
 - [性能优化](guides/performance_zh.md)
 - [高级分析](guides/advanced-analysis_zh.md)

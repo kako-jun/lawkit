@@ -34,6 +34,7 @@ lawkit provides powerful tools for:
 - [CLI Reference](reference/cli-reference.md) - Complete command documentation
 
 ### Guides
+- [Architecture Guide](guides/architecture.md) - System design and architecture overview
 - [Integration Guide](guides/integrations.md) - CI/CD and automation integration
 - [Performance Guide](guides/performance.md) - Optimization techniques
 - [Advanced Analysis](guides/advanced-analysis.md) - Advanced analysis features
