@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
-        input::{parse_input_auto, parse_text_input},
+        input::parse_text_input,
     },
     error::{BenfError, Result},
     laws::poisson::{
@@ -11,7 +11,7 @@ use lawkit_core::{
         RareEventAnalysis,
     },
 };
-use std::io::{self, Read};
+use crate::common_options::{get_optimized_reader, setup_optimization_config};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // 特殊モードの確認（フラグが明示的に指定された場合を優先）
@@ -31,76 +31,84 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    // 通常のポアソン分布分析モード
-    if let Some(input) = matches.get_one::<String>("input") {
-        match parse_input_auto(input) {
-            Ok(numbers) => {
-                if numbers.is_empty() {
-                    let language = get_language(matches);
-                    let error_msg = localized_text("no_numbers_found", language);
-                    eprintln!("{error_msg}");
-                    std::process::exit(1);
-                }
+    // 最適化設定をセットアップ
+    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
 
-                let result =
-                    match analyze_numbers_with_options(matches, input.to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{error_msg}: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error processing input '{input}': {e}");
-                std::process::exit(1);
-            }
+    // 最適化された入力読み込み
+    let input_data = if let Some(input) = matches.get_one::<String>("input") {
+        if input == "-" {
+            get_optimized_reader(None, use_optimize)
+        } else {
+            get_optimized_reader(Some(input), use_optimize)
         }
     } else {
-        // 標準入力処理
-        let mut buffer = String::new();
-        match io::stdin().read_to_string(&mut buffer) {
-            Ok(_) => {
-                if buffer.trim().is_empty() {
-                    eprintln!("Error: No input provided. Use --help for usage information.");
-                    std::process::exit(2);
-                }
+        get_optimized_reader(None, use_optimize)
+    };
 
-                let numbers = match parse_text_input(&buffer) {
-                    Ok(numbers) => numbers,
-                    Err(e) => {
-                        let language = get_language(matches);
-                        let error_msg = localized_text("analysis_error", language);
-                        eprintln!("{error_msg}: {e}");
-                        std::process::exit(1);
-                    }
-                };
-
-                let result =
-                    match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            let language = get_language(matches);
-                            let error_msg = localized_text("analysis_error", language);
-                            eprintln!("{error_msg}: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Error reading from stdin: {e}");
-                std::process::exit(1);
-            }
+    let buffer = match input_data {
+        Ok(data) => data,
+        Err(e) => {
+            eprintln!("Error reading input: {e}");
+            std::process::exit(1);
         }
+    };
+
+    if buffer.trim().is_empty() {
+        eprintln!("Error: No input provided. Use --help for usage information.");
+        std::process::exit(2);
     }
+
+    let numbers = match parse_text_input(&buffer) {
+        Ok(numbers) => numbers,
+        Err(e) => {
+            let language = get_language(matches);
+            let error_msg = localized_text("analysis_error", language);
+            eprintln!("{error_msg}: {e}");
+            std::process::exit(1);
+        }
+    };
+
+    if numbers.is_empty() {
+        let language = get_language(matches);
+        let error_msg = localized_text("no_numbers_found", language);
+        eprintln!("{error_msg}");
+        std::process::exit(1);
+    }
+
+    let dataset_name = matches
+        .get_one::<String>("input")
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| "stdin".to_string());
+
+    let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
+        Ok(result) => result,
+        Err(e) => {
+            let language = get_language(matches);
+            let error_msg = localized_text("analysis_error", language);
+            eprintln!("{error_msg}: {e}");
+            std::process::exit(1);
+        }
+    };
+
+    output_results(matches, &result);
+    std::process::exit(result.risk_level.exit_code())
+}
+
+fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
+    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+
+    let buffer = if let Some(input) = matches.get_one::<String>("input") {
+        if input == "-" {
+            get_optimized_reader(None, use_optimize)
+        } else {
+            get_optimized_reader(Some(input), use_optimize)
+        }
+    } else {
+        get_optimized_reader(None, use_optimize)
+    };
+
+    let data = buffer.map_err(|e| BenfError::ParseError(e.to_string()))?;
+    parse_text_input(&data)
 }
 
 fn run_poisson_test_mode(matches: &ArgMatches, test_type: &str) -> Result<()> {
@@ -156,17 +164,6 @@ fn run_rare_events_mode(matches: &ArgMatches) -> Result<()> {
     std::process::exit(exit_code);
 }
 
-fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
-    if let Some(input) = matches.get_one::<String>("input") {
-        parse_input_auto(input)
-    } else {
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| BenfError::ParseError(e.to_string()))?;
-        parse_text_input(&buffer)
-    }
-}
 
 fn output_results(matches: &clap::ArgMatches, result: &PoissonResult) {
     let format = matches.get_one::<String>("format").unwrap();

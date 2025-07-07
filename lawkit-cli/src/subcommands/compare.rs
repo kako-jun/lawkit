@@ -1,4 +1,4 @@
-use crate::common_options;
+use crate::common_options::{self, get_optimized_reader, setup_optimization_config};
 use clap::{ArgMatches, Command};
 use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;
@@ -39,23 +39,32 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     }
 }
 
-fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
+fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
+    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+
+    let buffer = if let Some(input) = matches.get_one::<String>("input") {
+        if input == "-" {
+            get_optimized_reader(None, use_optimize)
+        } else {
+            get_optimized_reader(Some(input), use_optimize)
         }
-        lawkit_core::common::input::parse_text_input(&buffer)?
+    } else {
+        get_optimized_reader(None, use_optimize)
     };
+
+    let data = buffer.map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+    
+    if data.trim().is_empty() {
+        return Err(lawkit_core::error::BenfError::ParseError(
+            "No input data provided".to_string(),
+        ));
+    }
+    
+    lawkit_core::common::input::parse_text_input(&data)
+}
+
+fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
 
     let result = if let Some(laws_str) = matches.get_one::<String>("laws") {
@@ -84,22 +93,7 @@ fn run_summary_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
-        }
-        lawkit_core::common::input::parse_text_input(&buffer)?
-    };
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
 
     let result = analyze_all_laws(&numbers, &dataset_name)?;
@@ -113,22 +107,7 @@ fn run_detailed_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
-        }
-        lawkit_core::common::input::parse_text_input(&buffer)?
-    };
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
 
@@ -143,22 +122,7 @@ fn run_conflict_analysis_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
-        }
-        lawkit_core::common::input::parse_text_input(&buffer)?
-    };
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
     let confidence_level = *matches.get_one::<f64>("confidence-level").unwrap();
 
@@ -173,22 +137,7 @@ fn run_cross_validation_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
-        }
-        lawkit_core::common::input::parse_text_input(&buffer)?
-    };
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
     let threshold = *matches.get_one::<f64>("threshold").unwrap();
 
@@ -203,22 +152,7 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn run_recommendation_mode(matches: &ArgMatches) -> Result<()> {
-    let numbers = if let Some(input) = matches.get_one::<String>("input") {
-        lawkit_core::common::input::parse_input_auto(input)?
-    } else {
-        // Read from stdin
-        use std::io::{self, Read};
-        let mut buffer = String::new();
-        io::stdin()
-            .read_to_string(&mut buffer)
-            .map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
-        if buffer.trim().is_empty() {
-            return Err(lawkit_core::error::BenfError::ParseError(
-                "No input data provided".to_string(),
-            ));
-        }
-        lawkit_core::common::input::parse_text_input(&buffer)?
-    };
+    let numbers = get_numbers_from_input(matches)?;
     let dataset_name = get_dataset_name(matches);
 
     let analysis_purpose = matches

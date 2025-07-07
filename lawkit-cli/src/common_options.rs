@@ -1,4 +1,8 @@
-use clap::{Arg, Command};
+use clap::{Arg, ArgMatches, Command};
+use lawkit_core::common::{
+    memory::MemoryConfig,
+    parallel::ParallelConfig,
+};
 
 /// 全サブコマンドで共通のオプションを定義
 pub fn add_common_options(cmd: Command) -> Command {
@@ -407,4 +411,53 @@ pub fn add_compare_options(cmd: Command) -> Command {
                 "general",
             ]),
     )
+}
+
+/// 最適化設定をセットアップ（--optimizeフラグに基づく）
+pub fn setup_optimization_config(matches: &ArgMatches) -> (bool, ParallelConfig, MemoryConfig) {
+    let use_optimize = matches.get_flag("optimize");
+    
+    if use_optimize {
+        // 最適化有効時の設定
+        let parallel_config = ParallelConfig {
+            num_threads: 0, // auto-detect
+            chunk_size: 1000,
+            enable_parallel: true,
+        };
+        let memory_config = MemoryConfig {
+            chunk_size: 10000,
+            max_memory_mb: 512,
+            enable_streaming: true,
+            enable_compression: false,
+        };
+        (true, parallel_config, memory_config)
+    } else {
+        // 最適化無効時の設定（デフォルト）
+        let parallel_config = ParallelConfig::default();
+        let memory_config = MemoryConfig::default();
+        (false, parallel_config, memory_config)
+    }
+}
+
+/// 最適化されたファイルリーダーを取得
+pub fn get_optimized_reader(
+    input: Option<&String>,
+    _use_optimize: bool,
+) -> Result<String, Box<dyn std::error::Error>> {
+    // シンプルに統一された読み込み方法を使用（最適化は将来の実装で詳細化）
+    if let Some(input_path) = input {
+        if input_path == "-" {
+            use std::io::Read;
+            let mut buffer = String::new();
+            std::io::stdin().read_to_string(&mut buffer)?;
+            Ok(buffer)
+        } else {
+            std::fs::read_to_string(input_path).map_err(Into::into)
+        }
+    } else {
+        use std::io::Read;
+        let mut buffer = String::new();
+        std::io::stdin().read_to_string(&mut buffer)?;
+        Ok(buffer)
+    }
 }
