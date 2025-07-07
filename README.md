@@ -1000,9 +1000,7 @@ Benf itself requires no configuration files or environment variables.
 ## Documentation
 
 For comprehensive documentation, see:
-- 📖 **[English Documentation](docs/index.md)** - Complete user guide and API reference  
-- 🇯🇵 **[日本語ドキュメント](docs/index_ja.md)** - Japanese documentation
-- 🇨🇳 **[中文文档](README.zh.md)** - Chinese documentation
+- 📖 **[English Documentation](docs/index.md)** - Complete user guide and API reference
 
 ## Contributing
 

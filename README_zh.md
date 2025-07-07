@@ -167,8 +167,7 @@ echo "١٢٣٤٥٦ ٧٨٩٠١٢" | lawkit benf --lang ar
 ## 文档
 
 有关全面文档，请参阅：
-- 📖 **[文档](docs/index.md)** - 完整用户指南和API参考
-- 🇯🇵 **[日本語ドキュメント](docs/index_ja.md)** - 日语文档
+- 📖 **[中文文档](docs/index_zh.md)** - 完整用户指南和API参考
 
 ## 贡献
 
