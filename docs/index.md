@@ -123,8 +123,6 @@ graph TB
         D --> N[YAML/TOML/XML]
     end
     
-    style A fill:#e1f5fe
-    style C fill:#fff3e0
 ```
 
 lawkit is built as a workspace with two main components:

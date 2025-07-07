@@ -358,9 +358,6 @@ flowchart TD
     K -->|はい| L[結果を承認]
     K -->|いいえ| M[追加分析推奨]
     
-    style F fill:#e1f5fe
-    style H fill:#ffebee
-    style L fill:#e8f5e8
 ```
 
 ## 高度な機能
