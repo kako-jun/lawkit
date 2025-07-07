@@ -138,11 +138,11 @@ lawkit benf data.csv --filter ">=100"
 ### 性能优化
 
 ```bash
-# 并行处理
-lawkit compare large_dataset.csv --parallel --threads 8
+# 性能优化
+lawkit compare large_dataset.csv --optimize
 
-# 流式处理大文件
-lawkit benf huge_file.csv --streaming --chunk-size 50000
+# 性能优化大文件
+lawkit benf huge_file.csv --optimize
 
 # 启用优化模式
 lawkit benf data.csv --optimize

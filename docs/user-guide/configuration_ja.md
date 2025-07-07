@@ -20,7 +20,7 @@ lawkitは以下の場所で設定ファイルを検索します：
 default_output = "json"
 # 注: 出力言語は英語で統一されています
 # 並列処理のスレッド数
-threads = 4
+optimize = true
 
 [benford]
 # ベンフォード法則のデフォルト設定
@@ -61,14 +61,14 @@ auto_recommend = true
 # 出力形式
 export LAWKIT_OUTPUT=json
 
-# 言語設定
-export LAWKIT_LANGUAGE=ja
+# 詳細出力
+export LAWKIT_VERBOSE=true
 
 # 詳細出力
 export LAWKIT_VERBOSE=true
 
-# スレッド数
-export LAWKIT_THREADS=8
+# 最適化モード
+export LAWKIT_OPTIMIZE=true
 ```
 
 ## 言語設定
@@ -87,13 +87,14 @@ export LAWKIT_THREADS=8
 
 ```bash
 # コマンドラインで指定
-lawkit benf data.csv --language ja
+# 国際数字フォーマットは自動認識されます
+lawkit benf data.csv
 
 # 設定ファイルで指定
-echo 'default_language = "ja"' >> lawkit.toml
+# 出力は英語に統一されています
 
 # 環境変数で指定
-export LAWKIT_LANGUAGE=ja
+export LAWKIT_OPTIMIZE=true
 ```
 
 ## 入力設定
@@ -199,11 +200,11 @@ case_sensitive = false
 ```toml
 [performance]
 # 並列処理のスレッド数
-threads = 4
+optimize = true
 # メモリ制限（MB）
 memory_limit = 1024
 # 大きなファイルの処理方法
-large_file_strategy = "streaming"
+optimize = true
 ```
 
 ### キャッシュ設定
@@ -244,7 +245,7 @@ logging.level = "debug"
 
 [profiles.quick]
 # 高速分析用設定
-performance.threads = 8
+performance.optimize = true
 cache.enabled = true
 benford.min_data_points = 10
 

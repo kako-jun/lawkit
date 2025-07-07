@@ -153,14 +153,14 @@ lawkit poisson incident_reports.csv --rare-events --predict
 ### 大文件分析
 
 ```bash
-# 流式处理大文件
+# 性能优化大文件
 lawkit benf huge_dataset.csv --optimize
 
 # 内存优化分析
-lawkit compare large_files/*.csv --optimize --memory-limit 2GB
+lawkit compare large_files/*.csv --optimize
 
 # 分布式处理
-find ./big_data -name "*.csv" | parallel -j8 lawkit benf {} --format json
+find ./big_data -name "*.csv" | xargs -P 8 -I {} lawkit benf {} --format json
 ```
 
 ### 实时数据分析
@@ -276,7 +276,7 @@ cat raw_data.csv | \
 # 性能比较
 time lawkit benf large_dataset.csv
 time lawkit benf large_dataset.csv --optimize
-time lawkit benf large_dataset.csv --optimize 
+time lawkit benf large_dataset.csv --optimize
 # 内存使用分析
 /usr/bin/time -v lawkit benf huge_file.csv --optimize
 ```
@@ -290,7 +290,7 @@ time lawkit benf large_dataset.csv --optimize
 lawkit benf large_file.csv --optimize
 
 # 性能优化
-lawkit compare *.csv --optimize 
+lawkit compare *.csv --optimize
 # 编码问题
 lawkit benf data.csv --input-encoding utf-8 --debug
 
