@@ -52,10 +52,10 @@ lawkit benf process_data.csv --detect-changepoints --enable-timeseries
 lawkit compare data.csv --optimize
 
 # 特定のスレッド数を設定
-lawkit compare data.csv --optimize 8
+lawkit compare data.csv --optimize
 
 # 並列処理のチャンクサイズを設定
-lawkit compare data.csv --optimize 10000
+lawkit compare data.csv --optimize
 
 # 並列とシリアル処理のベンチマーク
 lawkit compare data.csv --optimize
@@ -68,7 +68,7 @@ lawkit compare data.csv --optimize
 lawkit benf massive_file.csv --optimize
 
 # メモリ制限とチャンクサイズを設定
-lawkit benf large_file.csv --memory-limit 512 --optimize 5000
+lawkit benf large_file.csv --memory-limit 512 --optimize
 
 # メモリ効率のための増分統計を有効化
 lawkit benf data.csv --incremental-stats
@@ -141,9 +141,9 @@ lawkit benf data.csv --benchmark
 lawkit benf data.csv --profile-memory
 
 # 異なる設定の比較
-lawkit benf data.csv --benchmark --optimize 1
-lawkit benf data.csv --benchmark --optimize 4
-lawkit benf data.csv --benchmark --optimize 8
+time lawkit benf data.csv
+time lawkit benf data.csv --optimize
+time lawkit benf large_data.csv --optimize
 ```
 
 ### カスタムベンチマーク
@@ -219,7 +219,7 @@ lawkit compare data.csv --optimize $(nproc)
 lawkit compare data.csv --optimize $(($(nproc) - 2))
 
 # 一貫性のためのシングルスレッド
-lawkit benf data.csv --optimize 1
+lawkit benf data.csv
 ```
 
 ### アルゴリズム選択
@@ -315,7 +315,7 @@ perf report
 ```bash
 # 最小オーバーヘッド設定
 lawkit benf small_data.csv \
-  --optimize 1 \
+  --quiet \
   --no-cache \
   --algorithm fast
 ```
@@ -325,7 +325,7 @@ lawkit benf small_data.csv \
 ```bash
 # バランス設定
 lawkit compare medium_data.csv \
-  --optimize 4 \
+  --optimize \
   --cache-enabled \
   --algorithm balanced
 ```
@@ -335,7 +335,7 @@ lawkit compare medium_data.csv \
 ```bash
 # 大規模データセット用最適化
 lawkit compare large_data.csv \
-  --optimize 8 \
+  --optimize \
   --memory-limit 2048 \
   --sample-size 100000 \
   --optimize
