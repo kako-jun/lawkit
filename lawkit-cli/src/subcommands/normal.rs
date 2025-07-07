@@ -70,17 +70,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let numbers = match parse_text_input(&buffer) {
         Ok(numbers) => numbers,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
 
     if numbers.is_empty() {
-        let language = get_language(matches);
-        let error_msg = localized_text("no_numbers_found", language);
-        eprintln!("{error_msg}");
+        eprintln!("Error: No valid numbers found in input");
         std::process::exit(1);
     }
 
@@ -92,9 +88,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
         Ok(result) => result,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
@@ -276,25 +270,22 @@ fn output_results(matches: &clap::ArgMatches, result: &NormalResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
-    let language = get_language(matches);
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose, language),
+        "text" => print_text_output(result, quiet, verbose),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
         "toml" => print_toml_output(result),
         "xml" => print_xml_output(result),
         _ => {
-            let error_msg = localized_text("unsupported_format", language);
-            eprintln!("{error_msg}: {format}");
+            eprintln!("Error: Unsupported output format: {format}");
             std::process::exit(2);
         }
     }
 }
 
 fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTestResult) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -304,26 +295,26 @@ fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTe
         "text" => {
             println!(
                 "{}: {}",
-                localized_text("normality_test_result", language),
+                "English Text",
                 result.test_name
             );
             println!(
                 "{}: {:.6}",
-                localized_text("test_statistic", language),
+                "English Text",
                 result.statistic
             );
             println!(
                 "{}: {:.6}",
-                localized_text("p_value", language),
+                "English Text",
                 result.p_value
             );
             println!(
                 "{}: {}",
-                localized_text("is_normal", language),
+                "English Text",
                 if result.is_normal {
-                    localized_text("yes", language)
+                    "English Text"
                 } else {
-                    localized_text("no", language)
+                    "English Text"
                 }
             );
         }
@@ -342,13 +333,12 @@ fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTe
             &NormalResult::new("test".to_string(), &[0.0; 10]).unwrap(),
             false,
             false,
-            language,
+           
         ),
     }
 }
 
 fn output_outlier_detection_result(matches: &clap::ArgMatches, result: &OutlierDetectionResult) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -358,23 +348,23 @@ fn output_outlier_detection_result(matches: &clap::ArgMatches, result: &OutlierD
         "text" => {
             println!(
                 "{}: {}",
-                localized_text("outlier_detection_result", language),
+                "English Text",
                 result.method_name
             );
             println!(
                 "{}: {}",
-                localized_text("outliers_found", language),
+                "English Text",
                 result.outliers.len()
             );
 
             if !result.outliers.is_empty() {
-                println!("\n{}:", localized_text("outlier_details", language));
+                println!("\n{}:", "English Text");
                 for outlier in &result.outliers {
                     println!(
                         "  {}: {} ({}: {:.3})",
-                        localized_text("index", language),
+                        "English Text",
                         outlier.index,
-                        localized_text("value", language),
+                        "English Text",
                         outlier.value
                     );
                 }
@@ -400,7 +390,6 @@ fn output_outlier_detection_result(matches: &clap::ArgMatches, result: &OutlierD
 }
 
 fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityControlResult) {
-    let language = get_language(matches);
     let format_str = matches
         .get_one::<String>("format")
         .map(|s| s.as_str())
@@ -408,28 +397,28 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
 
     match format_str {
         "text" => {
-            println!("{}", localized_text("quality_control_result", language));
-            println!("{}: {:.3}", localized_text("mean", language), result.mean);
+            println!("{}", "English Text");
+            println!("{}: {:.3}", "English Text", result.mean);
             println!(
                 "{}: {:.3}",
-                localized_text("std_dev", language),
+                "English Text",
                 result.std_dev
             );
 
             if let (Some(cp), Some(cpk)) = (result.cp, result.cpk) {
-                println!("{}: {:.3}", localized_text("cp_index", language), cp);
-                println!("{}: {:.3}", localized_text("cpk_index", language), cpk);
+                println!("{}: {:.3}", "English Text", cp);
+                println!("{}: {:.3}", "English Text", cpk);
 
                 if let Some(ref capability) = result.process_capability {
                     let cap_text = match capability {
-                        ProcessCapability::Excellent => localized_text("excellent", language),
-                        ProcessCapability::Adequate => localized_text("adequate", language),
-                        ProcessCapability::Poor => localized_text("poor", language),
-                        ProcessCapability::Inadequate => localized_text("inadequate", language),
+                        ProcessCapability::Excellent => "English Text",
+                        ProcessCapability::Adequate => "English Text",
+                        ProcessCapability::Poor => "English Text",
+                        ProcessCapability::Inadequate => "English Text",
                     };
                     println!(
                         "{}: {}",
-                        localized_text("process_capability", language),
+                        "English Text",
                         cap_text
                     );
                 }
@@ -438,7 +427,7 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
             if let Some(within_spec) = result.within_spec_percent {
                 println!(
                     "{}: {:.1}%",
-                    localized_text("within_spec", language),
+                    "English Text",
                     within_spec
                 );
             }
@@ -460,7 +449,7 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
     }
 }
 
-fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool, lang: &str) {
+fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
     if quiet {
         println!("mean: {:.3}", result.mean);
         println!("std_dev: {:.3}", result.std_dev);
@@ -468,51 +457,51 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool, lang: &s
         return;
     }
 
-    println!("{}", localized_text("normal_analysis_results", lang));
+    println!("{}", "Normal Distribution Analysis Results");
     println!();
     println!(
         "{}: {}",
-        localized_text("dataset", lang),
+        "Dataset",
         result.dataset_name
     );
     println!(
         "{}: {}",
-        localized_text("numbers_analyzed", lang),
+        "Numbers analyzed",
         result.numbers_analyzed
     );
     println!(
         "{}: {:?}",
-        localized_text("risk_level", lang),
+        "Quality Level",
         result.risk_level
     );
 
     println!();
-    println!("{}:", localized_text("distribution_parameters", lang));
-    println!("  {}: {:.3}", localized_text("mean", lang), result.mean);
+    println!("Distribution Parameters:");
+    println!("  {}: {:.3}", "English Text", result.mean);
     println!(
         "  {}: {:.3}",
-        localized_text("std_dev", lang),
+        "English Text",
         result.std_dev
     );
     println!(
         "  {}: {:.3}",
-        localized_text("variance", lang),
+        "English Text",
         result.variance
     );
     println!(
         "  {}: {:.3}",
-        localized_text("skewness", lang),
+        "English Text",
         result.skewness
     );
     println!(
         "  {}: {:.3}",
-        localized_text("kurtosis", lang),
+        "English Text",
         result.kurtosis
     );
 
     if verbose {
         println!();
-        println!("{}:", localized_text("normality_tests", lang));
+        println!("Distribution Parameters:");
         println!(
             "  Shapiro-Wilk: W={:.3}, p={:.3}",
             result.shapiro_wilk_statistic, result.shapiro_wilk_p_value
@@ -527,97 +516,97 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool, lang: &s
         );
 
         println!();
-        println!("{}:", localized_text("fit_assessment", lang));
+        println!("Distribution Parameters:");
         println!(
             "  {}: {:.3}",
-            localized_text("normality_score", lang),
+            "English Text",
             result.normality_score
         );
         println!(
             "  {}: {:.3}",
-            localized_text("qq_correlation", lang),
+            "English Text",
             result.qq_correlation
         );
         println!(
             "  {}: {:.3}",
-            localized_text("distribution_quality", lang),
+            "English Text",
             result.distribution_quality
         );
 
         if !result.outliers_z_score.is_empty() {
             println!();
-            println!("{}:", localized_text("outliers_detected", lang));
+            println!("Distribution Parameters:");
             println!(
                 "  Z-score: {} {}",
                 result.outliers_z_score.len(),
-                localized_text("outliers", lang)
+                "English Text"
             );
             println!(
                 "  Modified Z-score: {} {}",
                 result.outliers_modified_z.len(),
-                localized_text("outliers", lang)
+                "English Text"
             );
             println!(
                 "  IQR method: {} {}",
                 result.outliers_iqr.len(),
-                localized_text("outliers", lang)
+                "English Text"
             );
         }
 
         println!();
-        println!("{}:", localized_text("sigma_coverage", lang));
+        println!("Distribution Parameters:");
         println!("  1σ: {:.1}%", result.within_1_sigma_percent);
         println!("  2σ: {:.1}%", result.within_2_sigma_percent);
         println!("  3σ: {:.1}%", result.within_3_sigma_percent);
 
         println!();
-        println!("{}:", localized_text("interpretation", lang));
-        print_normal_interpretation(result, lang);
+        println!("Distribution Parameters:");
+        print_normal_interpretation(result);
     }
 }
 
-fn print_normal_interpretation(result: &NormalResult, lang: &str) {
+fn print_normal_interpretation(result: &NormalResult) {
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ {}", localized_text("excellent_normality", lang));
-            println!("   {}", localized_text("data_follows_normal", lang));
+            println!("✅ {}", "English Text");
+            println!("   {}", "English Text");
         }
         RiskLevel::Medium => {
-            println!("⚠️  {}", localized_text("good_normality", lang));
-            println!("   {}", localized_text("minor_deviations", lang));
+            println!("⚠️  {}", "English Text");
+            println!("   {}", "English Text");
         }
         RiskLevel::High => {
-            println!("🚨 {}", localized_text("poor_normality", lang));
-            println!("   {}", localized_text("significant_deviations", lang));
+            println!("🚨 {}", "English Text");
+            println!("   {}", "English Text");
         }
         RiskLevel::Critical => {
-            println!("🔍 {}", localized_text("very_poor_normality", lang));
-            println!("   {}", localized_text("major_deviations", lang));
+            println!("🔍 {}", "English Text");
+            println!("   {}", "English Text");
         }
     }
 
     // 歪度・尖度に基づく解釈
     if result.skewness.abs() > 1.0 {
         if result.skewness > 0.0 {
-            println!("   📊 {}", localized_text("right_skewed", lang));
+            println!("   📊 {}", "English Text");
         } else {
-            println!("   📊 {}", localized_text("left_skewed", lang));
+            println!("   📊 {}", "English Text");
         }
     }
 
     if result.kurtosis > 1.0 {
-        println!("   📈 {}", localized_text("heavy_tailed", lang));
+        println!("   📈 {}", "English Text");
     } else if result.kurtosis < -1.0 {
-        println!("   📉 {}", localized_text("light_tailed", lang));
+        println!("   📉 {}", "English Text");
     }
 
     // 異常値の解釈
     if !result.outliers_z_score.is_empty() {
         println!(
             "   🎯 {}: {}",
-            localized_text("outliers_detected", lang),
+            "English Text",
             result.outliers_z_score.len()
         );
     }
@@ -731,156 +720,6 @@ fn print_xml_output(result: &NormalResult) {
     println!("</normal_analysis>");
 }
 
-fn get_language(matches: &clap::ArgMatches) -> &str {
-    match matches.get_one::<String>("language").map(|s| s.as_str()) {
-        Some("auto") | None => {
-            let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") {
-                "ja"
-            } else if lang.starts_with("zh") {
-                "zh"
-            } else if lang.starts_with("hi") {
-                "hi"
-            } else if lang.starts_with("ar") {
-                "ar"
-            } else {
-                "en"
-            }
-        }
-        Some("en") => "en",
-        Some("ja") => "ja",
-        Some("zh") => "zh",
-        Some("hi") => "hi",
-        Some("ar") => "ar",
-        Some(_) => "en",
-    }
-}
-
-fn localized_text(key: &str, lang: &str) -> &'static str {
-    match (lang, key) {
-        // English
-        ("en", "normal_analysis_results") => "Normal Distribution Analysis Results",
-        ("en", "dataset") => "Dataset",
-        ("en", "numbers_analyzed") => "Numbers analyzed",
-        ("en", "risk_level") => "Quality Level",
-        ("en", "distribution_parameters") => "Distribution Parameters",
-        ("en", "mean") => "Mean",
-        ("en", "std_dev") => "Standard deviation",
-        ("en", "variance") => "Variance",
-        ("en", "skewness") => "Skewness",
-        ("en", "kurtosis") => "Kurtosis",
-        ("en", "normality_tests") => "Normality Tests",
-        ("en", "fit_assessment") => "Fit Assessment",
-        ("en", "normality_score") => "Normality score",
-        ("en", "qq_correlation") => "Q-Q correlation",
-        ("en", "distribution_quality") => "Distribution quality",
-        ("en", "outliers_detected") => "Outliers detected",
-        ("en", "outliers") => "outliers",
-        ("en", "sigma_coverage") => "Sigma Coverage",
-        ("en", "interpretation") => "Interpretation",
-        ("en", "excellent_normality") => "Excellent normal distribution fit",
-        ("en", "data_follows_normal") => "Data closely follows normal distribution",
-        ("en", "good_normality") => "Good normal distribution fit",
-        ("en", "minor_deviations") => "Minor deviations from normality",
-        ("en", "poor_normality") => "Poor normal distribution fit",
-        ("en", "significant_deviations") => "Significant deviations from normality",
-        ("en", "very_poor_normality") => "Very poor normal distribution fit",
-        ("en", "major_deviations") => "Major deviations from normality",
-        ("en", "right_skewed") => "Distribution is right-skewed",
-        ("en", "left_skewed") => "Distribution is left-skewed",
-        ("en", "heavy_tailed") => "Distribution has heavy tails",
-        ("en", "light_tailed") => "Distribution has light tails",
-        ("en", "normality_test_result") => "Normality Test Result",
-        ("en", "test_statistic") => "Test statistic",
-        ("en", "p_value") => "P-value",
-        ("en", "is_normal") => "Is normal",
-        ("en", "yes") => "Yes",
-        ("en", "no") => "No",
-        ("en", "outlier_detection_result") => "Outlier Detection Result",
-        ("en", "outliers_found") => "Outliers found",
-        ("en", "outlier_details") => "Outlier Details",
-        ("en", "index") => "Index",
-        ("en", "value") => "Value",
-        ("en", "quality_control_result") => "Quality Control Analysis",
-        ("en", "cp_index") => "Cp index",
-        ("en", "cpk_index") => "Cpk index",
-        ("en", "process_capability") => "Process capability",
-        ("en", "excellent") => "Excellent",
-        ("en", "adequate") => "Adequate",
-        ("en", "poor") => "Poor",
-        ("en", "inadequate") => "Inadequate",
-        ("en", "within_spec") => "Within specifications",
-        ("en", "unsupported_format") => "Error: Unsupported output format",
-        ("en", "no_numbers_found") => "Error: No valid numbers found in input",
-        ("en", "analysis_error") => "Analysis error",
-
-        // 日本語
-        ("ja", "normal_analysis_results") => "正規分布解析結果",
-        ("ja", "dataset") => "データセット",
-        ("ja", "numbers_analyzed") => "解析した数値数",
-        ("ja", "risk_level") => "品質レベル",
-        ("ja", "distribution_parameters") => "分布パラメータ",
-        ("ja", "mean") => "平均",
-        ("ja", "std_dev") => "標準偏差",
-        ("ja", "variance") => "分散",
-        ("ja", "skewness") => "歪度",
-        ("ja", "kurtosis") => "尖度",
-        ("ja", "normality_tests") => "正規性検定",
-        ("ja", "fit_assessment") => "適合度評価",
-        ("ja", "normality_score") => "正規性スコア",
-        ("ja", "qq_correlation") => "Q-Q相関",
-        ("ja", "distribution_quality") => "分布品質",
-        ("ja", "outliers_detected") => "検出された外れ値",
-        ("ja", "outliers") => "個の外れ値",
-        ("ja", "sigma_coverage") => "σ範囲カバー率",
-        ("ja", "interpretation") => "解釈",
-        ("ja", "excellent_normality") => "優れた正規分布適合",
-        ("ja", "data_follows_normal") => "データは正規分布に良く従っています",
-        ("ja", "good_normality") => "良い正規分布適合",
-        ("ja", "minor_deviations") => "正規性からの軽微な偏差",
-        ("ja", "poor_normality") => "不十分な正規分布適合",
-        ("ja", "significant_deviations") => "正規性からの有意な偏差",
-        ("ja", "very_poor_normality") => "非常に不十分な正規分布適合",
-        ("ja", "major_deviations") => "正規性からの重大な偏差",
-        ("ja", "right_skewed") => "分布は右に偏っています",
-        ("ja", "left_skewed") => "分布は左に偏っています",
-        ("ja", "heavy_tailed") => "分布は裾が重い",
-        ("ja", "light_tailed") => "分布は裾が軽い",
-        ("ja", "normality_test_result") => "正規性検定結果",
-        ("ja", "test_statistic") => "検定統計量",
-        ("ja", "p_value") => "p値",
-        ("ja", "is_normal") => "正規分布か",
-        ("ja", "yes") => "はい",
-        ("ja", "no") => "いいえ",
-        ("ja", "outlier_detection_result") => "外れ値検出結果",
-        ("ja", "outliers_found") => "検出された外れ値数",
-        ("ja", "outlier_details") => "外れ値詳細",
-        ("ja", "index") => "インデックス",
-        ("ja", "value") => "値",
-        ("ja", "quality_control_result") => "品質管理分析",
-        ("ja", "cp_index") => "Cp指数",
-        ("ja", "cpk_index") => "Cpk指数",
-        ("ja", "process_capability") => "工程能力",
-        ("ja", "excellent") => "優秀",
-        ("ja", "adequate") => "適切",
-        ("ja", "poor") => "不十分",
-        ("ja", "inadequate") => "不適切",
-        ("ja", "within_spec") => "規格内率",
-        ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
-        ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
-        ("ja", "analysis_error") => "解析エラー",
-
-        // Default English
-        (_, "normal_analysis_results") => "Normal Distribution Analysis Results",
-        (_, "dataset") => "Dataset",
-        (_, "numbers_analyzed") => "Numbers analyzed",
-        (_, "risk_level") => "Quality Level",
-        (_, "unsupported_format") => "Error: Unsupported output format",
-        (_, "no_numbers_found") => "Error: No valid numbers found in input",
-        (_, "analysis_error") => "Analysis error",
-        (_, _) => "Unknown message",
-    }
-}
 
 /// Analyze numbers with filtering and custom options
 fn analyze_numbers_with_options(

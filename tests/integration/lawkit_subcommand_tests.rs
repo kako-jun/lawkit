@@ -22,10 +22,7 @@ fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
 
     command.args(&command_args);
 
-    // Don't add --language en for commands that don't support it
-    if subcommand != "selftest" && subcommand != "list" {
-        command.args(["--language", "en"]); // Force English output at the end
-    }
+    // Language option removed - CLI now outputs in English only
     // Set LANG environment variable to ensure English output
     command.env("LANG", "en_US.UTF-8");
 
@@ -53,18 +50,15 @@ fn debug_run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Ou
     let mut command = Command::new("cargo");
     command.args(["run", "--bin", "lawkit", "--", subcommand]);
     command.args(args);
-    command.args(["--language", "en"]); // Force English output at the end
-                                        // Set LANG environment variable to ensure English output
+    // Language option removed - CLI now outputs in English only
+    // Set LANG environment variable to ensure English output
     command.env("LANG", "en_US.UTF-8");
 
     let mut cmd_str = format!("cargo run --bin lawkit -- {subcommand}");
     for arg in args {
         cmd_str.push_str(&format!(" {arg}"));
     }
-    // Don't add --language en for commands that don't support it
-    if subcommand != "selftest" && subcommand != "list" {
-        cmd_str.push_str(" --language en");
-    }
+    // Language option removed - CLI now outputs in English only
     println!("🔍 Debug: Running command: {cmd_str}");
 
     let output = command.output().expect("Failed to execute lawkit command");

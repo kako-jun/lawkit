@@ -7,21 +7,22 @@ fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
     command.args(["run", "--bin", "lawkit", "--", subcommand]);
     // Add --language en for analysis commands that support it (not generate commands)
-    if !["--help", "--version", "list", "generate", "selftest"].contains(&subcommand) {
-        command.args(["--language", "en"]);
-    }
     command.args(args);
     command.output().expect("Failed to execute lawkit command")
 }
 
 /// Run lawkit command with data from temporary file
-fn run_lawkit_command_with_file(subcommand: &str, data: &str, extra_args: &[&str]) -> std::process::Output {
+fn run_lawkit_command_with_file(
+    subcommand: &str,
+    data: &str,
+    extra_args: &[&str],
+) -> std::process::Output {
     let temp_file = create_temp_file_with_content(data);
     let file_path = temp_file.path().to_str().unwrap();
-    
+
     let mut all_args = vec![file_path];
     all_args.extend_from_slice(extra_args);
-    
+
     run_lawkit_command(subcommand, &all_args)
 }
 
@@ -276,12 +277,8 @@ fn test_cli_reference_examples() {
 fn test_configuration_examples() {
     let test_data = generate_test_data();
 
-    // Japanese output
-    let output = run_lawkit_command("benf", &["--lang", "ja", &test_data]);
-    if output.status.success() {
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("ベンフォード") || stdout.contains("解析"));
-    }
+    // Language option removed - CLI now outputs in English only
+    // Skip language-specific test since --lang option is removed
 
     // YAML format
     let output = run_lawkit_command("benf", &["--format", "yaml", &test_data]);
@@ -318,7 +315,8 @@ fn test_multi_law_examples() {
     ));
 
     // Focus on concentration analysis
-    let output = run_lawkit_command_with_file("compare", &test_data, &["--laws", "benf,pareto,normal"]);
+    let output =
+        run_lawkit_command_with_file("compare", &test_data, &["--laws", "benf,pareto,normal"]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)

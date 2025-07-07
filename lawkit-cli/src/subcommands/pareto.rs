@@ -40,17 +40,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let numbers = match parse_text_input(&buffer) {
         Ok(numbers) => numbers,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
 
     if numbers.is_empty() {
-        let language = get_language(matches);
-        let error_msg = localized_text("no_numbers_found", language);
-        eprintln!("{error_msg}");
+        eprintln!("Error: No valid numbers found in input");
         std::process::exit(1);
     }
 
@@ -62,9 +58,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
         Ok(result) => result,
         Err(e) => {
-            let language = get_language(matches);
-            let error_msg = localized_text("analysis_error", language);
-            eprintln!("{error_msg}: {e}");
+            eprintln!("Analysis error: {e}");
             std::process::exit(1);
         }
     };
@@ -77,18 +71,16 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
-    let language = get_language(matches);
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose, language, matches),
+        "text" => print_text_output(result, quiet, verbose, matches),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
         "toml" => print_toml_output(result),
         "xml" => print_xml_output(result),
         _ => {
-            let error_msg = localized_text("unsupported_format", language);
-            eprintln!("{error_msg}: {format}");
+            eprintln!("Error: Unsupported output format: {format}");
             std::process::exit(2);
         }
     }
@@ -98,7 +90,6 @@ fn print_text_output(
     result: &ParetoResult,
     quiet: bool,
     verbose: bool,
-    lang: &str,
     matches: &clap::ArgMatches,
 ) {
     if quiet {
@@ -109,55 +100,31 @@ fn print_text_output(
         return;
     }
 
-    println!("{}", localized_text("pareto_analysis_results", lang));
+    println!("Pareto Principle (80/20 Rule) Analysis Results");
     println!();
-    println!(
-        "{}: {}",
-        localized_text("dataset", lang),
-        result.dataset_name
-    );
-    println!(
-        "{}: {}",
-        localized_text("numbers_analyzed", lang),
-        result.numbers_analyzed
-    );
-    println!(
-        "{}: {:?}",
-        localized_text("risk_level", lang),
-        result.risk_level
-    );
+    println!("Dataset: {}", result.dataset_name);
+    println!("Numbers analyzed: {}", result.numbers_analyzed);
+    println!("Attention Level: {:?}", result.risk_level);
 
     if verbose {
         println!();
-        println!("{}:", localized_text("pareto_metrics", lang));
-        println!(
-            "  {}: {:.1}%",
-            localized_text("top_20_percent_share", lang),
-            result.top_20_percent_share
-        );
-        println!(
-            "  {}: {:.3}",
-            localized_text("pareto_ratio", lang),
-            result.pareto_ratio
-        );
-        println!(
-            "  {}: {:.3}",
-            localized_text("concentration_index", lang),
-            result.concentration_index
-        );
+        println!("Pareto Metrics:");
+        println!("  Top 20% share: {:.1}%", result.top_20_percent_share);
+        println!("  Pareto ratio: {:.3}", result.pareto_ratio);
+        println!("  Concentration index: {:.3}", result.concentration_index);
 
         // カスタムパーセンタイルの表示
         if let Some(ref percentiles) = result.custom_percentiles {
             println!();
-            println!("{}:", localized_text("custom_percentiles", lang));
+            println!("Custom Percentiles:");
             for (percentile, share) in percentiles {
                 println!("  Top {percentile:.0}%: {share:.1}%");
             }
         }
 
         println!();
-        println!("{}:", localized_text("interpretation", lang));
-        print_pareto_interpretation(result, lang);
+        println!("Interpretation:");
+        print_pareto_interpretation(result);
     }
 
     // --gini-coefficient オプションが指定されたときにGini係数を明示的に表示
@@ -170,7 +137,7 @@ fn print_text_output(
     if !verbose && result.custom_percentiles.is_some() {
         if let Some(ref percentiles) = result.custom_percentiles {
             println!();
-            println!("{}:", localized_text("custom_percentiles", lang));
+            println!("Custom Percentiles:");
             for (percentile, share) in percentiles {
                 println!("  Top {percentile:.0}%: {share:.1}%");
             }
@@ -194,48 +161,33 @@ fn print_text_output(
     }
 }
 
-fn print_pareto_interpretation(result: &ParetoResult, lang: &str) {
+fn print_pareto_interpretation(result: &ParetoResult) {
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ {}", localized_text("ideal_pareto", lang));
-            println!("   {}", localized_text("pareto_80_20_maintained", lang));
+            println!("✅ Ideal Pareto distribution detected");
+            println!("   80/20 principle is maintained");
         }
         RiskLevel::Medium => {
-            println!("⚠️  {}", localized_text("slight_pareto_deviation", lang));
-            println!(
-                "   {}",
-                localized_text("pareto_monitoring_recommended", lang)
-            );
+            println!("⚠️  Slight deviation from Pareto principle");
+            println!("   Monitoring recommended");
         }
         RiskLevel::High => {
-            println!(
-                "🚨 {}",
-                localized_text("significant_pareto_deviation", lang)
-            );
-            println!("   {}", localized_text("pareto_rebalancing_needed", lang));
+            println!("🚨 Significant deviation from Pareto principle");
+            println!("   Rebalancing needed");
         }
         RiskLevel::Critical => {
-            println!("🔍 {}", localized_text("critical_pareto_deviation", lang));
-            println!(
-                "   {}",
-                localized_text("pareto_strategy_review_needed", lang)
-            );
+            println!("🔍 Critical deviation from Pareto principle");
+            println!("   Strategy review needed");
         }
     }
 
     // 80/20原則からの偏差説明
     if result.top_20_percent_share > 85.0 {
-        println!(
-            "   💡 {}",
-            localized_text("high_concentration_insight", lang)
-        );
+        println!("   💡 High concentration indicates good focus");
     } else if result.top_20_percent_share < 70.0 {
-        println!(
-            "   💡 {}",
-            localized_text("low_concentration_insight", lang)
-        );
+        println!("   💡 Low concentration suggests distribution inefficiency");
     }
 }
 
@@ -313,101 +265,6 @@ fn print_xml_output(result: &ParetoResult) {
         result.top_20_percent_share
     );
     println!("</pareto_analysis>");
-}
-
-fn get_language(matches: &clap::ArgMatches) -> &str {
-    match matches.get_one::<String>("language").map(|s| s.as_str()) {
-        Some("auto") | None => {
-            let lang = std::env::var("LANG").unwrap_or_default();
-            if lang.starts_with("ja") {
-                "ja"
-            } else if lang.starts_with("zh") {
-                "zh"
-            } else if lang.starts_with("hi") {
-                "hi"
-            } else if lang.starts_with("ar") {
-                "ar"
-            } else {
-                "en"
-            }
-        }
-        Some("en") => "en",
-        Some("ja") => "ja",
-        Some("zh") => "zh",
-        Some("hi") => "hi",
-        Some("ar") => "ar",
-        Some(_) => "en",
-    }
-}
-
-fn localized_text(key: &str, lang: &str) -> &'static str {
-    match (lang, key) {
-        // English
-        ("en", "pareto_analysis_results") => "Pareto Principle (80/20 Rule) Analysis Results",
-        ("en", "dataset") => "Dataset",
-        ("en", "numbers_analyzed") => "Numbers analyzed",
-        ("en", "risk_level") => "Attention Level",
-        ("en", "pareto_metrics") => "Pareto Metrics",
-        ("en", "top_20_percent_share") => "Top 20% share",
-        ("en", "pareto_ratio") => "Pareto ratio",
-        ("en", "concentration_index") => "Concentration index (Gini)",
-        ("en", "interpretation") => "Interpretation",
-        ("en", "ideal_pareto") => "Ideal Pareto distribution - follows 80/20 principle",
-        ("en", "pareto_80_20_maintained") => "Top 20% controls approximately 80% of value",
-        ("en", "slight_pareto_deviation") => "Slight deviation from Pareto principle",
-        ("en", "pareto_monitoring_recommended") => {
-            "Monitoring recommended for distribution balance"
-        }
-        ("en", "significant_pareto_deviation") => "Significant deviation from 80/20 principle",
-        ("en", "pareto_rebalancing_needed") => "Consider rebalancing strategy",
-        ("en", "critical_pareto_deviation") => "Critical deviation from Pareto principle",
-        ("en", "pareto_strategy_review_needed") => "Strategy review needed",
-        ("en", "high_concentration_insight") => {
-            "High concentration may indicate efficiency but also risk"
-        }
-        ("en", "low_concentration_insight") => {
-            "Low concentration may indicate missed optimization opportunities"
-        }
-        ("en", "unsupported_format") => "Error: Unsupported output format",
-        ("en", "no_numbers_found") => "Error: No valid numbers found in input",
-        ("en", "analysis_error") => "Analysis error",
-
-        // 日本語
-        ("ja", "pareto_analysis_results") => "パレートの法則（80/20の法則）解析結果",
-        ("ja", "dataset") => "データセット",
-        ("ja", "numbers_analyzed") => "解析した数値数",
-        ("ja", "risk_level") => "注意レベル",
-        ("ja", "pareto_metrics") => "パレート指標",
-        ("ja", "top_20_percent_share") => "上位20%の占有率",
-        ("ja", "pareto_ratio") => "パレート比率",
-        ("ja", "concentration_index") => "集中度指数（ジニ係数）",
-        ("ja", "interpretation") => "解釈",
-        ("ja", "ideal_pareto") => "理想的なパレート分布 - 80/20の法則に従っています",
-        ("ja", "pareto_80_20_maintained") => "上位20%が約80%の価値をコントロール",
-        ("ja", "slight_pareto_deviation") => "パレートの法則からの軽微な偏差",
-        ("ja", "pareto_monitoring_recommended") => "分布バランスの監視を推奨",
-        ("ja", "significant_pareto_deviation") => "80/20の法則からの有意な偏差",
-        ("ja", "pareto_rebalancing_needed") => "戦略の再バランスを検討",
-        ("ja", "critical_pareto_deviation") => "パレートの法則からの重大な偏差",
-        ("ja", "pareto_strategy_review_needed") => "戦略の見直しが必要",
-        ("ja", "high_concentration_insight") => "高い集中度は効率性を示すが、リスクも伴います",
-        ("ja", "low_concentration_insight") => "低い集中度は最適化機会を逃している可能性",
-        ("ja", "unsupported_format") => "エラー: サポートされていない出力形式",
-        ("ja", "no_numbers_found") => "エラー: 入力に有効な数値が見つかりません",
-        ("ja", "analysis_error") => "解析エラー",
-        ("ja", "custom_percentiles") => "カスタムパーセンタイル",
-
-        // Default English
-        (_, "pareto_analysis_results") => "Pareto Principle (80/20 Rule) Analysis Results",
-        (_, "custom_percentiles") => "Custom Percentiles",
-        (_, "dataset") => "Dataset",
-        (_, "numbers_analyzed") => "Numbers analyzed",
-        (_, "risk_level") => "Attention Level",
-        (_, "unsupported_format") => "Error: Unsupported output format",
-        (_, "no_numbers_found") => "Error: No valid numbers found in input",
-        (_, "analysis_error") => "Analysis error",
-        (_, _) => "Unknown message",
-    }
 }
 
 /// Analyze numbers with filtering and custom options
