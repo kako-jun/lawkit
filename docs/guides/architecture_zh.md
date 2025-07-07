@@ -197,18 +197,18 @@ lawkit设计用于处理从小样本（100+数据点）到企业级数据集（�
 - **子命令结构**: `lawkit <法则> [选项] <输入>`
 - **配置管理**: CLI参数和配置文件
 - **错误处理**: 全面错误报告和恢复
-- **国际化**: 多语言输出支持
+- **国际数字支持**: 5种语言数字格式自动识别
 
 ### 库集成
 
 - **Rust Crate**: 作为`lawkit-core`的核心功能
 - **Node.js包**: 带自动二进制下载的`lawkit-js`
 - **Python包**: 带CLI集成的`lawkit-python`
-- **WebAssembly**: 浏览器兼容统计分析
+- **WebAssembly**: 浏览器兼容统计分析（计划中）
 
-### API设计
+### 未来扩展（计划中）
 
-- **RESTful端点**: 用于Web集成的HTTP API
+- **RESTful API**: 用于Web集成的HTTP API
 - **GraphQL支持**: 灵活查询接口
 - **WebSocket流**: 实时分析更新
 - **身份验证**: 基于令牌的访问控制
