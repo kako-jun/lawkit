@@ -1,8 +1,5 @@
 use clap::{Arg, ArgMatches, Command};
-use lawkit_core::common::{
-    memory::MemoryConfig,
-    parallel::ParallelConfig,
-};
+use lawkit_core::common::{memory::MemoryConfig, parallel::ParallelConfig};
 
 /// 全サブコマンドで共通のオプションを定義
 pub fn add_common_options(cmd: Command) -> Command {
@@ -416,7 +413,7 @@ pub fn add_compare_options(cmd: Command) -> Command {
 /// 最適化設定をセットアップ（--optimizeフラグに基づく）
 pub fn setup_optimization_config(matches: &ArgMatches) -> (bool, ParallelConfig, MemoryConfig) {
     let use_optimize = matches.get_flag("optimize");
-    
+
     if use_optimize {
         // 最適化有効時の設定
         let parallel_config = ParallelConfig {

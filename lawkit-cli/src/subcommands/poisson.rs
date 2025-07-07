@@ -1,3 +1,4 @@
+use crate::common_options::{get_optimized_reader, setup_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
@@ -11,7 +12,6 @@ use lawkit_core::{
         RareEventAnalysis,
     },
 };
-use crate::common_options::{get_optimized_reader, setup_optimization_config};
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // 特殊モードの確認（フラグが明示的に指定された場合を優先）
@@ -163,7 +163,6 @@ fn run_rare_events_mode(matches: &ArgMatches) -> Result<()> {
     };
     std::process::exit(exit_code);
 }
-
 
 fn output_results(matches: &clap::ArgMatches, result: &PoissonResult) {
     let format = matches.get_one::<String>("format").unwrap();

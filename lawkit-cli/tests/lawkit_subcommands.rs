@@ -14,6 +14,17 @@ fn run_lawkit_command(subcommand: &str, args: &[&str]) -> std::process::Output {
     command.output().expect("Failed to execute lawkit command")
 }
 
+/// Run lawkit command with data from temporary file
+fn run_lawkit_command_with_file(subcommand: &str, data: &str, extra_args: &[&str]) -> std::process::Output {
+    let temp_file = create_temp_file_with_content(data);
+    let file_path = temp_file.path().to_str().unwrap();
+    
+    let mut all_args = vec![file_path];
+    all_args.extend_from_slice(extra_args);
+    
+    run_lawkit_command(subcommand, &all_args)
+}
+
 /// Create temporary file with given content
 fn create_temp_file_with_content(content: &str) -> NamedTempFile {
     let mut file = NamedTempFile::new().expect("Failed to create temp file");
@@ -154,7 +165,7 @@ fn test_lawkit_benf_verbose() {
 #[test]
 fn test_lawkit_pareto_basic() {
     let test_data = generate_test_data();
-    let output = run_lawkit_command("pareto", &[&test_data]);
+    let output = run_lawkit_command_with_file("pareto", &test_data, &[]);
 
     // paretoコマンドは集中度によって非ゼロ終了コードを返すことがある
     assert!(matches!(
@@ -170,7 +181,7 @@ fn test_lawkit_pareto_basic() {
 #[test]
 fn test_lawkit_zipf_basic() {
     let test_data = generate_test_data();
-    let output = run_lawkit_command("zipf", &[&test_data]);
+    let output = run_lawkit_command_with_file("zipf", &test_data, &[]);
 
     // zipfコマンドも分布によって非ゼロ終了コードを返すことがある
     assert!(matches!(
@@ -188,7 +199,7 @@ fn test_lawkit_normal_basic() {
     // normalコマンドは30+のサンプルが必要
     let large_data: Vec<String> = (100..150).map(|i| i.to_string()).collect();
     let test_data = large_data.join(" ");
-    let output = run_lawkit_command("normal", &[&test_data]);
+    let output = run_lawkit_command_with_file("normal", &test_data, &[]);
 
     // normalコマンドも正規性によって非ゼロ終了コードを返すことがある
     assert!(matches!(
@@ -204,7 +215,7 @@ fn test_lawkit_normal_basic() {
 #[test]
 fn test_lawkit_poisson_basic() {
     let test_data = "1 2 3 0 1 2 4 1 0 3 2 1 5 2 1 0 3 2 1 4"; // Discrete event counts
-    let output = run_lawkit_command("poisson", &[test_data]);
+    let output = run_lawkit_command_with_file("poisson", test_data, &[]);
 
     assert!(output.status.success());
 
@@ -216,7 +227,7 @@ fn test_lawkit_poisson_basic() {
 #[test]
 fn test_lawkit_compare_basic() {
     let test_data = generate_test_data();
-    let output = run_lawkit_command("compare", &[&test_data]);
+    let output = run_lawkit_command_with_file("compare", &test_data, &[]);
 
     // compareコマンドは矛盾検出時に非ゼロ終了コードを返すことがある
     assert!(matches!(
@@ -300,21 +311,21 @@ fn test_multi_law_examples() {
     let test_data = generate_test_data();
 
     // Compare all laws
-    let output = run_lawkit_command("compare", &[&test_data]);
+    let output = run_lawkit_command_with_file("compare", &test_data, &[]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
     ));
 
     // Focus on concentration analysis
-    let output = run_lawkit_command("compare", &["--laws", "benf,pareto,normal", &test_data]);
+    let output = run_lawkit_command_with_file("compare", &test_data, &["--laws", "benf,pareto,normal"]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
     ));
 
     // Recommendation mode
-    let output = run_lawkit_command("compare", &["--recommend", &test_data]);
+    let output = run_lawkit_command_with_file("compare", &test_data, &["--recommend"]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
