@@ -50,7 +50,10 @@
       "Bash(gh run view:*)",
       "Bash(./target/release/benf:*)",
       "Bash(chmod:*)",
-      "Bash(./ci-local.sh:*)"
+      "Bash(./ci-local.sh:*)",
+      "Bash(tree:*)",
+      "Bash(python test:*)",
+      "Bash(git tag:*)"
     ],
     "deny": []
   },
