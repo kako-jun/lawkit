@@ -38,8 +38,8 @@ echo "1234 5678 9012 3456" | cargo run --bin lawkit -- benf --min-count 4 || tes
 cargo run --bin lawkit -- generate benf --samples 100 --seed readme > /tmp/readme_test.txt
 cargo run --bin lawkit -- benf /tmp/readme_test.txt --format json
 
-# Multi-law comparison
-cargo run --bin lawkit -- compare /tmp/readme_test.txt
+# Multi-law comparison (allow exit codes 0-12 for analysis results)
+cargo run --bin lawkit -- compare /tmp/readme_test.txt || test $? -le 12
 
 # List functionality
 cargo run --bin lawkit -- list
