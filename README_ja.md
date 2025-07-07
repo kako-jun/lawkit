@@ -7,14 +7,17 @@
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io CLI](https://img.shields.io/crates/v/lawkit.svg?label=lawkit-cli)](https://crates.io/crates/lawkit)
 [![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
+[![npm](https://img.shields.io/npm/v/lawkit-js.svg?label=lawkit-js)](https://www.npmjs.com/package/lawkit-js)
+[![PyPI](https://img.shields.io/pypi/v/lawkit-python.svg?label=lawkit-python)](https://pypi.org/project/lawkit-python/)
 [![Documentation](https://img.shields.io/badge/📚%20ユーザーガイド-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index_ja.md)
+[![API Reference](https://img.shields.io/badge/🔧%20API%20Reference-docs.rs-blue)](https://docs.rs/lawkit-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 複数の統計法則を使用して異常、パターン、洞察を検出する次世代統計分析ツールキット。不正検知、データ品質評価、ビジネスインテリジェンスに最適。
 
 ```bash
 # 従来のツールは一度に一つのパターンしか分析しない
-$ benf data.csv  # ベンフォード法則のみ
+$ other-tool data.csv  # 単一統計分析
 
 # lawkitは包括的な多法則分析を提供
 $ lawkit compare --laws all data.csv
@@ -34,26 +37,41 @@ $ lawkit compare --laws all data.csv
 - **⚡ 高性能**: 並列処理によるRust製
 - **📊 豊富な出力**: テキスト、JSON、CSV、YAML、TOML、XML形式
 - **🔗 メタチェーン**: 時系列での統計パターン傾向分析
+- **🔍 高度外れ値検出**: LOF、Isolation Forest、DBSCAN、アンサンブル手法
+- **📈 時系列分析**: トレンド検出、季節性、変化点分析
+- **🚀 メモリ効率**: 大規模データセット用ストリーミングモード
 
-## 📊 パフォーマンスベンチマーク
+## 📊 パフォーマンス
+
+AMD Ryzen 5 PRO 4650Uでの実際のベンチマーク結果：
 
 ```bash
-# 100Kデータポイントでのベンチマーク
-# 従来ツールは1つのパターンを個別に分析
-benf data.csv                 # 単一統計分析: ~2.1秒
-pareto data.csv               # 別の個別分析: ~2.1秒
-
-# lawkitは複数パターンを効率的に分析
-lawkit benf data.csv          # 単一法則: ~180ms (11.7倍高速)
-lawkit compare data.csv       # 多法則分析: ~850ms (逐次実行より2.5倍高速)
+# 従来ツールは一度に一つのパターンを分析
+$ other-tool data.csv         # 単一分析: ~2.1秒
+$ lawkit benf data.csv        # 同じ分析: ~180ms (11.7倍高速)
+$ lawkit compare data.csv     # 多法則分析: ~850ms
 ```
 
-| データセットサイズ | 単一法則 | 多法則 | メモリ使用量 |
-|-------------------|---------|-------|-------------|
-| 1Kポイント         | 8ms     | 25ms  | 2.1MB       |
-| 10Kポイント        | 45ms    | 180ms | 8.4MB       |
-| 100Kポイント       | 180ms   | 850ms | 32MB        |
-| 1Mポイント         | 2.1秒   | 9.2秒 | 128MB       |
+## なぜlawkitなのか？
+
+従来ツールは一度に一つの統計パターンしか分析しません。`lawkit`は包括的な多法則分析を提供します。
+
+- **全体的洞察**: 複数の統計法則が異なる側面を明らかにします
+- **スマート推奨**: AI搭載の分析統合
+- **時間効率**: 複数法則の並列処理
+- **国際対応**: 5言語の数字解析
+
+## 🏗️ 仕組み
+
+```mermaid
+graph LR
+    A[データ] --> B[解析・検証]
+    B --> C[多法則分析]
+    C --> D[リスク評価]
+    D --> E[推奨事項]
+```
+
+lawkitは複数の統計レンズを通してデータを同時に分析し、結果を統合して包括的な洞察と推奨事項を提供します。
 
 ## 🚀 クイックスタート
 
@@ -84,183 +102,70 @@ lawkit compare --laws all financial_data.csv
 lawkit compare --laws all --filter ">=1000" --format json data.csv
 ```
 
-## 🔍 対応統計法則
+## 仕様
 
-### 1. ベンフォード法則
-**用途**: 財務データの不正検知
-```bash
-lawkit benf transactions.csv --threshold high
-```
-データ操作を示す可能性がある不自然な数字分布を検出します。
+### 対応統計法則
 
-### 2. パレート分析（80/20法則）
-**用途**: ビジネス優先順位付けと不平等測定
-```bash
-lawkit pareto customer_revenue.csv --verbose
-```
-結果の大部分を駆動する重要な少数を特定します。
+- **ベンフォード法則**: 金融データの不正検知
+- **パレート分析**: 80/20法則と不平等測定  
+- **ジップ法則**: 頻度分析とべき法則分布
+- **正規分布**: 品質管理と外れ値検出
+- **ポアソン分布**: イベント発生と稀少事象モデリング
 
-### 3. ジップ法則
-**用途**: 頻度分析とテキストマイニング
-```bash
-lawkit zipf --text document.txt
-lawkit zipf website_traffic.csv
-```
-ランキングと頻度のべき法則分布を分析します。
+### 分析タイプ
 
-### 4. 正規分布
-**用途**: 品質管理と外れ値検出
-```bash
-lawkit normal --quality-control --spec-limits 9.5,10.5 production.csv
-lawkit normal --outliers process_data.csv
-```
-統計的工程管理と異常検知。
+- 単一法則分析
+- 多法則比較・統合
+- 高度外れ値検出（LOF、Isolation Forest、DBSCAN）
+- 時系列分析とトレンド検出
+- テスト・検証用データ生成
 
-### 5. ポアソン分布
-**用途**: イベント発生と稀少事象モデリング
-```bash
-lawkit poisson --predict --rare-events incident_data.csv
-```
-離散的イベント発生をモデル化・予測します。
+### 出力形式
 
-## 🎲 データ生成・テスト機能
+`lawkit`は様々な用途に対応した複数形式で結果を出力：
 
-lawkitには教育、テスト、デモンストレーション用の強力なデータ生成機能が含まれています。
+- **テキスト形式（デフォルト）**: 人間が読みやすい分析結果
+- **JSON形式**: 自動化・統合用の機械可読形式
+- **CSV/YAML/TOML/XML**: データ処理用の各種構造化形式
 
-### サンプルデータの生成
+## インストール
 
-特定の法則に従う統計的に正確なサンプルデータを生成：
+### CLIツール
 
 ```bash
-# ベンフォードの法則に従う1000サンプルを生成
-lawkit generate benf --samples 1000
+# crates.ioから（推奨）
+cargo install lawkit
 
-# パレート分布（80/20の法則）を生成
-lawkit generate pareto --samples 5000 --concentration 0.8
-
-# カスタムパラメータでZipf分布を生成
-lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000
-
-# 正規分布データを生成
-lawkit generate normal --samples 1000 --mean 100 --stddev 15
-
-# ポアソンイベントデータを生成
-lawkit generate poisson --samples 500 --lambda 2.5
+# リリースから
+wget https://github.com/kako-jun/lawkit/releases/latest/download/lawkit-linux-x86_64.tar.gz
+tar -xzf lawkit-linux-x86_64.tar.gz
 ```
 
-### 生成→分析パイプライン
-
-生成と分析を組み合わせてテストと検証を実行：
+### パッケージ統合
 
 ```bash
-# ベンフォードの法則検出をテスト
-lawkit generate benf --samples 10000 | lawkit benf --format json
+# Node.js統合
+npm install lawkit-js
 
-# 生成データでパレートの法則を検証
-lawkit generate pareto --samples 5000 | lawkit pareto --verbose
-
-# 統計手法を検証
-lawkit generate normal --samples 1000 --mean 50 --stddev 10 | lawkit normal --outliers
-
-# 不正注入でのテスト
-lawkit generate benf --samples 5000 --fraud-rate 0.2 | lawkit benf --threshold critical
-```
-
-### セルフテスト
-
-lawkit機能の包括的なセルフテストを実行：
-
-```bash
-# 全セルフテストを実行
-lawkit selftest
-
-# 特定機能をテスト
-lawkit generate benf --samples 100 | lawkit benf --quiet
-```
-
-### 教育用途
-
-統計概念の教育に最適：
-
-```bash
-# 中心極限定理の実演
-for i in {1..5}; do
-  lawkit generate normal --samples 1000 --mean 100 --stddev 15 | 
-  lawkit normal --verbose
-done
-
-# パレートの法則の実際の動作を表示
-lawkit generate pareto --samples 10000 --concentration 0.8 | 
-lawkit pareto --format json | jq '.concentration_ratio'
-
-# 異なる分布の比較
-lawkit generate benf --samples 1000 > benf_data.txt
-lawkit generate normal --samples 1000 > normal_data.txt
-lawkit compare --laws benf,normal benf_data.txt
-lawkit compare --laws benf,normal normal_data.txt
-```
-
-## 国際数字サポート
-
-### 対応数字形式
-
-#### 1. 全角数字
-```bash
-echo "１２３４５６ ７８９０１２" | lawkit benf
-```
-
-#### 2. 漢数字（基本）
-```bash
-echo "一二三四五六七八九" | lawkit benf
-```
-
-#### 3. 漢数字（位取り）
-```bash
-echo "一千二百三十四 五千六百七十八 九万一千二百" | lawkit benf
-```
-
-#### 4. 混在パターン
-```bash
-echo "売上123万円 経費45万6千円 利益78万９千円" | lawkit benf
-```
-
-### 変換ルール
-
-| 漢字 | 数字 | 備考 |
-|------|------|------|
-| 一 | 1 | 基本数字 |
-| 十 | 10 | 十の位 |
-| 百 | 100 | 百の位 |
-| 千 | 1000 | 千の位 |
-| 万 | 10000 | 万の位 |
-| 一千二百三十四 | 1234 | 位取り記法 |
-
-### ヒンディー語数字（हिन्दी अंक）
-```bash
-# デーヴァナーガリー数字
-echo "१२३४५६ ७८९०१२" | lawkit benf --lang hi
-```
-
-### アラビア語数字（الأرقام العربية）
-```bash  
-# 東アラビア・インド数字
-echo "١٢٣٤٥٦ ٧٨٩٠١٢" | lawkit benf --lang ar
+# Python統合
+pip install lawkit-python
+lawkit-download-binary  # CLIバイナリをダウンロード
 ```
 
 ## ドキュメント
 
-包括的なドキュメントについては以下を参照してください：
-- 📖 **[日本語ドキュメント](docs/index_ja.md)** - 完全なユーザーガイドとAPIリファレンス
+包括的なガイド、サンプル、APIドキュメントについては：
 
-## 開発・貢献
+📚 **[ユーザーガイド](https://github.com/kako-jun/lawkit/tree/main/docs/index_ja.md)** - インストール、使用方法、サンプル  
+🔧 **[CLIリファレンス](https://github.com/kako-jun/lawkit/tree/main/docs/reference/cli-reference_ja.md)** - 完全なコマンドドキュメント  
+📊 **[統計法則ガイド](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/examples_ja.md)** - 詳細な分析サンプル  
+⚡ **[パフォーマンスガイド](https://github.com/kako-jun/lawkit/tree/main/docs/guides/performance_ja.md)** - 最適化と大規模データセット  
+🌍 **[国際サポート](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/configuration_ja.md)** - 多言語数字解析
 
-[CONTRIBUTING.md](CONTRIBUTING.md)を参照してください。
+## 貢献
+
+貢献を歓迎します！詳細は[貢献ガイド](CONTRIBUTING.md)を参照してください。
 
 ## ライセンス
 
-MIT ライセンス - [LICENSE](LICENSE)ファイルを参照
-
-## 参考資料
-
-- [ベンフォードの法則 - Wikipedia](https://ja.wikipedia.org/wiki/ベンフォードの法則)
-- [不正検知におけるベンフォードの法則の活用](https://example.com/benford-fraud-jp)
+このプロジェクトはMITライセンスの下でライセンスされています - 詳細は[LICENSE](LICENSE)ファイルを参照してください。
