@@ -5,27 +5,42 @@ All notable changes to lawkit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2025-07-07
 
 ### Added
-- Complete documentation restructure following diffx patterns
-- Japanese documentation variants for all guides
-- Integration guides for CI/CD, databases, and cloud platforms
-- Performance optimization guides
-- Project documentation (changelog, roadmap)
+- **Generate Command**: Complete sample data generation for all 5 statistical laws
+- **NPM Package**: `lawkit-js` with automatic binary download from GitHub Releases
+- **Python Package**: `lawkit-python` with comprehensive API wrapper and type hints
+- **Industry Examples**: Real-world usage examples for fraud detection and business intelligence
+- **Test Coverage**: 40+ usage examples with comprehensive test validation
+- **Multi-platform Distribution**: Windows, macOS, and Linux support with automatic binary detection
 
 ### Changed
-- **Documentation**: Reduced documentation languages from 5 to 3 (English, Japanese, Chinese)
-- **Strategic Focus**: Removed Arabic and Hindi documentation for cost efficiency
+- **Strategic Language Reduction**: **100% Complete** - CLI output unified to English for international compatibility
+- **Documentation Languages**: Reduced from 5 to 3 languages (English, Japanese, Chinese)
 - **Input Support**: **Unchanged** - Continues parsing all international number formats (EN/JA/ZH/HI/AR)
-- **Output Language**: CLI output standardized to English for international compatibility
-- Documentation structure now matches diffx sibling project
-- FAQ moved to user-guide subdirectory
-- All docs organized into proper subdirectories
+- **UNIX Philosophy**: English-only CLI output following international standards
+- **Architecture**: Removed all language-specific output functions from core library
 
 ### Removed
-- Arabic (README.ar.md) and Hindi (README.hi.md) documentation files
-- Unused language-specific CLI output options
+- **`--language` CLI option**: CLI output now standardized to English
+- **Language functions**: `get_language()` and `localized_text()` removed from all subcommands
+- **Arabic and Hindi documentation**: Focused on 3 major economic regions
+- **Legacy language arguments**: Updated all tests and examples
+
+### Fixed
+- **Compilation errors**: Resolved all language-related reference errors
+- **Test failures**: Updated language-dependent tests to match English output
+- **Japanese text**: Removed remaining Japanese text from core library analysis results
+- **CLI consistency**: Unified output format across all subcommands
+
+## [Unreleased]
+
+### Planned
+- PyPI and NPM package publication
+- ReadTheDocs documentation hosting
+- Additional statistical laws (Weibull, LogNormal, Beta/Gamma)
+- Enterprise features (configuration files, batch processing, PDF reports)
 
 ## [2.0.1] - 2024-07-05
 
