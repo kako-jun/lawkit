@@ -115,7 +115,7 @@ graph TB
     E --> F3[🔍 高度外れ値検出<br/>LOF, Isolation Forest, DBSCAN]
     E --> F4[📈 時系列分析<br/>トレンド, 季節性, 異常]
     
-    F1 --> G[📋 包括レポート<br/>Diffai/JSON/CSV/YAML/XML]
+    F1 --> G[📋 包括レポート<br/>lawkit/JSON/CSV/YAML/XML]
     F2 --> G
     F3 --> G
     F4 --> G
@@ -175,7 +175,7 @@ lawkitは複数の統計レンズを通してデータを同時に分析し、�
 
 `lawkit`は様々な用途に対応した複数形式で結果を出力：
 
-- **Diffai形式（デフォルト）**: 人間が読みやすい分析結果（[diffx](https://github.com/kako-jun/diffx)形式のスーパーセット）
+- **lawkit形式（デフォルト）**: 人間が読みやすい分析結果
 - **JSON/CSV/YAML/TOML/XML**: 自動化・統合・データ処理用の機械可読構造化形式
 
 ## インストール
@@ -264,7 +264,7 @@ diffx analysis_*.txt --chain  # 時間経過によるパターン進化を可視
 
 ## 🔗 メタチェーン：パターン変遷の追跡
 
-メタチェーンはlawkitの内蔵時系列分析とdiffxを組み合わせた長期パターン追跡：
+メタチェーンはlawkitの内蔵時系列分析と[diffx](https://github.com/kako-jun/diffx)を組み合わせた長期パターン追跡：
 
 ```mermaid
 graph LR

@@ -115,7 +115,7 @@ graph TB
     E --> F3[🔍 Advanced Outliers<br/>LOF, Isolation Forest, DBSCAN]
     E --> F4[📈 Time Series Analysis<br/>Trends, Seasonality, Anomalies]
     
-    F1 --> G[📋 Comprehensive Report<br/>Diffai/JSON/CSV/YAML/XML]
+    F1 --> G[📋 Comprehensive Report<br/>lawkit/JSON/CSV/YAML/XML]
     F2 --> G
     F3 --> G
     F4 --> G
@@ -175,7 +175,7 @@ Models the probability of rare events occurring in fixed time/space intervals. E
 
 `lawkit` outputs results in multiple formats for different use cases:
 
-- **Diffai Format (Default)**: Human-readable analysis results (superset of [diffx](https://github.com/kako-jun/diffx) format)
+- **lawkit Format (Default)**: Human-readable analysis results
 - **JSON/CSV/YAML/TOML/XML**: Machine-readable structured formats for automation, integration, and data processing
 
 ## Installation
@@ -264,7 +264,7 @@ diffx analysis_*.txt --chain  # Visualize pattern evolution over time
 
 ## 🔗 Meta-Chaining: Tracking Pattern Evolution
 
-Meta-chaining combines lawkit's built-in time series analysis with diffx for long-term pattern tracking:
+Meta-chaining combines lawkit's built-in time series analysis with [diffx](https://github.com/kako-jun/diffx) for long-term pattern tracking:
 
 ```mermaid
 graph LR
