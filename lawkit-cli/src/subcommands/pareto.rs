@@ -166,28 +166,28 @@ fn print_pareto_interpretation(result: &ParetoResult) {
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ Ideal Pareto distribution detected");
+            println!("[PASS] Ideal Pareto distribution detected");
             println!("   80/20 principle is maintained");
         }
         RiskLevel::Medium => {
-            println!("⚠️  Slight deviation from Pareto principle");
+            println!("[WARN] Slight deviation from Pareto principle");
             println!("   Monitoring recommended");
         }
         RiskLevel::High => {
-            println!("🚨 Significant deviation from Pareto principle");
+            println!("[FAIL] Significant deviation from Pareto principle");
             println!("   Rebalancing needed");
         }
         RiskLevel::Critical => {
-            println!("🔍 Critical deviation from Pareto principle");
+            println!("[CRITICAL] Critical deviation from Pareto principle");
             println!("   Strategy review needed");
         }
     }
 
     // 80/20原則からの偏差説明
     if result.top_20_percent_share > 85.0 {
-        println!("   💡 High concentration indicates good focus");
+        println!("   INFO: High concentration indicates good focus");
     } else if result.top_20_percent_share < 70.0 {
-        println!("   💡 Low concentration suggests distribution inefficiency");
+        println!("   ALERT: Low concentration suggests distribution inefficiency");
     }
 }
 

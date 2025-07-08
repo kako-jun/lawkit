@@ -96,9 +96,10 @@ fn format_text(result: &BenfordResult) -> String {
         result.numbers_analyzed,
         result.risk_level,
         match result.risk_level {
-            crate::common::risk::RiskLevel::Critical => "⚠️",
-            crate::common::risk::RiskLevel::High => "⚠️",
-            _ => "",
+            crate::common::risk::RiskLevel::Critical => "[CRITICAL]",
+            crate::common::risk::RiskLevel::High => "[HIGH]",
+            crate::common::risk::RiskLevel::Medium => "[MEDIUM]",
+            crate::common::risk::RiskLevel::Low => "[LOW]",
         },
         format_distribution_bars(result),
         result.chi_square,

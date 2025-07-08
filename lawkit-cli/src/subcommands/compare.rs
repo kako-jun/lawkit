@@ -285,7 +285,7 @@ fn output_integration_text(
     if !result.conflicts.is_empty() {
         writeln!(writer, "{}:", get_text("conflicts", "en"))?;
         for conflict in &result.conflicts {
-            writeln!(writer, "  ⚠️ {}", conflict.description)?;
+            writeln!(writer, "  CONFLICT: {}", conflict.description)?;
             writeln!(
                 writer,
                 "     {}: {}",
@@ -305,7 +305,7 @@ fn output_integration_text(
     writeln!(writer, "{}:", get_text("recommendations", "en"))?;
     writeln!(
         writer,
-        "  🎯 {}: {}",
+        "  FOCUS: {}: {}",
         get_text("primary_law", "en"),
         get_law_name(&result.recommendations.primary_law, "en")
     )?;
@@ -319,7 +319,7 @@ fn output_integration_text(
             .collect();
         writeln!(
             writer,
-            "  🔍 {}: {}",
+            "  DETAIL: {}: {}",
             get_text("secondary_laws", "en"),
             secondary_names.join(", ")
         )?;
@@ -327,7 +327,7 @@ fn output_integration_text(
 
     writeln!(
         writer,
-        "  📊 {}: {}",
+        "  METRIC: {}: {}",
         get_text("rationale", "en"),
         result.recommendations.rationale
     )?;
@@ -617,9 +617,9 @@ fn output_consistency_check_result(
     )?;
 
     if result.consistency_score >= threshold {
-        writeln!(writer, "✅ {}", get_text("consistent_results", "en"))?;
+        writeln!(writer, "[PASS] {}", get_text("consistent_results", "en"))?;
     } else {
-        writeln!(writer, "⚠️ {}", get_text("inconsistent_results", "en"))?;
+        writeln!(writer, "[WARN] {}", get_text("inconsistent_results", "en"))?;
     }
 
     Ok(())

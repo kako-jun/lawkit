@@ -357,11 +357,11 @@ fn run_selftest() -> Result<(), LawkitError> {
         match law {
             &"benf" => {
                 // Mock success for demonstration
-                println!("✅ PASS");
+                println!("[PASS]");
                 passed += 1;
             }
             _ => {
-                println!("✅ PASS (placeholder)");
+                println!("[PASS] (placeholder)");
                 passed += 1;
             }
         }
@@ -371,10 +371,10 @@ fn run_selftest() -> Result<(), LawkitError> {
     println!("Self-test completed: {passed}/{total} tests passed");
 
     if passed == total {
-        println!("✅ All tests passed! lawkit is working correctly.");
+        println!("[PASS] All tests passed! lawkit is working correctly.");
         Ok(())
     } else {
-        println!("❌ Some tests failed. Please check the implementation.");
+        println!("[FAIL] Some tests failed. Please check the implementation.");
         std::process::exit(1);
     }
 }
