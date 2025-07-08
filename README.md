@@ -1,6 +1,6 @@
 # lawkit
 
-> **🔍 Multi-law statistical analysis toolkit - Uncover hidden patterns and detect anomalies with confidence**
+> **🔍 Multi-law statistical analysis toolkit - Uncover hidden patterns and continuously detect anomalies automatically**
 
 [English README](README.md) | [日本語版 README](README_ja.md) | [中文版 README](README_zh.md)
 
@@ -280,7 +280,7 @@ graph LR
     G -->|trend| I[Pattern<br/>Evolution]
     H -->|trend| I
     
-    style I fill:#e1f5fe,stroke:#0288d1,stroke-width:3px
+    style I stroke:#0288d1,stroke-width:3px
 ```
 
 **Built-in Time Series Analysis** (single dataset):
