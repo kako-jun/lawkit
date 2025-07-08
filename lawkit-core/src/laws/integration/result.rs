@@ -5,6 +5,7 @@ use crate::laws::pareto::ParetoResult;
 use crate::laws::poisson::PoissonResult;
 use crate::laws::zipf::ZipfResult;
 use std::collections::HashMap;
+use diffx_core::{diff, DiffResult};
 
 /// 統合分析結果
 #[derive(Debug, Clone)]
@@ -59,6 +60,8 @@ pub enum ConflictType {
     RiskLevelConflict,      // リスクレベルの不一致
     ScaleIncompatibility,   // スケール不適合
     MethodologicalConflict, // 手法論的矛盾
+    ScoreDeviation,         // スコア乖離（diffx-core検出）
+    UnexpectedConsistency,  // 異常な一致（diffx-core検出）
 }
 
 /// 推奨システム結果
@@ -293,6 +296,111 @@ impl IntegrationResult {
     fn detect_conflicts(&mut self) {
         self.conflicts.clear();
 
+        // diffx-coreを使用してより詳細な矛盾分析を実行
+        self.detect_conflicts_with_diffx();
+        
+        // 従来の手法も併用（スコア差分の詳細分析）
+        self.detect_score_conflicts();
+
+        self.conflicts_detected = self.conflicts.len();
+    }
+
+    /// diffx-coreを使用した構造的矛盾検出
+    fn detect_conflicts_with_diffx(&mut self) {
+        if self.law_scores.is_empty() {
+            return;
+        }
+
+        // 期待されるスコア分布（平均値ベース）と実際のスコア分布を比較
+        let average_score: f64 = self.law_scores.values().sum::<f64>() / self.law_scores.len() as f64;
+        let mut expected_scores = HashMap::new();
+        
+        for law in self.law_scores.keys() {
+            expected_scores.insert(law.clone(), average_score);
+        }
+
+        // JSONに変換してdiffx-coreで比較
+        let expected_json = serde_json::to_value(&expected_scores).unwrap_or_default();
+        let actual_json = serde_json::to_value(&self.law_scores).unwrap_or_default();
+
+        // diffx-coreで構造的差分を分析
+        let diff_results = diff(&expected_json, &actual_json, None, Some(0.01), None);
+
+        if diff_results.is_empty() {
+            // 全てのスコアが期待値と一致（疑わしい一致）
+            if self.law_scores.len() > 1 {
+                let conflict = Conflict {
+                    conflict_type: ConflictType::UnexpectedConsistency,
+                    laws_involved: self.law_scores.keys().cloned().collect(),
+                    conflict_score: 0.6,
+                    description: "全ての統計法則が同一スコアを示しており、データまたは分析に問題がある可能性".to_string(),
+                    likely_cause: "データの多様性不足または分析アルゴリズムの問題".to_string(),
+                    resolution_suggestion: "データの品質と分析手法を再確認してください".to_string(),
+                };
+                self.conflicts.push(conflict);
+            }
+        } else {
+            // 差分が検出された場合の詳細分析
+            for diff_result in &diff_results {
+                match diff_result {
+                    DiffResult::Modified(path, expected_val, actual_val) => {
+                        if let (Some(expected), Some(actual)) = (expected_val.as_f64(), actual_val.as_f64()) {
+                            let deviation = (actual - expected).abs() / expected.max(0.01);
+                            
+                            if deviation > 0.3 { // 30%以上の偏差を異常とする
+                                let law_name = path.trim_start_matches('"').trim_end_matches('"');
+                                let conflict = Conflict {
+                                    conflict_type: ConflictType::ScoreDeviation,
+                                    laws_involved: vec![law_name.to_string()],
+                                    conflict_score: deviation.min(1.0),
+                                    description: format!(
+                                        "法則 '{}' のスコア ({:.3}) が期待値 ({:.3}) から大きく乖離（偏差率: {:.1}%）",
+                                        law_name, actual, expected, deviation * 100.0
+                                    ),
+                                    likely_cause: format!(
+                                        "法則 '{}' がデータパターンに適合していない可能性", law_name
+                                    ),
+                                    resolution_suggestion: format!(
+                                        "法則 '{}' の適用条件やデータ品質を再確認してください", law_name
+                                    ),
+                                };
+                                self.conflicts.push(conflict);
+                            }
+                        }
+                    }
+                    DiffResult::Added(path, _val) | DiffResult::Removed(path, _val) => {
+                        // 予期しない法則の追加・削除
+                        let law_name = path.trim_start_matches('"').trim_end_matches('"');
+                        let conflict = Conflict {
+                            conflict_type: ConflictType::MethodologicalConflict,
+                            laws_involved: vec![law_name.to_string()],
+                            conflict_score: 0.5,
+                            description: format!("法則 '{}' の予期しない変更が検出されました", law_name),
+                            likely_cause: "分析設定または法則選択の不整合".to_string(),
+                            resolution_suggestion: "分析対象の法則設定を確認してください".to_string(),
+                        };
+                        self.conflicts.push(conflict);
+                    }
+                    DiffResult::TypeChanged(path, _old, _new) => {
+                        // スコアの型変更（通常は発生しないはず）
+                        let law_name = path.trim_start_matches('"').trim_end_matches('"');
+                        let conflict = Conflict {
+                            conflict_type: ConflictType::MethodologicalConflict,
+                            laws_involved: vec![law_name.to_string()],
+                            conflict_score: 0.8,
+                            description: format!("法則 '{}' のスコア型が変更されました", law_name),
+                            likely_cause: "内部分析エラーまたはデータ破損".to_string(),
+                            resolution_suggestion: "分析を再実行してください".to_string(),
+                        };
+                        self.conflicts.push(conflict);
+                    }
+                }
+            }
+        }
+    }
+
+    /// 従来のスコア差分ベース矛盾検出
+    fn detect_score_conflicts(&mut self) {
         let laws: Vec<String> = self.law_scores.keys().cloned().collect();
         for i in 0..laws.len() {
             for j in i + 1..laws.len() {
@@ -323,8 +431,6 @@ impl IntegrationResult {
                 }
             }
         }
-
-        self.conflicts_detected = self.conflicts.len();
     }
 
     fn create_conflict(
