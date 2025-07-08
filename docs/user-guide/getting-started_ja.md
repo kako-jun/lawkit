@@ -88,13 +88,13 @@ lawkit poisson events.csv --forecast 30
 
 ```bash
 # 複数法則の比較
-lawkit compare data.csv --laws benford,pareto,normal
+lawkit analyze data.csv --laws benford,pareto,normal
 
 # 矛盾検出
-lawkit compare data.csv --laws all --detect-conflicts
+lawkit analyze data.csv --laws all --detect-conflicts
 
 # 推奨システム
-lawkit compare data.csv --recommend
+lawkit analyze data.csv --recommend
 ```
 
 ## サンプルデータでの実習
@@ -188,7 +188,7 @@ lawkit pareto sales.csv --threshold 0.95
 lawkit benf large_data.csv --sample-size 10000
 
 # 並列処理のスレッド数指定
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 ```
 
 ## よく使われるワークフロー
@@ -196,7 +196,7 @@ lawkit compare data.csv --optimize
 ### 1. データ品質チェック
 ```bash
 # 総合的なデータ品質評価
-lawkit compare financial_data.csv --laws benford,normal --detect-conflicts
+lawkit analyze financial_data.csv --laws benford,normal --detect-conflicts
 ```
 
 ### 2. 不正検知パイプライン

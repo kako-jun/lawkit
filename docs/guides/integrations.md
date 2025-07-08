@@ -26,7 +26,7 @@ jobs:
       - name: Quality Analysis
         run: |
           for file in data/*.csv; do
-            lawkit compare "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
+            lawkit analyze "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
           done
           
       - name: Upload Results
@@ -46,7 +46,7 @@ data-quality:
   stage: quality-check
   script:
     - cargo install lawkit
-    - lawkit compare data/financial.csv --laws all --output json > quality-report.json
+    - lawkit analyze data/financial.csv --laws all --output json > quality-report.json
   artifacts:
     reports:
       - quality-report.json

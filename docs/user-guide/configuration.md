@@ -115,17 +115,17 @@ echo "123 ４５６ 七八九" | lawkit benf
 
 ```bash
 # Select specific laws
-lawkit compare data.csv --laws benf,pareto,normal
+lawkit analyze data.csv --laws benf,pareto,normal
 
 # Focus on specific analysis
-lawkit compare data.csv --focus quality
-lawkit compare data.csv --focus anomaly
+lawkit analyze data.csv --focus quality
+lawkit analyze data.csv --focus anomaly
 
 # Conflict detection
-lawkit compare data.csv --threshold 0.7 --report conflicting
+lawkit analyze data.csv --threshold 0.7 --report conflicting
 
 # Recommendation mode
-lawkit compare data.csv --recommend --purpose fraud
+lawkit analyze data.csv --recommend --purpose fraud
 ```
 
 ### Analysis Purposes
@@ -172,7 +172,7 @@ for file in *.csv; do
 done
 
 # Compare results
-lawkit compare data1.csv data2.csv data3.csv --report summary
+lawkit analyze data1.csv data2.csv data3.csv --report summary
 ```
 
 ## Performance Tuning
@@ -184,7 +184,7 @@ lawkit compare data1.csv data2.csv data3.csv --report summary
 lawkit benf large_data.csv --min-count 1000
 
 # Focus on specific analysis
-lawkit compare large_data.csv --focus quality --laws benf,normal
+lawkit analyze large_data.csv --focus quality --laws benf,normal
 ```
 
 ### Memory Management

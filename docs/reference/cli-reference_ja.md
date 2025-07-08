@@ -290,12 +290,12 @@ lawkit generate pareto --samples 2000 --fraud-rate 0.2
 lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 ```
 
-### lawkit compare - 複数法則比較
+### lawkit analyze - 複数法則比較
 
 **用途**: 複数法則の統合分析、矛盾検出、推奨システム
 
 ```bash
-lawkit compare [ファイル] [オプション]
+lawkit analyze [ファイル] [オプション]
 ```
 
 #### オプション
@@ -312,19 +312,19 @@ lawkit compare [ファイル] [オプション]
 
 ```bash
 # 全法則での比較分析
-lawkit compare data.csv --laws all
+lawkit analyze data.csv --laws all
 
 # 特定法則のみ
-lawkit compare financial.csv --laws benford,normal
+lawkit analyze financial.csv --laws benford,normal
 
 # 矛盾検出付き
-lawkit compare audit_data.csv --detect-conflicts
+lawkit analyze audit_data.csv --detect-conflicts
 
 # 推奨システム付き
-lawkit compare dataset.csv --recommend
+lawkit analyze dataset.csv --recommend
 
 # 重み付き分析
-lawkit compare data.csv --laws benford,pareto --weights 0.7,0.3
+lawkit analyze data.csv --laws benford,pareto --weights 0.7,0.3
 ```
 
 ### lawkit list - 利用可能な法則一覧
@@ -377,7 +377,7 @@ preprocess_data.py input.xlsx | lawkit pareto --threshold 0.9
 lawkit benf data.csv --config audit.toml
 
 # プロファイル使用
-lawkit compare data.csv --profile comprehensive
+lawkit analyze data.csv --profile comprehensive
 ```
 
 ## エラーハンドリング
@@ -416,7 +416,7 @@ lawkit benf huge_file.csv
 lawkit benf large_file.csv --sample-size 50000
 
 # 並列処理
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # ストリーミング処理
 lawkit benf big_data.csv --optimize

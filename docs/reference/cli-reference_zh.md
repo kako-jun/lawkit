@@ -269,7 +269,7 @@ lawkit poisson failures.csv --rare-events --verbose
 ### compare - 多法则比较
 
 ```bash
-lawkit compare [OPTIONS] [INPUT]
+lawkit analyze [OPTIONS] [INPUT]
 ```
 
 同时应用多种统计法则，提供综合分析和建议。
@@ -298,16 +298,16 @@ lawkit compare [OPTIONS] [INPUT]
 
 ```bash
 # 所有法则比较
-lawkit compare dataset.csv
+lawkit analyze dataset.csv
 
 # 特定法则组合
-lawkit compare financial.csv --laws "benf,pareto" --recommend
+lawkit analyze financial.csv --laws "benf,pareto" --recommend
 
 # 冲突检测
-lawkit compare data.csv --conflict-detection --quality-focus
+lawkit analyze data.csv --conflict-detection --quality-focus
 
 # 质量专注分析
-lawkit compare measurements.csv --quality-focus --format json
+lawkit analyze measurements.csv --quality-focus --format json
 ```
 
 ### generate - 数据生成

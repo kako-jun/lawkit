@@ -14,7 +14,7 @@ lawkit benf expenses_2024.csv --columns "金額" --output json
 lawkit benf expenses_2024.csv  --verbose
 
 # 複数法則での包括分析
-lawkit compare expenses_2024.csv --laws benford,normal --detect-conflicts
+lawkit analyze expenses_2024.csv --laws benford,normal --detect-conflicts
 ```
 
 **期待される結果**: 
@@ -151,7 +151,7 @@ lawkit normal measurements.csv --normality-tests shapiro,anderson,ks
 
 ```bash
 # 包括的データ分析
-lawkit compare large_dataset.csv --laws all --recommend
+lawkit analyze large_dataset.csv --laws all --recommend
 
 # サンプリング分析
 lawkit benf big_data.csv --sample-size 50000
@@ -197,7 +197,7 @@ for file in reports/2024-*.csv; do
     lawkit pareto "$file" --output json > "results/pareto_$(basename "$file" .csv).json"
     
     # 包括分析
-    lawkit compare "$file" --laws benford,pareto --output json > "results/compare_$(basename "$file" .csv).json"
+    lawkit analyze "$file" --laws benford,pareto --output json > "results/compare_$(basename "$file" .csv).json"
 done
 
 echo "Batch processing complete!"
@@ -226,7 +226,7 @@ jobs:
       - name: Quality Analysis
         run: |
           for file in data/*.csv; do
-            lawkit compare "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
+            lawkit analyze "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
           done
           
       - name: Upload Results
@@ -255,7 +255,7 @@ echo "=== 包括的データ監査開始: $DATA_FILE ==="
 
 # 1. 基本統計とデータ品質
 echo "1. データ品質分析..."
-lawkit compare "$DATA_FILE" --laws all --recommend --output json > "$OUTPUT_DIR/quality_${TIMESTAMP}.json"
+lawkit analyze "$DATA_FILE" --laws all --recommend --output json > "$OUTPUT_DIR/quality_${TIMESTAMP}.json"
 
 # 2. 不正検知（ベンフォード法則）
 echo "2. 不正検知分析..."

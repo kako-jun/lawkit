@@ -130,7 +130,7 @@ fi
 
 # 阶段2: 分布类型识别
 echo "阶段2: 分布识别"
-lawkit compare "$INPUT_FILE" --laws all --format json > "$OUTPUT_DIR/distribution_analysis.json"
+lawkit analyze "$INPUT_FILE" --laws all --format json > "$OUTPUT_DIR/distribution_analysis.json"
 
 best_fit=$(jq -r '.recommendations[0].law' "$OUTPUT_DIR/distribution_analysis.json")
 echo "最佳拟合分布: $best_fit"

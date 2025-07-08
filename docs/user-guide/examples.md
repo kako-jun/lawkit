@@ -14,7 +14,7 @@ lawkit benf expenses_2024.csv --columns "Amount" --output json
 lawkit benf expenses_2024.csv --verbose
 
 # Comprehensive analysis with multiple laws
-lawkit compare expenses_2024.csv --laws benford,normal --detect-conflicts
+lawkit analyze expenses_2024.csv --laws benford,normal --detect-conflicts
 ```
 
 **Expected Results**: 
@@ -122,10 +122,10 @@ lawkit poisson incidents.csv --time-series --predict 7
 
 ```bash
 # Multi-law comparison for data quality
-lawkit compare financial_data.csv --laws benford,pareto,normal --focus quality
+lawkit analyze financial_data.csv --laws benford,pareto,normal --focus quality
 
 # Generate detailed quality report
-lawkit compare data.csv --laws all --output json > quality_report.json
+lawkit analyze data.csv --laws all --output json > quality_report.json
 ```
 
 ### Case: Automated Anomaly Detection Pipeline
@@ -144,7 +144,7 @@ lawkit pareto daily_sales.csv --gini-coefficient
 lawkit normal process_metrics.csv --quality-control
 
 # Step 4: Comprehensive report
-lawkit compare daily_data.csv --laws benford,pareto,normal --output json > daily_report.json
+lawkit analyze daily_data.csv --laws benford,pareto,normal --output json > daily_report.json
 ```
 
 ## 6. CI/CD Integration Examples
@@ -165,7 +165,7 @@ jobs:
       - name: Run quality checks
         run: |
           lawkit benf data/transactions.csv --format json
-          lawkit compare data/sales.csv --laws benford,pareto --output json
+          lawkit analyze data/sales.csv --laws benford,pareto --output json
 ```
 
 ### Jenkins Pipeline Integration
@@ -177,7 +177,7 @@ pipeline {
         stage('Data Quality Check') {
             steps {
                 sh 'lawkit benf ${WORKSPACE}/data/*.csv --min-count 50'
-                sh 'lawkit compare ${WORKSPACE}/data/sales.csv --laws all --output json > quality_report.json'
+                sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --output json > quality_report.json'
                 archiveArtifacts artifacts: 'quality_report.json'
             }
         }
@@ -253,7 +253,7 @@ lawkit poisson --predict --format json
 
 # Cross-validation between laws
 lawkit generate normal --samples 5000 --mean 50 --stddev 10 > normal_data.txt
-lawkit compare normal_data.txt --laws normal,benf,zipf --detect-conflicts
+lawkit analyze normal_data.txt --laws normal,benf,zipf --detect-conflicts
 
 # Comprehensive self-testing
 lawkit selftest --comprehensive
