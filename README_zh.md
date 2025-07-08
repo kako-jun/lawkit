@@ -1,6 +1,6 @@
 # lawkit
 
-> **🔍 多法则统计分析工具包 - 发现隐藏模式，自信检测异常**
+> **🔍 多法则统计分析工具包 - 发现隐藏模式，持续自动检测异常**
 
 [English README](README.md) | [日本語版 README](README_ja.md) | [中文版 README](README_zh.md)
 
@@ -13,33 +13,66 @@
 [![API Reference](https://img.shields.io/badge/🔧%20API%20Reference-docs.rs-blue)](https://docs.rs/lawkit-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-使用多种统计法则检测异常、模式和洞察的下一代统计分析工具包。非常适合欺诈检测、数据质量评估和商业智能。
+## 为什么选择lawkit？
+
+传统工具一次只分析一种模式。lawkit同时分析多个统计法则，为您提供完整图像。它自动检测冲突，通过并行处理运行更快，并提供清晰的洞察。
+
+专为现代自动化设计，提供JSON、CSV和其他结构化输出，与AI工具和自动化工作流完美配合。非常适合欺诈检测、数据质量检查和商业智能。
 
 ```bash
-# 传统工具一次只分析一种模式
-$ other-tool data.csv  # 单一统计分析
+# 单法则分析 - 本福德定律
+$ lawkit benf financial_data.csv
+Benford Law Analysis Results
 
-# lawkit提供全面的多法则分析
+Dataset: financial_data.csv
+Numbers analyzed: 2500
+Chi-square: 12.834
+p-value: 0.117
+Attention: PASS
+
+# 生成帕累托分布数据
+$ lawkit generate pareto --size 100 | head -5
+4.312
+1.827
+12.543
+2.156
+6.789
+
+# 全面的多法则比较
 $ lawkit compare --laws all data.csv
-📊 本福德定律: ⚠️  中等风险 (卡方: 15.2)
-📈 帕累托分析: ✅ 正态分布 (基尼: 0.31)
-📉 齐夫定律: ❌ 高风险 (相关: 0.45)
-🔔 正态分布: ✅ 高斯分布 (p值: 0.12)
-🎯 泊松分布: ⚠️  中等风险 (λ=2.3)
-🧠 建议: 关注齐夫分析 - 检测到异常频率模式
+Statistical Laws Integration Analysis
+
+Dataset: data.csv
+Numbers analyzed: 1000
+Laws executed: 5 (benford, pareto, zipf, normal, poisson)
+
+Integration Metrics:
+  Overall Quality: 0.743
+  Consistency: 0.823
+  Conflicts Detected: 2
+  Recommendation Confidence: 0.892
+
+Law Results:
+  Benford Law: 0.652
+  Pareto Analysis: 0.845
+  Zipf Law: 0.423
+  Normal Distribution: 0.912
+  Poisson Distribution: 0.634
+
+Conflicts:
+  ⚠️ Benford and Zipf laws show conflicting patterns
+     Cause: Different distribution assumptions
+     Suggestion: Focus on Zipf analysis for frequency data
+
+Risk Assessment: MEDIUM (Score: 0.743)
 ```
 
 ## ✨ 主要功能
 
-- **🎯 多法则分析**: 本福德、帕累托、齐夫、正态、泊松分布
-- **🌍 国际输入**: 解析英语、日语、中文、印地语、阿拉伯语格式数字
-- **🤖 智能集成**: 多法则比较获得全面洞察
-- **⚡ 高性能**: 使用Rust构建，支持并行处理
-- **📊 丰富输出**: 文本、JSON、CSV、YAML、TOML、XML格式
-- **🔗 元链**: 统计模式的时间序列趋势分析
-- **🔍 高级异常值检测**: LOF、隔离森林、DBSCAN、集成方法
-- **📈 时间序列分析**: 趋势检测、季节性、变化点分析
-- **🚀 内存高效**: 大型数据集流式处理模式
+- **🎯 多法则分析**: 本福德、帕累托、齐夫、正态、泊松分布的智能集成
+- **🌍 国际支持**: 5语言数字解析（英日中印阿）和丰富输出格式
+- **📈 高级分析**: 时间序列分析、异常值检测（LOF·隔离森林·DBSCAN）、元链
+- **⚡ 高性能**: Rust驱动并行处理优化大型数据集
 
 ## 📊 性能
 
@@ -52,70 +85,82 @@ $ lawkit benf data.csv        # 相同分析: ~180ms (快11.7倍)
 $ lawkit compare data.csv     # 多法则分析: ~850ms
 ```
 
-## 为什么选择lawkit？
-
-传统工具一次只分析一种统计模式。`lawkit`提供全面的多法则分析。
-
-- **整体洞察**: 多个统计法则揭示不同方面
-- **智能建议**: AI支持的分析集成
-- **时间高效**: 多法则并行处理
-- **国际就绪**: 5种语言数字解析
 
 ## 🏗️ 工作原理
 
 ```mermaid
-graph LR
-    A[数据] --> B[解析和验证]
-    B --> C[多法则分析]
-    C --> D[风险评估]
-    D --> E[建议]
+graph TB
+    A[📄 输入数据<br/>CSV, JSON, Excel, PDF...] --> B[🔍 解析验证<br/>5语言支持]
+    
+    B --> C1[🕵️ 本福德定律<br/>欺诈检测]
+    B --> C2[📊 帕累托分析<br/>80/20法则]
+    B --> C3[🔤 齐夫定律<br/>频率分析]
+    B --> C4[📈 正态分布<br/>质量控制]
+    B --> C5[⚡ 泊松分布<br/>稀有事件]
+    
+    C1 --> D1[📊 统计评分]
+    C2 --> D2[📊 基尼系数]
+    C3 --> D3[📊 相关分析]
+    C4 --> D4[📊 正态性检验]
+    C5 --> D5[📊 事件建模]
+    
+    D1 --> E[🧠 集成引擎<br/>冲突检测]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D5 --> E
+    
+    E --> F1[⚠️ 风险评估<br/>Critical/High/Medium/Low]
+    E --> F2[🎯 智能建议<br/>主要/辅助法则]
+    E --> F3[🔍 高级异常值检测<br/>LOF, 隔离森林, DBSCAN]
+    E --> F4[📈 时间序列分析<br/>趋势, 季节性, 异常]
+    
+    F1 --> G[📋 综合报告<br/>Diffai/JSON/CSV/YAML/XML]
+    F2 --> G
+    F3 --> G
+    F4 --> G
 ```
 
 lawkit通过多个统计镜头同时分析您的数据，然后整合结果提供全面的洞察和建议。
-
-## 🚀 快速开始
-
-### 安装
-
-```bash
-# 统计分析工具包（推荐）
-cargo install lawkit
-
-# 或下载预构建二进制文件
-wget https://github.com/kako-jun/lawkit/releases/latest/download/lawkit-linux-x86_64.tar.gz
-tar -xzf lawkit-linux-x86_64.tar.gz
-```
-
-### 基本用法
-
-```bash
-# 单法则分析
-lawkit benf data.csv
-lawkit pareto sales.csv
-lawkit normal measurements.csv
-
-# 多法则比较（推荐）
-lawkit compare --laws benf,pareto data.csv
-lawkit compare --laws all financial_data.csv
-
-# 国际数字支持
-echo "壹萬貳仟參佰肆拾伍" | lawkit benf    # 繁体字金融数字（防伪大写）
-echo "一千二百三十四" | lawkit benf        # 简体中文数字
-echo "１２３４５６" | lawkit benf          # 全角数字
-
-# 带过滤的高级分析
-lawkit compare --laws all --filter ">=1000" --format json data.csv
-```
 
 ## 规格
 
 ### 支持的统计法则
 
-- **本福德定律**: 财务数据欺诈检测
-- **帕累托分析**: 80/20法则和不平等测量  
-- **齐夫定律**: 频率分析和幂律分布
-- **正态分布**: 质量控制和异常值检测
-- **泊松分布**: 事件发生和稀有事件建模
+#### 🕵️ 本福德定律 - 欺诈检测
+自然发生数字的首位数字遵循特定分布（1出现约30%，2出现约18%等）。偏离此分布通常表明数据操作，在以下领域至关重要：
+- **财务审计**: 检测被操作的会计记录
+- **选举监督**: 识别投票计数的不规则性
+- **科学数据验证**: 发现伪造的研究数据
+- **税务欺诈检测**: 查找被更改的收入/支出报告
+
+#### 📊 帕累托分析 - 80/20原则
+著名的"80/20法则"，即80%的结果来自20%的原因。对以下用途至关重要：
+- **业务优化**: 识别顶级客户、产品或收入来源
+- **资源分配**: 将精力集中在高影响力领域
+- **质量管理**: 找到导致大多数问题的少数缺陷
+- **财富分配分析**: 理解经济不平等模式
+
+#### 🔤 齐夫定律 - 频率幂律
+词频遵循可预测模式，第n个最常见词出现频率是最常见词的1/n倍。适用于：
+- **内容分析**: 分析文本模式和真实性
+- **市场研究**: 理解品牌提及分布
+- **语言处理**: 检测人工或生成的文本
+- **社交媒体分析**: 识别异常发布模式
+
+#### 📈 正态分布 - 统计基础
+在自然界和人类行为中普遍出现的钟形分布。对以下领域至关重要：
+- **质量控制**: 检测制造缺陷和过程变异
+- **性能分析**: 评估测试分数、测量值和指标
+- **风险评估**: 理解自然变异与异常
+- **过程改进**: 建立控制限制和规格
+
+#### ⚡ 泊松分布 - 稀有事件建模
+建模在固定时间/空间间隔内稀有事件发生概率。对以下用途至关重要：
+- **系统可靠性**: 预测故障率和维护需求
+- **客户服务**: 建模呼叫中心流量和等待时间
+- **网络分析**: 理解数据包丢失和连接模式
+- **医疗监控**: 跟踪疾病爆发和事故率
 
 ### 分析类型
 
@@ -129,9 +174,8 @@ lawkit compare --laws all --filter ">=1000" --format json data.csv
 
 `lawkit`以多种格式输出结果，适用于不同用例：
 
-- **文本格式（默认）**: 人类可读的分析结果
-- **JSON格式**: 用于自动化和集成的机器可读格式
-- **CSV/YAML/TOML/XML**: 各种结构化数据处理格式
+- **Diffai格式（默认）**: 人类可读的分析结果（[diffx](https://github.com/kako-jun/diffx)格式的超集）
+- **JSON/CSV/YAML/TOML/XML**: 用于自动化、集成和数据处理的机器可读结构化格式
 
 ## 安装
 
@@ -146,6 +190,23 @@ wget https://github.com/kako-jun/lawkit/releases/latest/download/lawkit-linux-x8
 tar -xzf lawkit-linux-x86_64.tar.gz
 ```
 
+### Rust库
+
+```toml
+# 在您的Cargo.toml中
+[dependencies]
+lawkit-core = "2.1"
+```
+
+```rust
+use lawkit_core::laws::benford::analyze_benford;
+use lawkit_core::common::input::parse_text_input;
+
+let numbers = parse_text_input("123 456 789")?;
+let result = analyze_benford(&numbers, "data.txt", false)?;
+println!("卡方值: {}", result.chi_square);
+```
+
 ### 包集成
 
 ```bash
@@ -154,8 +215,85 @@ npm install lawkit-js
 
 # Python集成
 pip install lawkit-python
-lawkit-download-binary  # 下载CLI二进制文件
+lawkit-download-binary  # 下载CLI二进制文件 (pip install后可用)
 ```
+
+## 基本用法
+
+```bash
+# 各种输入格式的单法则分析
+lawkit benf financial_data.csv
+lawkit pareto sales_report.json
+lawkit zipf word_frequencies.txt
+lawkit normal measurements.xlsx
+lawkit poisson server_logs.tsv
+
+# 不同输出格式的多法则比较
+lawkit compare --laws all transactions.csv
+lawkit compare --laws all inventory.json --format yaml
+lawkit compare --laws benf,zipf document.txt --format json
+
+# 生成测试数据
+lawkit generate pareto --size 1000 > test_data.txt
+lawkit generate normal --mean 100 --std 15 --size 500
+
+# 内置时间序列分析
+lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
+# 返回: 趋势分析、季节性检测、变化点、预测
+
+# 高级过滤和分析
+lawkit compare --laws all --filter ">=1000" financial_data.xlsx
+lawkit benf --column "amount" sales_data.csv --format xml
+
+# 管道使用
+cat raw_numbers.txt | lawkit benf -
+lawkit generate zipf --size 10000 | lawkit compare --laws all -
+
+# 使用diffx进行时间序列分析的元链
+lawkit benf sales_2023.csv > analysis_2023.txt
+lawkit benf sales_2024.csv > analysis_2024.txt
+diffx analysis_2023.txt analysis_2024.txt  # 检测统计模式的变化
+
+# 持续监控管道
+for month in {01..12}; do
+  lawkit compare --laws all sales_2024_${month}.csv > analysis_${month}.txt
+done
+diffx analysis_*.txt --chain  # 可视化模式随时间的演变
+```
+
+## 🔗 元链：跟踪模式演变
+
+元链结合lawkit的内置时间序列分析与diffx进行长期模式跟踪：
+
+```mermaid
+graph LR
+    A[1月数据] -->|lawkit| B[1月分析]
+    C[2月数据] -->|lawkit| D[2月分析]
+    E[3月数据] -->|lawkit| F[3月分析]
+    
+    B -->|diffx| G[模式变化<br/>1月→2月]
+    D -->|diffx| G
+    D -->|diffx| H[模式变化<br/>2月→3月]
+    F -->|diffx| H
+    
+    G -->|趋势| I[模式<br/>演变]
+    H -->|趋势| I
+    
+    style I stroke:#0288d1,stroke-width:3px
+```
+
+**内置时间序列分析** (单一数据集):
+- 基于R平方分析的趋势检测
+- 自动季节性检测和分解
+- 变化点识别（水平、趋势、方差变化）
+- 带置信区间的预测
+- 异常检测和数据质量评估
+
+**与diffx的元链** (多个时期):
+- 本福德合规性的逐渐偏离（潜在欺诈累积）
+- 统计模式的长期演化
+- 跨期间异常比较
+- 历史模式基线建立
 
 ## 文档
 
@@ -169,8 +307,8 @@ lawkit-download-binary  # 下载CLI二进制文件
 
 ## 贡献
 
-我们欢迎贡献！详情请参阅我们的[贡献指南](CONTRIBUTING.md)。
+我们欢迎贡献！详情请参阅[CONTRIBUTING](CONTRIBUTING.md)。
 
 ## 许可证
 
-此项目根据MIT许可证授权 - 详情请参阅[LICENSE](LICENSE)文件。
+此项目根据MIT许可证授权 - 详情请参阅[LICENSE](LICENSE)。
