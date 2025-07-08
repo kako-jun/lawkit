@@ -115,7 +115,7 @@ graph TB
     E --> F3[🔍 高级异常值检测<br/>LOF, 隔离森林, DBSCAN]
     E --> F4[📈 时间序列分析<br/>趋势, 季节性, 异常]
     
-    F1 --> G[📋 综合报告<br/>Diffai/JSON/CSV/YAML/XML]
+    F1 --> G[📋 综合报告<br/>lawkit/JSON/CSV/YAML/XML]
     F2 --> G
     F3 --> G
     F4 --> G
@@ -175,7 +175,7 @@ lawkit通过多个统计镜头同时分析您的数据，然后整合结果提�
 
 `lawkit`以多种格式输出结果，适用于不同用例：
 
-- **Diffai格式（默认）**: 人类可读的分析结果（[diffx](https://github.com/kako-jun/diffx)格式的超集）
+- **lawkit格式（默认）**: 人类可读的分析结果
 - **JSON/CSV/YAML/TOML/XML**: 用于自动化、集成和数据处理的机器可读结构化格式
 
 ## 安装
@@ -264,7 +264,7 @@ diffx analysis_*.txt --chain  # 可视化模式随时间的演变
 
 ## 🔗 元链：跟踪模式演变
 
-元链结合lawkit的内置时间序列分析与diffx进行长期模式跟踪：
+元链结合lawkit的内置时间序列分析与[diffx](https://github.com/kako-jun/diffx)进行长期模式跟踪：
 
 ```mermaid
 graph LR
