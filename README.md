@@ -22,7 +22,7 @@ Designed for modern automation with JSON, CSV, and other structured outputs that
 ```bash
 # Single law analysis - Benford's Law
 $ lawkit benf financial_data.csv
-Benford's Law Analysis Results
+Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
@@ -53,9 +53,9 @@ Integration Metrics:
   Recommendation Confidence: 0.892
 
 Law Results:
-  Benford's Law: 0.652
+  Benford Law: 0.652
   Pareto Analysis: 0.845
-  Zipf's Law: 0.423
+  Zipf Law: 0.423
   Normal Distribution: 0.912
   Poisson Distribution: 0.634
 
@@ -262,7 +262,7 @@ done
 diffx analysis_*.txt --chain  # Visualize pattern evolution over time
 ```
 
-## 🔗 Meta-Chaining: Tracking Statistical Evolution
+## 🔗 Meta-Chaining: Tracking Pattern Evolution
 
 Meta-chaining combines lawkit's built-in time series analysis with diffx for long-term pattern tracking:
 
@@ -277,10 +277,10 @@ graph LR
     D -->|diffx| H[Pattern Changes<br/>Feb→Mar]
     F -->|diffx| H
     
-    G -->|trend| I[Statistical<br/>Evolution]
+    G -->|trend| I[Pattern<br/>Evolution]
     H -->|trend| I
     
-    style I fill:#f9f,stroke:#333,stroke-width:4px
+    style I fill:#e1f5fe,stroke:#0288d1,stroke-width:3px
 ```
 
 **Built-in Time Series Analysis** (single dataset):
@@ -312,5 +312,5 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) for details.
 

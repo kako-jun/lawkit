@@ -22,7 +22,7 @@ JSON、CSV等の構造化出力で、AIツールや自動化ワークフロー�
 ```bash
 # 単一法則分析 - ベンフォード法則
 $ lawkit benf financial_data.csv
-Benford's Law Analysis Results
+Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
@@ -53,9 +53,9 @@ Integration Metrics:
   Recommendation Confidence: 0.892
 
 Law Results:
-  Benford's Law: 0.652
+  Benford Law: 0.652
   Pareto Analysis: 0.845
-  Zipf's Law: 0.423
+  Zipf Law: 0.423
   Normal Distribution: 0.912
   Poisson Distribution: 0.634
 
@@ -262,7 +262,7 @@ done
 diffx analysis_*.txt --chain  # 時間経過によるパターン進化を可視化
 ```
 
-## 🔗 メタチェーン：統計的進化の追跡
+## 🔗 メタチェーン：パターン変遷の追跡
 
 メタチェーンはlawkitの内蔵時系列分析とdiffxを組み合わせた長期パターン追跡：
 
@@ -277,10 +277,10 @@ graph LR
     D -->|diffx| H[パターン変化<br/>2月→3月]
     F -->|diffx| H
     
-    G -->|トレンド| I[統計的<br/>進化]
+    G -->|トレンド| I[パターン<br/>変遷]
     H -->|トレンド| I
     
-    style I fill:#f9f,stroke:#333,stroke-width:4px
+    style I fill:#e1f5fe,stroke:#0288d1,stroke-width:3px
 ```
 
 **内蔵時系列分析** (単一データセット):
@@ -312,4 +312,4 @@ graph LR
 
 ## ライセンス
 
-このプロジェクトはMITライセンスの下でライセンスされています - 詳細は[LICENSE](LICENSE)ファイルを参照してください。
+このプロジェクトはMITライセンスの下でライセンスされています - 詳細は[LICENSE](LICENSE)を参照してください。
