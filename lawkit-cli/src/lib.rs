@@ -4,6 +4,6 @@ pub mod subcommands;
 
 // 明示的なre-exportで曖昧さを回避
 pub use lawkit_core::{common, error, laws, VERSION as CORE_VERSION};
-pub use subcommands::{benf, compare, normal, pareto, poisson, zipf};
+pub use subcommands::{analyze, benf, diagnose, normal, pareto, poisson, validate, zipf};
 
 pub const VERSION: &str = "2.0.1";

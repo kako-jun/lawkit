@@ -54,7 +54,9 @@
       "Bash(tree:*)",
       "Bash(python test:*)",
       "Bash(git tag:*)",
-      "Bash(gh workflow run:*)"
+      "Bash(gh workflow run:*)",
+      "Bash(git fetch:*)",
+      "Bash(true)"
     ],
     "deny": []
   },
