@@ -1,5 +1,5 @@
 use is_terminal::IsTerminal;
-use owo_colors::{OwoColorize, Style};
+use owo_colors::OwoColorize;
 use std::env;
 
 /// 色付けが有効かどうか判定 (diffx準拠)
