@@ -30,6 +30,37 @@
 
 ## 📋 **現在の優先度ランキング**
 
+### **🔥 次期実装予定: compare機能刷新 + diffx-core統合**
+
+**実装戦略**: 既存compare機能を3つの明確な機能に再編し、diffx-coreを内部利用
+
+#### **新サブコマンド設計**
+1. **`lawkit integrate`** - 複数法則統合分析（現在のcompare summary）
+2. **`lawkit validate`** - データ品質検証（現在のcompare consistency+conflict）
+3. **`lawkit recommend`** - 法則推奨（現在のcompare recommend）
+
+#### **diffx-core内部利用箇所**
+- **統合分析での矛盾検出**: `IntegrationResult`の`conflicts`検出時の複数法則結果オブジェクト差分比較
+- **クロスバリデーション**: `cross_validate_laws`でのfold間構造化差分による安定性評価精度向上
+- **時系列変化点検出**: `TimeSeriesAnalysis`での統計オブジェクト構造化差分による精密変化検出
+
+#### **実装手順**
+1. **Phase 1**: diffx-coreをCargo.tomlに追加（optional feature: "advanced-diff"）
+2. **Phase 2**: 既存compare.rsを3つのサブコマンドに分割
+   - `integrate.rs` - 統合分析機能
+   - `validate.rs` - 品質検証機能  
+   - `recommend.rs` - 推奨機能
+3. **Phase 3**: diffx-core統合
+   - `lawkit-core/src/laws/integration/result.rs:342-362` 矛盾検出強化
+   - `lawkit-core/src/laws/integration/analysis.rs:295-315` クロスバリデーション強化
+   - `lawkit-core/src/common/timeseries.rs:224-275` 変化点検出強化
+
+#### **技術詳細**
+- **Cargo依存**: `diffx-core = { version = "0.1", optional = true }`
+- **Feature gate**: `#[cfg(feature = "advanced-diff")]`
+- **compare機能削除**: 既存compare機能は完全削除し、新3コマンドで置換
+- **クリーンアップ**: `lawkit-cli/src/subcommands/compare.rs`削除、新ファイル3つ作成
+
 ### **🥇 最優先 (即座実行推奨)**
 1. **リリース準備**: 
    - `2.1.0` 安定版タグ作成
@@ -63,6 +94,7 @@
 ### 基本仕様
 - **言語**: Rust
 - **アーキテクチャ**: サブコマンド方式（`lawkit benf`, `lawkit pareto`, `lawkit zipf`, `lawkit normal`, `lawkit poisson`, `lawkit compare`, `lawkit generate`, `lawkit list`）
+- **予定アーキテクチャ**: 新サブコマンド追加（`lawkit integrate`, `lawkit validate`, `lawkit recommend`でcompare機能を置換）
 - **出力形式**: text, json, csv, yaml, toml, xml
 - **国際数字対応**: 英語、日本語、中国語、ヒンディー語、アラビア語
 
