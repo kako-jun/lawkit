@@ -6,16 +6,13 @@ use clap::{ArgMatches, Command};
 use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;
 use lawkit_core::laws::integration::{
-    analyze_all_laws, detect_conflicts_detailed, generate_detailed_recommendations,
-    AnalysisPurpose,
+    analyze_all_laws, detect_conflicts_detailed, generate_detailed_recommendations, AnalysisPurpose,
 };
 use std::io::Write;
 
 pub fn command() -> Command {
     common_options::add_compare_options(common_options::add_common_options(
-        common_options::add_input_arg(
-            Command::new("diagnose").about("矛盾検出と詳細分析レポート"),
-        ),
+        common_options::add_input_arg(Command::new("diagnose").about("矛盾検出と詳細分析レポート")),
     ))
 }
 

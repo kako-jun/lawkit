@@ -378,10 +378,16 @@ fn run_selftest() -> Result<(), LawkitError> {
     println!("Self-test completed: {passed}/{total} tests passed");
 
     if passed == total {
-        println!("{}", colors::pass("[PASS] All tests passed! lawkit is working correctly."));
+        println!(
+            "{}",
+            colors::pass("[PASS] All tests passed! lawkit is working correctly.")
+        );
         Ok(())
     } else {
-        println!("{}", colors::fail("[FAIL] Some tests failed. Please check the implementation."));
+        println!(
+            "{}",
+            colors::fail("[FAIL] Some tests failed. Please check the implementation.")
+        );
         std::process::exit(1);
     }
 }

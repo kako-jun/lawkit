@@ -4,8 +4,8 @@ use crate::laws::normal::NormalResult;
 use crate::laws::pareto::ParetoResult;
 use crate::laws::poisson::PoissonResult;
 use crate::laws::zipf::ZipfResult;
-use std::collections::HashMap;
 use diffx_core::{diff, DiffResult};
+use std::collections::HashMap;
 
 /// 統合分析結果
 #[derive(Debug, Clone)]
@@ -298,7 +298,7 @@ impl IntegrationResult {
 
         // diffx-coreを使用してより詳細な矛盾分析を実行
         self.detect_conflicts_with_diffx();
-        
+
         // 従来の手法も併用（スコア差分の詳細分析）
         self.detect_score_conflicts();
 
@@ -312,9 +312,10 @@ impl IntegrationResult {
         }
 
         // 期待されるスコア分布（平均値ベース）と実際のスコア分布を比較
-        let average_score: f64 = self.law_scores.values().sum::<f64>() / self.law_scores.len() as f64;
+        let average_score: f64 =
+            self.law_scores.values().sum::<f64>() / self.law_scores.len() as f64;
         let mut expected_scores = HashMap::new();
-        
+
         for law in self.law_scores.keys() {
             expected_scores.insert(law.clone(), average_score);
         }
@@ -333,7 +334,9 @@ impl IntegrationResult {
                     conflict_type: ConflictType::UnexpectedConsistency,
                     laws_involved: self.law_scores.keys().cloned().collect(),
                     conflict_score: 0.6,
-                    description: "全ての統計法則が同一スコアを示しており、データまたは分析に問題がある可能性".to_string(),
+                    description:
+                        "全ての統計法則が同一スコアを示しており、データまたは分析に問題がある可能性"
+                            .to_string(),
                     likely_cause: "データの多様性不足または分析アルゴリズムの問題".to_string(),
                     resolution_suggestion: "データの品質と分析手法を再確認してください".to_string(),
                 };
@@ -344,10 +347,13 @@ impl IntegrationResult {
             for diff_result in &diff_results {
                 match diff_result {
                     DiffResult::Modified(path, expected_val, actual_val) => {
-                        if let (Some(expected), Some(actual)) = (expected_val.as_f64(), actual_val.as_f64()) {
+                        if let (Some(expected), Some(actual)) =
+                            (expected_val.as_f64(), actual_val.as_f64())
+                        {
                             let deviation = (actual - expected).abs() / expected.max(0.01);
-                            
-                            if deviation > 0.3 { // 30%以上の偏差を異常とする
+
+                            if deviation > 0.3 {
+                                // 30%以上の偏差を異常とする
                                 let law_name = path.trim_start_matches('"').trim_end_matches('"');
                                 let conflict = Conflict {
                                     conflict_type: ConflictType::ScoreDeviation,
@@ -358,10 +364,10 @@ impl IntegrationResult {
                                         law_name, actual, expected, deviation * 100.0
                                     ),
                                     likely_cause: format!(
-                                        "法則 '{}' がデータパターンに適合していない可能性", law_name
+                                        "法則 '{law_name}' がデータパターンに適合していない可能性"
                                     ),
                                     resolution_suggestion: format!(
-                                        "法則 '{}' の適用条件やデータ品質を再確認してください", law_name
+                                        "法則 '{law_name}' の適用条件やデータ品質を再確認してください"
                                     ),
                                 };
                                 self.conflicts.push(conflict);
@@ -375,9 +381,12 @@ impl IntegrationResult {
                             conflict_type: ConflictType::MethodologicalConflict,
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.5,
-                            description: format!("法則 '{}' の予期しない変更が検出されました", law_name),
+                            description: format!(
+                                "法則 '{law_name}' の予期しない変更が検出されました"
+                            ),
                             likely_cause: "分析設定または法則選択の不整合".to_string(),
-                            resolution_suggestion: "分析対象の法則設定を確認してください".to_string(),
+                            resolution_suggestion: "分析対象の法則設定を確認してください"
+                                .to_string(),
                         };
                         self.conflicts.push(conflict);
                     }
@@ -388,7 +397,7 @@ impl IntegrationResult {
                             conflict_type: ConflictType::MethodologicalConflict,
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.8,
-                            description: format!("法則 '{}' のスコア型が変更されました", law_name),
+                            description: format!("法則 '{law_name}' のスコア型が変更されました"),
                             likely_cause: "内部分析エラーまたはデータ破損".to_string(),
                             resolution_suggestion: "分析を再実行してください".to_string(),
                         };

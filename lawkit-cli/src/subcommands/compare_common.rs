@@ -1,10 +1,10 @@
 use crate::common_options::{get_optimized_reader, setup_optimization_config};
+use chrono;
 use clap::ArgMatches;
 use lawkit_core::common::output::OutputConfig;
 use lawkit_core::error::Result;
 use lawkit_core::laws::integration::AnalysisPurpose;
 use std::io::Write;
-use chrono;
 
 pub fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
     let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
@@ -235,7 +235,9 @@ fn output_integration_json(
 }
 
 /// diffx-coreを活用してより構造化されたJSON出力を生成
-fn create_enhanced_integration_json(result: &lawkit_core::laws::integration::IntegrationResult) -> serde_json::Value {
+fn create_enhanced_integration_json(
+    result: &lawkit_core::laws::integration::IntegrationResult,
+) -> serde_json::Value {
     // 基本のJSON構造を作成
     let basic_json = serde_json::json!({
         "dataset": result.dataset_name,
@@ -271,9 +273,12 @@ fn create_enhanced_integration_json(result: &lawkit_core::laws::integration::Int
 
     // diffx-core拡張情報を追加
     let mut enhanced_json = basic_json;
-    
+
     // 法則スコアの詳細解釈を追加
-    if let Some(law_scores_obj) = enhanced_json.get_mut("law_scores").and_then(|v| v.as_object_mut()) {
+    if let Some(law_scores_obj) = enhanced_json
+        .get_mut("law_scores")
+        .and_then(|v| v.as_object_mut())
+    {
         for (law, score) in &result.law_scores {
             if let Some(score_val) = law_scores_obj.get_mut(law) {
                 *score_val = serde_json::json!({
@@ -286,30 +291,44 @@ fn create_enhanced_integration_json(result: &lawkit_core::laws::integration::Int
     }
 
     // 矛盾の重要度分類を追加
-    if let Some(conflicts_array) = enhanced_json.get_mut("conflicts").and_then(|v| v.as_array_mut()) {
+    if let Some(conflicts_array) = enhanced_json
+        .get_mut("conflicts")
+        .and_then(|v| v.as_array_mut())
+    {
         for (i, conflict) in result.conflicts.iter().enumerate() {
             if let Some(conflict_obj) = conflicts_array.get_mut(i).and_then(|v| v.as_object_mut()) {
-                conflict_obj.insert("severity".to_string(), 
-                    serde_json::Value::String(classify_conflict_severity(conflict.conflict_score).to_string()));
-                
+                conflict_obj.insert(
+                    "severity".to_string(),
+                    serde_json::Value::String(
+                        classify_conflict_severity(conflict.conflict_score).to_string(),
+                    ),
+                );
+
                 // diffx-core由来の矛盾には特別な情報を追加
-                if matches!(conflict.conflict_type, 
-                    lawkit_core::laws::integration::ConflictType::ScoreDeviation |
-                    lawkit_core::laws::integration::ConflictType::UnexpectedConsistency) {
-                    conflict_obj.insert("detection_method".to_string(), 
-                        serde_json::Value::String("diffx-core structural analysis".to_string()));
+                if matches!(
+                    conflict.conflict_type,
+                    lawkit_core::laws::integration::ConflictType::ScoreDeviation
+                        | lawkit_core::laws::integration::ConflictType::UnexpectedConsistency
+                ) {
+                    conflict_obj.insert(
+                        "detection_method".to_string(),
+                        serde_json::Value::String("diffx-core structural analysis".to_string()),
+                    );
                 }
             }
         }
     }
 
     // メタデータを追加
-    enhanced_json.as_object_mut().unwrap().insert("metadata".to_string(), serde_json::json!({
-        "tool": "lawkit",
-        "enhanced_with": "diffx-core",
-        "format_version": "2.1.0",
-        "generation_timestamp": chrono::Utc::now().to_rfc3339()
-    }));
+    enhanced_json.as_object_mut().unwrap().insert(
+        "metadata".to_string(),
+        serde_json::json!({
+            "tool": "lawkit",
+            "enhanced_with": "diffx-core",
+            "format_version": "2.1.0",
+            "generation_timestamp": chrono::Utc::now().to_rfc3339()
+        }),
+    );
 
     enhanced_json
 }
@@ -318,10 +337,10 @@ fn create_enhanced_integration_json(result: &lawkit_core::laws::integration::Int
 fn classify_score_tier(score: f64) -> &'static str {
     match score {
         s if s >= 0.9 => "excellent",
-        s if s >= 0.7 => "good", 
+        s if s >= 0.7 => "good",
         s if s >= 0.5 => "fair",
         s if s >= 0.3 => "poor",
-        _ => "very_poor"
+        _ => "very_poor",
     }
 }
 
@@ -331,7 +350,7 @@ fn interpret_score(score: f64) -> &'static str {
         s if s >= 0.7 => "Good fit with expected distribution",
         s if s >= 0.5 => "Moderate alignment with pattern",
         s if s >= 0.3 => "Weak correlation with expected behavior",
-        _ => "Minimal or no adherence to law"
+        _ => "Minimal or no adherence to law",
     }
 }
 
@@ -341,7 +360,7 @@ fn classify_conflict_severity(score: f64) -> &'static str {
         s if s >= 0.6 => "high",
         s if s >= 0.4 => "medium",
         s if s >= 0.2 => "low",
-        _ => "minimal"
+        _ => "minimal",
     }
 }
 
