@@ -234,8 +234,8 @@ lawkit validate --laws all inventory.json --format yaml
 lawkit diagnose --laws benf,zipf document.txt --format json
 
 # Generate test data
-lawkit generate pareto --size 1000 > test_data.txt
-lawkit generate normal --mean 100 --std 15 --size 500
+lawkit generate pareto --samples 1000 > test_data.txt
+lawkit generate normal --mean 100 --stddev 15 --samples 500
 
 # Built-in time series analysis
 lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
@@ -243,11 +243,11 @@ lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
 
 # Advanced filtering and analysis
 lawkit analyze --laws all --filter ">=1000" financial_data.xlsx
-lawkit benf --column "amount" sales_data.csv --format xml
+lawkit benf sales_data.csv --format xml
 
 # Pipeline usage
 cat raw_numbers.txt | lawkit benf -
-lawkit generate zipf --size 10000 | lawkit analyze --laws all -
+lawkit generate zipf --samples 10000 | lawkit analyze --laws all -
 
 # Meta-chaining with diffx for time series analysis
 lawkit benf sales_2023.csv > analysis_2023.txt

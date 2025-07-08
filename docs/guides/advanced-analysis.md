@@ -338,29 +338,27 @@ lawkit analyze datasets/*.csv \
    \
   --output-format json
 
-# Real-time stream processing
-lawkit benf data_stream.csv \
-  --enable-parallel \
-   \
-  \
-  --real-time-output
+# Real-time data processing
+lawkit benf data.csv \
+  --optimize \
+  --quiet
 ```
 
 ## Memory-Efficient Processing
 
-Handle datasets larger than available RAM using streaming and incremental algorithms.
+Handle datasets larger than available RAM using optimized processing and incremental algorithms.
 
-### Streaming Mode
+### Optimized Processing Mode
 
 ```bash
-# Basic streaming for large files
-lawkit benf massive_dataset.csv 
+# Basic optimized processing for large files
+lawkit benf massive_dataset.csv --optimize
 
-# Streaming with custom chunk size
-lawkit benf huge_file.csv  
+# Optimized processing with memory management
+lawkit benf huge_file.csv --optimize
 
-# Memory-limited streaming
-lawkit benf data.csv  
+# Memory-limited optimized processing
+lawkit benf data.csv --optimize
 ```
 
 ### Incremental Statistics
@@ -412,12 +410,10 @@ lawkit benf massive_financial_data.csv \
   --progress-reporting
 
 # Continuous data processing
-lawkit benf continuous_stream.csv \
-   \
-  --real-time \
-   \
-  --buffer-size 100 \
-  --live-updates
+lawkit benf continuous_data.csv \
+  --optimize \
+  --incremental-stats \
+  --quiet
 
 # Multi-gigabyte comparison
 lawkit analyze huge_datasets/*.csv \
@@ -532,11 +528,10 @@ lawkit benf data.csv \
 
 **Real-time Analysis:**
 ```bash
-lawkit benf stream.csv \
-   \
-  --real-time \
-  --outlier-method isolation \
-  --fast-mode
+lawkit benf data.csv \
+  --optimize \
+  --quiet \
+  --outlier-method isolation
 ```
 
 **Batch Processing:**

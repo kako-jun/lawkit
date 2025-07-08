@@ -14,7 +14,7 @@ lawkit benf expenses_2024.csv --columns "金額" --output json
 lawkit benf expenses_2024.csv  --verbose
 
 # 複数法則での包括分析
-lawkit analyze expenses_2024.csv --laws benford,normal --detect-conflicts
+lawkit analyze expenses_2024.csv --laws benford,normal --consistency-check
 ```
 
 **期待される結果**: 
@@ -197,7 +197,7 @@ for file in reports/2024-*.csv; do
     lawkit pareto "$file" --output json > "results/pareto_$(basename "$file" .csv).json"
     
     # 包括分析
-    lawkit analyze "$file" --laws benford,pareto --output json > "results/compare_$(basename "$file" .csv).json"
+    lawkit analyze "$file" --laws benford,pareto --output json > "results/analyze_$(basename "$file" .csv).json"
 done
 
 echo "Batch processing complete!"
@@ -226,7 +226,7 @@ jobs:
       - name: Quality Analysis
         run: |
           for file in data/*.csv; do
-            lawkit analyze "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
+            lawkit analyze "$file" --laws benford,normal --consistency-check --output json > "qa_$(basename "$file" .csv).json"
           done
           
       - name: Upload Results

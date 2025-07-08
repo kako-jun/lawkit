@@ -360,7 +360,7 @@ def analyze_data(request):
         
         # 运行分析
         result = subprocess.run([
-            'lawkit', 'compare', temp_file.name, 
+            'lawkit', 'analyze', temp_file.name, 
             '--laws', 'all', '--format', 'json'
         ], capture_output=True, text=True)
         
@@ -498,7 +498,7 @@ result = analyzer.analyze_dataframe(df, 'amount', law='benf', verbose=True)
 print(f"Risk Level: {result['risk_level']}")
 
 # 分析文件
-result = analyzer.analyze_file('financial.csv', law='compare', 
+result = analyzer.analyze_file('financial.csv', law='analyze', 
                              laws='all', recommend=True)
 
 # 批量分析
@@ -561,13 +561,13 @@ LawkitAnalyzer <- R6::R6Class("LawkitAnalyzer",
       }
     },
     
-    compare_laws = function(data, laws = "all", ...) {
+    analyze_laws = function(data, laws = "all", ...) {
       if (is.character(data)) {
         # 文件路径
-        return(self$analyze_file(data, "compare", laws = laws, ...))
+        return(self$analyze_file(data, "analyze", laws = laws, ...))
       } else {
         # 数据向量
-        return(self$analyze_vector(data, "compare", laws = laws, ...))
+        return(self$analyze_vector(data, "analyze", laws = laws, ...))
       }
     }
   )
@@ -586,7 +586,7 @@ result <- analyzer$analyze_file("financial.csv", law = "pareto",
                                gini_coefficient = TRUE)
 
 # 比较多种法则
-comparison <- analyzer$compare_laws("data.csv", laws = "benf,pareto,normal",
+comparison <- analyzer$analyze_laws("data.csv", laws = "benf,pareto,normal",
                                    recommend = TRUE)
 ```
 
@@ -708,7 +708,7 @@ class LawkitAnalyzer {
         
         // 批量分析
         const files = ['q1.csv', 'q2.csv', 'q3.csv'];
-        const batchResults = await analyzer.batchAnalyze(files, 'compare', {
+        const batchResults = await analyzer.batchAnalyze(files, 'analyze', {
             laws: 'all',
             recommend: true
         });

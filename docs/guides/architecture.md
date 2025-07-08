@@ -169,7 +169,7 @@ pub trait StatisticalLaw {
 lawkit is designed to handle datasets from small samples (100+ data points) to enterprise-scale datasets (millions of records) through:
 
 - **Parallel Processing**: Multi-threaded analysis
-- **Memory Management**: Efficient data structures and streaming
+- **Memory Management**: Efficient data structures and optimized processing
 - **Incremental Analysis**: Progressive result computation
 
 ## Quality Assurance

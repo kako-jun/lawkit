@@ -112,11 +112,11 @@ valgrind --tool=massif lawkit benf test_data.csv
 # ~/.config/lawkit/config.yaml
 memory:
   chunk_size: 100000
-  stream_threshold: 10000000  # 10M records
+  optimize_threshold: 10000000  # 10M records
   gc_frequency: 1000
   memory_limit: "2GB"
 
-streaming:
+optimization:
   enabled: true
   buffer_size: 8192
   compression: true

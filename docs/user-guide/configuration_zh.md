@@ -62,7 +62,7 @@
 --vocabulary-size <N> # 词汇表大小
 ```
 
-#### 比较分析 (compare)
+#### 多法则分析 (analyze)
 ```bash
 --laws <LIST>        # 指定要比较的法则 (例如: benf,pareto,normal)
 --recommend          # 显示分析建议
@@ -112,7 +112,7 @@ normal:
   outlier_method: ensemble
   quality_control: true
 
-compare:
+analyze:
   recommend: true
   conflict_detection: true
 ```

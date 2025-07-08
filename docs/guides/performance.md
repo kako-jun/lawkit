@@ -314,11 +314,11 @@ lawkit benf data.csv --optimize
 # Minimize output for faster processing
 lawkit benf data.csv --quiet --output json
 
-# Stream output for real-time processing
-lawkit benf data.csv --stream-output
+# Quiet mode for real-time processing
+lawkit benf data.csv --quiet
 
-# Compress output for large results
-lawkit analyze data.csv --compress-output
+# Efficient output format for large results
+lawkit analyze data.csv --format json
 ```
 
 ## Network Performance

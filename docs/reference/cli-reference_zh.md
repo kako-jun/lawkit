@@ -266,7 +266,7 @@ lawkit poisson incidents.csv --predict --time-unit day
 lawkit poisson failures.csv --rare-events --verbose
 ```
 
-### compare - 多法则比较
+### analyze - 多法则分析
 
 ```bash
 lawkit analyze [OPTIONS] [INPUT]
@@ -487,7 +487,7 @@ normal:
   outliers: true
   outlier_method: ensemble
 
-compare:
+analyze:
   recommend: true
   conflict_detection: true
 ```

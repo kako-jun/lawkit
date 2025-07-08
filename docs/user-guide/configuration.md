@@ -111,7 +111,7 @@ echo "123 ４５６ 七八九" | lawkit benf
 
 ## Integration Analysis
 
-### Compare Command Configuration
+### Multi-Law Analysis Configuration
 
 ```bash
 # Select specific laws
@@ -122,7 +122,7 @@ lawkit analyze data.csv --focus quality
 lawkit analyze data.csv --focus anomaly
 
 # Conflict detection
-lawkit analyze data.csv --threshold 0.7 --report conflicting
+lawkit diagnose data.csv --threshold 0.7 --report conflicting
 
 # Recommendation mode
 lawkit analyze data.csv --recommend --purpose fraud
@@ -171,7 +171,7 @@ for file in *.csv; do
   lawkit benf "$file" --format json > "results_${file%.csv}.json"
 done
 
-# Compare results
+# Analyze results
 lawkit analyze data1.csv data2.csv data3.csv --report summary
 ```
 
