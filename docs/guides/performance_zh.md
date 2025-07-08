@@ -36,13 +36,13 @@ time lawkit benf large_dataset.csv --optimize
 
 ```bash
 # 自动检测CPU核心数
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # 性能优化模式
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # 智能优化模式
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 ```
 
 ### 批量并行处理

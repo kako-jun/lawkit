@@ -231,7 +231,7 @@ lawkit normal --format yaml data.csv
 lawkit poisson --format toml data.csv
 
 # XML format (enterprise integration)
-lawkit compare --format xml data.csv
+lawkit analyze --format xml data.csv
 ```
 
 ## Filtering and Thresholds
@@ -316,16 +316,16 @@ Compare multiple statistical laws for comprehensive analysis:
 
 ```bash
 # Compare two laws
-lawkit compare --laws benf,pareto data.csv
+lawkit analyze --laws benf,pareto data.csv
 
 # Compare all applicable laws
-lawkit compare --laws all data.csv
+lawkit analyze --laws all data.csv
 
 # Verbose comparison with recommendations
-lawkit compare --laws benf,pareto,normal --verbose data.csv
+lawkit analyze --laws benf,pareto,normal --verbose data.csv
 
 # Output in JSON format
-lawkit compare --laws all --format json data.csv
+lawkit analyze --laws all --format json data.csv
 ```
 
 ### Integration Features
@@ -416,7 +416,7 @@ lawkit benf --filter ">=100" --threshold high transactions.csv
 lawkit pareto --verbose --format json daily_volumes.csv
 
 # Multi-law comparison
-lawkit compare --laws benf,pareto financial_data.csv
+lawkit analyze --laws benf,pareto financial_data.csv
 ```
 
 ### Quality Control
@@ -452,7 +452,7 @@ lawkit pareto --verbose customer_revenue.csv
 lawkit poisson --predict --rare-events incident_reports.csv
 
 # Comprehensive business data analysis
-lawkit compare --laws pareto,normal,poisson --verbose business_metrics.csv
+lawkit analyze --laws pareto,normal,poisson --verbose business_metrics.csv
 ```
 
 ## Error Handling

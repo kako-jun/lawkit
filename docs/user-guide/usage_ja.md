@@ -231,7 +231,7 @@ lawkit normal --format yaml data.csv
 lawkit poisson --format toml data.csv
 
 # XML形式（エンタープライズ統合）
-lawkit compare --format xml data.csv
+lawkit analyze --format xml data.csv
 ```
 
 ## フィルタリングと閾値
@@ -313,16 +313,16 @@ lawkitは国際数字形式を自動認識します：
 
 ```bash
 # 2つの法則を比較
-lawkit compare --laws benf,pareto data.csv
+lawkit analyze --laws benf,pareto data.csv
 
 # 適用可能なすべての法則を比較
-lawkit compare --laws all data.csv
+lawkit analyze --laws all data.csv
 
 # 推奨付き詳細比較
-lawkit compare --laws benf,pareto,normal --verbose data.csv
+lawkit analyze --laws benf,pareto,normal --verbose data.csv
 
 # JSON形式で出力
-lawkit compare --laws all --format json data.csv
+lawkit analyze --laws all --format json data.csv
 ```
 
 ### 統合機能
@@ -413,7 +413,7 @@ lawkit benf --filter ">=100" --threshold high transactions.csv
 lawkit pareto --verbose --format json daily_volumes.csv
 
 # 多法則比較
-lawkit compare --laws benf,pareto financial_data.csv
+lawkit analyze --laws benf,pareto financial_data.csv
 ```
 
 ### 品質管理
@@ -449,7 +449,7 @@ lawkit pareto --verbose customer_revenue.csv
 lawkit poisson --predict --rare-events incident_reports.csv
 
 # 包括的ビジネスデータ分析
-lawkit compare --laws pareto,normal,poisson --verbose business_metrics.csv
+lawkit analyze --laws pareto,normal,poisson --verbose business_metrics.csv
 ```
 
 ## エラーハンドリング

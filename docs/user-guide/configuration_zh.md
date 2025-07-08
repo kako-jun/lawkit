@@ -143,7 +143,7 @@ lawkit benf huge_file.csv --optimize
 
 ```bash
 # 性能优化模式
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 ```
 
 ### 缓存设置
@@ -247,7 +247,7 @@ lawkit benf large_file.csv --optimize
 #### 性能问题
 ```bash
 # 性能优化模式
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 ```
 
 ## 下一步

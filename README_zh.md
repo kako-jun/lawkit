@@ -39,7 +39,7 @@ $ lawkit generate pareto --size 100 | head -5
 6.789
 
 # 全面的多法则比较
-$ lawkit compare --laws all data.csv
+$ lawkit analyze --laws all data.csv
 Statistical Laws Integration Analysis
 
 Dataset: data.csv
@@ -82,7 +82,7 @@ Risk Assessment: MEDIUM (Score: 0.743)
 # 传统工具一次分析一种模式
 $ other-tool data.csv         # 单一分析: ~2.1秒
 $ lawkit benf data.csv        # 相同分析: ~180ms (快11.7倍)
-$ lawkit compare data.csv     # 多法则分析: ~850ms
+$ lawkit analyze data.csv     # 多法则分析: ~850ms
 ```
 
 
@@ -229,9 +229,9 @@ lawkit normal measurements.xlsx
 lawkit poisson server_logs.tsv
 
 # 不同输出格式的多法则比较
-lawkit compare --laws all transactions.csv
-lawkit compare --laws all inventory.json --format yaml
-lawkit compare --laws benf,zipf document.txt --format json
+lawkit analyze --laws all transactions.csv
+lawkit validate --laws all inventory.json --format yaml
+lawkit diagnose --laws benf,zipf document.txt --format json
 
 # 生成测试数据
 lawkit generate pareto --size 1000 > test_data.txt
@@ -242,12 +242,12 @@ lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
 # 返回: 趋势分析、季节性检测、变化点、预测
 
 # 高级过滤和分析
-lawkit compare --laws all --filter ">=1000" financial_data.xlsx
+lawkit analyze --laws all --filter ">=1000" financial_data.xlsx
 lawkit benf --column "amount" sales_data.csv --format xml
 
 # 管道使用
 cat raw_numbers.txt | lawkit benf -
-lawkit generate zipf --size 10000 | lawkit compare --laws all -
+lawkit generate zipf --size 10000 | lawkit analyze --laws all -
 
 # 使用diffx进行时间序列分析的元链
 lawkit benf sales_2023.csv > analysis_2023.txt
@@ -256,7 +256,7 @@ diffx analysis_2023.txt analysis_2024.txt  # 检测统计模式的变化
 
 # 持续监控管道
 for month in {01..12}; do
-  lawkit compare --laws all sales_2024_${month}.csv > analysis_${month}.txt
+  lawkit analyze --laws all sales_2024_${month}.csv > analysis_${month}.txt
 done
 diffx analysis_*.txt --chain  # 可视化模式随时间的演变
 ```

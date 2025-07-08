@@ -49,11 +49,11 @@ lawkit benf process_data.csv --detect-changepoints --enable-timeseries
 
 ```bash
 # Enable optimizations for large datasets (includes parallel processing)
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # Performance comparison
-time lawkit compare data.csv          # Standard processing
-time lawkit compare data.csv --optimize  # Optimized processing
+time lawkit analyze data.csv          # Standard processing
+time lawkit analyze data.csv --optimize  # Optimized processing
 ```
 
 ### 4. Memory-Efficient Processing
@@ -220,9 +220,9 @@ done
 
 # Performance comparison
 echo "Testing standard mode:"
-time lawkit compare data.csv --quiet
+time lawkit analyze data.csv --quiet
 echo "Testing optimized mode:"
-time lawkit compare data.csv --optimize --quiet
+time lawkit analyze data.csv --optimize --quiet
 ```
 
 ## Memory Usage Optimization
@@ -270,10 +270,10 @@ lawkit benf data2.csv
 
 ```bash
 # Optimized analysis for large datasets
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # Standard processing for comparison
-lawkit compare data.csv
+lawkit analyze data.csv
 
 # Performance comparison
 time lawkit benf data.csv
@@ -318,7 +318,7 @@ lawkit benf data.csv --quiet --output json
 lawkit benf data.csv --stream-output
 
 # Compress output for large results
-lawkit compare data.csv --compress-output
+lawkit analyze data.csv --compress-output
 ```
 
 ## Network Performance
@@ -382,7 +382,7 @@ lawkit benf small_data.csv \
 
 ```bash
 # Balanced configuration
-lawkit compare medium_data.csv \
+lawkit analyze medium_data.csv \
   --optimize \
   --cache-enabled \
   --algorithm balanced
@@ -392,7 +392,7 @@ lawkit compare medium_data.csv \
 
 ```bash
 # Optimized for large datasets
-lawkit compare large_data.csv \
+lawkit analyze large_data.csv \
   --optimize \
   --sample-size 100000
 ```
@@ -432,7 +432,7 @@ lawkit benf timeseries.csv \
   --incremental-stats
 
 # Parallel comparison analysis
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --optimize \
   --memory-limit 1024
 ```

@@ -255,7 +255,7 @@ lawkit normal sensor_readings.csv \
   --real-time-alerts
 
 # Business metrics tracking
-lawkit compare monthly_kpis.csv \
+lawkit analyze monthly_kpis.csv \
   --enable-timeseries \
   --trend-analysis \
   --forecast-steps 6 \
@@ -271,7 +271,7 @@ Leverage multi-core processing for faster analysis of large datasets.
 
 ```bash
 # Enable automatic parallelization
-lawkit compare large_dataset.csv --enable-parallel
+lawkit analyze large_dataset.csv --enable-parallel
 
 # Let lawkit determine optimal thread count
 lawkit benf huge_file.csv --enable-parallel --auto-threads
@@ -281,13 +281,13 @@ lawkit benf huge_file.csv --enable-parallel --auto-threads
 
 ```bash
 # Specify thread count
-lawkit compare data.csv 
+lawkit analyze data.csv 
 
 # Use all available cores
 lawkit benf data.csv 
 
 # Leave some cores free for other processes
-lawkit compare data.csv 
+lawkit analyze data.csv 
 ```
 
 ### Chunk-based Processing
@@ -299,7 +299,7 @@ lawkit benf large_data.csv \
   
 
 # Adaptive chunk sizing
-lawkit compare massive_file.csv \
+lawkit analyze massive_file.csv \
   --enable-parallel \
   --adaptive-chunks \
   
@@ -309,7 +309,7 @@ lawkit compare massive_file.csv \
 
 ```bash
 # Benchmark parallel performance
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --benchmark-parallel \
   --show-speedup
@@ -332,7 +332,7 @@ lawkit benf transactions.csv \
   
 
 # Multi-file comparison analysis
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
   \
    \
@@ -370,7 +370,7 @@ lawkit benf data.csv
 lawkit benf large_data.csv --incremental-stats
 
 # Incremental processing with periodic results
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --incremental-stats \
   --progress-interval 10000
 
@@ -388,7 +388,7 @@ lawkit benf data.csv \
 lawkit benf data.csv 
 
 # Resource monitoring
-lawkit compare large_files/*.csv \
+lawkit analyze large_files/*.csv \
   --monitor-resources \
    \
   --cpu-limit 80
@@ -420,7 +420,7 @@ lawkit benf continuous_stream.csv \
   --live-updates
 
 # Multi-gigabyte comparison
-lawkit compare huge_datasets/*.csv \
+lawkit analyze huge_datasets/*.csv \
    \
   --enable-parallel \
    \
@@ -484,7 +484,7 @@ lawkit normal time_data.csv \
 
 ```bash
 # Comprehensive statistical analysis
-lawkit compare complex_data.csv \
+lawkit analyze complex_data.csv \
   --all-laws \
   --advanced-outliers \
   --time-series-analysis \
@@ -492,7 +492,7 @@ lawkit compare complex_data.csv \
   --detailed-report
 
 # Consensus-based analysis
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --law-ensemble \
   --outlier-consensus \
   --confidence-aggregation \
@@ -541,7 +541,7 @@ lawkit benf stream.csv \
 
 **Batch Processing:**
 ```bash
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
   \
   --batch-mode \
@@ -561,7 +561,7 @@ lawkit benf data.csv \
 
 **CPU-Intensive Workloads:**
 ```bash
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --cpu-intensive \
   \

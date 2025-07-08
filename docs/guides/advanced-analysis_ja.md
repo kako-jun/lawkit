@@ -256,7 +256,7 @@ lawkit normal sensor_readings.csv \
   --real-time-alerts
 
 # ビジネスメトリクス追跡
-lawkit compare monthly_kpis.csv \
+lawkit analyze monthly_kpis.csv \
   --enable-timeseries \
   --trend-analysis \
   --forecast-steps 6 \
@@ -272,7 +272,7 @@ lawkit compare monthly_kpis.csv \
 
 ```bash
 # 自動並列化を有効化
-lawkit compare large_dataset.csv --enable-parallel
+lawkit analyze large_dataset.csv --enable-parallel
 
 # lawkitに最適スレッド数を決定させる
 lawkit benf huge_file.csv --enable-parallel --auto-threads
@@ -282,13 +282,13 @@ lawkit benf huge_file.csv --enable-parallel --auto-threads
 
 ```bash
 # スレッド数を指定
-lawkit compare data.csv 
+lawkit analyze data.csv 
 
 # 利用可能な全コアを使用
 lawkit benf data.csv 
 
 # 他のプロセス用にいくつかのコアを残す
-lawkit compare data.csv 
+lawkit analyze data.csv 
 ```
 
 ### チャンクベース処理
@@ -300,7 +300,7 @@ lawkit benf large_data.csv \
   
 
 # 適応的チャンクサイジング
-lawkit compare massive_file.csv \
+lawkit analyze massive_file.csv \
   --enable-parallel \
   --adaptive-chunks \
   
@@ -310,7 +310,7 @@ lawkit compare massive_file.csv \
 
 ```bash
 # 並列パフォーマンスをベンチマーク
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --benchmark-parallel \
   --show-speedup
@@ -333,7 +333,7 @@ lawkit benf transactions.csv \
   
 
 # マルチファイル比較分析
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
   \
    \
@@ -371,7 +371,7 @@ lawkit benf data.csv
 lawkit benf large_data.csv --incremental-stats
 
 # 定期的結果での増分処理
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --incremental-stats \
   --progress-interval 10000
 
@@ -389,7 +389,7 @@ lawkit benf data.csv \
 lawkit benf data.csv 
 
 # リソース監視
-lawkit compare large_files/*.csv \
+lawkit analyze large_files/*.csv \
   --monitor-resources \
    \
   --cpu-limit 80
@@ -421,7 +421,7 @@ lawkit benf continuous_stream.csv \
   --live-updates
 
 # マルチギガバイト比較
-lawkit compare huge_datasets/*.csv \
+lawkit analyze huge_datasets/*.csv \
    \
   --enable-parallel \
    \
@@ -485,7 +485,7 @@ lawkit normal time_data.csv \
 
 ```bash
 # 包括的統計分析
-lawkit compare complex_data.csv \
+lawkit analyze complex_data.csv \
   --all-laws \
   --advanced-outliers \
   --time-series-analysis \
@@ -493,7 +493,7 @@ lawkit compare complex_data.csv \
   --detailed-report
 
 # 合意ベース分析
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --law-ensemble \
   --outlier-consensus \
   --confidence-aggregation \
@@ -542,7 +542,7 @@ lawkit benf stream.csv \
 
 **バッチ処理:**
 ```bash
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
   \
   --batch-mode \
@@ -562,7 +562,7 @@ lawkit benf data.csv \
 
 **CPU集約的ワークロード:**
 ```bash
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --cpu-intensive \
   \

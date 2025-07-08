@@ -218,10 +218,10 @@ The `compare` command analyzes data with multiple statistical laws:
 
 ```bash
 # Compare specific laws
-lawkit compare --laws benf,pareto data.csv
+lawkit analyze --laws benf,pareto data.csv
 
 # Compare all applicable laws
-lawkit compare --laws all data.csv
+lawkit analyze --laws all data.csv
 ```
 
 Features include:
@@ -299,7 +299,7 @@ lawkit pareto small_data.csv  # Lower requirements than normal
 lawkit benf --verbose data.csv
 
 # Check data with different laws
-lawkit compare --laws all data.csv
+lawkit analyze --laws all data.csv
 
 # Validate data format
 head -10 data.csv
@@ -351,10 +351,10 @@ This occurs when:
 **Solutions:**
 ```bash
 # Try with lower minimum counts
-lawkit compare --laws all --min-count 5 data.csv
+lawkit analyze --laws all --min-count 5 data.csv
 
 # Check data characteristics
-lawkit compare --laws all --verbose data.csv
+lawkit analyze --laws all --verbose data.csv
 ```
 
 ### "Permission denied" or "Access denied"

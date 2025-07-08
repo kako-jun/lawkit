@@ -279,7 +279,7 @@ lawkit benf ~/temp/your_file.csv
 
 3. **比较多种方法**：
    ```bash
-   lawkit compare data.csv --laws all --recommend
+   lawkit analyze data.csv --laws all --recommend
    ```
 
 ## 高级使用

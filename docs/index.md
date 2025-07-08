@@ -77,7 +77,7 @@ lawkit benf data.csv
 lawkit pareto --verbose data.csv
 
 # Multi-law comparison
-lawkit compare --laws benf,pareto data.csv
+lawkit analyze --laws benf,pareto data.csv
 ```
 
 ### Advanced Usage
@@ -144,7 +144,7 @@ sequenceDiagram
     participant Integration
     participant Output
     
-    User->>CLI: lawkit compare --laws all data.csv
+    User->>CLI: lawkit analyze --laws all data.csv
     CLI->>Core: Parse input data
     Core->>Laws: Analyze with each law
     Laws-->>Core: Return individual results

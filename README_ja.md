@@ -38,8 +38,8 @@ $ lawkit generate pareto --size 100 | head -5
 2.156
 6.789
 
-# 包括的な多法則比較
-$ lawkit compare --laws all data.csv
+# 包括的な多法則分析
+$ lawkit analyze --laws all data.csv
 Statistical Laws Integration Analysis
 
 Dataset: data.csv
@@ -82,7 +82,7 @@ AMD Ryzen 5 PRO 4650Uでの実際のベンチマーク結果：
 # 従来ツールは一度に一つのパターンを分析
 $ other-tool data.csv         # 単一分析: ~2.1秒
 $ lawkit benf data.csv        # 同じ分析: ~180ms (11.7倍高速)
-$ lawkit compare data.csv     # 多法則分析: ~850ms
+$ lawkit analyze data.csv     # 多法則分析: ~850ms
 ```
 
 
@@ -229,9 +229,9 @@ lawkit normal measurements.xlsx
 lawkit poisson server_logs.tsv
 
 # 異なる出力形式での多法則比較
-lawkit compare --laws all transactions.csv
-lawkit compare --laws all inventory.json --format yaml
-lawkit compare --laws benf,zipf document.txt --format json
+lawkit analyze --laws all transactions.csv
+lawkit validate --laws all inventory.json --format yaml
+lawkit diagnose --laws benf,zipf document.txt --format json
 
 # テストデータ生成
 lawkit generate pareto --size 1000 > test_data.txt
@@ -242,12 +242,12 @@ lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
 # 返却値: トレンド分析、季節性検出、変化点、予測
 
 # 高度なフィルタリングと分析
-lawkit compare --laws all --filter ">=1000" financial_data.xlsx
+lawkit analyze --laws all --filter ">=1000" financial_data.xlsx
 lawkit benf --column "amount" sales_data.csv --format xml
 
 # パイプライン使用
 cat raw_numbers.txt | lawkit benf -
-lawkit generate zipf --size 10000 | lawkit compare --laws all -
+lawkit generate zipf --size 10000 | lawkit analyze --laws all -
 
 # diffxによる時系列分析のメタチェーン
 lawkit benf sales_2023.csv > analysis_2023.txt
@@ -256,7 +256,7 @@ diffx analysis_2023.txt analysis_2024.txt  # 統計パターンの変化を検�
 
 # 継続的モニタリングパイプライン
 for month in {01..12}; do
-  lawkit compare --laws all sales_2024_${month}.csv > analysis_${month}.txt
+  lawkit analyze --laws all sales_2024_${month}.csv > analysis_${month}.txt
 done
 diffx analysis_*.txt --chain  # 時間経過によるパターン進化を可視化
 ```

@@ -49,16 +49,16 @@ lawkit benf process_data.csv --detect-changepoints --enable-timeseries
 
 ```bash
 # 大規模データセットの自動並列処理を使用
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # 特定のスレッド数を設定
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # 並列処理のチャンクサイズを設定
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 
 # 並列とシリアル処理のベンチマーク
-lawkit compare data.csv --optimize
+lawkit analyze data.csv --optimize
 ```
 
 ### 4. メモリ効率的な処理
@@ -163,9 +163,9 @@ done
 # 異なるスレッド数のテスト
 # パフォーマンス比較
 echo "標準モードテスト:"
-time lawkit compare data.csv --quiet
+time lawkit analyze data.csv --quiet
 echo "最適化モードテスト:"
-time lawkit compare data.csv --optimize --quiet
+time lawkit analyze data.csv --optimize --quiet
 ```
 
 ## メモリ使用量の最適化
@@ -213,10 +213,10 @@ lawkit benf data2.csv
 
 ```bash
 # 最大スレッドでCPU集約的分析
-lawkit compare data.csv --optimize $(nproc)
+lawkit analyze data.csv --optimize $(nproc)
 
 # バランス取りアプローチ（一部コアを空ける）
-lawkit compare data.csv --optimize $(($(nproc) - 2))
+lawkit analyze data.csv --optimize $(($(nproc) - 2))
 
 # 一貫性のためのシングルスレッド
 lawkit benf data.csv
@@ -260,7 +260,7 @@ lawkit benf data.csv --quiet --output json
 lawkit benf data.csv --stream-output
 
 # 大きな結果の出力を圧縮
-lawkit compare data.csv --compress-output
+lawkit analyze data.csv --compress-output
 ```
 
 ## ネットワークパフォーマンス
@@ -324,7 +324,7 @@ lawkit benf small_data.csv \
 
 ```bash
 # バランス設定
-lawkit compare medium_data.csv \
+lawkit analyze medium_data.csv \
   --optimize \
   --cache-enabled \
   --algorithm balanced
@@ -334,7 +334,7 @@ lawkit compare medium_data.csv \
 
 ```bash
 # 大規模データセット用最適化
-lawkit compare large_data.csv \
+lawkit analyze large_data.csv \
   --optimize \
   --memory-limit 2048 \
   --sample-size 100000 \

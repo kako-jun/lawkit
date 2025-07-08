@@ -67,13 +67,13 @@ lawkit poisson event_data.csv --predict
 
 ```bash
 # 比较所有法则
-lawkit compare data.csv --laws all
+lawkit analyze data.csv --laws all
 
 # 比较特定法则
-lawkit compare data.csv --laws benf,pareto,normal
+lawkit analyze data.csv --laws benf,pareto,normal
 
 # 获取分析建议
-lawkit compare data.csv --recommend
+lawkit analyze data.csv --recommend
 ```
 
 ### 数据生成
@@ -114,7 +114,7 @@ lawkit pareto monthly_sales.csv --business-analysis
 lawkit normal sales_history.csv --enable-timeseries
 
 # 多维度比较
-lawkit compare Q1_sales.csv Q2_sales.csv Q3_sales.csv
+lawkit analyze Q1_sales.csv Q2_sales.csv Q3_sales.csv
 ```
 
 ## 配置选项
@@ -139,7 +139,7 @@ lawkit benf data.csv --filter ">=100"
 
 ```bash
 # 性能优化
-lawkit compare large_dataset.csv --optimize
+lawkit analyze large_dataset.csv --optimize
 
 # 性能优化大文件
 lawkit benf huge_file.csv --optimize

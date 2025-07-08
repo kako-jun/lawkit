@@ -23,7 +23,9 @@ Available statistical laws:
   poisson - Poisson distribution analysis
 
 Integration commands:
-  compare - Compare and integrate multiple statistical laws
+  analyze  - Multi-law basic analysis and recommendations
+  validate - Data validation and consistency checks  
+  diagnose - Conflict detection and detailed diagnostics
 ```
 
 ## Statistical Law Commands
@@ -214,12 +216,28 @@ lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 
 ## Integration Commands
 
-### `lawkit compare` - Multi-Law Analysis
+### `lawkit analyze` - Multi-Law Analysis
 
-Compare and integrate multiple statistical laws for comprehensive analysis.
+Perform basic multi-law analysis with recommendations for comprehensive data assessment.
 
 ```bash
-lawkit compare [OPTIONS] [INPUT]
+lawkit analyze [OPTIONS] [INPUT]
+```
+
+### `lawkit validate` - Data Validation
+
+Validate data consistency and quality across multiple statistical patterns.
+
+```bash
+lawkit validate [OPTIONS] [INPUT]
+```
+
+### `lawkit diagnose` - Conflict Detection
+
+Detect conflicts and provide detailed diagnostics between statistical law results.
+
+```bash
+lawkit diagnose [OPTIONS] [INPUT]
 ```
 
 #### Options
@@ -236,16 +254,16 @@ lawkit compare [OPTIONS] [INPUT]
 #### Examples
 ```bash
 # Compare all laws
-lawkit compare data.csv
+lawkit analyze data.csv
 
 # Focus on fraud detection
-lawkit compare transactions.csv --purpose fraud --recommend
+lawkit analyze transactions.csv --purpose fraud --recommend
 
 # Conflict analysis
-lawkit compare data.csv --report conflicting --threshold 0.7
+lawkit analyze data.csv --report conflicting --threshold 0.7
 
 # Custom law selection
-lawkit compare data.csv --laws benf,normal --focus quality
+lawkit analyze data.csv --laws benf,normal --focus quality
 ```
 
 ## Common Options
@@ -320,13 +338,13 @@ data.csv,1000,Low,0.85
 lawkit benf transactions.csv --purpose fraud --threshold high
 
 # Multi-law fraud detection
-lawkit compare suspicious_data.csv --purpose fraud --recommend
+lawkit analyze suspicious_data.csv --purpose fraud --recommend
 ```
 
 ### Data Quality Assessment
 ```bash
 # Comprehensive quality check
-lawkit compare dataset.csv --purpose quality --report detailed
+lawkit analyze dataset.csv --purpose quality --report detailed
 
 # Focus on normality
 lawkit normal dataset.csv --test all
