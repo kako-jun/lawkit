@@ -1,3 +1,4 @@
+pub mod colors;
 pub mod common_options;
 pub mod subcommands;
 

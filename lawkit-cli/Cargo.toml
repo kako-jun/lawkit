@@ -30,6 +30,8 @@ path = "src/bin/pareto.rs"
 lawkit-core = { version = "2.1.0", path = "../lawkit-core" }
 clap = { workspace = true }
 serde_json = { workspace = true }
+owo-colors = "4.1"
+is-terminal = "0.4"
 
 [dev-dependencies]
 tempfile = { workspace = true }
