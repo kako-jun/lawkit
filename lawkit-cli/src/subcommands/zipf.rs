@@ -146,35 +146,35 @@ fn print_zipf_interpretation(result: &ZipfResult) {
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ Ideal Zipf distribution - follows Zipf's law");
+            println!("[PASS] Ideal Zipf distribution - follows Zipf's law");
             println!("   Distribution follows the expected 1/rank pattern");
         }
         RiskLevel::Medium => {
-            println!("⚠️  Slight deviation from Zipf's law");
+            println!("[WARN] Slight deviation from Zipf's law");
             println!("   Monitoring recommended for distribution pattern");
         }
         RiskLevel::High => {
-            println!("🚨 Significant deviation from Zipf's law");
+            println!("[FAIL] Significant deviation from Zipf's law");
             println!("   Consider rebalancing distribution");
         }
         RiskLevel::Critical => {
-            println!("🔍 Critical deviation from Zipf's law");
+            println!("[CRITICAL] Critical deviation from Zipf's law");
             println!("   Distribution strategy review needed");
         }
     }
 
     // Zipf指数に基づく解釈
     if result.zipf_exponent > 1.5 {
-        println!("   💡 High concentration - extreme dominance pattern");
+        println!("   INFO: High concentration - extreme dominance pattern");
     } else if result.zipf_exponent < 0.5 {
-        println!("   💡 Low concentration - more uniform distribution");
+        println!("   INFO: Low concentration - more uniform distribution");
     }
 
     // 相関係数に基づく解釈
     if result.correlation_coefficient < 0.5 {
-        println!("   📊 Poor fit to Zipf's law - irregular distribution");
+        println!("   ALERT: Poor fit to Zipf's law - irregular distribution");
     } else if result.correlation_coefficient > 0.8 {
-        println!("   📊 Excellent fit to Zipf's law");
+        println!("   INFO: Excellent fit to Zipf's law");
     }
 }
 

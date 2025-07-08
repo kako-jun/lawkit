@@ -296,7 +296,7 @@ fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnaly
 
             if result.clustering_detected {
                 println!();
-                println!("⚠️ Event clustering detected");
+                println!("ALERT: Event clustering detected");
             }
         }
         "json" => {
@@ -398,37 +398,40 @@ fn print_poisson_interpretation(result: &PoissonResult) {
 
     match result.distribution_assessment {
         PoissonAssessment::Excellent => {
-            println!("✅ Excellent Poisson distribution fit");
+            println!("[PASS] Excellent Poisson distribution fit");
             println!("   Data closely follows Poisson distribution");
         }
         PoissonAssessment::Good => {
-            println!("✅ Good Poisson distribution fit");
+            println!("[PASS] Good Poisson distribution fit");
             println!("   Acceptable fit to Poisson distribution");
         }
         PoissonAssessment::Moderate => {
-            println!("⚠️  Moderate Poisson distribution fit");
+            println!("[WARN] Moderate Poisson distribution fit");
             println!("   Some deviations from Poisson distribution");
         }
         PoissonAssessment::Poor => {
-            println!("🚨 Poor Poisson distribution fit");
+            println!("[FAIL] Poor Poisson distribution fit");
             println!("   Significant deviations from Poisson distribution");
         }
         PoissonAssessment::NonPoisson => {
-            println!("🔍 Non-Poisson distribution");
+            println!("[CRITICAL] Non-Poisson distribution");
             println!("   Data does not follow Poisson distribution");
         }
     }
 
     // 分散/平均比に基づく解釈
     if result.variance_ratio > 1.5 {
-        println!("   📊 Distribution is overdispersed");
+        println!("   INFO: Distribution is overdispersed");
     } else if result.variance_ratio < 0.7 {
-        println!("   📊 Distribution is underdispersed");
+        println!("   INFO: Distribution is underdispersed");
     }
 
     // 稀少事象の解釈
     if result.rare_events_count > 0 {
-        println!("   🎯 Rare events detected: {}", result.rare_events_count);
+        println!(
+            "   ALERT: Rare events detected: {}",
+            result.rare_events_count
+        );
     }
 }
 
