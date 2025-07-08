@@ -1,0 +1,438 @@
+use crate::common_options::{get_optimized_reader, setup_optimization_config};
+use clap::ArgMatches;
+use lawkit_core::common::output::OutputConfig;
+use lawkit_core::error::Result;
+use lawkit_core::laws::integration::AnalysisPurpose;
+use std::io::Write;
+
+pub fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
+    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+
+    let buffer = if let Some(input) = matches.get_one::<String>("input") {
+        if input == "-" {
+            get_optimized_reader(None, use_optimize)
+        } else {
+            get_optimized_reader(Some(input), use_optimize)
+        }
+    } else {
+        get_optimized_reader(None, use_optimize)
+    };
+
+    let data = buffer.map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;
+
+    if data.trim().is_empty() {
+        return Err(lawkit_core::error::BenfError::ParseError(
+            "No input data provided".to_string(),
+        ));
+    }
+
+    lawkit_core::common::input::parse_text_input(&data)
+}
+
+pub fn get_dataset_name(matches: &ArgMatches) -> String {
+    matches
+        .get_one::<String>("input")
+        .cloned()
+        .unwrap_or_else(|| "stdin".to_string())
+}
+
+pub fn parse_analysis_purpose(purpose_str: &str) -> AnalysisPurpose {
+    match purpose_str {
+        "quality" => AnalysisPurpose::QualityAudit,
+        "fraud" => AnalysisPurpose::FraudDetection,
+        "concentration" => AnalysisPurpose::ConcentrationAnalysis,
+        "anomaly" => AnalysisPurpose::AnomalyDetection,
+        "distribution" => AnalysisPurpose::DistributionFitting,
+        _ => AnalysisPurpose::GeneralAnalysis,
+    }
+}
+
+// Output functions
+pub fn output_integration_result(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+    config: &OutputConfig,
+) -> Result<()> {
+    match config.format.as_str() {
+        "json" => output_integration_json(writer, result),
+        "csv" => output_integration_csv(writer, result),
+        "yaml" => output_integration_yaml(writer, result),
+        _ => output_integration_text(writer, result, config),
+    }
+}
+
+fn output_integration_text(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+    config: &OutputConfig,
+) -> Result<()> {
+    if config.quiet {
+        writeln!(writer, "{:.3}", result.overall_quality_score)?;
+        return Ok(());
+    }
+
+    writeln!(writer, "Statistical Laws Integration Analysis")?;
+    writeln!(writer)?;
+
+    writeln!(
+        writer,
+        "{}: {}",
+        get_text("dataset", "en"),
+        result.dataset_name
+    )?;
+    writeln!(
+        writer,
+        "{}: {}",
+        get_text("numbers_analyzed", "en"),
+        result.numbers_analyzed
+    )?;
+    writeln!(
+        writer,
+        "{}: {} ({})",
+        get_text("laws_executed", "en"),
+        result.laws_executed.len(),
+        result.laws_executed.join(", ")
+    )?;
+
+    if let Some(ref focus) = result.focus {
+        writeln!(writer, "{}: {}", get_text("focus", "en"), focus)?;
+    }
+
+    writeln!(writer)?;
+
+    writeln!(writer, "{}:", get_text("integration_metrics", "en"))?;
+    writeln!(
+        writer,
+        "  {}: {:.3}",
+        get_text("overall_quality", "en"),
+        result.overall_quality_score
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:.3}",
+        get_text("consistency", "en"),
+        result.consistency_score
+    )?;
+    writeln!(
+        writer,
+        "  {}: {}",
+        get_text("conflicts_detected", "en"),
+        result.conflicts_detected
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:.3}",
+        get_text("recommendation_confidence", "en"),
+        result.recommendation_confidence
+    )?;
+    writeln!(writer)?;
+
+    writeln!(writer, "{}:", get_text("law_results", "en"))?;
+    for (law, score) in &result.law_scores {
+        let law_name = get_law_name(law, "en");
+        writeln!(writer, "  {law_name}: {score:.3}")?;
+    }
+    writeln!(writer)?;
+
+    if !result.conflicts.is_empty() {
+        writeln!(writer, "{}:", get_text("conflicts", "en"))?;
+        for conflict in &result.conflicts {
+            writeln!(writer, "  CONFLICT: {}", conflict.description)?;
+            writeln!(
+                writer,
+                "     {}: {}",
+                get_text("cause", "en"),
+                conflict.likely_cause
+            )?;
+            writeln!(
+                writer,
+                "     {}: {}",
+                get_text("suggestion", "en"),
+                conflict.resolution_suggestion
+            )?;
+        }
+        writeln!(writer)?;
+    }
+
+    writeln!(writer, "{}:", get_text("recommendations", "en"))?;
+    writeln!(
+        writer,
+        "  FOCUS: {}: {}",
+        get_text("primary_law", "en"),
+        get_law_name(&result.recommendations.primary_law, "en")
+    )?;
+
+    if !result.recommendations.secondary_laws.is_empty() {
+        let secondary_names: Vec<String> = result
+            .recommendations
+            .secondary_laws
+            .iter()
+            .map(|law| get_law_name(law, "en"))
+            .collect();
+        writeln!(
+            writer,
+            "  DETAIL: {}: {}",
+            get_text("secondary_laws", "en"),
+            secondary_names.join(", ")
+        )?;
+    }
+
+    writeln!(
+        writer,
+        "  METRIC: {}: {}",
+        get_text("rationale", "en"),
+        result.recommendations.rationale
+    )?;
+    writeln!(writer)?;
+
+    if config.verbose {
+        output_verbose_integration_details(writer, result, "en")?;
+    }
+
+    Ok(())
+}
+
+fn output_integration_json(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+) -> Result<()> {
+    let json_value = serde_json::json!({
+        "dataset": result.dataset_name,
+        "numbers_analyzed": result.numbers_analyzed,
+        "laws_executed": result.laws_executed,
+        "focus": result.focus,
+        "integration_metrics": {
+            "overall_quality_score": result.overall_quality_score,
+            "consistency_score": result.consistency_score,
+            "conflicts_detected": result.conflicts_detected,
+            "recommendation_confidence": result.recommendation_confidence
+        },
+        "law_scores": result.law_scores,
+        "conflicts": result.conflicts.iter().map(|c| {
+            serde_json::json!({
+                "type": format!("{:?}", c.conflict_type),
+                "laws_involved": c.laws_involved,
+                "conflict_score": c.conflict_score,
+                "description": c.description,
+                "likely_cause": c.likely_cause,
+                "resolution_suggestion": c.resolution_suggestion
+            })
+        }).collect::<Vec<_>>(),
+        "recommendations": {
+            "primary_law": result.recommendations.primary_law,
+            "secondary_laws": result.recommendations.secondary_laws,
+            "confidence": result.recommendations.confidence,
+            "rationale": result.recommendations.rationale
+        },
+        "overall_assessment": format!("{:?}", result.overall_assessment),
+        "risk_level": format!("{:?}", result.risk_level)
+    });
+
+    writeln!(writer, "{}", serde_json::to_string_pretty(&json_value)?)?;
+    Ok(())
+}
+
+fn output_integration_csv(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+) -> Result<()> {
+    writeln!(writer, "dataset,numbers_analyzed,laws_executed,focus,overall_quality_score,consistency_score,conflicts_detected,primary_law,overall_assessment,risk_level")?;
+    writeln!(
+        writer,
+        "{},{},{},{},{:.3},{:.3},{},{},{:?},{:?}",
+        result.dataset_name,
+        result.numbers_analyzed,
+        result.laws_executed.len(),
+        result.focus.as_deref().unwrap_or(""),
+        result.overall_quality_score,
+        result.consistency_score,
+        result.conflicts_detected,
+        result.recommendations.primary_law,
+        result.overall_assessment,
+        result.risk_level
+    )?;
+    Ok(())
+}
+
+fn output_integration_yaml(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+) -> Result<()> {
+    writeln!(writer, "dataset: \"{}\"", result.dataset_name)?;
+    writeln!(writer, "numbers_analyzed: {}", result.numbers_analyzed)?;
+    writeln!(writer, "laws_executed:")?;
+    for law in &result.laws_executed {
+        writeln!(writer, "  - \"{law}\"")?;
+    }
+    if let Some(ref focus) = result.focus {
+        writeln!(writer, "focus: \"{focus}\"")?;
+    }
+    writeln!(writer, "integration_metrics:")?;
+    writeln!(
+        writer,
+        "  overall_quality_score: {:.3}",
+        result.overall_quality_score
+    )?;
+    writeln!(
+        writer,
+        "  consistency_score: {:.3}",
+        result.consistency_score
+    )?;
+    writeln!(
+        writer,
+        "  conflicts_detected: {}",
+        result.conflicts_detected
+    )?;
+    writeln!(writer, "law_scores:")?;
+    for (law, score) in &result.law_scores {
+        writeln!(writer, "  {law}: {score:.3}")?;
+    }
+    writeln!(writer, "recommendations:")?;
+    writeln!(
+        writer,
+        "  primary_law: \"{}\"",
+        result.recommendations.primary_law
+    )?;
+    writeln!(
+        writer,
+        "  confidence: {:.3}",
+        result.recommendations.confidence
+    )?;
+    Ok(())
+}
+
+// Helper functions for verbose output
+fn output_verbose_integration_details(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+    _lang: &str,
+) -> Result<()> {
+    writeln!(writer, "=== {} ===", get_text("detailed_metrics", "en"))?;
+
+    output_data_characteristics(writer, result, "en")?;
+
+    if !result.recommendations.alternative_combinations.is_empty() {
+        output_alternative_combinations(writer, result, "en")?;
+    }
+
+    Ok(())
+}
+
+fn output_data_characteristics(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+    _lang: &str,
+) -> Result<()> {
+    let chars = &result.data_characteristics;
+
+    writeln!(writer, "{}:", get_text("data_characteristics", "en"))?;
+    writeln!(
+        writer,
+        "  {}: {:?}",
+        get_text("data_type", "en"),
+        chars.data_type
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:?}",
+        get_text("distribution_shape", "en"),
+        chars.distribution_shape
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:?}",
+        get_text("outlier_presence", "en"),
+        chars.outlier_presence
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:?}",
+        get_text("scale_range", "en"),
+        chars.scale_range
+    )?;
+    writeln!(
+        writer,
+        "  {}: {:?}",
+        get_text("sample_size_category", "en"),
+        chars.sample_size_category
+    )?;
+    writeln!(writer)?;
+
+    Ok(())
+}
+
+fn output_alternative_combinations(
+    writer: &mut Box<dyn Write>,
+    result: &lawkit_core::laws::integration::IntegrationResult,
+    _lang: &str,
+) -> Result<()> {
+    writeln!(writer, "{}:", get_text("alternative_combinations", "en"))?;
+
+    for combo in &result.recommendations.alternative_combinations {
+        writeln!(writer, "• {} ({})", combo.purpose, combo.laws.join(" + "))?;
+        writeln!(
+            writer,
+            "  {}: {:.3}",
+            get_text("effectiveness", "en"),
+            combo.effectiveness_score
+        )?;
+        writeln!(
+            writer,
+            "  {}: {}",
+            get_text("description", "en"),
+            combo.description
+        )?;
+        writeln!(writer)?;
+    }
+
+    Ok(())
+}
+
+// Text localization
+fn get_text(key: &str, _lang: &str) -> String {
+    match key {
+        "integration_title" => "Integration Analysis Result",
+        "dataset" => "Dataset",
+        "numbers_analyzed" => "Numbers Analyzed",
+        "laws_executed" => "Laws Executed",
+        "integration_metrics" => "Integration Metrics",
+        "overall_quality" => "Overall Quality Score",
+        "consistency" => "Consistency Score",
+        "conflicts_detected" => "Conflicts Detected",
+        "recommendation_confidence" => "Recommendation Confidence",
+        "law_results" => "Law Results",
+        "conflicts" => "Conflicts",
+        "cause" => "Likely Cause",
+        "suggestion" => "Suggestion",
+        "recommendations" => "Recommendations",
+        "primary_law" => "Primary Law",
+        "secondary_laws" => "Secondary Laws",
+        "rationale" => "Rationale",
+        "focus" => "Focus",
+        "detailed_analysis" => "Detailed Analysis",
+        "detailed_metrics" => "Detailed Metrics",
+        "data_characteristics" => "Data Characteristics",
+        "data_type" => "Data Type",
+        "distribution_shape" => "Distribution Shape",
+        "outlier_presence" => "Outlier Presence",
+        "scale_range" => "Scale Range",
+        "sample_size_category" => "Sample Size Category",
+        "alternative_combinations" => "Alternative Combinations",
+        "effectiveness" => "Effectiveness",
+        "description" => "Description",
+        _ => key,
+    }
+    .to_string()
+}
+
+fn get_law_name(law: &str, _lang: &str) -> String {
+    match law {
+        "benf" => "Benford's Law",
+        "pareto" => "Pareto Principle",
+        "zipf" => "Zipf's Law",
+        "normal" => "Normal Distribution",
+        "poisson" => "Poisson Distribution",
+        _ => law,
+    }
+    .to_string()
+}

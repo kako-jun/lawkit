@@ -177,7 +177,7 @@ mod lawkit_core_tests {
         assert!(stdout.contains("zipf"));
         assert!(stdout.contains("normal"));
         assert!(stdout.contains("poisson"));
-        assert!(stdout.contains("compare"));
+        assert!(stdout.contains("analyze"));
     }
 }
 
@@ -565,13 +565,13 @@ mod poisson_distribution_tests {
 }
 
 #[cfg(test)]
-mod integration_compare_tests {
+mod integration_analyze_tests {
     use super::*;
 
     #[test]
-    fn test_lawkit_compare_basic() {
+    fn test_lawkit_analyze_basic() {
         let test_data = generate_test_data();
-        let output = run_lawkit_command("compare", &[&test_data]);
+        let output = run_lawkit_command("analyze", &[&test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -580,7 +580,7 @@ mod integration_compare_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(
-            stdout.contains("compare")
+            stdout.contains("analyze")
                 || stdout.contains("integration")
                 || stdout.contains("Integration")
         );
@@ -588,9 +588,9 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_specific_laws() {
+    fn test_lawkit_analyze_specific_laws() {
         let test_data = generate_test_data();
-        let output = run_lawkit_command("compare", &["--laws", "benf,pareto,normal", &test_data]);
+        let output = run_lawkit_command("analyze", &["--laws", "benf,pareto,normal", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -602,31 +602,10 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_fraud_detection() {
+    fn test_lawkit_analyze_quality_focus() {
         let test_data = generate_test_data();
         let output = run_lawkit_command(
-            "compare",
-            &["--purpose", "fraud", "--recommend", &test_data],
-        );
-
-        assert!(matches!(
-            output.status.code(),
-            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
-        ));
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(
-            stdout.contains("Analysis results")
-                || stdout.contains("recommend")
-                || stdout.contains("Purpose")
-        );
-    }
-
-    #[test]
-    fn test_lawkit_compare_quality_focus() {
-        let test_data = generate_test_data();
-        let output = run_lawkit_command(
-            "compare",
+            "analyze",
             &["--laws", "benf,normal", "--focus", "quality", &test_data],
         );
 
@@ -640,10 +619,87 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_conflict_detection() {
+    fn test_lawkit_analyze_optimize() {
+        // Test analyze with optimize flag on large dataset
+        let mut large_data = Vec::new();
+        for i in 1..=2000 {
+            large_data.push((100 + i * 17).to_string());
+        }
+        let test_data = large_data.join(" ");
+
+        let output = run_lawkit_command("analyze", &["--optimize", "--laws", "all", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Laws Executed") || stdout.contains("Integration"));
+    }
+}
+
+mod integration_validate_tests {
+    use super::*;
+
+    #[test]
+    fn test_lawkit_validate_basic() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("validate", &[&test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Consistency") || stdout.contains("validation"));
+    }
+
+    #[test]
+    fn test_lawkit_validate_cross_validation() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("validate", &["--cross-validation", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Cross-Validation") || stdout.contains("stability"));
+    }
+}
+
+mod integration_diagnose_tests {
+    use super::*;
+
+    #[test]
+    fn test_lawkit_diagnose_fraud_detection() {
         let test_data = generate_test_data();
         let output = run_lawkit_command(
-            "compare",
+            "diagnose",
+            &["--purpose", "fraud", "--recommend", &test_data],
+        );
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(
+            stdout.contains("Recommendations")
+                || stdout.contains("recommend")
+                || stdout.contains("Purpose")
+        );
+    }
+
+    #[test]
+    fn test_lawkit_diagnose_conflict_detection() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command(
+            "diagnose",
             &["--report", "conflicting", "--threshold", "0.7", &test_data],
         );
 
@@ -658,26 +714,6 @@ mod integration_compare_tests {
                 || stdout.contains("Resolution Strategies")
                 || stdout.contains("Threshold")
         );
-    }
-
-    #[test]
-    fn test_lawkit_compare_optimize() {
-        // Test compare with optimize flag on large dataset
-        let mut large_data = Vec::new();
-        for i in 1..=2000 {
-            large_data.push((100 + i * 17).to_string());
-        }
-        let test_data = large_data.join(" ");
-
-        let output = run_lawkit_command("compare", &["--optimize", "--laws", "all", &test_data]);
-
-        assert!(matches!(
-            output.status.code(),
-            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
-        ));
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("Laws Executed") || stdout.contains("Integration"));
     }
 }
 
@@ -744,8 +780,8 @@ mod documentation_examples_tests {
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
-        // Test compare with optimize
-        let output = run_lawkit_command("compare", &["--optimize", &test_data]);
+        // Test analyze with optimize
+        let output = run_lawkit_command("analyze", &["--optimize", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -815,22 +851,22 @@ mod documentation_examples_tests {
     fn test_multi_law_examples() {
         let test_data = generate_test_data();
 
-        // Compare all laws
-        let output = run_lawkit_command("compare", &[&test_data]);
+        // Analyze all laws
+        let output = run_lawkit_command("analyze", &[&test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Focus on concentration analysis
-        let output = run_lawkit_command("compare", &["--laws", "benf,pareto,normal", &test_data]);
+        let output = run_lawkit_command("analyze", &["--laws", "benf,pareto,normal", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Recommendation mode
-        let output = run_lawkit_command("compare", &["--recommend", &test_data]);
+        let output = run_lawkit_command("diagnose", &["--recommend", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -895,9 +931,9 @@ mod documentation_examples_tests {
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
-        // Compare with optimization
+        // Analyze with optimization
         let output = run_lawkit_command(
-            "compare",
+            "analyze",
             &["--optimize", temp_file.path().to_str().unwrap()],
         );
         assert!(matches!(
@@ -1206,7 +1242,7 @@ mod generate_functionality_tests {
     }
 
     #[test]
-    fn test_generate_integration_compare() {
+    fn test_generate_integration_analyze() {
         // Generate data for multiple laws
         let benf_output =
             run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "1001"]);
@@ -1218,35 +1254,35 @@ mod generate_functionality_tests {
         assert!(benf_output.status.success());
         assert!(normal_output.status.success());
 
-        // Test compare functionality with generated data
+        // Test analyze functionality with generated data
         let benf_data = String::from_utf8_lossy(&benf_output.stdout);
         let temp_file = create_temp_file_with_content(&benf_data);
 
-        let compare_output = debug_run_lawkit_command(
-            "compare",
+        let analyze_output = debug_run_lawkit_command(
+            "analyze",
             &["--laws", "benf,normal", temp_file.path().to_str().unwrap()],
         );
-        if !compare_output.status.success() {
-            let stderr = String::from_utf8_lossy(&compare_output.stderr);
-            println!("Compare failed with stderr: {stderr}");
-            let stdout = String::from_utf8_lossy(&compare_output.stdout);
-            println!("Compare stdout: {stdout}");
+        if !analyze_output.status.success() {
+            let stderr = String::from_utf8_lossy(&analyze_output.stderr);
+            println!("Analyze failed with stderr: {stderr}");
+            let stdout = String::from_utf8_lossy(&analyze_output.stdout);
+            println!("Analyze stdout: {stdout}");
         }
-        // Compare command returns exit code based on risk level (0, 10, 11)
+        // Analyze command returns exit code based on risk level (0, 10, 11)
         // which is not always 0 even on successful execution
         assert!(
-            matches!(compare_output.status.code(), Some(0) | Some(10) | Some(11)),
-            "Expected compare to return risk-based exit code (0/10/11), got {:?}",
-            compare_output.status.code()
+            matches!(analyze_output.status.code(), Some(0) | Some(10) | Some(11)),
+            "Expected analyze to return risk-based exit code (0/10/11), got {:?}",
+            analyze_output.status.code()
         );
 
-        let compare_result = String::from_utf8_lossy(&compare_output.stdout);
+        let analyze_result = String::from_utf8_lossy(&analyze_output.stdout);
         // Check that output contains expected content
         assert!(
-            compare_result.contains("Integration Analysis Result")
-                || compare_result.contains("Benford's Law")
-                || compare_result.contains("Normal Distribution"),
-            "Expected compare output to contain analysis results"
+            analyze_result.contains("Integration Analysis Result")
+                || analyze_result.contains("Benford's Law")
+                || analyze_result.contains("Normal Distribution"),
+            "Expected analyze output to contain analysis results"
         );
     }
 }
@@ -1359,8 +1395,8 @@ mod error_handling_tests {
         let output = run_lawkit_command("zipf", &["--optimize", "文書.txt"]);
         assert!(output.status.code().is_some());
 
-        // Test compare with optimize flag
-        let output = run_lawkit_command("compare", &["--optimize", "data.csv"]);
+        // Test analyze with optimize flag
+        let output = run_lawkit_command("analyze", &["--optimize", "data.csv"]);
         assert!(output.status.code().is_some());
 
         // Test normal with time series and optimize
@@ -1456,8 +1492,8 @@ mod error_handling_tests {
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
-        // Compare with optimize
-        let output = run_lawkit_command("compare", &["--optimize", test_data]);
+        // Analyze with optimize
+        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -1510,8 +1546,8 @@ mod error_handling_tests {
 
         let test_data = "1234 2345 3456 4567 5678 6789 7890 8901 9012";
 
-        // Test compare with optimize from getting started
-        let output = run_lawkit_command("compare", &["--optimize", test_data]);
+        // Test analyze with optimize from getting started
+        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
