@@ -22,7 +22,7 @@
 ```bash
 # 单法则分析 - 本福德定律
 $ lawkit benf financial_data.csv
-Benford's Law Analysis Results
+Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
@@ -53,9 +53,9 @@ Integration Metrics:
   Recommendation Confidence: 0.892
 
 Law Results:
-  Benford's Law: 0.652
+  Benford Law: 0.652
   Pareto Analysis: 0.845
-  Zipf's Law: 0.423
+  Zipf Law: 0.423
   Normal Distribution: 0.912
   Poisson Distribution: 0.634
 
@@ -262,7 +262,7 @@ done
 diffx analysis_*.txt --chain  # 可视化模式随时间的演变
 ```
 
-## 🔗 元链：跟踪统计演化
+## 🔗 元链：跟踪模式演变
 
 元链结合lawkit的内置时间序列分析与diffx进行长期模式跟踪：
 
@@ -277,10 +277,10 @@ graph LR
     D -->|diffx| H[模式变化<br/>2月→3月]
     F -->|diffx| H
     
-    G -->|趋势| I[统计<br/>演化]
+    G -->|趋势| I[模式<br/>演变]
     H -->|趋势| I
     
-    style I fill:#f9f,stroke:#333,stroke-width:4px
+    style I fill:#e1f5fe,stroke:#0288d1,stroke-width:3px
 ```
 
 **内置时间序列分析** (单一数据集):
@@ -312,4 +312,4 @@ graph LR
 
 ## 许可证
 
-此项目根据MIT许可证授权 - 详情请参阅[LICENSE](LICENSE)文件。
+此项目根据MIT许可证授权 - 详情请参阅[LICENSE](LICENSE)。
