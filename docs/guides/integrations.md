@@ -159,7 +159,7 @@ def tableau_lawkit_analysis(data_source):
     
     # Analyze with lawkit
     result = subprocess.run([
-        'lawkit', 'compare', data_source, 
+        'lawkit', 'analyze', data_source, 
         '--laws', 'all', '--output', 'json'
     ], capture_output=True, text=True)
     
@@ -247,7 +247,7 @@ def analyze_data(request):
     
     # Run analysis
     result = subprocess.run([
-        'lawkit', 'compare', '/tmp/data.csv', 
+        'lawkit', 'analyze', '/tmp/data.csv', 
         '--laws', 'all', '--output', 'json'
     ], capture_output=True, text=True)
     

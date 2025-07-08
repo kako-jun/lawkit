@@ -339,12 +339,10 @@ lawkit analyze datasets/*.csv \
    \
   --output-format json
 
-# リアルタイムストリーム処理
-lawkit benf data_stream.csv \
-  --enable-parallel \
-   \
-  \
-  --real-time-output
+# リアルタイムデータ処理
+lawkit benf data.csv \
+  --optimize \
+  --quiet
 ```
 
 ## メモリ効率的な処理
@@ -413,7 +411,7 @@ lawkit benf massive_financial_data.csv \
   --progress-reporting
 
 # 継続的データ処理
-lawkit benf continuous_stream.csv \
+lawkit benf continuous_data.csv \
    \
   --real-time \
    \
@@ -533,7 +531,7 @@ lawkit benf data.csv \
 
 **リアルタイム分析:**
 ```bash
-lawkit benf stream.csv \
+lawkit benf data.csv \
    \
   --real-time \
   --outlier-method isolation \

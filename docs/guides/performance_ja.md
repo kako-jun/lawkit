@@ -256,11 +256,11 @@ lawkit benf data.csv --optimize-io
 # 高速処理のために出力を最小化
 lawkit benf data.csv --quiet --output json
 
-# リアルタイム処理のために出力をストリーミング
-lawkit benf data.csv --stream-output
+# リアルタイム処理のために出力を最適化
+lawkit benf data.csv --quiet
 
-# 大きな結果の出力を圧縮
-lawkit analyze data.csv --compress-output
+# 大きな結果の効率的な出力形式
+lawkit analyze data.csv --format json
 ```
 
 ## ネットワークパフォーマンス

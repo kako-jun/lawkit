@@ -214,13 +214,13 @@ echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
 
 ### How does multi-law comparison work?
 
-The `compare` command analyzes data with multiple statistical laws:
+The `analyze` command analyzes data with multiple statistical laws:
 
 ```bash
-# Compare specific laws
+# Analyze with specific laws
 lawkit analyze --laws benf,pareto data.csv
 
-# Compare all applicable laws
+# Analyze with all applicable laws
 lawkit analyze --laws all data.csv
 ```
 
@@ -307,7 +307,7 @@ head -10 data.csv
 
 ### Can I analyze data in real-time?
 
-Yes, lawkit supports streaming input:
+Yes, lawkit supports piped input:
 
 ```bash
 # Pipe data from other commands

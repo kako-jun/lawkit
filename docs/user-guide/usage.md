@@ -28,7 +28,7 @@ lawkit <SUBCOMMAND> [OPTIONS] <INPUT>
 - `zipf` - Zipf's law analysis
 - `normal` - Normal distribution analysis
 - `poisson` - Poisson distribution analysis
-- `compare` - Multi-law integration analysis
+- `analyze` - Multi-law integration analysis and recommendations
 - `list` - List available statistical laws
 
 ### Common Options
@@ -312,16 +312,16 @@ lawkit automatically recognizes international number formats:
 
 ## Integration Analysis
 
-Compare multiple statistical laws for comprehensive analysis:
+Analyze with multiple statistical laws for comprehensive analysis:
 
 ```bash
-# Compare two laws
+# Analyze with two laws
 lawkit analyze --laws benf,pareto data.csv
 
-# Compare all applicable laws
+# Analyze with all applicable laws
 lawkit analyze --laws all data.csv
 
-# Verbose comparison with recommendations
+# Verbose analysis with recommendations
 lawkit analyze --laws benf,pareto,normal --verbose data.csv
 
 # Output in JSON format

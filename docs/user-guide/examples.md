@@ -190,8 +190,8 @@ pipeline {
 ### Large Dataset Processing
 
 ```bash
-# Enable streaming for large files
-lawkit benf large_dataset.csv --min-count 1000
+# Optimized processing for large files
+lawkit benf large_dataset.csv --optimize --min-count 1000
 
 # Parallel processing for multiple files
 find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}

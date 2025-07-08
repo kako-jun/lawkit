@@ -241,7 +241,7 @@ lawkit diagnose [OPTIONS] [INPUT]
 ```
 
 #### Options
-- `--laws <LAWS>` - Specific laws to compare: benf,pareto,zipf,normal,poisson
+- `--laws <LAWS>` - Specific laws to analyze: benf,pareto,zipf,normal,poisson
 - `--focus <FOCUS>` - Analysis focus: quality, concentration, distribution, anomaly
 - `--threshold <THRESHOLD>` - Conflict detection threshold: 0.0-1.0 (default: 0.5)
 - `--recommend` - Enable optimal law recommendation mode
