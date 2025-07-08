@@ -8,12 +8,12 @@ pub fn should_use_color() -> bool {
     if env::var("NO_COLOR").is_ok() {
         return false;
     }
-    
+
     // FORCE_COLOR環境変数チェック
     if env::var("FORCE_COLOR").is_ok() {
         return true;
     }
-    
+
     // 標準出力がターミナルかチェック (パイプやリダイレクト検出)
     std::io::stdout().is_terminal()
 }

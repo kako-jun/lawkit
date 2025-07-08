@@ -1,5 +1,7 @@
 use crate::common_options;
-use crate::subcommands::compare_common::{get_dataset_name, get_numbers_from_input, output_integration_result};
+use crate::subcommands::compare_common::{
+    get_dataset_name, get_numbers_from_input, output_integration_result,
+};
 use clap::{ArgMatches, Command};
 use lawkit_core::common::output::{create_output_writer, OutputConfig};
 use lawkit_core::error::Result;

@@ -5,9 +5,9 @@ use crate::laws::normal::analyze_normal_distribution;
 use crate::laws::pareto::analyze_pareto_distribution;
 use crate::laws::poisson::analyze_poisson_distribution;
 use crate::laws::zipf::analyze_numeric_zipf;
+use diffx_core::{diff, DiffResult};
 use rayon::prelude::*;
 use std::collections::HashSet;
-use diffx_core::{diff, DiffResult};
 
 /// 統合分析実行
 pub fn analyze_all_laws(numbers: &[f64], dataset_name: &str) -> Result<IntegrationResult> {
@@ -309,26 +309,29 @@ fn calculate_enhanced_consistency_with_diffx(
     // HashMap<String, f64>をJSONに変換してdiffx-coreで比較
     let train_json = serde_json::to_value(&train_result.law_scores).unwrap_or_default();
     let test_json = serde_json::to_value(&test_result.law_scores).unwrap_or_default();
-    
+
     // diffx-coreで構造的差分を検出
     let diff_results = diff(&train_json, &test_json, None, Some(0.01), None);
-    
+
     if diff_results.is_empty() {
         return 1.0; // 完全一致
     }
 
     // 差分の種類と重要度に基づいて一貫性スコアを計算
-    let total_laws = train_result.law_scores.len().max(test_result.law_scores.len()) as f64;
+    let total_laws = train_result
+        .law_scores
+        .len()
+        .max(test_result.law_scores.len()) as f64;
     if total_laws == 0.0 {
         return 0.0;
     }
 
     let mut total_diff_impact = 0.0;
-    
+
     for diff_result in &diff_results {
         let impact = match diff_result {
-            DiffResult::Added(_, _) => 0.5,       // 追加は中程度の影響
-            DiffResult::Removed(_, _) => 0.5,     // 削除は中程度の影響  
+            DiffResult::Added(_, _) => 0.5,   // 追加は中程度の影響
+            DiffResult::Removed(_, _) => 0.5, // 削除は中程度の影響
             DiffResult::Modified(_, old_val, new_val) => {
                 // 数値の変更は差分の大きさに応じて影響度を計算
                 if let (Some(old_num), Some(new_num)) = (old_val.as_f64(), new_val.as_f64()) {
@@ -338,7 +341,7 @@ fn calculate_enhanced_consistency_with_diffx(
                     1.0 // 非数値の変更は最大影響
                 }
             }
-            DiffResult::TypeChanged(_, _, _) => 1.0,  // 型変更は最大影響
+            DiffResult::TypeChanged(_, _, _) => 1.0, // 型変更は最大影響
         };
         total_diff_impact += impact;
     }
@@ -347,7 +350,6 @@ fn calculate_enhanced_consistency_with_diffx(
     let average_impact = total_diff_impact / diff_results.len() as f64;
     (1.0 - average_impact).max(0.0)
 }
-
 
 fn calculate_overall_stability(validation_results: &[ValidationFold]) -> f64 {
     if validation_results.is_empty() {
