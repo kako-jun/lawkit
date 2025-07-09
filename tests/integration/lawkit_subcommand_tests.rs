@@ -1301,7 +1301,7 @@ mod selftest_functionality_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("self-test"));
-        assert!(stdout.contains("PASS") || stdout.contains("✅"));
+        assert!(stdout.contains("[PASS]") || stdout.contains("✅"));
 
         // Should test all 5 laws
         assert!(stdout.contains("benf"));
