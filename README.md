@@ -125,9 +125,9 @@ graph LR
         C --> C1[Detailed Root Cause<br/>Resolution Strategies<br/>Risk Assessment]
     end
     
-    style A fill:#e3f2fd
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
+    style A stroke:#2196f3,stroke-width:2px
+    style B stroke:#9c27b0,stroke-width:2px
+    style C stroke:#ff9800,stroke-width:2px
 ```
 
 **analyze** → **validate** → **diagnose**: Start with a broad overview, then check data quality, and finally investigate any specific problems.
@@ -371,7 +371,7 @@ done
 diffx analysis_*.txt --chain  # Visualize pattern evolution over time
 ```
 
-## 🔗 Meta-Chaining: Tracking Pattern Evolution
+## 🔗 Meta-Chaining: Tracking Long-Term Pattern Evolution
 
 Meta-chaining combines lawkit's built-in time series analysis with [diffx](https://github.com/kako-jun/diffx) for long-term pattern tracking:
 
@@ -381,13 +381,13 @@ graph LR
     C[Feb Data] -->|lawkit| D[Feb Analysis]
     E[Mar Data] -->|lawkit| F[Mar Analysis]
     
-    B -->|diffx| G[Pattern Changes<br/>Jan→Feb]
+    B -->|diffx| G[Period Differences<br/>Jan→Feb]
     D -->|diffx| G
-    D -->|diffx| H[Pattern Changes<br/>Feb→Mar]
+    D -->|diffx| H[Period Differences<br/>Feb→Mar]
     F -->|diffx| H
     
-    G -->|trend| I[Pattern<br/>Evolution]
-    H -->|trend| I
+    G -->|long-term trend| I[Pattern<br/>Evolution]
+    H -->|long-term trend| I
     
     style I stroke:#0288d1,stroke-width:3px
 ```
@@ -400,8 +400,9 @@ graph LR
 - Anomaly detection and data quality assessment
 
 **Meta-chaining with diffx** (multiple time periods):
+- **Period Differences**: Changes in statistical results between adjacent periods (e.g., Jan→Feb changes)
+- **Pattern Evolution**: Long-term statistical pattern development trends (e.g., year-long changes)
 - Gradual drift in Benford compliance (potential fraud buildup)
-- Long-term evolution of statistical patterns
 - Cross-period anomaly comparison
 - Historical pattern baseline establishment
 
