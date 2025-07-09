@@ -4,7 +4,7 @@
 
 ### What is lawkit?
 
-lawkit is a comprehensive statistical analysis toolkit that implements multiple statistical laws including Benford's Law, Pareto Principle, Zipf's Law, Normal Distribution, and Poisson Distribution. It's designed for fraud detection, data quality assessment, business analytics, and scientific research.
+lawkit is a comprehensive statistical analysis toolkit that implements multiple statistical laws including Benford Law, Pareto Principle, Zipf Law, Normal Distribution, and Poisson Distribution. It's designed for fraud detection, data quality assessment, business analytics, and scientific research.
 
 ### What makes lawkit different from other statistical tools?
 
@@ -89,9 +89,9 @@ awk -F',' '{print $2}' data.csv | lawkit pareto
 ### How many data points do I need for reliable analysis?
 
 Minimum requirements vary by statistical law:
-- **Benford's Law**: 5+ points (recommended: 100+)
+- **Benford Law**: 5+ points (recommended: 100+)
 - **Pareto Analysis**: 5+ points (recommended: 20+)
-- **Zipf's Law**: 5+ points (recommended: 50+)
+- **Zipf Law**: 5+ points (recommended: 50+)
 - **Normal Distribution**: 8+ points (recommended: 30+)
 - **Poisson Distribution**: 10+ points (recommended: 50+)
 
@@ -115,9 +115,9 @@ lawkit benf --threshold high data.csv
 
 ## Statistical Analysis Questions
 
-### When should I use Benford's Law?
+### When should I use Benford Law?
 
-Benford's Law is ideal for:
+Benford Law is ideal for:
 - **Financial fraud detection**: Transaction amounts, accounting data
 - **Data quality assessment**: Naturally occurring numerical data
 - **Scientific validation**: Experimental measurements
@@ -136,7 +136,7 @@ Benford's Law is ideal for:
 - Provides business insights and recommendations
 - Best for: sales analysis, customer segmentation, resource allocation
 
-**Zipf's Law (Power-law Distribution):**
+**Zipf Law (Power-law Distribution):**
 - Focuses on frequency distributions
 - Analyzes rank-frequency relationships
 - Supports text analysis and word frequencies

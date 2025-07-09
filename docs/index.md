@@ -5,9 +5,9 @@ lawkit is a comprehensive statistical law analysis toolkit that supports multipl
 ## Overview
 
 lawkit provides powerful tools for:
-- **Benford's Law Analysis**: Fraud detection and data quality assessment
+- **Benford Law Analysis**: Fraud detection and data quality assessment
 - **Pareto Analysis**: 80/20 rule and inequality measurement
-- **Zipf's Law Analysis**: Frequency distribution and text analysis
+- **Zipf Law Analysis**: Frequency distribution and text analysis
 - **Normal Distribution Analysis**: Statistical quality control and outlier detection
 - **Poisson Distribution Analysis**: Event occurrence and rare event modeling
 - **Integration Analysis**: Multi-law comparison and anomaly detection
@@ -111,9 +111,9 @@ graph TB
     end
     
     subgraph "Statistical Laws"
-        G[Benford's Law] --> B
+        G[Benford Law] --> B
         H[Pareto Analysis] --> B
-        I[Zipf's Law] --> B
+        I[Zipf Law] --> B
         J[Normal Distribution] --> B
         K[Poisson Distribution] --> B
     end
@@ -180,13 +180,13 @@ sequenceDiagram
 
 ## Statistical Laws
 
-### Benford's Law
+### Benford Law
 First-digit frequency analysis for fraud detection and data quality assessment.
 
 ### Pareto Principle
 80/20 rule analysis with Gini coefficient calculation and business insights.
 
-### Zipf's Law
+### Zipf Law
 Power-law distribution analysis for text, frequency data, and ranking systems.
 
 ### Normal Distribution

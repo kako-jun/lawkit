@@ -1,6 +1,6 @@
-# benf - Benford's Law Analysis
+# benf - Benford Law Analysis
 
-A convenience command for Benford's Law analysis, part of the [**lawkit**](https://github.com/kako-jun/lawkit) statistical analysis toolkit.
+A convenience command for Benford Law analysis, part of the [**lawkit**](https://github.com/kako-jun/lawkit) statistical analysis toolkit.
 
 ## Quick Start
 
@@ -18,9 +18,9 @@ benf data.csv --format json
 lawkit benf data.xlsx --verbose --filter ">=1000"
 ```
 
-## What is Benford's Law?
+## What is Benford Law?
 
-Benford's Law states that in many naturally occurring datasets, the first digit 1 appears about 30% of the time, 2 appears about 18% of the time, and so on. Deviations from this pattern often indicate:
+Benford Law states that in many naturally occurring datasets, the first digit 1 appears about 30% of the time, 2 appears about 18% of the time, and so on. Deviations from this pattern often indicate:
 
 - **Financial fraud** in accounting data
 - **Data manipulation** in scientific studies  
@@ -38,9 +38,9 @@ Benford's Law states that in many naturally occurring datasets, the first digit 
 This `benf` command is a convenience wrapper for `lawkit benf`. For complete statistical analysis capabilities, use **lawkit**:
 
 ### Available Statistical Laws
-- **Benford's Law**: `lawkit benf` - Fraud detection and anomaly analysis
+- **Benford Law**: `lawkit benf` - Fraud detection and anomaly analysis
 - **Pareto Principle**: `lawkit pareto` - 80/20 rule and concentration measurement  
-- **Zipf's Law**: `lawkit zipf` - Power-law distribution analysis
+- **Zipf Law**: `lawkit zipf` - Power-law distribution analysis
 - **Normal Distribution**: `lawkit normal` - Normality testing and outlier detection
 - **Poisson Distribution**: `lawkit poisson` - Rare event analysis
 

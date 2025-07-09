@@ -261,15 +261,15 @@ Integration Metrics:
   Recommendation Confidence: 0.100
 
 Law Results:
-  Benford's Law: 0.944
+  Benford Law: 0.944
   Pareto Principle: -0.868
   Normal Distribution: 0.125
-  Zipf's Law: 0.813
+  Zipf Law: 0.813
 
 Conflicts:
-  CONFLICT: Law 'benf' score (0.944) significantly deviates from expected (0.254) - deviation: 272.2%
-     Likely Cause: Law 'benf' may not be compatible with the data pattern
-     Suggestion: Please review application conditions and data quality for law 'benf'
+  CONFLICT: Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+     Likely Cause: Benford Law may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for Benford Law
 
 # 段階2：整合性チェック付きデータ検証
 $ lawkit validate --laws benf,pareto,normal test_data.txt --consistency-check
@@ -279,7 +279,7 @@ Dataset: test_data.txt
 Threshold: 0.500
 Consistency Score: 0.484
 
-⚠️  WARNING: Consistency below threshold
+WARNING: Consistency below threshold
 Recommendation: Review data quality and collection methods
 
 Statistical Laws Integration Analysis
@@ -295,8 +295,8 @@ Integration Metrics:
   Recommendation Confidence: 0.100
 
 Law Results:
-  Benford's Law: 0.944
-  Zipf's Law: 0.813
+  Benford Law: 0.944
+  Zipf Law: 0.813
   Pareto Principle: -0.868
 
 # 段階3：詳細な矛盾分析と推奨事項
@@ -314,15 +314,15 @@ Integration Metrics:
   Recommendation Confidence: 0.100
 
 Law Results:
-  Benford's Law: 0.944
+  Benford Law: 0.944
   Pareto Principle: -0.868
   Normal Distribution: 0.125
-  Zipf's Law: 0.813
+  Zipf Law: 0.813
 
 Conflicts:
-  CONFLICT: Law 'benf' score (0.944) significantly deviates from expected (0.254) - deviation: 272.2%
-     Likely Cause: Law 'benf' may not be compatible with the data pattern
-     Suggestion: Please review application conditions and data quality for law 'benf'
+  CONFLICT: Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+     Likely Cause: Benford Law may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for Benford Law
   CONFLICT: Law 'normal' score (0.125) significantly deviates from expected (0.254) - deviation: 50.8%
      Likely Cause: Law 'normal' may not be compatible with the data pattern
      Suggestion: Please review application conditions and data quality for law 'normal'

@@ -42,7 +42,7 @@ lawkit <SUBCOMMAND> [OPTIONS] <INPUT>
 
 ## Statistical Laws
 
-### Benford's Law
+### Benford Law
 
 Analyzes first-digit frequency distribution for fraud detection.
 
@@ -84,7 +84,7 @@ lawkit pareto --filter "100-10000" customer_values.csv
 - Customer segmentation
 - Quality management
 
-### Zipf's Law
+### Zipf Law
 
 Analyzes power-law distributions and frequency patterns.
 

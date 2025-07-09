@@ -14,7 +14,7 @@ Automatically downloads the appropriate `lawkit` binary for your system from Git
 
 ### CLI Usage
 ```bash
-# Fraud detection with Benford's Law
+# Fraud detection with Benford Law
 lawkit benf financial-data.csv
 
 # Business analysis with Pareto principle
@@ -42,9 +42,9 @@ async function analyzeFraud() {
 
 ## Supported Laws
 
-- **Benford's Law**: Fraud detection in financial data
+- **Benford Law**: Fraud detection in financial data
 - **Pareto Analysis**: 80/20 rule and business optimization
-- **Zipf's Law**: Text analysis and frequency patterns
+- **Zipf Law**: Text analysis and frequency patterns
 - **Normal Distribution**: Quality control and outlier detection
 - **Poisson Distribution**: Event prediction and risk assessment
 - **Multi-Law Compare**: Comprehensive analysis integration

@@ -287,9 +287,9 @@ lawkit analyze [OPTIONS] [INPUT]
 
 | 法则代码 | 完整名称 | 描述 |
 |----------|----------|------|
-| `benf` | Benford's Law | 本福德定律 |
+| `benf` | Benford Law | 本福德定律 |
 | `pareto` | Pareto Principle | 帕累托法则 |
-| `zipf` | Zipf's Law | 齐夫定律 |
+| `zipf` | Zipf Law | 齐夫定律 |
 | `normal` | Normal Distribution | 正态分布 |
 | `poisson` | Poisson Distribution | 泊松分布 |
 | `all` | All Laws | 所有法则 |
