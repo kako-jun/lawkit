@@ -168,14 +168,17 @@ def _execute_lawkit(args: List[str]) -> tuple[str, str]:
             [lawkit_path] + args,
             capture_output=True,
             text=True,
-            check=True
+            check=False  # Don't raise exception on non-zero exit
         )
-        return result.stdout, result.stderr
-    except subprocess.CalledProcessError as e:
+        
+        # Exit codes 10-19 are typically warnings, not fatal errors
+        if result.returncode == 0 or (result.returncode >= 10 and result.returncode <= 19):
+            return result.stdout, result.stderr
+        
         raise LawkitError(
-            f"lawkit exited with code {e.returncode}",
-            e.returncode,
-            e.stderr or ""
+            f"lawkit exited with code {result.returncode}",
+            result.returncode,
+            result.stderr or ""
         )
     except FileNotFoundError:
         raise LawkitError(
@@ -215,6 +218,10 @@ def analyze_benford(
     
     # Add common options
     _add_common_options(args, options)
+    
+    # Add Benford-specific options
+    if options.threshold_level:
+        args.extend(["--threshold", options.threshold_level])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -567,8 +574,7 @@ compare_laws = analyze_laws
 
 def generate_data(
     law_type: LawType,
-    samples: int = 1000,
-    seed: Optional[int] = None,
+    options: Optional[LawkitOptions] = None,
     **kwargs
 ) -> str:
     """
@@ -576,29 +582,46 @@ def generate_data(
     
     Args:
         law_type: Type of statistical law to use
-        samples: Number of samples to generate
-        seed: Random seed for reproducibility
-        **kwargs: Law-specific parameters
+        options: Generation options (samples, seed, etc.)
+        **kwargs: Law-specific parameters (deprecated, use options instead)
         
     Returns:
         Generated data as string
         
     Examples:
-        >>> data = generate_data('benf', samples=1000, seed=42)
+        >>> data = generate_data('benf', LawkitOptions(samples=1000, seed=42))
         >>> print(data)
         
-        >>> normal_data = generate_data('normal', samples=500, mean=100, stddev=15)
-        >>> pareto_data = generate_data('pareto', samples=1000, concentration=0.8)
+        >>> options = LawkitOptions(samples=500, fraud_rate=0.1, range="1,10000")
+        >>> normal_data = generate_data('normal', options)
+        >>> pareto_data = generate_data('pareto', LawkitOptions(concentration=0.8))
     """
+    if options is None:
+        options = LawkitOptions()
+    
     args = ["generate", law_type]
     
-    if samples != 1000:
-        args.extend(["--samples", str(samples)])
+    # Add common options
+    _add_common_options(args, options)
     
-    if seed is not None:
-        args.extend(["--seed", str(seed)])
+    # Add generate-specific options
+    if options.samples is not None:
+        args.extend(["--samples", str(options.samples)])
     
-    # Add law-specific parameters
+    if options.seed is not None:
+        args.extend(["--seed", str(options.seed)])
+    
+    if options.output_file:
+        args.extend(["--output-file", options.output_file])
+    
+    if options.fraud_rate is not None:
+        args.extend(["--fraud-rate", str(options.fraud_rate)])
+    
+    # Note: --range option not available in current CLI
+    
+    # Note: --scale option may not be available for all law types
+    
+    # Add law-specific parameters (backward compatibility)
     for key, value in kwargs.items():
         key_formatted = key.replace("_", "-")
         args.extend([f"--{key_formatted}", str(value)])

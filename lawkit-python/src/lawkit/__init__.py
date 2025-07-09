@@ -13,6 +13,9 @@ from .lawkit import (
     analyze_zipf,
     analyze_normal,
     analyze_poisson,
+    analyze_laws,
+    validate_laws,
+    diagnose_laws,
     compare_laws,
     generate_data,
     analyze_string,
@@ -38,6 +41,9 @@ __all__ = [
     "analyze_zipf",
     "analyze_normal",
     "analyze_poisson",
+    "analyze_laws",
+    "validate_laws",
+    "diagnose_laws",
     "compare_laws",
     
     # Utility functions
