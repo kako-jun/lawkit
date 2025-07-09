@@ -38,8 +38,8 @@ $ lawkit generate pareto --size 100 | head -5
 2.156
 6.789
 
-# Comprehensive multi-law comparison
-$ lawkit compare --laws all data.csv
+# Comprehensive multi-law analysis
+$ lawkit analyze --laws all data.csv
 Statistical Laws Integration Analysis
 
 Dataset: data.csv
@@ -82,7 +82,7 @@ Real benchmark results on AMD Ryzen 5 PRO 4650U:
 # Traditional tools analyze one pattern at a time
 $ other-tool data.csv         # Single analysis: ~2.1s
 $ lawkit benf data.csv        # Same analysis: ~180ms (11.7x faster)
-$ lawkit compare data.csv     # Multi-law analysis: ~850ms
+$ lawkit analyze data.csv     # Multi-law analysis: ~850ms
 ```
 
 
@@ -122,7 +122,6 @@ graph TB
 ```
 
 lawkit analyzes your data through multiple statistical lenses simultaneously, then integrates the results to provide comprehensive insights and recommendations.
-
 
 ## Specification
 
@@ -229,26 +228,26 @@ lawkit zipf word_frequencies.txt
 lawkit normal measurements.xlsx
 lawkit poisson server_logs.tsv
 
-# Multi-law comparison with different outputs
-lawkit compare --laws all transactions.csv
-lawkit compare --laws all inventory.json --format yaml
-lawkit compare --laws benf,zipf document.txt --format json
+# Multi-law analysis with different outputs
+lawkit analyze --laws all transactions.csv
+lawkit validate --laws all inventory.json --format yaml
+lawkit diagnose --laws benf,zipf document.txt --format json
 
 # Generate test data
-lawkit generate pareto --size 1000 > test_data.txt
-lawkit generate normal --mean 100 --std 15 --size 500
+lawkit generate pareto --samples 1000 > test_data.txt
+lawkit generate normal --mean 100 --stddev 15 --samples 500
 
 # Built-in time series analysis
 lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
 # Returns: trend analysis, seasonality detection, changepoints, forecasts
 
 # Advanced filtering and analysis
-lawkit compare --laws all --filter ">=1000" financial_data.xlsx
-lawkit benf --column "amount" sales_data.csv --format xml
+lawkit analyze --laws all --filter ">=1000" financial_data.xlsx
+lawkit benf sales_data.csv --format xml
 
 # Pipeline usage
 cat raw_numbers.txt | lawkit benf -
-lawkit generate zipf --size 10000 | lawkit compare --laws all -
+lawkit generate zipf --samples 10000 | lawkit analyze --laws all -
 
 # Meta-chaining with diffx for time series analysis
 lawkit benf sales_2023.csv > analysis_2023.txt
@@ -257,7 +256,7 @@ diffx analysis_2023.txt analysis_2024.txt  # Detect changes in statistical patte
 
 # Continuous monitoring pipeline
 for month in {01..12}; do
-  lawkit compare --laws all sales_2024_${month}.csv > analysis_${month}.txt
+  lawkit analyze --laws all sales_2024_${month}.csv > analysis_${month}.txt
 done
 diffx analysis_*.txt --chain  # Visualize pattern evolution over time
 ```

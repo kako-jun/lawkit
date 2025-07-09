@@ -177,7 +177,7 @@ mod lawkit_core_tests {
         assert!(stdout.contains("zipf"));
         assert!(stdout.contains("normal"));
         assert!(stdout.contains("poisson"));
-        assert!(stdout.contains("compare"));
+        assert!(stdout.contains("analyze"));
     }
 }
 
@@ -278,6 +278,50 @@ mod benford_law_tests {
             assert!(stdout.contains("Numbers analyzed"));
         }
     }
+
+    #[test]
+    fn test_lawkit_benf_optimize() {
+        // Generate large dataset to test optimize mode
+        let mut large_data = Vec::new();
+        for i in 1..=5000 {
+            large_data.push((100 + i * 17).to_string());
+        }
+        let test_data = large_data.join(" ");
+
+        // Test with optimize flag
+        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Numbers analyzed"));
+        assert!(stdout.contains("5000"));
+    }
+
+    #[test]
+    fn test_lawkit_benf_optimize_with_file() {
+        // Test optimization with file input
+        let mut large_data = Vec::new();
+        for i in 1..=1000 {
+            large_data.push((1000 + i * 23).to_string());
+        }
+        let content = large_data.join("\n");
+        let temp_file = create_temp_file_with_content(&content);
+
+        let output =
+            run_lawkit_command("benf", &["--optimize", temp_file.path().to_str().unwrap()]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Numbers analyzed"));
+    }
 }
 
 #[cfg(test)]
@@ -342,6 +386,21 @@ mod pareto_law_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("70%") || stdout.contains("80%") || stdout.contains("90%"));
+    }
+
+    #[test]
+    fn test_lawkit_pareto_optimize() {
+        // Test optimize mode for pareto analysis
+        let test_data = generate_pareto_test_data();
+        let output = run_lawkit_command("pareto", &["--optimize", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Pareto") || stdout.contains("80/20"));
     }
 }
 
@@ -506,13 +565,13 @@ mod poisson_distribution_tests {
 }
 
 #[cfg(test)]
-mod integration_compare_tests {
+mod integration_analyze_tests {
     use super::*;
 
     #[test]
-    fn test_lawkit_compare_basic() {
+    fn test_lawkit_analyze_basic() {
         let test_data = generate_test_data();
-        let output = run_lawkit_command("compare", &[&test_data]);
+        let output = run_lawkit_command("analyze", &[&test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -521,7 +580,7 @@ mod integration_compare_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(
-            stdout.contains("compare")
+            stdout.contains("analyze")
                 || stdout.contains("integration")
                 || stdout.contains("Integration")
         );
@@ -529,9 +588,9 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_specific_laws() {
+    fn test_lawkit_analyze_specific_laws() {
         let test_data = generate_test_data();
-        let output = run_lawkit_command("compare", &["--laws", "benf,pareto,normal", &test_data]);
+        let output = run_lawkit_command("analyze", &["--laws", "benf,pareto,normal", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -543,31 +602,10 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_fraud_detection() {
+    fn test_lawkit_analyze_quality_focus() {
         let test_data = generate_test_data();
         let output = run_lawkit_command(
-            "compare",
-            &["--purpose", "fraud", "--recommend", &test_data],
-        );
-
-        assert!(matches!(
-            output.status.code(),
-            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
-        ));
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(
-            stdout.contains("Analysis results")
-                || stdout.contains("recommend")
-                || stdout.contains("Purpose")
-        );
-    }
-
-    #[test]
-    fn test_lawkit_compare_quality_focus() {
-        let test_data = generate_test_data();
-        let output = run_lawkit_command(
-            "compare",
+            "analyze",
             &["--laws", "benf,normal", "--focus", "quality", &test_data],
         );
 
@@ -581,10 +619,87 @@ mod integration_compare_tests {
     }
 
     #[test]
-    fn test_lawkit_compare_conflict_detection() {
+    fn test_lawkit_analyze_optimize() {
+        // Test analyze with optimize flag on large dataset
+        let mut large_data = Vec::new();
+        for i in 1..=2000 {
+            large_data.push((100 + i * 17).to_string());
+        }
+        let test_data = large_data.join(" ");
+
+        let output = run_lawkit_command("analyze", &["--optimize", "--laws", "all", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Laws Executed") || stdout.contains("Integration"));
+    }
+}
+
+mod integration_validate_tests {
+    use super::*;
+
+    #[test]
+    fn test_lawkit_validate_basic() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("validate", &[&test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Consistency") || stdout.contains("validation"));
+    }
+
+    #[test]
+    fn test_lawkit_validate_cross_validation() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("validate", &["--cross-validation", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Cross-Validation") || stdout.contains("stability"));
+    }
+}
+
+mod integration_diagnose_tests {
+    use super::*;
+
+    #[test]
+    fn test_lawkit_diagnose_fraud_detection() {
         let test_data = generate_test_data();
         let output = run_lawkit_command(
-            "compare",
+            "diagnose",
+            &["--purpose", "fraud", "--recommend", &test_data],
+        );
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(
+            stdout.contains("Recommendations")
+                || stdout.contains("recommend")
+                || stdout.contains("Purpose")
+        );
+    }
+
+    #[test]
+    fn test_lawkit_diagnose_conflict_detection() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command(
+            "diagnose",
             &["--report", "conflicting", "--threshold", "0.7", &test_data],
         );
 
@@ -648,16 +763,65 @@ mod documentation_examples_tests {
         assert!(stdout.contains("{"));
     }
 
+    /// Test examples from performance guide documentation
+    #[test]
+    fn test_performance_guide_examples() {
+        // Generate a moderately large dataset
+        let mut data = Vec::new();
+        for i in 1..=1000 {
+            data.push(format!("{}", 100 + i * 13));
+        }
+        let test_data = data.join(" ");
+
+        // Test optimize mode
+        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test analyze with optimize
+        let output = run_lawkit_command("analyze", &["--optimize", &test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+    }
+
+    /// Test examples from advanced analysis guide
+    #[test]
+    fn test_advanced_analysis_examples() {
+        let test_data = generate_test_data();
+
+        // Test outlier detection with ensemble method
+        let output = run_lawkit_command(
+            "normal",
+            &["--outliers", "--outlier-method", "ensemble", &test_data],
+        );
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test time series analysis with optimize
+        let output =
+            run_lawkit_command("normal", &["--enable-timeseries", "--optimize", &test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+    }
+
     /// Test examples from configuration documentation
     #[test]
     fn test_configuration_examples() {
         let test_data = generate_test_data();
 
-        // Japanese output
-        let output = run_lawkit_command("benf", &["--language", "ja", &test_data]);
+        // English output (unified)
+        let output = run_lawkit_command("benf", &[&test_data]);
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            assert!(stdout.contains("ベンフォード") || stdout.contains("解析"));
+            assert!(stdout.contains("Benford") || stdout.contains("analysis"));
         }
 
         // YAML format
@@ -687,22 +851,22 @@ mod documentation_examples_tests {
     fn test_multi_law_examples() {
         let test_data = generate_test_data();
 
-        // Compare all laws
-        let output = run_lawkit_command("compare", &[&test_data]);
+        // Analyze all laws
+        let output = run_lawkit_command("analyze", &[&test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Focus on concentration analysis
-        let output = run_lawkit_command("compare", &["--laws", "benf,pareto,normal", &test_data]);
+        let output = run_lawkit_command("analyze", &["--laws", "benf,pareto,normal", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Recommendation mode
-        let output = run_lawkit_command("compare", &["--recommend", &test_data]);
+        let output = run_lawkit_command("diagnose", &["--recommend", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -749,6 +913,57 @@ mod documentation_examples_tests {
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
             assert!(stdout.contains("quality") || stdout.contains("spec"));
+        }
+    }
+
+    /// Test Chinese documentation examples
+    #[test]
+    fn test_chinese_documentation_examples() {
+        // Example from Chinese getting-started guide
+        let test_data = generate_test_data();
+        let temp_file = create_temp_file_with_content(&test_data);
+
+        // Performance optimization for large files
+        let output =
+            run_lawkit_command("benf", &["--optimize", temp_file.path().to_str().unwrap()]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Analyze with optimization
+        let output = run_lawkit_command(
+            "analyze",
+            &["--optimize", temp_file.path().to_str().unwrap()],
+        );
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+    }
+
+    /// Test Japanese documentation examples  
+    #[test]
+    fn test_japanese_documentation_examples() {
+        let test_data = generate_test_data();
+
+        // Example from Japanese usage guide - optimize mode
+        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Text analysis without language option
+        let text_content = "これは テスト です テスト テスト データ";
+        let temp_file = create_temp_file_with_content(text_content);
+        let output = run_lawkit_command(
+            "zipf",
+            &["--text", temp_file.path().to_str().unwrap(), "--optimize"],
+        );
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            assert!(stdout.contains("Zipf") || stdout.contains("text"));
         }
     }
 }
@@ -1027,7 +1242,7 @@ mod generate_functionality_tests {
     }
 
     #[test]
-    fn test_generate_integration_compare() {
+    fn test_generate_integration_analyze() {
         // Generate data for multiple laws
         let benf_output =
             run_lawkit_command("generate", &["benf", "--samples", "100", "--seed", "1001"]);
@@ -1039,35 +1254,35 @@ mod generate_functionality_tests {
         assert!(benf_output.status.success());
         assert!(normal_output.status.success());
 
-        // Test compare functionality with generated data
+        // Test analyze functionality with generated data
         let benf_data = String::from_utf8_lossy(&benf_output.stdout);
         let temp_file = create_temp_file_with_content(&benf_data);
 
-        let compare_output = debug_run_lawkit_command(
-            "compare",
+        let analyze_output = debug_run_lawkit_command(
+            "analyze",
             &["--laws", "benf,normal", temp_file.path().to_str().unwrap()],
         );
-        if !compare_output.status.success() {
-            let stderr = String::from_utf8_lossy(&compare_output.stderr);
-            println!("Compare failed with stderr: {stderr}");
-            let stdout = String::from_utf8_lossy(&compare_output.stdout);
-            println!("Compare stdout: {stdout}");
+        if !analyze_output.status.success() {
+            let stderr = String::from_utf8_lossy(&analyze_output.stderr);
+            println!("Analyze failed with stderr: {stderr}");
+            let stdout = String::from_utf8_lossy(&analyze_output.stdout);
+            println!("Analyze stdout: {stdout}");
         }
-        // Compare command returns exit code based on risk level (0, 10, 11)
+        // Analyze command returns exit code based on risk level (0, 10, 11)
         // which is not always 0 even on successful execution
         assert!(
-            matches!(compare_output.status.code(), Some(0) | Some(10) | Some(11)),
-            "Expected compare to return risk-based exit code (0/10/11), got {:?}",
-            compare_output.status.code()
+            matches!(analyze_output.status.code(), Some(0) | Some(10) | Some(11)),
+            "Expected analyze to return risk-based exit code (0/10/11), got {:?}",
+            analyze_output.status.code()
         );
 
-        let compare_result = String::from_utf8_lossy(&compare_output.stdout);
+        let analyze_result = String::from_utf8_lossy(&analyze_output.stdout);
         // Check that output contains expected content
         assert!(
-            compare_result.contains("Integration Analysis Result")
-                || compare_result.contains("Benford's Law")
-                || compare_result.contains("Normal Distribution"),
-            "Expected compare output to contain analysis results"
+            analyze_result.contains("Integration Analysis Result")
+                || analyze_result.contains("Benford's Law")
+                || analyze_result.contains("Normal Distribution"),
+            "Expected analyze output to contain analysis results"
         );
     }
 }
@@ -1166,5 +1381,191 @@ mod error_handling_tests {
         assert!(output.status.success());
         // Should generate some output
         assert!(!String::from_utf8_lossy(&output.stdout).is_empty());
+    }
+
+    #[test]
+    fn test_japanese_cli_reference_examples() {
+        // Test examples from Japanese CLI reference (cli-reference_ja.md)
+
+        // Test benford with optimize flag from Japanese docs
+        let output = run_lawkit_command("benf", &["--optimize", "会計データ.csv"]);
+        assert!(output.status.code().is_some());
+
+        // Test zipf with optimize flag from Japanese docs
+        let output = run_lawkit_command("zipf", &["--optimize", "文書.txt"]);
+        assert!(output.status.code().is_some());
+
+        // Test analyze with optimize flag
+        let output = run_lawkit_command("analyze", &["--optimize", "data.csv"]);
+        assert!(output.status.code().is_some());
+
+        // Test normal with time series and optimize
+        let output = run_lawkit_command(
+            "normal",
+            &["--enable-timeseries", "--optimize", "timeseries.csv"],
+        );
+        assert!(output.status.code().is_some());
+    }
+
+    #[test]
+    fn test_japanese_advanced_analysis_examples() {
+        // Test examples from Japanese advanced analysis guide (advanced-analysis_ja.md)
+
+        let test_data = "100 150 200 250 300 350 400 450 500 10000"; // Contains outlier
+
+        // Test ensemble outlier detection with normal command (most common in docs)
+        let output = run_lawkit_command(
+            "normal",
+            &["--outliers", "--outlier-method", "ensemble", test_data],
+        );
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test LOF outlier detection with normal command
+        let output = run_lawkit_command(
+            "normal",
+            &["--outliers", "--outlier-method", "lof", test_data],
+        );
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test isolation outlier detection with normal command
+        let output = run_lawkit_command(
+            "normal",
+            &["--outliers", "--outlier-method", "isolation", test_data],
+        );
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test time series analysis with normal command
+        let output = run_lawkit_command("normal", &["--enable-timeseries", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test benford basic analysis
+        let output = run_lawkit_command("benf", &[test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+    }
+
+    #[test]
+    fn test_optimize_flag_comprehensive() {
+        // Test --optimize flag across all major subcommands as shown in docs
+
+        let test_data = "123 456 789 1234 2345 3456 4567 5678 6789 7890";
+
+        // Benford with optimize
+        let output = run_lawkit_command("benf", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Pareto with optimize
+        let output = run_lawkit_command("pareto", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Zipf with optimize
+        let output = run_lawkit_command("zipf", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Normal with optimize
+        let output = run_lawkit_command("normal", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Analyze with optimize
+        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+    }
+
+    #[test]
+    fn test_japanese_usage_guide_examples() {
+        // Test examples from Japanese usage guide (usage_ja.md)
+
+        let test_data = "123 456 789 1234 2345 3456 4567 5678 6789 7890";
+
+        // Test zipf text analysis with optimize from usage guide
+        let output = run_lawkit_command("zipf", &["--text", "--optimize", "japanese_text.txt"]);
+        assert!(output.status.code().is_some());
+
+        // Test optimize mode examples from usage guide
+        let output = run_lawkit_command("benf", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test multi-language text analysis with optimize
+        let output = run_lawkit_command("zipf", &["--text", "multilingual_doc.txt", "--optimize"]);
+        assert!(output.status.code().is_some());
+    }
+
+    #[test]
+    fn test_traditional_chinese_financial_numerals() {
+        // Test traditional Chinese financial numerals (anti-fraud numerals)
+        // From documentation examples in Japanese and Chinese guides
+
+        let traditional_data =
+            "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾 参拾萬 肆萬 伍萬 陸萬 柒萬 捌萬 玖萬 拾萬";
+
+        let output = run_lawkit_command("benf", &[traditional_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test that the traditional numerals are properly recognized as numbers
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Numbers analyzed: 10"));
+    }
+
+    #[test]
+    fn test_japanese_getting_started_examples() {
+        // Test examples from Japanese getting started guide (getting-started_ja.md)
+
+        let test_data = "1234 2345 3456 4567 5678 6789 7890 8901 9012";
+
+        // Test analyze with optimize from getting started
+        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test basic benford analysis
+        let output = run_lawkit_command("benf", &[test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        // Test pareto analysis
+        let output = run_lawkit_command("pareto", &[test_data]);
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
     }
 }

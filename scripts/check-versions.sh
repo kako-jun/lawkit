@@ -30,9 +30,18 @@ info() {
     echo -e "${BLUE}ℹ️  $1${NC}"
 }
 
-# Extract versions
-CORE_VERSION=$(grep '^version = ' lawkit-core/Cargo.toml | head -1 | cut -d'"' -f2)
-CLI_VERSION=$(grep '^version = ' lawkit-cli/Cargo.toml | head -1 | cut -d'"' -f2)
+# Extract versions (handle workspace versions)
+if grep -q 'version.workspace = true' lawkit-core/Cargo.toml; then
+    CORE_VERSION=$(grep '^version = ' Cargo.toml | head -1 | cut -d'"' -f2)
+else
+    CORE_VERSION=$(grep '^version = ' lawkit-core/Cargo.toml | head -1 | cut -d'"' -f2)
+fi
+
+if grep -q 'version.workspace = true' lawkit-cli/Cargo.toml; then
+    CLI_VERSION=$(grep '^version = ' Cargo.toml | head -1 | cut -d'"' -f2)
+else
+    CLI_VERSION=$(grep '^version = ' lawkit-cli/Cargo.toml | head -1 | cut -d'"' -f2)
+fi
 
 if [ -f "lawkit-npm/package.json" ]; then
     NPM_VERSION=$(node -p "require('./lawkit-npm/package.json').version" 2>/dev/null || echo "unknown")
@@ -113,7 +122,7 @@ else
 fi
 
 # Check if core dependency versions in CLI match
-CLI_CORE_DEP=$(grep 'lawkit-core.*version' lawkit-cli/Cargo.toml | grep -o '"[^"]*"' | tr -d '"' || echo "not found")
+CLI_CORE_DEP=$(grep 'lawkit-core.*version' lawkit-cli/Cargo.toml | grep -o 'version = "[^"]*"' | cut -d'"' -f2 || echo "not found")
 if [ "$CLI_CORE_DEP" != "not found" ] && [ "$CLI_CORE_DEP" != "$CORE_VERSION" ]; then
     error "CLI references wrong core version:"
     echo "   Core version: $CORE_VERSION"

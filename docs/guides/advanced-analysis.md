@@ -117,7 +117,7 @@ lawkit normal measurements.csv \
 lawkit benf network_logs.csv \
   --outlier-method isolation \
   --outlier-depth 12 \
-  --parallel-processing \
+   \
   --real-time
 ```
 
@@ -255,7 +255,7 @@ lawkit normal sensor_readings.csv \
   --real-time-alerts
 
 # Business metrics tracking
-lawkit compare monthly_kpis.csv \
+lawkit analyze monthly_kpis.csv \
   --enable-timeseries \
   --trend-analysis \
   --forecast-steps 6 \
@@ -271,7 +271,7 @@ Leverage multi-core processing for faster analysis of large datasets.
 
 ```bash
 # Enable automatic parallelization
-lawkit compare large_dataset.csv --enable-parallel
+lawkit analyze large_dataset.csv --enable-parallel
 
 # Let lawkit determine optimal thread count
 lawkit benf huge_file.csv --enable-parallel --auto-threads
@@ -281,13 +281,13 @@ lawkit benf huge_file.csv --enable-parallel --auto-threads
 
 ```bash
 # Specify thread count
-lawkit compare data.csv --parallel-threads 8
+lawkit analyze data.csv 
 
 # Use all available cores
-lawkit benf data.csv --parallel-threads $(nproc)
+lawkit benf data.csv 
 
 # Leave some cores free for other processes
-lawkit compare data.csv --parallel-threads $(($(nproc) - 2))
+lawkit analyze data.csv 
 ```
 
 ### Chunk-based Processing
@@ -296,20 +296,20 @@ lawkit compare data.csv --parallel-threads $(($(nproc) - 2))
 # Configure chunk size for memory efficiency
 lawkit benf large_data.csv \
   --enable-parallel \
-  --parallel-chunk-size 10000
+  
 
 # Adaptive chunk sizing
-lawkit compare massive_file.csv \
+lawkit analyze massive_file.csv \
   --enable-parallel \
   --adaptive-chunks \
-  --memory-limit 2048
+  
 ```
 
 ### Performance Monitoring
 
 ```bash
 # Benchmark parallel performance
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --benchmark-parallel \
   --show-speedup
@@ -318,7 +318,7 @@ lawkit compare data.csv \
 lawkit benf data.csv \
   --enable-parallel \
   --performance-report \
-  --threads-efficiency
+  
 ```
 
 ### Parallel Processing Examples
@@ -327,40 +327,38 @@ lawkit benf data.csv \
 # Large-scale fraud detection
 lawkit benf transactions.csv \
   --enable-parallel \
-  --parallel-threads 16 \
+  \
   --outlier-method ensemble \
-  --parallel-chunk-size 50000
+  
 
 # Multi-file comparison analysis
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
-  --parallel-threads 8 \
-  --memory-limit 4096 \
+  \
+   \
   --output-format json
 
-# Real-time stream processing
-lawkit benf data_stream.csv \
-  --enable-parallel \
-  --streaming \
-  --parallel-threads 4 \
-  --real-time-output
+# Real-time data processing
+lawkit benf data.csv \
+  --optimize \
+  --quiet
 ```
 
 ## Memory-Efficient Processing
 
-Handle datasets larger than available RAM using streaming and incremental algorithms.
+Handle datasets larger than available RAM using optimized processing and incremental algorithms.
 
-### Streaming Mode
+### Optimized Processing Mode
 
 ```bash
-# Basic streaming for large files
-lawkit benf massive_dataset.csv --streaming
+# Basic optimized processing for large files
+lawkit benf massive_dataset.csv --optimize
 
-# Streaming with custom chunk size
-lawkit benf huge_file.csv --streaming --chunk-size 5000
+# Optimized processing with memory management
+lawkit benf huge_file.csv --optimize
 
-# Memory-limited streaming
-lawkit benf data.csv --streaming --memory-limit 512
+# Memory-limited optimized processing
+lawkit benf data.csv --optimize
 ```
 
 ### Incremental Statistics
@@ -370,7 +368,7 @@ lawkit benf data.csv --streaming --memory-limit 512
 lawkit benf large_data.csv --incremental-stats
 
 # Incremental processing with periodic results
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --incremental-stats \
   --progress-interval 10000
 
@@ -385,19 +383,19 @@ lawkit benf data.csv \
 
 ```bash
 # Set memory limits
-lawkit benf data.csv --memory-limit 1024
+lawkit benf data.csv 
 
 # Resource monitoring
-lawkit compare large_files/*.csv \
+lawkit analyze large_files/*.csv \
   --monitor-resources \
-  --memory-limit 2048 \
+   \
   --cpu-limit 80
 
 # Garbage collection optimization
 lawkit benf data.csv \
-  --streaming \
+   \
   --optimize-gc \
-  --memory-limit 512
+  
 ```
 
 ### Memory-Efficient Examples
@@ -405,25 +403,23 @@ lawkit benf data.csv \
 ```bash
 # Process 10GB+ dataset on 4GB RAM
 lawkit benf massive_financial_data.csv \
-  --streaming \
-  --memory-limit 1024 \
-  --chunk-size 1000 \
+   \
+   \
+   \
   --incremental-stats \
   --progress-reporting
 
 # Continuous data processing
-lawkit benf continuous_stream.csv \
-  --streaming \
-  --real-time \
-  --memory-limit 512 \
-  --buffer-size 100 \
-  --live-updates
+lawkit benf continuous_data.csv \
+  --optimize \
+  --incremental-stats \
+  --quiet
 
 # Multi-gigabyte comparison
-lawkit compare huge_datasets/*.csv \
-  --streaming \
+lawkit analyze huge_datasets/*.csv \
+   \
   --enable-parallel \
-  --memory-limit 2048 \
+   \
   --incremental-stats \
   --summary-only
 ```
@@ -439,7 +435,7 @@ Combine advanced features with lawkit's statistical law analysis.
 lawkit benf financial_data.csv \
   --outlier-method ensemble \
   --time-series-analysis \
-  --parallel-processing
+  
 
 # Multi-scale Benford analysis
 lawkit benf data.csv \
@@ -484,15 +480,15 @@ lawkit normal time_data.csv \
 
 ```bash
 # Comprehensive statistical analysis
-lawkit compare complex_data.csv \
+lawkit analyze complex_data.csv \
   --all-laws \
   --advanced-outliers \
   --time-series-analysis \
-  --parallel-processing \
+   \
   --detailed-report
 
 # Consensus-based analysis
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --law-ensemble \
   --outlier-consensus \
   --confidence-aggregation \
@@ -507,24 +503,24 @@ Optimize analysis performance based on your specific use case.
 
 **Small Datasets (< 10K records):**
 ```bash
-lawkit benf data.csv --threads 1 --no-streaming
+lawkit benf data.csv  
 ```
 
 **Medium Datasets (10K - 1M records):**
 ```bash
 lawkit benf data.csv \
   --enable-parallel \
-  --parallel-threads 4 \
-  --chunk-size 10000
+  \
+  
 ```
 
 **Large Datasets (1M+ records):**
 ```bash
 lawkit benf data.csv \
-  --streaming \
+   \
   --enable-parallel \
-  --parallel-threads 8 \
-  --memory-limit 2048 \
+  \
+   \
   --incremental-stats
 ```
 
@@ -532,18 +528,17 @@ lawkit benf data.csv \
 
 **Real-time Analysis:**
 ```bash
-lawkit benf stream.csv \
-  --streaming \
-  --real-time \
-  --outlier-method isolation \
-  --fast-mode
+lawkit benf data.csv \
+  --optimize \
+  --quiet \
+  --outlier-method isolation
 ```
 
 **Batch Processing:**
 ```bash
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
-  --parallel-threads $(nproc) \
+  \
   --batch-mode \
   --summary-only
 ```
@@ -561,18 +556,18 @@ lawkit benf data.csv \
 
 **CPU-Intensive Workloads:**
 ```bash
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --cpu-intensive \
-  --parallel-threads $(nproc) \
+  \
   --no-io-limit
 ```
 
 **Memory-Constrained Systems:**
 ```bash
 lawkit benf data.csv \
-  --streaming \
-  --memory-limit 256 \
+   \
+   \
   --minimal-cache \
   --compress-intermediate
 ```
@@ -580,7 +575,7 @@ lawkit benf data.csv \
 **Storage-Optimized:**
 ```bash
 lawkit benf data.csv \
-  --streaming \
+   \
   --direct-io \
   --minimal-memory \
   --compress-output

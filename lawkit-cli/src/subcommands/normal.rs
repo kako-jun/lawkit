@@ -470,23 +470,36 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
 }
 
 fn print_normal_interpretation(result: &NormalResult) {
+    use crate::colors;
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("✅ Data follows normal distribution well");
+            println!(
+                "{}",
+                colors::pass("[PASS] Data follows normal distribution well")
+            );
             println!("   Suitable for standard statistical analysis");
         }
         RiskLevel::Medium => {
-            println!("⚠️  Data shows some deviation from normality");
+            println!(
+                "{}",
+                colors::warn("[WARN] Data shows some deviation from normality")
+            );
             println!("   Consider robust statistical methods");
         }
         RiskLevel::High => {
-            println!("🚨 Data significantly deviates from normality");
+            println!(
+                "{}",
+                colors::fail("[FAIL] Data significantly deviates from normality")
+            );
             println!("   Non-parametric methods recommended");
         }
         RiskLevel::Critical => {
-            println!("🔍 Data shows extreme deviation from normality");
+            println!(
+                "{}",
+                colors::critical("[CRITICAL] Data shows extreme deviation from normality")
+            );
             println!("   Requires special handling and investigation");
         }
     }
@@ -494,21 +507,39 @@ fn print_normal_interpretation(result: &NormalResult) {
     // 歪度・尖度に基づく解釈
     if result.skewness.abs() > 1.0 {
         if result.skewness > 0.0 {
-            println!("   📊 Data is right-skewed (positive skewness)");
+            println!(
+                "   {}",
+                colors::info("INFO: Data is right-skewed (positive skewness)")
+            );
         } else {
-            println!("   📊 Data is left-skewed (negative skewness)");
+            println!(
+                "   {}",
+                colors::info("INFO: Data is left-skewed (negative skewness)")
+            );
         }
     }
 
     if result.kurtosis > 1.0 {
-        println!("   📈 Data has heavy tails (high kurtosis)");
+        println!(
+            "   {}",
+            colors::info("INFO: Data has heavy tails (high kurtosis)")
+        );
     } else if result.kurtosis < -1.0 {
-        println!("   📉 Data has light tails (low kurtosis)");
+        println!(
+            "   {}",
+            colors::info("INFO: Data has light tails (low kurtosis)")
+        );
     }
 
     // 異常値の解釈
     if !result.outliers_z_score.is_empty() {
-        println!("   🎯 Outliers detected: {}", result.outliers_z_score.len());
+        println!(
+            "   {}",
+            colors::alert(&format!(
+                "ALERT: Outliers detected: {}",
+                result.outliers_z_score.len()
+            ))
+        );
     }
 }
 

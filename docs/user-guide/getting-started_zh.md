@@ -67,13 +67,13 @@ lawkit poisson event_data.csv --predict
 
 ```bash
 # 比较所有法则
-lawkit compare data.csv --laws all
+lawkit analyze data.csv --laws all
 
 # 比较特定法则
-lawkit compare data.csv --laws benf,pareto,normal
+lawkit analyze data.csv --laws benf,pareto,normal
 
 # 获取分析建议
-lawkit compare data.csv --recommend
+lawkit analyze data.csv --recommend
 ```
 
 ### 数据生成
@@ -114,7 +114,7 @@ lawkit pareto monthly_sales.csv --business-analysis
 lawkit normal sales_history.csv --enable-timeseries
 
 # 多维度比较
-lawkit compare Q1_sales.csv Q2_sales.csv Q3_sales.csv
+lawkit analyze Q1_sales.csv Q2_sales.csv Q3_sales.csv
 ```
 
 ## 配置选项
@@ -138,11 +138,11 @@ lawkit benf data.csv --filter ">=100"
 ### 性能优化
 
 ```bash
-# 并行处理
-lawkit compare large_dataset.csv --parallel --threads 8
+# 性能优化
+lawkit analyze large_dataset.csv --optimize
 
-# 流式处理大文件
-lawkit benf huge_file.csv --streaming --chunk-size 50000
+# 性能优化大文件
+lawkit benf huge_file.csv --optimize
 
 # 启用优化模式
 lawkit benf data.csv --optimize
@@ -155,6 +155,9 @@ lawkit支持多种数字格式：
 ```bash
 # 中文数字
 echo "一千二百三十四 五千六百七十八" | lawkit benf
+
+# 繁体字金融数字（防伪大写）
+echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 
 # 全角数字
 echo "１２３４ ５６７８" | lawkit benf

@@ -1,6 +1,7 @@
 use clap::{command, Command};
 use lawkit_core::error::LawkitError;
 
+mod colors;
 mod common_options;
 mod subcommands;
 
@@ -36,7 +37,9 @@ fn main() {
                 Command::new("poisson").about("Poisson distribution analysis"),
             )),
         ))
-        .subcommand(subcommands::compare::command())
+        .subcommand(subcommands::analyze::command())
+        .subcommand(subcommands::validate::command())
+        .subcommand(subcommands::diagnose::command())
         .subcommand(
             Command::new("generate")
                 .about("Generate sample data following statistical laws")
@@ -78,7 +81,9 @@ fn main() {
         Some(("zipf", sub_matches)) => subcommands::zipf::run(sub_matches),
         Some(("normal", sub_matches)) => subcommands::normal::run(sub_matches),
         Some(("poisson", sub_matches)) => subcommands::poisson::run(sub_matches),
-        Some(("compare", sub_matches)) => subcommands::compare::run(sub_matches),
+        Some(("analyze", sub_matches)) => subcommands::analyze::run(sub_matches),
+        Some(("validate", sub_matches)) => subcommands::validate::run(sub_matches),
+        Some(("diagnose", sub_matches)) => subcommands::diagnose::run(sub_matches),
         Some(("generate", sub_matches)) => handle_generate_command(sub_matches),
         Some(("list", _)) => list_laws(),
         Some(("selftest", _)) => run_selftest(),
@@ -332,7 +337,9 @@ fn list_laws() -> Result<(), LawkitError> {
     println!("  poisson - Poisson distribution analysis");
     println!();
     println!("Integration commands:");
-    println!("  compare - Compare and integrate multiple statistical laws");
+    println!("  analyze  - Multi-law basic analysis and recommendations");
+    println!("  validate - Data validation and consistency checks");
+    println!("  diagnose - Conflict detection and detailed diagnostics");
     println!();
     println!("Generation commands:");
     println!("  generate - Generate sample data following statistical laws");
@@ -357,11 +364,11 @@ fn run_selftest() -> Result<(), LawkitError> {
         match law {
             &"benf" => {
                 // Mock success for demonstration
-                println!("✅ PASS");
+                println!("{}", colors::pass("[PASS]"));
                 passed += 1;
             }
             _ => {
-                println!("✅ PASS (placeholder)");
+                println!("{}", colors::pass("[PASS] (placeholder)"));
                 passed += 1;
             }
         }
@@ -371,10 +378,16 @@ fn run_selftest() -> Result<(), LawkitError> {
     println!("Self-test completed: {passed}/{total} tests passed");
 
     if passed == total {
-        println!("✅ All tests passed! lawkit is working correctly.");
+        println!(
+            "{}",
+            colors::pass("[PASS] All tests passed! lawkit is working correctly.")
+        );
         Ok(())
     } else {
-        println!("❌ Some tests failed. Please check the implementation.");
+        println!(
+            "{}",
+            colors::fail("[FAIL] Some tests failed. Please check the implementation.")
+        );
         std::process::exit(1);
     }
 }

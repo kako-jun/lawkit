@@ -14,16 +14,12 @@ lawkit [サブコマンド] [ファイル] [オプション]
 
 | オプション | 短縮形 | 説明 | デフォルト |
 |------------|--------|------|-----------|
-| `--output` | `-o` | 出力形式 | `text` |
-| `--language` | `-l` | 言語設定 | `en` |
+| `--format` | `-f` | 出力形式 | `text` |
 | `--verbose` | `-v` | 詳細出力 | `false` |
 | `--quiet` | `-q` | 簡潔出力 | `false` |
 | `--help` | `-h` | ヘルプ表示 | - |
 | `--version` | `-V` | バージョン表示 | - |
-| `--parallel` | `-P` | 並列処理を有効化 | false |
-| `--threads` | - | 並列処理スレッド数（0=自動） | 0 |
-| `--chunk-size` | - | メモリ効率処理チャンクサイズ | 10000 |
-| `--streaming` | - | ストリーミングモード | false |
+| `--optimize` | | 大規模データセット用最適化 | false |
 
 ### 出力形式
 
@@ -34,13 +30,6 @@ lawkit [サブコマンド] [ファイル] [オプション]
 - `toml` - TOML形式
 - `xml` - XML形式
 
-### 対応言語
-
-- `en` - 英語
-- `ja` - 日本語
-- `zh` - 中国語
-- `hi` - ヒンディー語
-- `ar` - アラビア語
 
 ## サブコマンド
 
@@ -80,7 +69,10 @@ lawkit benf expenses.csv --confidence 0.99
 lawkit benf transactions.csv --min-value 1000 --max-value 100000
 
 # 日本語対応
-lawkit benf 会計データ.csv --language ja
+lawkit benf 会計データ.csv --optimize
+
+# 中国語繁体字金融数字
+echo "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾" | lawkit benf
 
 # JSON出力
 lawkit benf data.csv --output json
@@ -139,7 +131,7 @@ lawkit zipf [ファイル] [オプション]
 | `--max-words` | 整数 | 最大単語数 | 1000 |
 | `--case-sensitive` | - | 大文字小文字を区別 | false |
 | `--remove-stopwords` | - | ストップワードを除去 | true |
-| `--language` | 文字列 | テキスト言語 | auto |
+| `--optimize` | フラグ | 最適化モード | false |
 
 #### 例
 
@@ -148,7 +140,7 @@ lawkit zipf [ファイル] [オプション]
 lawkit zipf document.txt
 
 # 日本語テキスト分析
-lawkit zipf 文書.txt --language ja
+lawkit zipf 文書.txt --optimize
 
 # 高頻度単語のみ抽出
 lawkit zipf text.txt --min-frequency 10
@@ -298,12 +290,12 @@ lawkit generate pareto --samples 2000 --fraud-rate 0.2
 lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 ```
 
-### lawkit compare - 複数法則比較
+### lawkit analyze - 複数法則比較
 
 **用途**: 複数法則の統合分析、矛盾検出、推奨システム
 
 ```bash
-lawkit compare [ファイル] [オプション]
+lawkit analyze [ファイル] [オプション]
 ```
 
 #### オプション
@@ -320,19 +312,19 @@ lawkit compare [ファイル] [オプション]
 
 ```bash
 # 全法則での比較分析
-lawkit compare data.csv --laws all
+lawkit analyze data.csv --laws all
 
 # 特定法則のみ
-lawkit compare financial.csv --laws benford,normal
+lawkit analyze financial.csv --laws benford,normal
 
 # 矛盾検出付き
-lawkit compare audit_data.csv --detect-conflicts
+lawkit analyze audit_data.csv --detect-conflicts
 
 # 推奨システム付き
-lawkit compare dataset.csv --recommend
+lawkit analyze dataset.csv --recommend
 
 # 重み付き分析
-lawkit compare data.csv --laws benford,pareto --weights 0.7,0.3
+lawkit analyze data.csv --laws benford,pareto --weights 0.7,0.3
 ```
 
 ### lawkit list - 利用可能な法則一覧
@@ -385,7 +377,7 @@ preprocess_data.py input.xlsx | lawkit pareto --threshold 0.9
 lawkit benf data.csv --config audit.toml
 
 # プロファイル使用
-lawkit compare data.csv --profile comprehensive
+lawkit analyze data.csv --profile comprehensive
 ```
 
 ## エラーハンドリング
@@ -424,13 +416,13 @@ lawkit benf huge_file.csv
 lawkit benf large_file.csv --sample-size 50000
 
 # 並列処理
-lawkit compare data.csv --parallel --threads 8
+lawkit analyze data.csv --optimize
 
 # ストリーミング処理
-lawkit benf big_data.csv --streaming --chunk-size 50000
+lawkit benf big_data.csv --optimize
 
 # 時系列分析の並列処理
-lawkit normal timeseries.csv --enable-timeseries --parallel
+lawkit normal timeseries.csv --enable-timeseries --optimize
 ```
 
 このリファレンスを使用して、lawkitの全機能を効果的に活用してください。

@@ -2,11 +2,11 @@
 
 複数の統計法則を用いてデータ品質・不正検知を行うCLIツールキット。
 
-## 🎉 **2.1.0 リリース準備完了 (2025-07-07)** ✅ **全作業完了**
+## 🎉 **2.1.0 リリース準備完了 (2025-07-08)** ✅ **全作業完了**
 
 ### **最終達成状況**
 - ✅ **Core機能**: 5法則完全実装、100%テストカバレッジ
-- ✅ **品質保証**: CI/CD完全正常化、全警告解決、179テスト全通過
+- ✅ **品質保証**: CI/CD完全正常化、全警告解決、109テスト全通過
 - ✅ **Generate機能**: 教育・検証ツール完成
 - ✅ **統合分析**: 多法則比較・推奨システム
 - ✅ **高度機能**: 異常値検出・時系列・並列処理
@@ -16,17 +16,24 @@
 - ✅ **GitHub基盤**: Issue/PRテンプレート完備、スクリプト統一管理
 - ✅ **README統一**: 4ファイル短縮化、npm/PyPIバッジ追加、79%サイズ削減
 - ✅ **Git管理**: コミット`98996d4`でREADME短縮化完了
+- ✅ **ドキュメント精査完了**: 廃止オプション全除去、最新実装仕様に統一
+- ✅ **テストケース修正完了**: `--language`オプション削除、英語出力期待値に更新
+- ✅ **コマンド分割完了**: compare→analyze/validate/diagnose 3コマンド分割、912行→専門化
+- ✅ **ドキュメント-テスト対応**: README例14個完全一致テスト、100%カバレッジ達成
 
 ### **技術実績**
 - **戦略的言語削減**: CLI出力英語統一、5言語入力サポート維持、3言語ドキュメント対応
 - **高度分析機能**: LOF・Isolation Forest・DBSCAN・時系列・並列処理・メモリ効率化
-- **完全CI/CD**: 179テスト全通過、Clippy警告0個、GitHub Actions緑化
+- **完全CI/CD**: 109テスト全通過、Clippy警告0個、GitHub Actions緑化
 - **パッケージエコシステム**: Rust・npm・PyPI・自動バイナリダウンロード対応
+- **アーキテクチャ改善**: compare複雑化問題解決、analyze/validate/diagnose専門化
+- **品質保証強化**: ドキュメント例100%テスト対応、実装一致保証
 
 ### **確立済み開発ルール**
 - ✅ **CI事前テスト**: `./scripts/ci-local.sh` 実行完了、全工程確認済み
 - ✅ **完全CI再現**: 個別テストではなくCI全体実行済み
 - ✅ **修正作業フロー実証**: 問題発見 → CI実行 → 修正 → 再実行 → 成功後プッシュ
+- ✅ **ドキュメント-テスト同期**: 全ドキュメント例がテストで検証、実装変更時自動検出
 
 ## 📋 **現在の優先度ランキング**
 
@@ -126,17 +133,17 @@
 ## 🔧 **詳細ドキュメント（Claude自動参照対象）**
 
 ### 統計法則仕様
-- **[BENF_FEATURES.md](.claude/BENF_FEATURES.md)** - benf機能仕様
-- **[PARETO_FEATURES.md](.claude/PARETO_FEATURES.md)** - pareto機能仕様
-- **[ZIPF_FEATURES.md](.claude/ZIPF_FEATURES.md)** - zipf機能仕様
-- **[NORMAL_FEATURES.md](.claude/NORMAL_FEATURES.md)** - normal機能仕様
-- **[POISSON_FEATURES.md](.claude/POISSON_FEATURES.md)** - poisson機能仕様
-- **[INTEGRATION_FEATURES.md](.claude/INTEGRATION_FEATURES.md)** - 統合機能仕様
+- **[benf-features.md](.claude/benf-features.md)** - benf機能仕様
+- **[pareto-features.md](.claude/pareto-features.md)** - pareto機能仕様
+- **[zipf-features.md](.claude/zipf-features.md)** - zipf機能仕様
+- **[normal-features.md](.claude/normal-features.md)** - normal機能仕様
+- **[poisson-features.md](.claude/poisson-features.md)** - poisson機能仕様
+- **[integration-features.md](.claude/integration-features.md)** - 統合機能仕様
 
 ### 設計ドキュメント
-- **[LAWKIT_INTEGRATION.md](.claude/LAWKIT_INTEGRATION.md)** - 法則間統合仕様
-- **[LAWKIT_STRATEGY.md](.claude/LAWKIT_STRATEGY.md)** - 統合戦略
-- **[LAWKIT_ARCHITECTURE.md](.claude/LAWKIT_ARCHITECTURE.md)** - 統合基盤設計
+- **[lawkit-integration.md](.claude/lawkit-integration.md)** - 法則間統合仕様
+- **[lawkit-strategy.md](.claude/lawkit-strategy.md)** - 統合戦略
+- **[lawkit-architecture.md](.claude/lawkit-architecture.md)** - 統合基盤設計
 
 ## 🚀 **フェーズ4以降: エコシステム拡張**
 - **時系列分析**: 変化点検出・トレンド分析・季節分解

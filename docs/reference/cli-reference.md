@@ -23,7 +23,9 @@ Available statistical laws:
   poisson - Poisson distribution analysis
 
 Integration commands:
-  compare - Compare and integrate multiple statistical laws
+  analyze  - Multi-law basic analysis and recommendations
+  validate - Data validation and consistency checks  
+  diagnose - Conflict detection and detailed diagnostics
 ```
 
 ## Statistical Law Commands
@@ -40,10 +42,9 @@ lawkit benf [OPTIONS] [INPUT]
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Detailed statistics
-- `--language <LANGUAGE>` - Output language: en, ja, zh, hi, ar (default: auto)
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
 - `--threshold <LEVEL>` - Custom anomaly detection threshold: low, medium, high, critical (default: auto)
-- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 5)
+- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
 
 #### Examples
 ```bash
@@ -76,7 +77,7 @@ lawkit pareto [OPTIONS] [INPUT]
 lawkit pareto sales.csv --business-analysis
 
 # Custom percentiles
-lawkit pareto data.csv --percentiles "70,80,90"
+lawkit pareto data.csv --percentiles 70,80,90
 ```
 
 ### `lawkit zipf` - Zipf's Law Analysis
@@ -88,17 +89,16 @@ lawkit zipf [OPTIONS] [INPUT]
 ```
 
 #### Specific Options
-- `--text-analysis` - Enable text/word frequency analysis
-- `--ranking` - Analyze ranking distributions
-- `--correlation-method <METHOD>` - Correlation calculation method
+- `--text, -T` - Enable text analysis mode
+- `--words, -w <NUMBER>` - Maximum number of words to analyze in text mode (default: 1000)
 
 #### Examples
 ```bash
 # Text frequency analysis
-lawkit zipf document.txt --text-analysis
+lawkit zipf document.txt --text
 
-# Numeric ranking
-lawkit zipf rankings.csv --ranking
+# Numeric ranking with custom word limit
+lawkit zipf rankings.csv --text --words 500
 ```
 
 ### `lawkit normal` - Normal Distribution Analysis
@@ -115,7 +115,6 @@ lawkit normal [OPTIONS] [INPUT]
 - `--outlier-method <METHOD>` - Detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (default: zscore)
 - `--quality-control` - Enable quality control analysis
 - `--spec-limits <LIMITS>` - Specification limits: "lower,upper"
-- `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
 - `--enable-timeseries` - Enable time series analysis
 - `--timeseries-window <SIZE>` - Time series analysis window size (default: 10)
 
@@ -131,7 +130,7 @@ lawkit normal data.csv --outliers --outlier-method ensemble
 lawkit normal timeseries.csv --enable-timeseries --timeseries-window 20
 
 # Quality control
-lawkit normal measurements.csv --quality-control --spec-limits "10,20"
+lawkit normal measurements.csv --quality-control --spec-limits 10,20
 ```
 
 ### `lawkit poisson` - Poisson Distribution Analysis
@@ -145,9 +144,8 @@ lawkit poisson [OPTIONS] [INPUT]
 #### Specific Options
 - `--test <TYPE>` - Poisson test: chi-square, ks, variance, all (default: all)
 - `--predict` - Enable event probability prediction
-- `--max-events <COUNT>` - Maximum events for prediction (default: 10)
+- `--max-events <COUNT>` - Maximum events for prediction (default: 20)
 - `--rare-events` - Enable rare event analysis
-- `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
 
 #### Examples
 ```bash
@@ -218,16 +216,32 @@ lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
 
 ## Integration Commands
 
-### `lawkit compare` - Multi-Law Analysis
+### `lawkit analyze` - Multi-Law Analysis
 
-Compare and integrate multiple statistical laws for comprehensive analysis.
+Perform basic multi-law analysis with recommendations for comprehensive data assessment.
 
 ```bash
-lawkit compare [OPTIONS] [INPUT]
+lawkit analyze [OPTIONS] [INPUT]
+```
+
+### `lawkit validate` - Data Validation
+
+Validate data consistency and quality across multiple statistical patterns.
+
+```bash
+lawkit validate [OPTIONS] [INPUT]
+```
+
+### `lawkit diagnose` - Conflict Detection
+
+Detect conflicts and provide detailed diagnostics between statistical law results.
+
+```bash
+lawkit diagnose [OPTIONS] [INPUT]
 ```
 
 #### Options
-- `--laws <LAWS>` - Specific laws to compare: benf,pareto,zipf,normal,poisson
+- `--laws <LAWS>` - Specific laws to analyze: benf,pareto,zipf,normal,poisson
 - `--focus <FOCUS>` - Analysis focus: quality, concentration, distribution, anomaly
 - `--threshold <THRESHOLD>` - Conflict detection threshold: 0.0-1.0 (default: 0.5)
 - `--recommend` - Enable optimal law recommendation mode
@@ -240,16 +254,16 @@ lawkit compare [OPTIONS] [INPUT]
 #### Examples
 ```bash
 # Compare all laws
-lawkit compare data.csv
+lawkit analyze data.csv
 
 # Focus on fraud detection
-lawkit compare transactions.csv --purpose fraud --recommend
+lawkit analyze transactions.csv --purpose fraud --recommend
 
 # Conflict analysis
-lawkit compare data.csv --report conflicting --threshold 0.7
+lawkit analyze data.csv --report conflicting --threshold 0.7
 
 # Custom law selection
-lawkit compare data.csv --laws benf,normal --focus quality
+lawkit analyze data.csv --laws benf,normal --focus quality
 ```
 
 ## Common Options
@@ -261,15 +275,11 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
-- `--language <LANG>` - Output language: en, ja, zh, hi, ar, auto
-- `--parallel` - Enable parallel processing
-- `--threads <NUMBER>` - Number of threads for parallel processing (0 = auto)
-- `--chunk-size <SIZE>` - Chunk size for memory-efficient processing (default: 10000)
-- `--streaming` - Enable streaming mode for large datasets
+- `--optimize` - Enable memory and processing optimizations for large datasets
 
 ### Data Processing
 - `--filter <RANGE>` - Number filtering (>=100, <1000, 50-500)
-- `--min-count <NUMBER>` - Minimum data points required
+- `--min-count <NUMBER>` - Minimum data points required (default: 10)
 
 ## Input Formats
 
@@ -328,25 +338,25 @@ data.csv,1000,Low,0.85
 lawkit benf transactions.csv --purpose fraud --threshold high
 
 # Multi-law fraud detection
-lawkit compare suspicious_data.csv --purpose fraud --recommend
+lawkit analyze suspicious_data.csv --purpose fraud --recommend
 ```
 
 ### Data Quality Assessment
 ```bash
 # Comprehensive quality check
-lawkit compare dataset.csv --purpose quality --report detailed
+lawkit analyze dataset.csv --purpose quality --report detailed
 
 # Focus on normality
-lawkit normal dataset.csv --test all --confidence-level 0.99
+lawkit normal dataset.csv --test all
 ```
 
 ### Business Intelligence
 ```bash
 # 80/20 analysis
-lawkit pareto sales.csv --business-analysis --percentiles "80,90,95"
+lawkit pareto sales.csv --business-analysis --percentiles 80,90,95
 
 # Customer analysis
-lawkit zipf customer_frequency.csv --ranking
+lawkit zipf customer_frequency.csv --text
 ```
 
 ### Anomaly Detection

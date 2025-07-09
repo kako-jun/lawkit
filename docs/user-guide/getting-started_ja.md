@@ -45,8 +45,8 @@ lawkit pareto sales.csv --gini
 # テキストファイルの分析
 lawkit zipf document.txt
 
-# 複数言語対応
-lawkit zipf japanese_text.txt --language ja
+# テキスト分析
+lawkit zipf japanese_text.txt
 
 # 最小出現回数を指定
 lawkit zipf text.txt --min-frequency 5
@@ -88,13 +88,13 @@ lawkit poisson events.csv --forecast 30
 
 ```bash
 # 複数法則の比較
-lawkit compare data.csv --laws benford,pareto,normal
+lawkit analyze data.csv --laws benford,pareto,normal
 
 # 矛盾検出
-lawkit compare data.csv --laws all --detect-conflicts
+lawkit analyze data.csv --laws all --detect-conflicts
 
 # 推奨システム
-lawkit compare data.csv --recommend
+lawkit analyze data.csv --recommend
 ```
 
 ## サンプルデータでの実習
@@ -153,20 +153,20 @@ lawkit benf data.csv --output xml
 lawkitは以下の言語に対応しています：
 
 ```bash
-# 日本語
-lawkit benf data.csv --language ja
+# 英語出力（デフォルト統一）
+lawkit benf data.csv
 
-# 英語（デフォルト）
-lawkit benf data.csv --language en
+# 日本語数字は自動認識されます
+echo "１２３４５６ ７８９０" | lawkit benf
 
-# 中国語
-lawkit benf data.csv --language zh
+# 中国語数字も自動認識されます
+echo "一千二百三十四" | lawkit benf
 
-# ヒンディー語
-lawkit benf data.csv --language hi
+# 中国語繁体字（旧字体）金融数字も対応
+echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 
-# アラビア語
-lawkit benf data.csv --language ar
+# 日本語漢数字も自動認識
+echo "五万六千七百八十九" | lawkit benf
 ```
 
 ## 高度な機能
@@ -188,7 +188,7 @@ lawkit pareto sales.csv --threshold 0.95
 lawkit benf large_data.csv --sample-size 10000
 
 # 並列処理のスレッド数指定
-lawkit compare data.csv --threads 4
+lawkit analyze data.csv --optimize
 ```
 
 ## よく使われるワークフロー
@@ -196,7 +196,7 @@ lawkit compare data.csv --threads 4
 ### 1. データ品質チェック
 ```bash
 # 総合的なデータ品質評価
-lawkit compare financial_data.csv --laws benford,normal --detect-conflicts
+lawkit analyze financial_data.csv --laws benford,normal --detect-conflicts
 ```
 
 ### 2. 不正検知パイプライン
@@ -214,7 +214,7 @@ lawkit normal suspicious_data.csv --outliers
 lawkit pareto monthly_sales.csv --gini
 
 # 顧客分析
-lawkit zipf customer_feedback.txt --language ja
+lawkit zipf customer_feedback.txt
 ```
 
 ## 次のステップ

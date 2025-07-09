@@ -24,7 +24,7 @@ lawkit benf data.csv
 lawkit pareto sales.csv
 
 # 複数法則比較
-lawkit compare data.csv --laws benford,pareto,normal
+lawkit analyze data.csv --laws benford,pareto,normal
 ```
 
 ## ドキュメント
@@ -39,6 +39,7 @@ lawkit compare data.csv --laws benford,pareto,normal
 - [CLIリファレンス](reference/cli-reference_ja.md)
 
 ### ガイド
+- [アーキテクチャガイド](guides/architecture_ja.md) - システム設計とアーキテクチャ概要
 - [統合機能](guides/integrations_ja.md)
 - [パフォーマンス](guides/performance_ja.md)
 

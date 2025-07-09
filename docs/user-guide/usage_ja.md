@@ -28,13 +28,13 @@ lawkit <サブコマンド> [オプション] <入力>
 - `zipf` - ジップ法則分析
 - `normal` - 正規分布分析
 - `poisson` - ポアソン分布分析
-- `compare` - 複数法則統合分析
+- `analyze` - 複数法則統合分析
 - `list` - 利用可能な統計法則一覧
 
 ### 共通オプション
 
 - `--format <フォーマット>` - 出力形式 (text, json, csv, yaml, toml, xml)
-- `--lang <言語>` - 出力言語 (en, ja, zh, hi, ar, auto)
+- `--optimize` - 最適化モード有効化 (true/false)
 - `--quiet` - 最小限の出力
 - `--verbose` - 詳細分析
 - `--filter <範囲>` - データの範囲フィルタ
@@ -96,7 +96,7 @@ lawkit zipf --text document.txt
 lawkit zipf --verbose city_populations.csv
 
 # 多言語テキスト分析
-lawkit zipf --text --lang ja japanese_text.txt
+lawkit zipf --text japanese_text.txt --optimize
 ```
 
 **使用例:**
@@ -231,7 +231,7 @@ lawkit normal --format yaml data.csv
 lawkit poisson --format toml data.csv
 
 # XML形式（エンタープライズ統合）
-lawkit compare --format xml data.csv
+lawkit analyze --format xml data.csv
 ```
 
 ## フィルタリングと閾値
@@ -290,15 +290,11 @@ lawkit benf --min-count 100 data.csv
 ### 言語選択
 
 ```bash
-# 自動検出（デフォルト）
-lawkit benf --lang auto data.csv
+# 最適化モード（デフォルト）
+lawkit benf data.csv --optimize
 
-# 特定言語
-lawkit benf --lang en data.csv    # 英語
-lawkit benf --lang ja data.csv    # 日本語
-lawkit benf --lang zh data.csv    # 中国語
-lawkit benf --lang hi data.csv    # ヒンディー語
-lawkit benf --lang ar data.csv    # アラビア語
+# 最適化モード
+lawkit benf data.csv --optimize    # 高速処理有効化
 ```
 
 ### 国際数字
@@ -306,8 +302,8 @@ lawkit benf --lang ar data.csv    # アラビア語
 lawkitは国際数字形式を自動認識します：
 
 - **英語**: `1,234.56`, `1234.56`
-- **日本語**: `１，２３４．５６`, `1,234.56`, `一千二百三十四`
-- **中国語**: `1,234.56`, `一千二百三十四`
+- **日本語**: `１，２３４．５６`, `1,234.56`, `一千二百三十四`, `五万六千七百八十九`
+- **中国語**: `1,234.56`, `一千二百三十四`, `壹萬貳仟參佰肆拾伍` (繁体字金融数字)
 - **ヒンディー語**: `१,२३४.५६`, `1,234.56`
 - **アラビア語**: `١٬٢٣٤٫٥٦`, `1,234.56`
 
@@ -317,16 +313,16 @@ lawkitは国際数字形式を自動認識します：
 
 ```bash
 # 2つの法則を比較
-lawkit compare --laws benf,pareto data.csv
+lawkit analyze --laws benf,pareto data.csv
 
 # 適用可能なすべての法則を比較
-lawkit compare --laws all data.csv
+lawkit analyze --laws all data.csv
 
 # 推奨付き詳細比較
-lawkit compare --laws benf,pareto,normal --verbose data.csv
+lawkit analyze --laws benf,pareto,normal --verbose data.csv
 
 # JSON形式で出力
-lawkit compare --laws all --format json data.csv
+lawkit analyze --laws all --format json data.csv
 ```
 
 ### 統合機能
@@ -402,7 +398,7 @@ lawkit poisson --predict --max-events 20 incidents.csv
 lawkit zipf --text document.txt
 
 # 多言語テキスト処理
-lawkit zipf --text --lang ja japanese_document.txt
+lawkit zipf --text japanese_document.txt --optimize
 ```
 
 ## 使用例別
@@ -417,7 +413,7 @@ lawkit benf --filter ">=100" --threshold high transactions.csv
 lawkit pareto --verbose --format json daily_volumes.csv
 
 # 多法則比較
-lawkit compare --laws benf,pareto financial_data.csv
+lawkit analyze --laws benf,pareto financial_data.csv
 ```
 
 ### 品質管理
@@ -440,7 +436,7 @@ lawkit poisson --verbose --test all defect_counts.csv
 lawkit zipf --text --verbose document.txt
 
 # 多言語文書分析
-lawkit zipf --text --lang auto multilingual_doc.txt
+lawkit zipf --text multilingual_doc.txt --optimize
 ```
 
 ### ビジネスインテリジェンス
@@ -453,7 +449,7 @@ lawkit pareto --verbose customer_revenue.csv
 lawkit poisson --predict --rare-events incident_reports.csv
 
 # 包括的ビジネスデータ分析
-lawkit compare --laws pareto,normal,poisson --verbose business_metrics.csv
+lawkit analyze --laws pareto,normal,poisson --verbose business_metrics.csv
 ```
 
 ## エラーハンドリング

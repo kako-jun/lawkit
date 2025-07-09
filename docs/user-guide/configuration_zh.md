@@ -19,10 +19,6 @@
 --min-count <N>      # 分析所需的最小数据点数
 
 # 性能选项
---parallel           # 启用并行处理
---threads <N>        # 线程数（默认：CPU核心数）
---streaming          # 流式处理大文件
---chunk-size <N>     # 块大小（默认：10000）
 --optimize           # 启用性能优化模式
 ```
 
@@ -66,7 +62,7 @@
 --vocabulary-size <N> # 词汇表大小
 ```
 
-#### 比较分析 (compare)
+#### 多法则分析 (analyze)
 ```bash
 --laws <LIST>        # 指定要比较的法则 (例如: benf,pareto,normal)
 --recommend          # 显示分析建议
@@ -80,8 +76,8 @@
 # 设置默认输出格式
 export LAWKIT_FORMAT=json
 
-# 设置默认并行度
-export LAWKIT_THREADS=8
+# 启用默认优化模式
+export LAWKIT_OPTIMIZE=true
 
 # 启用调试模式
 export LAWKIT_DEBUG=1
@@ -101,8 +97,7 @@ lawkit支持YAML格式的配置文件：
 default:
   format: json
   verbose: true
-  parallel: true
-  threads: 8
+  optimize: true
 
 benf:
   threshold: medium
@@ -117,7 +112,7 @@ normal:
   outlier_method: ensemble
   quality_control: true
 
-compare:
+analyze:
   recommend: true
   conflict_detection: true
 ```
@@ -140,24 +135,15 @@ lawkit benf data.csv --format csv  # 覆盖配置文件中的json设置
 ### 内存优化
 
 ```bash
-# 大文件流式处理
-lawkit benf huge_file.csv --streaming --chunk-size 50000
-
-# 内存使用限制
-lawkit compare data.csv --memory-limit 1GB
+# 大文件性能优化
+lawkit benf huge_file.csv --optimize
 ```
 
 ### 并行处理
 
 ```bash
-# 自动检测CPU核心数
-lawkit compare data.csv --parallel
-
-# 手动设置线程数
-lawkit compare data.csv --parallel --threads 16
-
-# 负载均衡
-lawkit compare *.csv --parallel --load-balance
+# 性能优化模式
+lawkit analyze data.csv --optimize
 ```
 
 ### 缓存设置
@@ -254,20 +240,14 @@ lawkit benf data.csv --memory-monitor
 
 #### 内存不足
 ```bash
-# 减少块大小
-lawkit benf large_file.csv --chunk-size 1000
-
-# 启用流式处理
-lawkit benf large_file.csv --streaming
+# 性能优化处理
+lawkit benf large_file.csv --optimize
 ```
 
 #### 性能问题
 ```bash
-# 减少线程数
-lawkit compare data.csv --threads 2
-
-# 禁用并行处理
-lawkit compare data.csv --no-parallel
+# 性能优化模式
+lawkit analyze data.csv --optimize
 ```
 
 ## 下一步
