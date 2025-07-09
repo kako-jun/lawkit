@@ -321,8 +321,8 @@ lawkit validate --laws all inventory.json --format yaml
 lawkit diagnose --laws benf,zipf document.txt --format json
 
 # 生成测试数据
-lawkit generate pareto --size 1000 > test_data.txt
-lawkit generate normal --mean 100 --std 15 --size 500
+lawkit generate pareto --samples 1000 > test_data.txt
+lawkit generate normal --mean 100 --stddev 15 --samples 500
 
 # 内置时间序列分析
 lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12

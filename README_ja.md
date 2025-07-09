@@ -336,7 +336,7 @@ Conflicts:
 
 # テストデータ生成
 lawkit generate pareto --samples 1000 > test_data.txt
-lawkit generate normal --mean 100 --std 15 --size 500
+lawkit generate normal --mean 100 --stddev 15 --samples 500
 
 # 内蔵時系列分析
 lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
