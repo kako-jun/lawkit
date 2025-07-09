@@ -1,4 +1,5 @@
 use crate::error::Result;
+use diffx_core::{diff, DiffResult};
 
 /// 時系列データポイント
 #[derive(Debug, Clone)]
@@ -244,6 +245,24 @@ fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangeP
             .sum::<f64>()
             / after_window.len() as f64;
 
+        // diffx-coreを使用した詳細な統計構造比較
+        let before_stats = serde_json::json!({
+            "mean": before_mean,
+            "variance": before_var,
+            "std_dev": before_var.sqrt(),
+            "cv": if before_mean.abs() > 0.0 { before_var.sqrt() / before_mean.abs() } else { 0.0 }
+        });
+
+        let after_stats = serde_json::json!({
+            "mean": after_mean,
+            "variance": after_var,
+            "std_dev": after_var.sqrt(),
+            "cv": if after_mean.abs() > 0.0 { after_var.sqrt() / after_mean.abs() } else { 0.0 }
+        });
+
+        // diffx-coreで構造的差分を検出
+        let diff_results = diff(&before_stats, &after_stats, None, Some(0.1), None);
+        
         // 平均の変化を検出
         let mean_change = (after_mean - before_mean).abs();
         let pooled_std = ((before_var + after_var) / 2.0).sqrt();
@@ -251,18 +270,31 @@ fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangeP
         if pooled_std > 0.0 {
             let significance = mean_change / pooled_std;
 
-            if significance > 2.0 {
-                // 閾値
-                let change_type = if (after_var / before_var).max(before_var / after_var) > 2.0 {
-                    ChangeType::VarianceChange
-                } else {
-                    ChangeType::LevelShift
-                };
+            // diffx-coreの差分情報を活用した変化タイプの精密判定
+            let mut change_type = ChangeType::LevelShift;
+            let mut max_change_ratio = 0.0;
 
+            for diff_result in &diff_results {
+                if let DiffResult::Modified(path, old_val, new_val) = diff_result {
+                    if path.contains("variance") || path.contains("std_dev") {
+                        if let (Some(old), Some(new)) = (old_val.as_f64(), new_val.as_f64()) {
+                            let ratio = (new / old.max(0.001)).max(old / new.max(0.001));
+                            if ratio > max_change_ratio {
+                                max_change_ratio = ratio;
+                                if ratio > 2.0 {
+                                    change_type = ChangeType::VarianceChange;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if significance > 2.0 || max_change_ratio > 2.0 {
                 changepoints.push(ChangePoint {
                     timestamp: timestamps[i],
                     index: i,
-                    significance,
+                    significance: significance.max(max_change_ratio),
                     change_type,
                     before_value: before_mean,
                     after_value: after_mean,
