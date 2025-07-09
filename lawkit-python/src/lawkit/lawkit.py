@@ -45,6 +45,17 @@ class LawkitOptions:
     business_analysis: bool = False
     concentration: Optional[float] = None
     
+    # Benford-specific options
+    threshold_level: Optional[str] = None  # "low", "medium", "high", "critical", "auto"
+    
+    # Generate-specific options
+    samples: Optional[int] = None
+    seed: Optional[int] = None
+    output_file: Optional[str] = None
+    fraud_rate: Optional[float] = None
+    range: Optional[str] = None  # "1,100000"
+    scale: Optional[float] = None
+    
     # Statistical options
     test_type: Optional[str] = None
     alpha: Optional[float] = None
