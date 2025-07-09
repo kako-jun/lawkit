@@ -88,6 +88,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        # Check if release already exists
+        if gh release view ${{ github.event.inputs.tag }} >/dev/null 2>&1; then
+          echo "Release ${{ github.event.inputs.tag }} already exists, deleting..."
+          gh release delete ${{ github.event.inputs.tag }} --yes
+        fi
+        
+        # Create new release
         gh release create ${{ github.event.inputs.tag }} \
           --title "Release ${{ github.event.inputs.tag }}" \
           --notes "Release ${{ github.event.inputs.tag }}" \
@@ -98,6 +105,7 @@ jobs:
           if [ -d "$dir" ]; then
             for file in "$dir"*; do
               if [ -f "$file" ]; then
+                echo "Uploading $file..."
                 gh release upload ${{ github.event.inputs.tag }} "$file"
               fi
             done
