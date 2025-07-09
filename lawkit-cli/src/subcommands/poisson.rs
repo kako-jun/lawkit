@@ -399,7 +399,10 @@ fn print_poisson_interpretation(result: &PoissonResult) {
 
     match result.distribution_assessment {
         PoissonAssessment::Excellent => {
-            println!("{}", colors::level_pass("Excellent Poisson distribution fit"));
+            println!(
+                "{}",
+                colors::level_pass("Excellent Poisson distribution fit")
+            );
             println!("   Data closely follows Poisson distribution");
         }
         PoissonAssessment::Good => {
