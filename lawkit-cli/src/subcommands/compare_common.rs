@@ -560,9 +560,9 @@ fn get_text(key: &str, _lang: &str) -> String {
 
 fn get_law_name(law: &str, _lang: &str) -> String {
     match law {
-        "benf" => "Benford's Law",
+        "benf" => "Benford Law",
         "pareto" => "Pareto Principle",
-        "zipf" => "Zipf's Law",
+        "zipf" => "Zipf Law",
         "normal" => "Normal Distribution",
         "poisson" => "Poisson Distribution",
         _ => law,

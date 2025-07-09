@@ -7,6 +7,18 @@ use crate::laws::zipf::ZipfResult;
 use diffx_core::{diff, DiffResult};
 use std::collections::HashMap;
 
+/// 法則名を短縮形からフルネーム（アポストロフィなし）に変換
+fn get_law_display_name(law: &str) -> &str {
+    match law {
+        "benf" => "Benford Law",
+        "pareto" => "Pareto Principle",
+        "zipf" => "Zipf Law",
+        "normal" => "Normal Distribution",
+        "poisson" => "Poisson Distribution",
+        _ => law,
+    }
+}
+
 /// 統合分析結果
 #[derive(Debug, Clone)]
 pub struct IntegrationResult {
@@ -360,14 +372,16 @@ impl IntegrationResult {
                                     laws_involved: vec![law_name.to_string()],
                                     conflict_score: deviation.min(1.0),
                                     description: format!(
-                                        "Law '{}' score ({:.3}) significantly deviates from expected ({:.3}) - deviation: {:.1}%",
-                                        law_name, actual, expected, deviation * 100.0
+                                        "{} score {:.3} significantly deviates from expected {:.3} - deviation {:.1}%",
+                                        get_law_display_name(law_name), actual, expected, deviation * 100.0
                                     ),
                                     likely_cause: format!(
-                                        "Law '{law_name}' may not be compatible with the data pattern"
+                                        "{} may not be compatible with the data pattern",
+                                        get_law_display_name(law_name)
                                     ),
                                     resolution_suggestion: format!(
-                                        "Please review application conditions and data quality for law '{law_name}'"
+                                        "Please review application conditions and data quality for {}",
+                                        get_law_display_name(law_name)
                                     ),
                                 };
                                 self.conflicts.push(conflict);
@@ -382,7 +396,8 @@ impl IntegrationResult {
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.5,
                             description: format!(
-                                "Unexpected change detected for law '{law_name}'"
+                                "Unexpected change detected for {}",
+                                get_law_display_name(law_name)
                             ),
                             likely_cause: "Analysis configuration or law selection inconsistency".to_string(),
                             resolution_suggestion: "Please verify the analysis target law settings"
@@ -397,7 +412,7 @@ impl IntegrationResult {
                             conflict_type: ConflictType::MethodologicalConflict,
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.8,
-                            description: format!("Score type changed for law '{law_name}'"),
+                            description: format!("Score type changed for {}", get_law_display_name(law_name)),
                             likely_cause: "Internal analysis error or data corruption".to_string(),
                             resolution_suggestion: "Please re-run the analysis".to_string(),
                         };
@@ -498,7 +513,7 @@ impl IntegrationResult {
         // diffx-coreの差分情報から詳細な説明を生成
         let mut detailed_description = format!(
             "{} and {} show significantly different evaluations (difference: {:.3})",
-            law_a, law_b, (score_a - score_b).abs()
+            get_law_display_name(&law_a), get_law_display_name(&law_b), (score_a - score_b).abs()
         );
 
         if !diff_results.is_empty() {
@@ -623,8 +638,8 @@ impl IntegrationResult {
         let conflict_type = self.classify_conflict_type(&law_a, &law_b);
         let description = format!(
             "{} and {} show significantly different evaluations (difference: {:.3})",
-            law_a,
-            law_b,
+            get_law_display_name(&law_a),
+            get_law_display_name(&law_b),
             (score_a - score_b).abs()
         );
         let likely_cause = self.diagnose_conflict_cause(&law_a, &law_b, score_a, score_b);
