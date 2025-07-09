@@ -26,17 +26,15 @@ Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
-Chi-square: 12.834
-p-value: 0.117
-Attention: PASS
+LOW: Dataset analysis
 
 # 生成帕累托分布数据
 $ lawkit generate pareto --samples 100 | head -5
-4.312
-1.827
-12.543
-2.156
-6.789
+5.48
+1.03
+1.04
+1.42
+1.61
 
 # 全面的多法则比较
 $ lawkit analyze --laws all data.csv
@@ -47,24 +45,24 @@ Numbers analyzed: 1000
 Laws executed: 5 (benford, pareto, zipf, normal, poisson)
 
 Integration Metrics:
-  Overall Quality: 0.743
-  Consistency: 0.823
+  Overall Quality Score: 0.743
+  Consistency Score: 0.823
   Conflicts Detected: 2
   Recommendation Confidence: 0.892
 
 Law Results:
   Benford Law: 0.652
-  Pareto Analysis: 0.845
+  Pareto Principle: 0.845
   Zipf Law: 0.423
   Normal Distribution: 0.912
   Poisson Distribution: 0.634
 
 Conflicts:
-  ⚠️ Benford and Zipf laws show conflicting patterns
-     Cause: Different distribution assumptions
+  CONFLICT: Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
+     Likely Cause: Different distribution assumptions
      Suggestion: Focus on Zipf analysis for frequency data
 
-Risk Assessment: MEDIUM (Score: 0.743)
+Risk Assessment: MEDIUM
 
 # 一致性检查的数据验证
 $ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
@@ -80,9 +78,9 @@ Validation Results:
   Statistical Reliability: HIGH
 
 Individual Law Validation:
-  ✅ Benford Law: PASSED (Score: 0.834, p-value: 0.023)
-  ✅ Pareto Analysis: PASSED (Gini: 0.78, Alpha: 2.12)
-  ⚠️ Normal Distribution: MARGINAL (Shapiro-Wilk: 0.032)
+  PASS: Benford Law validation (Score: 0.834, p-value: 0.023)
+  PASS: Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
+  WARNING: Normal Distribution validation (Shapiro-Wilk: 0.032)
 
 Consistency Analysis:
   Benford-Pareto Agreement: 0.912 (HIGH)

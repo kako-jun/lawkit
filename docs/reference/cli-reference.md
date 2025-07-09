@@ -16,11 +16,11 @@ List all available statistical laws and their descriptions.
 ```bash
 $ lawkit list
 Available statistical laws:
-  benf    - Benford's law analysis
-  pareto  - Pareto principle (80/20 rule) analysis
-  zipf    - Zipf's law analysis
-  normal  - Normal distribution analysis
-  poisson - Poisson distribution analysis
+  benf    - Benford Law analysis
+  pareto  - Pareto Principle (80/20 rule) analysis
+  zipf    - Zipf Law analysis
+  normal  - Normal Distribution analysis
+  poisson - Poisson Distribution analysis
 
 Integration commands:
   analyze  - Multi-law basic analysis and recommendations
@@ -30,9 +30,9 @@ Integration commands:
 
 ## Statistical Law Commands
 
-### `lawkit benf` - Benford's Law Analysis
+### `lawkit benf` - Benford Law Analysis
 
-Detect anomalies and assess data quality using Benford's Law.
+Detect anomalies and assess data quality using Benford Law.
 
 ```bash
 lawkit benf [OPTIONS] [INPUT]
@@ -80,7 +80,7 @@ lawkit pareto sales.csv --business-analysis
 lawkit pareto data.csv --percentiles 70,80,90
 ```
 
-### `lawkit zipf` - Zipf's Law Analysis
+### `lawkit zipf` - Zipf Law Analysis
 
 Analyze frequency distributions and ranking patterns.
 

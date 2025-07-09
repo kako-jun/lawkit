@@ -20,22 +20,35 @@ Traditional tools analyze one pattern at a time. lawkit analyzes multiple statis
 Designed for modern automation with JSON, CSV, and other structured outputs that work perfectly with AI tools and automated workflows. Ideal for fraud detection, data quality checks, and business intelligence.
 
 ```bash
-# Single law analysis - Benford's Law for fraud detection
+# Single law analysis - Benford Law for fraud detection
 $ lawkit benf financial_data.csv
 Benford Law Analysis Results
-Dataset: financial_data.csv, Numbers analyzed: 2500
-Chi-square: 12.834, p-value: 0.117, Attention: PASS
+
+Dataset: financial_data.csv
+Numbers analyzed: 2500
+LOW: Dataset analysis
 
 # Generate test data following statistical laws
-$ lawkit generate pareto --size 100 | head -5
-4.312
-1.827
-12.543
+$ lawkit generate pareto --samples 100 | head -5
+5.48
+1.03
+1.04
+1.42
+1.61
 
 # Multi-law analysis with smart integration
 $ lawkit analyze --laws all data.csv
-Overall Quality: 0.743, Consistency: 0.823, Conflicts: 2
-Risk Assessment: MEDIUM
+Statistical Laws Integration Analysis
+
+Dataset: data.csv
+Numbers Analyzed: 1000
+Laws Executed: 5 (benf, pareto, zipf, normal, poisson)
+
+Integration Metrics:
+  Overall Quality Score: 0.743
+  Consistency Score: 0.823
+  Conflicts Detected: 2
+  Recommendation Confidence: 0.892
 ```
 
 ## ✨ Key Features
@@ -65,9 +78,9 @@ $ lawkit analyze data.csv     # Multi-law analysis: ~850ms
 graph TB
     A[📄 Input Data<br/>CSV, JSON, Excel, PDF...] --> B[🔍 Parse & Validate<br/>5 Language Support]
     
-    B --> C1[🕵️ Benford's Law<br/>Fraud Detection]
+    B --> C1[🕵️ Benford Law<br/>Fraud Detection]
     B --> C2[📊 Pareto Analysis<br/>80/20 Rule]
-    B --> C3[🔤 Zipf's Law<br/>Frequency Analysis]
+    B --> C3[🔤 Zipf Law<br/>Frequency Analysis]
     B --> C4[📈 Normal Distribution<br/>Quality Control]
     B --> C5[⚡ Poisson Distribution<br/>Rare Events]
     
@@ -125,7 +138,7 @@ lawkit looks at your data from multiple angles at once, then combines what it fi
 
 ### Supported Statistical Laws
 
-#### 🕵️ Benford's Law - Fraud Detection
+#### 🕵️ Benford Law - Fraud Detection
 The first digit of naturally occurring numbers follows a specific distribution (1 appears ~30%, 2 appears ~18%, etc.). Deviations often indicate data manipulation, making it invaluable for:
 - **Financial auditing**: Detecting manipulated accounting records
 - **Election monitoring**: Identifying vote count irregularities  
@@ -139,7 +152,7 @@ The famous "80/20 rule" where 80% of effects come from 20% of causes. Essential 
 - **Quality management**: Finding the few defects causing most problems
 - **Wealth distribution analysis**: Understanding economic inequality patterns
 
-#### 🔤 Zipf's Law - Frequency Power Laws
+#### 🔤 Zipf Law - Frequency Power Laws
 Word frequencies follow a predictable pattern where the nth most common word appears 1/n as often as the most common word. Useful for:
 - **Content analysis**: Analyzing text patterns and authenticity
 - **Market research**: Understanding brand mention distributions
@@ -249,17 +262,17 @@ Integration Metrics:
 
 Law Results:
   Benford Law: 0.652
-  Pareto Analysis: 0.845
+  Pareto Principle: 0.845
   Zipf Law: 0.423
   Normal Distribution: 0.912
   Poisson Distribution: 0.634
 
 Conflicts:
-  ⚠️ Benford and Zipf laws show conflicting patterns
-     Cause: Different distribution assumptions
+  CONFLICT: Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
+     Likely Cause: Different distribution assumptions
      Suggestion: Focus on Zipf analysis for frequency data
 
-Risk Assessment: MEDIUM (Score: 0.743)
+Risk Assessment: MEDIUM
 
 # Stage 2: Data validation with consistency checks
 $ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
@@ -275,9 +288,9 @@ Validation Results:
   Statistical Reliability: HIGH
 
 Individual Law Validation:
-  ✅ Benford Law: PASSED (Score: 0.834, p-value: 0.023)
-  ✅ Pareto Analysis: PASSED (Gini: 0.78, Alpha: 2.12)
-  ⚠️ Normal Distribution: MARGINAL (Shapiro-Wilk: 0.032)
+  PASS: Benford Law validation (Score: 0.834, p-value: 0.023)
+  PASS: Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
+  WARNING: Normal Distribution validation (Shapiro-Wilk: 0.032)
 
 Consistency Analysis:
   Benford-Pareto Agreement: 0.912 (HIGH)
@@ -294,30 +307,30 @@ Dataset: suspicious_data.csv
 Numbers analyzed: 1500
 Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
 
-⚠️ CONFLICTS DETECTED: 3 Critical Issues
+CONFLICT: 3 Critical Issues Detected
 
 Critical Conflict #1: Score Deviation
-  Laws: Benford vs Normal Distribution
+  Laws: Benford Law vs Normal Distribution
   Conflict Score: 0.847 (HIGH)
-  Description: Benford and Normal Distribution show significantly different 
+  Description: Benford Law and Normal Distribution show significantly different 
               evaluations (difference: 0.623) with structural differences in: 
               confidence_level ("high" → "low"), score_category ("good" → "poor")
-  Root Cause: Benford indicates potential data manipulation while Normal 
+  Root Cause: Benford Law indicates potential data manipulation while Normal 
              suggests legitimate natural distribution pattern
   Resolution: Investigate data source integrity; consider temporal analysis 
              to identify manipulation periods
 
 Critical Conflict #2: Distribution Mismatch  
-  Laws: Pareto vs Poisson Distribution
+  Laws: Pareto Principle vs Poisson Distribution
   Conflict Score: 0.793 (HIGH)
   Description: Power law distribution conflicts with discrete event modeling
   Root Cause: Data contains mixed patterns (continuous wealth distribution 
              and discrete event counts)
-  Resolution: Segment data by type before analysis; apply Pareto to amounts, 
-             Poisson to frequencies
+  Resolution: Segment data by type before analysis; apply Pareto Principle to amounts, 
+             Poisson Distribution to frequencies
 
 Critical Conflict #3: Methodological Conflict
-  Laws: Zipf vs Normal Distribution  
+  Laws: Zipf Law vs Normal Distribution  
   Conflict Score: 0.651 (MEDIUM)
   Description: Frequency-based analysis conflicts with continuous distribution
   Root Cause: Dataset may contain both textual frequency data and numerical measurements
