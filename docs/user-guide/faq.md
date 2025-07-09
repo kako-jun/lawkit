@@ -95,11 +95,6 @@ Minimum requirements vary by statistical law:
 - **Normal Distribution**: 8+ points (recommended: 30+)
 - **Poisson Distribution**: 10+ points (recommended: 50+)
 
-You can adjust minimums with `--min-count`:
-```bash
-lawkit benf --min-count 100 data.csv
-```
-
 ### What does the risk assessment mean?
 
 lawkit categorizes results into risk levels:
@@ -139,20 +134,16 @@ Benford Law is ideal for:
 **Zipf Law (Power-law Distribution):**
 - Focuses on frequency distributions
 - Analyzes rank-frequency relationships
-- Supports text analysis and word frequencies
+- Supports numerical data analysis
 - Best for: linguistic analysis, city populations, website traffic
 
 ### How accurate is the normal distribution testing?
 
-lawkit implements multiple normality tests:
-- **Shapiro-Wilk**: Most powerful for small samples (n < 50)
-- **Anderson-Darling**: Good for moderate samples
-- **Kolmogorov-Smirnov**: General purpose, less powerful
-
-Use `--test all` to run all tests:
-```bash
-lawkit normal --test all data.csv
-```
+lawkit implements normality testing with statistical validation. The analysis provides:
+- Statistical measures for normality assessment
+- Confidence intervals and significance testing
+- Outlier detection capabilities
+- Quality control metrics
 
 ### What does Poisson distribution analysis tell me?
 
@@ -164,9 +155,9 @@ Poisson analysis is useful for:
 
 The analysis provides:
 - Lambda parameter (average rate)
-- Goodness-of-fit testing
-- Event probability predictions
-- Rare event assessment
+- Statistical validation
+- Event probability assessment
+- Quality metrics
 
 ## International and Language Support
 
@@ -183,18 +174,7 @@ echo "१,२३४.५६" | lawkit benf    # Hindi numbers (auto-detected)
 
 ### Can I analyze text in non-English languages?
 
-Yes! lawkit supports Unicode text analysis with automatic language detection:
-
-```bash
-# Japanese text analysis (automatic language detection)
-lawkit zipf --text japanese_document.txt
-
-# Chinese text analysis (automatic language detection)
-lawkit zipf --text chinese_text.txt
-
-# Multilingual documents (automatic language detection)
-lawkit zipf --text multilingual_doc.txt
-```
+Yes! lawkit supports Unicode text analysis with automatic language detection for international number formats in input data.
 
 ### What languages does lawkit support?
 
@@ -222,6 +202,9 @@ lawkit analyze --laws benf,pareto data.csv
 
 # Analyze with all applicable laws
 lawkit analyze --laws all data.csv
+
+# Get recommendations
+lawkit analyze --laws all --recommend data.csv
 ```
 
 Features include:
@@ -260,11 +243,8 @@ See our [Integration Guide](../guides/integrations.md) for examples with:
 # Use quiet mode for faster processing
 lawkit benf --quiet large_data.csv
 
-# Filter data to reduce size
-lawkit benf --filter ">=1000" large_data.csv
-
-# Use appropriate minimum counts
-lawkit benf --min-count 1000 large_data.csv
+# Use appropriate thresholds
+lawkit benf --threshold medium large_data.csv
 
 # Choose efficient output formats
 lawkit benf --format json large_data.csv  # Faster than text
@@ -277,9 +257,6 @@ This error occurs when your dataset doesn't meet minimum requirements:
 ```bash
 # Check your data size
 wc -l data.csv
-
-# Reduce minimum count requirement
-lawkit benf --min-count 5 small_data.csv
 
 # Use appropriate law for your data size
 lawkit pareto small_data.csv  # Lower requirements than normal
@@ -320,6 +297,38 @@ while true; do
 done
 ```
 
+## Advanced Usage
+
+### How do I generate test data?
+
+```bash
+# Generate sample data for testing
+lawkit generate --samples 1000 | lawkit benf
+
+# Generate and save to file
+lawkit generate --samples 500 > test_data.csv
+```
+
+### How do I validate data quality?
+
+```bash
+# Validate using multiple laws
+lawkit validate --laws all data.csv
+
+# Focus on specific area
+lawkit validate --laws benf,pareto --focus fraud-detection data.csv
+```
+
+### How do I diagnose data problems?
+
+```bash
+# Diagnose data issues
+lawkit diagnose --laws all data.csv
+
+# Specify analysis purpose
+lawkit diagnose --laws all --purpose quality-assessment data.csv
+```
+
 ## Error Messages
 
 ### "Failed to parse input data"
@@ -350,11 +359,11 @@ This occurs when:
 
 **Solutions:**
 ```bash
-# Try with lower minimum counts
-lawkit analyze --laws all --min-count 5 data.csv
-
 # Check data characteristics
 lawkit analyze --laws all --verbose data.csv
+
+# Try with different thresholds
+lawkit benf --threshold low data.csv
 ```
 
 ### "Permission denied" or "Access denied"
@@ -378,14 +387,14 @@ test -f data.csv && echo "File exists" || echo "File not found"
 - **Documentation**: [docs/](index.md)
 - **Issues**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
-- **Examples**: Check the `tests/fixtures/` directory in the repository
+- **Self-test**: Run `lawkit selftest` to verify installation
 
 ### How do I report a bug?
 
 1. Check existing issues on GitHub
 2. Provide minimal reproduction case
 3. Include system information and lawkit version
-4. Attach sample data if possible (anonymized)
+4. Run `lawkit selftest --verbose` and include output
 
 ### How do I request a new feature?
 

@@ -32,7 +32,7 @@ cargo install lawkit
 
 3. 如果仍有问题，请从源码编译：
    ```bash
-   git clone https://github.com/user/lawkit.git
+   git clone https://github.com/kako-jun/lawkit.git
    cd lawkit
    cargo build --release
    ```
@@ -108,7 +108,7 @@ echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 |------|----------|----------|
 | **本福德定律** | 自然发生的数据 | 财务欺诈检测、选举数据验证 |
 | **帕累托定律** | 集中度分析 | 销售分析、客户价值分析 |
-| **齐夫定律** | 排名/频率数据 | 文本分析、词频统计 |
+| **齐夫定律** | 排名/频率数据 | 数值分布分析、频率统计 |
 | **正态分布** | 质量控制 | 制造业QC、性能监控 |
 | **泊松分布** | 事件发生 | 故障预测、到达率分析 |
 
@@ -132,27 +132,31 @@ echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 **A:** 
 
 ```bash
-# 检查最小数据要求
-lawkit benf small_data.csv --min-count 10
+# 检查数据特征
+lawkit analyze --laws all data.csv
 
-# 如果数据不足，会显示警告
-# 建议：收集更多数据或使用less严格的分析
+# 使用适合小数据量的法则
+lawkit pareto small_data.csv  # 要求较低
 ```
 
 最小数据要求：
-- 本福德定律：推荐100+，最少30
-- 帕累托分析：推荐50+，最少20  
-- 正态分布：推荐30+，最少10
+- 本福德定律：推荐100+，最少5
+- 帕累托分析：推荐20+，最少5  
+- 正态分布：推荐30+，最少8
+- 泊松分布：推荐50+，最少10
 
 ## 性能和优化
 
 ### Q: 分析大文件时内存不足怎么办？
 
-**A:** 使用流式处理：
+**A:** 使用优化处理：
 
 ```bash
-# 启用性能优化
-lawkit benf large_file.csv --optimize
+# 使用静默模式
+lawkit benf --quiet large_file.csv
+
+# 使用合适的阈值
+lawkit benf --threshold medium large_file.csv
 ```
 
 ### Q: 如何加速分析？
@@ -160,11 +164,11 @@ lawkit benf large_file.csv --optimize
 **A:** 几种优化方法：
 
 ```bash
-# 启用优化模式
-lawkit benf data.csv --optimize
-
 # 减少输出详细度
-lawkit benf data.csv --quiet
+lawkit benf --quiet data.csv
+
+# 使用合适的阈值
+lawkit benf --threshold medium data.csv
 
 # 批量处理
 find . -name "*.csv" | xargs -I {} lawkit benf {}
@@ -180,14 +184,14 @@ find . -name "*.csv" | xargs -I {} lawkit benf {}
    head -10 your_file.csv
    ```
 
-2. 启用调试模式：
+2. 启用详细模式：
    ```bash
-   lawkit benf your_file.csv --debug
+   lawkit benf your_file.csv --verbose
    ```
 
-3. 尝试性能优化：
+3. 尝试不同的分析方法：
    ```bash
-   lawkit benf your_file.csv --optimize --verbose
+   lawkit analyze --laws all your_file.csv
    ```
 
 ## 输出和格式
@@ -228,19 +232,14 @@ lawkit benf data.csv --format json | jq -r '"文件: \(.dataset), 风险: \(.ris
 
 **A:** 常见原因和解决方案：
 
-1. **编码问题**：
-   ```bash
-   lawkit benf data.csv --input-encoding utf-8
-   ```
-
-2. **数据格式问题**：
+1. **数据格式问题**：
    ```bash
    # 检查文件内容
    head -5 data.csv
    # 尝试不同的分隔符或格式
    ```
 
-3. **空文件或无效数据**：
+2. **空文件或无效数据**：
    ```bash
    # 检查文件大小
    ls -la data.csv
@@ -269,20 +268,56 @@ lawkit benf ~/temp/your_file.csv
 
 1. **检查数据质量**：
    ```bash
-   lawkit benf data.csv --verbose --debug
+   lawkit benf data.csv --verbose
    ```
 
 2. **使用已知数据测试**：
    ```bash
-   lawkit generate benf --samples 1000 | lawkit benf --verbose
+   lawkit generate --samples 1000 | lawkit benf --verbose
    ```
 
 3. **比较多种方法**：
    ```bash
-   lawkit analyze data.csv --laws all --recommend
+   lawkit analyze --laws all --recommend data.csv
    ```
 
 ## 高级使用
+
+### Q: 如何生成测试数据？
+
+**A:** 
+
+```bash
+# 生成样本数据进行测试
+lawkit generate --samples 1000 | lawkit benf
+
+# 生成并保存到文件
+lawkit generate --samples 500 > test_data.csv
+```
+
+### Q: 如何验证数据质量？
+
+**A:** 
+
+```bash
+# 使用多种法则验证
+lawkit validate --laws all data.csv
+
+# 专注特定领域
+lawkit validate --laws benf,pareto --focus fraud-detection data.csv
+```
+
+### Q: 如何诊断数据问题？
+
+**A:** 
+
+```bash
+# 诊断数据问题
+lawkit diagnose --laws all data.csv
+
+# 指定分析目的
+lawkit diagnose --laws all --purpose quality-assessment data.csv
+```
 
 ### Q: 如何集成到自动化流程中？
 
@@ -364,15 +399,13 @@ pandoc report.md -o report.pdf
    - [使用示例](examples_zh.md)
 
 3. **社区支持**：
-   - [GitHub Issues](https://github.com/user/lawkit/issues)
-   - [讨论区](https://github.com/user/lawkit/discussions)
+   - [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
+   - [讨论区](https://github.com/kako-jun/lawkit/discussions)
 
-4. **报告问题**：
+4. **自检工具**：
    ```bash
-   # 收集诊断信息
-   lawkit --version
+   # 运行自检验证安装
    lawkit selftest --verbose
-   # 在GitHub Issues中提供这些信息
    ```
 
 ### Q: 如何贡献或提出功能请求？
@@ -386,4 +419,4 @@ pandoc report.md -o report.pdf
 
 ---
 
-如果您的问题没有在此列出，请在[GitHub Issues](https://github.com/user/lawkit/issues)中提问，我们会及时回复并将常见问题添加到此FAQ中。
+如果您的问题没有在此列出，请在[GitHub Issues](https://github.com/kako-jun/lawkit/issues)中提问，我们会及时回复并将常见问题添加到此FAQ中。

@@ -24,20 +24,20 @@ lawkit benf data.csv
 lawkit pareto sales_data.json
 
 # Compare multiple laws
-lawkit analyze financial_data.yaml
+lawkit compare financial_data.yaml
 ```
 
 ### Real-World Example
 
 ```bash
 # Analyze financial transactions for fraud detection
-lawkit benf transactions.csv --purpose fraud --verbose
+lawkit benf transactions.csv --threshold high --verbose
 
 # Check sales concentration (80/20 rule)
 lawkit pareto sales.json --business-analysis
 
 # Compare all laws for comprehensive analysis
-lawkit analyze data.csv --report detailed
+lawkit compare data.csv --report detailed
 ```
 
 ## Core Concepts
@@ -51,7 +51,7 @@ Each law provides unique insights:
 - **Event modeling** → Poisson Distribution
 
 ### Integration Analysis
-Use `lawkit analyze` to:
+Use `lawkit compare` to:
 - Run multiple laws simultaneously
 - Detect conflicts between results
 - Get recommendations for best approach

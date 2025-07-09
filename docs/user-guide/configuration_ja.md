@@ -300,12 +300,4 @@ lawkit config path
    ls -la ~/.config/lawkit/config.toml
    ```
 
-### 設定のリセット
-
-```bash
-# ユーザー設定をリセット
-rm ~/.config/lawkit/config.toml
-
-# 設定を初期化
-lawkit config init
-```
+**注意**: このドキュメントに記載されている設定機能の多くは、現在実装されていません。実際に使用できる機能については、`lawkit --help` および各サブコマンドの `--help` を参照してください。

@@ -504,7 +504,7 @@ result = analyzer.analyze_file('financial.csv', law='analyze',
 # 批量分析
 files = ['q1.csv', 'q2.csv', 'q3.csv', 'q4.csv']
 results = analyzer.batch_analyze(files, law='pareto', 
-                                business_analysis=True)
+                                threshold=80)
 ```
 
 ### R
@@ -583,7 +583,7 @@ cat("Risk Level:", result$risk_level, "\n")
 
 # 分析文件
 result <- analyzer$analyze_file("financial.csv", law = "pareto", 
-                               gini_coefficient = TRUE)
+                               threshold = 80)
 
 # 比较多种法则
 comparison <- analyzer$analyze_laws("data.csv", laws = "benf,pareto,normal",
@@ -694,17 +694,16 @@ class LawkitAnalyzer {
     try {
         // 分析文件
         const result = await analyzer.analyzeFile('sales.csv', 'benf', {
-            verbose: true,
-            threshold: 'high'
+            verbose: true
         });
         console.log('Risk Level:', result.risk_level);
         
         // 分析数组数据
         const data = [1234, 5678, 9012, 3456, 7890];
         const arrayResult = await analyzer.analyzeArray(data, 'pareto', {
-            gini_coefficient: true
+            threshold: 80
         });
-        console.log('Concentration:', arrayResult.concentration_80);
+        console.log('Top 20% Share:', arrayResult.top_20_percent_share);
         
         // 批量分析
         const files = ['q1.csv', 'q2.csv', 'q3.csv'];

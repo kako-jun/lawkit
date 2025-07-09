@@ -52,8 +52,8 @@ lawkit --version
 # 运行帮助命令
 lawkit --help
 
-# 运行自检
-lawkit selftest
+# 列出可用的统计法则
+lawkit list
 ```
 
 ## 故障排除
@@ -76,3 +76,7 @@ sudo cargo install lawkit
 ## 下一步
 
 安装完成后，请阅读[入门指南](getting-started_zh.md)开始使用lawkit。
+
+- [入门指南](getting-started_zh.md) - 学习基本功能
+- [使用示例](examples_zh.md) - 实际应用场景
+- [CLI参考文档](../reference/cli-reference_zh.md) - 命令详情

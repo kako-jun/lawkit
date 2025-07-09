@@ -43,19 +43,23 @@ lawkit benf [OPTIONS] [INPUT]
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Detailed statistics
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
-- `--threshold <LEVEL>` - Custom anomaly detection threshold: low, medium, high, critical (default: auto)
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
+- `--optimize` - Enable memory and processing optimizations for large datasets
+- `--threshold <LEVEL>` - Anomaly detection threshold: low, medium, high, critical (default: auto)
 
 #### Examples
 ```bash
 # Basic analysis
 lawkit benf data.csv
 
-# Fraud detection mode
-lawkit benf transactions.json --threshold high --verbose
+# Detailed output with JSON format
+lawkit benf transactions.json --verbose --format json
 
-# Filter and format output
-lawkit benf data.csv --filter ">=1000" --format json
+# Quiet mode for minimal output
+lawkit benf data.csv --quiet
+
+# Filter large transactions with high threshold
+lawkit benf accounts.csv --filter ">=1000" --threshold high
 ```
 
 ### `lawkit pareto` - Pareto Principle Analysis
@@ -67,17 +71,24 @@ lawkit pareto [OPTIONS] [INPUT]
 ```
 
 #### Specific Options
-- `--business-analysis` - Enable business-specific analysis
-- `--gini-coefficient` - Calculate Gini coefficient
-- `--percentiles <LIST>` - Custom percentiles (default: 80,90,95)
+- `--concentration <THRESHOLD>` - Concentration threshold (0.0-1.0) (default: 0.8)
+- `--gini-coefficient` - Calculate Gini coefficient for inequality measurement
+- `--percentiles <PERCENTILES>` - Custom percentiles to calculate (e.g., 70,80,90)
+- `--business-analysis` - Enable business analysis insights
 
 #### Examples
 ```bash
-# Business analysis
-lawkit pareto sales.csv --business-analysis
+# Basic pareto analysis
+lawkit pareto sales.csv
+
+# Custom threshold
+lawkit pareto data.csv --concentration 0.9
+
+# Business analysis with Gini coefficient
+lawkit pareto customers.csv --business-analysis --gini-coefficient
 
 # Custom percentiles
-lawkit pareto data.csv --percentiles 70,80,90
+lawkit pareto revenue.csv --percentiles 70,80,90,95
 ```
 
 ### `lawkit zipf` - Zipf Law Analysis
@@ -88,17 +99,16 @@ Analyze frequency distributions and ranking patterns.
 lawkit zipf [OPTIONS] [INPUT]
 ```
 
-#### Specific Options
-- `--text, -T` - Enable text analysis mode
-- `--words, -w <NUMBER>` - Maximum number of words to analyze in text mode (default: 1000)
-
 #### Examples
 ```bash
-# Text frequency analysis
-lawkit zipf document.txt --text
+# Basic zipf analysis
+lawkit zipf frequency_data.csv
 
-# Numeric ranking with custom word limit
-lawkit zipf rankings.csv --text --words 500
+# Verbose output
+lawkit zipf rankings.csv --verbose
+
+# JSON output format
+lawkit zipf data.csv --format json
 ```
 
 ### `lawkit normal` - Normal Distribution Analysis
@@ -109,28 +119,16 @@ Test for normality and detect outliers.
 lawkit normal [OPTIONS] [INPUT]
 ```
 
-#### Specific Options
-- `--test <TYPE>` - Normality test: shapiro, anderson, ks, all (default: all)
-- `--outliers` - Enable outlier detection
-- `--outlier-method <METHOD>` - Detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (default: zscore)
-- `--quality-control` - Enable quality control analysis
-- `--spec-limits <LIMITS>` - Specification limits: "lower,upper"
-- `--enable-timeseries` - Enable time series analysis
-- `--timeseries-window <SIZE>` - Time series analysis window size (default: 10)
-
 #### Examples
 ```bash
-# Normality testing
-lawkit normal data.csv --test shapiro
+# Basic normality testing
+lawkit normal data.csv
 
-# Advanced outlier detection
-lawkit normal data.csv --outliers --outlier-method ensemble
+# Detailed output
+lawkit normal measurements.csv --verbose
 
-# Time series analysis
-lawkit normal timeseries.csv --enable-timeseries --timeseries-window 20
-
-# Quality control
-lawkit normal measurements.csv --quality-control --spec-limits 10,20
+# JSON output format
+lawkit normal quality_data.csv --format json
 ```
 
 ### `lawkit poisson` - Poisson Distribution Analysis
@@ -141,22 +139,16 @@ Analyze event occurrences and rare events.
 lawkit poisson [OPTIONS] [INPUT]
 ```
 
-#### Specific Options
-- `--test <TYPE>` - Poisson test: chi-square, ks, variance, all (default: all)
-- `--predict` - Enable event probability prediction
-- `--max-events <COUNT>` - Maximum events for prediction (default: 20)
-- `--rare-events` - Enable rare event analysis
-
 #### Examples
 ```bash
 # Basic Poisson analysis
 lawkit poisson events.csv
 
-# Prediction mode
-lawkit poisson data.csv --predict --max-events 15
+# Detailed output
+lawkit poisson incidents.csv --verbose
 
-# Rare event analysis
-lawkit poisson incidents.csv --rare-events
+# JSON output format
+lawkit poisson data.csv --format json
 ```
 
 ## Generation Commands
@@ -179,39 +171,27 @@ lawkit generate <LAW> [OPTIONS]
 #### Common Generation Options
 - `--samples <NUMBER>` - Number of samples to generate (default: 1000)
 - `--seed <NUMBER>` - Random seed for reproducible generation
-- `--fraud-rate <RATE>` - Fraud injection rate (0.0-1.0) for testing
+- `--output-file <FILE>` - Output file path (default: stdout)
 
 #### Law-Specific Options
 
 **Benford Generation:**
-- `--range <MIN,MAX>` - Number range (default: 1,100000)
-
-**Pareto Generation:**
-- `--concentration <RATIO>` - Concentration ratio (default: 0.8)
-- `--scale <NUMBER>` - Scale parameter (default: 1.0)
-
-**Zipf Generation:**
-- `--exponent <NUMBER>` - Zipf exponent (default: 1.0)
-- `--vocabulary-size <NUMBER>` - Vocabulary size (default: 10000)
-
-**Normal Generation:**
-- `--mean <NUMBER>` - Mean (default: 0.0)
-- `--stddev <NUMBER>` - Standard deviation (default: 1.0)
-
-**Poisson Generation:**
-- `--lambda <NUMBER>` - Lambda parameter (default: 2.0)
-- `--time-series` - Generate time-series event data
+- `--fraud-rate <RATE>` - Fraud injection rate (0.0-1.0) for testing (default: 0.0)
+- `--range <MIN,MAX>` - Number range for generation (e.g., 1,10000) (default: 1,100000)
 
 #### Examples
 ```bash
 # Generate Benford's law data
-lawkit generate benf --samples 5000 --range 1,1000000
+lawkit generate benf --samples 5000
 
-# Generate Pareto data with 20% fraud
-lawkit generate pareto --samples 2000 --fraud-rate 0.2
+# Generate Benford data with fraud injection
+lawkit generate benf --samples 2000 --fraud-rate 0.1
 
-# Generate reproducible normal data
-lawkit generate normal --samples 1000 --seed 42 --mean 100 --stddev 15
+# Generate reproducible data with custom range
+lawkit generate benf --samples 1000 --seed 42 --range 1,50000
+
+# Generate and save to file
+lawkit generate normal --samples 1000 --output-file test_data.csv
 ```
 
 ## Integration Commands
@@ -243,13 +223,13 @@ lawkit diagnose [OPTIONS] [INPUT]
 #### Options
 - `--laws <LAWS>` - Specific laws to analyze: benf,pareto,zipf,normal,poisson
 - `--focus <FOCUS>` - Analysis focus: quality, concentration, distribution, anomaly
-- `--threshold <THRESHOLD>` - Conflict detection threshold: 0.0-1.0 (default: 0.5)
+- `--purpose <PURPOSE>` - Analysis purpose: quality, fraud, concentration, anomaly, distribution, general
 - `--recommend` - Enable optimal law recommendation mode
-- `--report <TYPE>` - Report type: summary, detailed, conflicting (default: summary)
-- `--consistency-check` - Run consistency check
+- `--threshold <THRESHOLD>` - Conflict detection threshold (0.0-1.0) (default: 0.5)
+- `--report <TYPE>` - Integration report type: summary, detailed, conflicting (default: summary)
+- `--consistency-check` - Enable consistency check
 - `--cross-validation` - Enable cross-validation analysis
 - `--confidence-level <LEVEL>` - Confidence level (default: 0.95)
-- `--purpose <PURPOSE>` - Analysis purpose: quality, fraud, concentration, anomaly, distribution, general
 
 #### Examples
 ```bash
@@ -259,11 +239,11 @@ lawkit analyze data.csv
 # Focus on fraud detection
 lawkit analyze transactions.csv --purpose fraud --recommend
 
-# Conflict analysis
-lawkit analyze data.csv --report conflicting --threshold 0.7
-
 # Custom law selection
 lawkit analyze data.csv --laws benf,normal --focus quality
+
+# Verbose output with JSON format
+lawkit analyze dataset.csv --verbose --format json
 ```
 
 ## Common Options
@@ -291,11 +271,6 @@ All commands support these common options:
 - **YAML** - YAML configuration files
 - **TOML** - TOML configuration files
 - **XML** - XML data files
-- **Excel** - .xlsx spreadsheet files
-- **OpenDocument** - .ods/.odt files
-- **PDF** - Text extraction from PDF
-- **Word** - .docx document files
-- **PowerPoint** - .pptx presentation files
 
 ## Output Formats
 
@@ -335,7 +310,7 @@ data.csv,1000,Low,0.85
 ### Fraud Detection
 ```bash
 # Financial transaction analysis
-lawkit benf transactions.csv --purpose fraud --threshold high
+lawkit benf transactions.csv --verbose
 
 # Multi-law fraud detection
 lawkit analyze suspicious_data.csv --purpose fraud --recommend
@@ -344,29 +319,26 @@ lawkit analyze suspicious_data.csv --purpose fraud --recommend
 ### Data Quality Assessment
 ```bash
 # Comprehensive quality check
-lawkit analyze dataset.csv --purpose quality --report detailed
+lawkit analyze dataset.csv --purpose quality --verbose
 
 # Focus on normality
-lawkit normal dataset.csv --test all
+lawkit normal dataset.csv --verbose
 ```
 
 ### Business Intelligence
 ```bash
 # 80/20 analysis
-lawkit pareto sales.csv --business-analysis --percentiles 80,90,95
+lawkit pareto sales.csv --threshold 0.8
 
 # Customer analysis
-lawkit zipf customer_frequency.csv --text
+lawkit zipf customer_frequency.csv --verbose
 ```
 
 ### Anomaly Detection
 ```bash
-# Multi-method outlier detection
-lawkit normal data.csv --outliers --outlier-method ensemble
+# Normality and outlier analysis
+lawkit normal data.csv --verbose
 
-# LOF outlier detection for complex patterns
-lawkit normal data.csv --outliers --outlier-method lof
-
-# Event anomaly analysis
-lawkit poisson incidents.csv --rare-events
+# Event analysis
+lawkit poisson incidents.csv --verbose
 ```

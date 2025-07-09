@@ -6,8 +6,8 @@ This document outlines realistic future development plans for lawkit.
 
 ### Package Distribution
 - [x] **Rust crates.io**: Core and CLI packages published
-- [ ] **npm package**: JavaScript wrapper completion and publication  
-- [ ] **PyPI package**: Python wrapper completion and publication
+- [x] **npm package**: JavaScript wrapper completion and publication  
+- [x] **PyPI package**: Python wrapper completion and publication
 - [ ] **Homebrew formula**: macOS package manager support
 
 ### Additional Statistical Laws

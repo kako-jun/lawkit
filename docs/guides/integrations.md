@@ -26,7 +26,7 @@ jobs:
       - name: Quality Analysis
         run: |
           for file in data/*.csv; do
-            lawkit analyze "$file" --laws benford,normal --detect-conflicts --output json > "qa_$(basename "$file" .csv).json"
+            lawkit analyze "$file" --laws benford,normal --format json > "qa_$(basename "$file" .csv).json"
           done
           
       - name: Upload Results
@@ -46,7 +46,7 @@ data-quality:
   stage: quality-check
   script:
     - cargo install lawkit
-    - lawkit analyze data/financial.csv --laws all --output json > quality-report.json
+    - lawkit analyze data/financial.csv --laws all --format json > quality-report.json
   artifacts:
     reports:
       - quality-report.json
@@ -68,7 +68,7 @@ class LawkitAPI:
     def analyze_benford(self, data_file, output_format='json'):
         result = subprocess.run([
             self.binary, 'benf', data_file, 
-            '--output', output_format
+            '--format', output_format
         ], capture_output=True, text=True)
         
         if output_format == 'json':
@@ -83,7 +83,7 @@ const { spawn } = require('child_process');
 
 function analyzeBenford(dataFile) {
   return new Promise((resolve, reject) => {
-    const lawkit = spawn('lawkit', ['benf', dataFile, '--output', 'json']);
+    const lawkit = spawn('lawkit', ['benf', dataFile, '--format', 'json']);
     
     let output = '';
     lawkit.stdout.on('data', (data) => {
@@ -116,7 +116,7 @@ BEGIN
     EXECUTE format('COPY (SELECT %I FROM %I) TO ''/tmp/data.csv'' CSV HEADER', column_name, table_name);
     
     -- Run lawkit analysis
-    SELECT INTO result system('lawkit benf /tmp/data.csv --output json');
+    SELECT INTO result system('lawkit benf /tmp/data.csv --format json');
     
     RETURN result;
 END;
@@ -160,7 +160,7 @@ def tableau_lawkit_analysis(data_source):
     # Analyze with lawkit
     result = subprocess.run([
         'lawkit', 'analyze', data_source, 
-        '--laws', 'all', '--output', 'json'
+        '--laws', 'all', '--format', 'json'
     ], capture_output=True, text=True)
     
     analysis = json.loads(result.stdout)
@@ -186,12 +186,12 @@ dataset.to_csv(temp_file, index=False)
 
 # Run lawkit analysis
 result = subprocess.run([
-    'lawkit', 'benf', temp_file, '--output', 'json'
+    'lawkit', 'benf', temp_file, '--format', 'json'
 ], capture_output=True, text=True)
 
 # Parse results for Power BI
 analysis = json.loads(result.stdout)
-fraud_score = analysis['fraud_likelihood']
+risk_level = analysis['risk_level']
 ```
 
 ## Cloud Platforms
@@ -214,7 +214,7 @@ def lambda_handler(event, context):
     
     # Run lawkit analysis
     result = subprocess.run([
-        'lawkit', 'benf', '/tmp/data.csv', '--output', 'json'
+        'lawkit', 'benf', '/tmp/data.csv', '--format', 'json'
     ], capture_output=True, text=True)
     
     # Upload results back to S3
@@ -248,7 +248,7 @@ def analyze_data(request):
     # Run analysis
     result = subprocess.run([
         'lawkit', 'analyze', '/tmp/data.csv', 
-        '--laws', 'all', '--output', 'json'
+        '--laws', 'all', '--format', 'json'
     ], capture_output=True, text=True)
     
     return json.loads(result.stdout)
@@ -264,16 +264,16 @@ import subprocess
 import json
 
 # Define metrics
-fraud_score_gauge = Gauge('lawkit_fraud_score', 'Fraud likelihood score')
+risk_level_gauge = Gauge('lawkit_risk_level', 'Risk level score')
 analysis_counter = Counter('lawkit_analyses_total', 'Total analyses performed')
 
 def update_metrics(data_file):
     result = subprocess.run([
-        'lawkit', 'benf', data_file, '--output', 'json'
+        'lawkit', 'benf', data_file, '--format', 'json'
     ], capture_output=True, text=True)
     
     analysis = json.loads(result.stdout)
-    fraud_score_gauge.set(analysis['fraud_likelihood'])
+    risk_level_gauge.set(analysis['risk_level'])
     analysis_counter.inc()
 ```
 
@@ -289,7 +289,7 @@ def update_metrics(data_file):
         "type": "stat",
         "targets": [
           {
-            "expr": "lawkit_fraud_score",
+            "expr": "lawkit_risk_level",
             "legendFormat": "Fraud Score"
           }
         ]
@@ -304,14 +304,20 @@ def update_metrics(data_file):
 ### Build Your Own
 
 ```rust
-// Rust integration using lawkit-core
-use lawkit_core::laws::benford::BenfordAnalysis;
-use lawkit_core::common::input::parser::parse_csv;
+// Rust integration using lawkit as subprocess
+use std::process::Command;
+use serde_json::Value;
 
-fn custom_analysis(file_path: &str) -> Result<BenfordAnalysis, Box<dyn std::error::Error>> {
-    let numbers = parse_csv(file_path)?;
-    let analysis = BenfordAnalysis::analyze(&numbers)?;
-    Ok(analysis)
+fn custom_analysis(file_path: &str) -> Result<Value, Box<dyn std::error::Error>> {
+    let output = Command::new("lawkit")
+        .arg("benf")
+        .arg(file_path)
+        .arg("--format")
+        .arg("json")
+        .output()?;
+    
+    let result: Value = serde_json::from_slice(&output.stdout)?;
+    Ok(result)
 }
 ```
 

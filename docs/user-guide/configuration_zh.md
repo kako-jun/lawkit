@@ -1,6 +1,8 @@
 # 配置指南
 
-本指南详细介绍了lawkit的配置选项和自定义设置。
+## 概述
+
+`lawkit`设计为开箱即用，具有合理的默认设置，但为不同用例提供多种配置选项。
 
 ## 命令行选项
 
@@ -8,250 +10,199 @@
 
 ```bash
 # 输出格式
---format <FORMAT>     # text, json, csv, yaml, toml, xml (默认: text)
+lawkit benf data.csv --format json
+lawkit benf data.csv --format yaml
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
 
-# 输出控制
---quiet              # 最小输出（仅数值）
---verbose            # 详细统计信息
+# 国际数字支持（自动识别）
+echo "１２３４５６" | lawkit benf      # 日文数字
+echo "一千二百三十四" | lawkit benf    # 中文数字
 
-# 数据过滤
---filter <RANGE>     # 过滤数值 (例如: --filter ">=100")
---min-count <N>      # 分析所需的最小数据点数
-
-# 性能选项
---optimize           # 启用性能优化模式
+# 详细程度
+lawkit benf data.csv --quiet     # 最小输出
+lawkit benf data.csv --verbose   # 详细输出
 ```
 
-### 特定分析选项
-
-#### 本福德定律 (benf)
-```bash
---threshold <LEVEL>   # 警报阈值: low, medium, high, critical
---columns <COLS>      # 指定要分析的列
---mad-threshold <N>   # MAD阈值（默认：4.0）
-```
-
-#### 帕累托分析 (pareto)
-```bash
---gini-coefficient    # 显示基尼系数
---percentiles <LIST>  # 自定义百分位数 (例如: 70,80,90)
---business-analysis   # 业务分析洞察
-```
-
-#### 正态分布 (normal)
-```bash
---outliers           # 启用异常值检测
---outlier-method <M> # 方法: iqr, zscore, lof, isolation, dbscan, ensemble
---quality-control    # 质量控制分析
---process-capability # 工艺能力分析
---enable-timeseries  # 时间序列分析
---timeseries-window <N> # 时间序列窗口大小
-```
-
-#### 泊松分布 (poisson)
-```bash
---predict            # 启用预测功能
---rare-events        # 罕见事件分析
---time-unit <UNIT>   # 时间单位: second, minute, hour, day
-```
-
-#### 齐夫定律 (zipf)
-```bash
---ranking            # 显示排名分析
---text-analysis      # 文本分析模式
---vocabulary-size <N> # 词汇表大小
-```
-
-#### 多法则分析 (analyze)
-```bash
---laws <LIST>        # 指定要比较的法则 (例如: benf,pareto,normal)
---recommend          # 显示分析建议
---conflict-detection # 启用冲突检测
---quality-focus      # 专注于质量分析
-```
-
-## 环境变量
+### 分析选项
 
 ```bash
-# 设置默认输出格式
-export LAWKIT_FORMAT=json
+# 带阈值的帕累托分析
+lawkit pareto data.csv --threshold 0.8
 
-# 启用默认优化模式
-export LAWKIT_OPTIMIZE=true
+# 多法则分析
+lawkit analyze data.csv --laws benford,pareto,normal
 
-# 启用调试模式
-export LAWKIT_DEBUG=1
+# 焦点分析
+lawkit analyze data.csv --laws benford --focus accuracy
 
-# 设置默认输入编码
-export LAWKIT_INPUT_ENCODING=utf-8
+# 特定目的分析
+lawkit analyze data.csv --laws all --purpose audit
+
+# 推荐功能
+lawkit analyze data.csv --laws all --recommend
 ```
 
-## 配置文件
+## 输出格式
 
-lawkit支持YAML格式的配置文件：
+### 支持的格式
 
-### 创建配置文件
+| 格式 | 描述 | 最适用于 |
+|------|------|----------|
+| `text` | 人类可读（默认） | 终端显示 |
+| `json` | 机器可读 | API，自动化 |
+| `csv` | 表格数据 | 电子表格 |
+| `yaml` | 结构化配置 | 配置文件 |
+| `toml` | Rust友好 | Rust集成 |
+| `xml` | 传统系统 | 企业系统 |
 
-```yaml
-# ~/.config/lawkit/config.yaml
-default:
-  format: json
-  verbose: true
-  optimize: true
+### 格式示例
 
-benf:
-  threshold: medium
-  mad_threshold: 4.0
-
-pareto:
-  gini_coefficient: true
-  business_analysis: true
-
-normal:
-  outliers: true
-  outlier_method: ensemble
-  quality_control: true
-
-analyze:
-  recommend: true
-  conflict_detection: true
+#### JSON输出
+```bash
+lawkit benf data.csv --format json
+```
+```json
+{
+  "dataset": "data.csv",
+  "numbers_analyzed": 1000,
+  "risk_level": "Low",
+  "mean_absolute_deviation": 2.3,
+  "chi_square_p_value": 0.85
+}
 ```
 
-### 使用配置文件
+#### CSV输出
+```bash
+lawkit benf data.csv --format csv
+```
+```csv
+dataset,numbers_analyzed,risk_level,mad,chi_square_p
+data.csv,1000,Low,2.3,0.85
+```
+
+## 多语言支持
+
+### 支持的语言
+
+- **English** (`en`) - 默认
+- **Japanese** (`ja`) - 日本语
+- **Chinese** (`zh`) - 中文
+- **Hindi** (`hi`) - हिन्दी
+- **Arabic** (`ar`) - العربية
+
+### 国际数字支持
+
+`lawkit`自动识别各种数字格式：
 
 ```bash
-# 使用默认配置文件
-lawkit benf data.csv
+# 日文数字
+echo "１２３４ ５６７８" | lawkit benf
 
-# 指定配置文件
-lawkit benf data.csv --config /path/to/config.yaml
+# 中文金融数字
+echo "壹万贰千 三千四百" | lawkit benf
 
-# 命令行选项会覆盖配置文件设置
-lawkit benf data.csv --format csv  # 覆盖配置文件中的json设置
+# 混合格式
+echo "123 ４５６ 七八九" | lawkit benf
+```
+
+## 集成分析
+
+### 多法则分析配置
+
+```bash
+# 选择特定法则
+lawkit analyze data.csv --laws benford,pareto,normal
+
+# 专注于特定分析类型
+lawkit analyze data.csv --laws benford --focus accuracy
+
+# 特定目的分析
+lawkit analyze data.csv --laws all --purpose audit
+
+# 推荐模式
+lawkit analyze data.csv --laws all --recommend
+
+# 验证模式
+lawkit validate data.csv --laws all
+
+# 诊断模式
+lawkit diagnose data.csv --laws all
+```
+
+### 分析目的
+
+| 目的 | 最佳法则 | 用例 |
+|------|----------|------|
+| `audit` | Benford + Normal | 数据质量审计 |
+| `fraud` | Benford + Poisson | 欺诈检测 |
+| `business` | Pareto + Zipf | 业务分析 |
+| `research` | 所有法则 | 通用分析 |
+
+## 批处理
+
+```bash
+# 处理多个文件
+for file in *.csv; do
+  lawkit benf "$file" --format json > "results_${file%.csv}.json"
+done
+
+# 使用不同法则分析
+lawkit analyze data1.csv --laws benford --format json
+lawkit analyze data2.csv --laws pareto --format json
+lawkit analyze data3.csv --laws normal --format json
 ```
 
 ## 性能调优
 
-### 内存优化
+### 大型数据集
 
 ```bash
-# 大文件性能优化
-lawkit benf huge_file.csv --optimize
+# 使用静默模式以获得更好性能
+lawkit benf large_data.csv --quiet
+
+# 专注于特定分析
+lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-### 并行处理
+### 内存管理
 
-```bash
-# 性能优化模式
-lawkit analyze data.csv --optimize
-```
-
-### 缓存设置
-
-```bash
-# 启用结果缓存
-export LAWKIT_CACHE_ENABLED=1
-export LAWKIT_CACHE_DIR=~/.cache/lawkit
-
-# 缓存大小限制
-export LAWKIT_CACHE_SIZE=1GB
-```
-
-## 输出自定义
-
-### 模板配置
-
-```yaml
-# 自定义输出模板
-output:
-  templates:
-    benf_summary: |
-      分析结果：{{dataset}}
-      风险等级：{{risk_level}}
-      卡方值：{{chi_square}}
-      p值：{{p_value}}
-    
-    pareto_business: |
-      业务洞察：{{dataset}}
-      集中度：{{concentration}}%
-      基尼系数：{{gini}}
-      建议：{{recommendation}}
-```
-
-### 颜色配置
-
-```yaml
-colors:
-  risk_levels:
-    low: green
-    medium: yellow
-    high: red
-    critical: bold_red
-  
-  statistics:
-    significant: blue
-    normal: white
-    warning: yellow
-```
-
-## 国际化设置
-
-### 数字格式
-
-```bash
-# 自动检测数字格式
-lawkit benf mixed_format.csv --auto-detect
-
-# 指定输入格式
-lawkit benf chinese_data.csv --input-format chinese
-
-# 支持的格式
-# - ascii: 标准ASCII数字
-# - chinese: 中文数字（简体/繁体）
-# - japanese: 日文数字（全角/汉字）
-# - hindi: 印地语数字
-# - arabic: 阿拉伯数字
-```
-
-### 时区设置
-
-```bash
-# 设置时区
-export TZ=Asia/Shanghai
-lawkit normal timeseries_data.csv --enable-timeseries
-```
+- 文件 > 1GB：考虑数据预处理
+- 使用`--quiet`以减少内存使用
+- 使用stdin输入的流处理
 
 ## 故障排除
 
-### 调试选项
+### 常见问题
+
+1. **"数据不足"** - 提供更多数据或检查文件格式
+2. **"未找到数字"** - 检查数据格式和编码
+3. **"格式错误"** - 验证文件格式是否与内容匹配
+
+### 调试模式
 
 ```bash
 # 启用详细日志
-lawkit benf data.csv --debug
+lawkit benf data.csv --verbose
 
-# 性能分析
-lawkit benf data.csv --profile
-
-# 内存使用监控
-lawkit benf data.csv --memory-monitor
+# 检查数据解析
+lawkit benf data.csv --format json | jq '.numbers_analyzed'
 ```
 
-### 常见配置错误
+## 未来配置功能
 
-#### 内存不足
-```bash
-# 性能优化处理
-lawkit benf large_file.csv --optimize
-```
+以下功能计划在未来版本中实现：
 
-#### 性能问题
-```bash
-# 性能优化模式
-lawkit analyze data.csv --optimize
-```
+- 配置文件支持（`lawkit.toml`）
+- 环境变量设置
+- 自定义阈值配置
+- 基于配置文件的设置
+- 数据过滤选项
+- 高级分析选项
 
 ## 下一步
 
-- 查看[使用示例](examples_zh.md)了解实际配置场景
-- 参考[CLI参考文档](../reference/cli-reference_zh.md)获取完整选项列表
-- 阅读[性能优化指南](../guides/performance_zh.md)了解高级性能设置
+- [使用示例](examples_zh.md) - 实际配置示例
+- [CLI参考](../reference/cli-reference_zh.md) - 完整命令文档
+- [集成指南](../guides/integrations_zh.md) - CI/CD自动化

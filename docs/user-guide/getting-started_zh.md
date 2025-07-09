@@ -57,23 +57,23 @@ lawkit benf financial_data.csv
 lawkit pareto sales_data.csv --gini-coefficient
 
 # 正态分布检验
-lawkit normal quality_data.csv --outliers
+lawkit normal quality_data.csv --verbose
 
 # 泊松分布分析
-lawkit poisson event_data.csv --predict
+lawkit poisson event_data.csv --verbose
 ```
 
 ### 多法则比较
 
 ```bash
 # 比较所有法则
-lawkit analyze data.csv --laws all
+lawkit compare data.csv --laws all
 
 # 比较特定法则
-lawkit analyze data.csv --laws benf,pareto,normal
+lawkit compare data.csv --laws benf,pareto,normal
 
 # 获取分析建议
-lawkit analyze data.csv --recommend
+lawkit compare data.csv --recommend
 ```
 
 ### 数据生成
@@ -83,7 +83,7 @@ lawkit analyze data.csv --recommend
 lawkit generate benf --samples 1000
 
 # 生成帕累托分布数据
-lawkit generate pareto --samples 5000 --concentration 0.8
+lawkit generate pareto --samples 5000
 
 # 生成并分析（管道操作）
 lawkit generate benf --samples 1000 | lawkit benf --format json
@@ -111,10 +111,10 @@ tail -f transaction.log | lawkit benf --format json
 lawkit pareto monthly_sales.csv --business-analysis
 
 # 季节性趋势分析
-lawkit normal sales_history.csv --enable-timeseries
+lawkit normal sales_history.csv --verbose
 
 # 多维度比较
-lawkit analyze Q1_sales.csv Q2_sales.csv Q3_sales.csv
+lawkit compare Q1_sales.csv Q2_sales.csv Q3_sales.csv
 ```
 
 ## 配置选项
@@ -139,7 +139,7 @@ lawkit benf data.csv --filter ">=100"
 
 ```bash
 # 性能优化
-lawkit analyze large_dataset.csv --optimize
+lawkit compare large_dataset.csv --optimize
 
 # 性能优化大文件
 lawkit benf huge_file.csv --optimize
@@ -168,8 +168,8 @@ lawkit benf chinese_financial_report.pdf
 
 ## 下一步
 
-- 阅读[配置指南](configuration_zh.md)了解详细配置选项
 - 查看[使用示例](examples_zh.md)获取更多实际应用场景
 - 参考[CLI参考文档](../reference/cli-reference_zh.md)了解所有可用命令和选项
+- 阅读[架构指南](../guides/architecture_zh.md)了解系统设计
 
-如有问题，请查看[常见问题](faq_zh.md)或在GitHub上提交issue。
+如有问题，请在GitHub上提交issue。

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`lawkit` is designed to work out-of-the-box with sensible defaults, but offers extensive configuration options for advanced users.
+`lawkit` is designed to work out-of-the-box with sensible defaults, but offers several configuration options for different use cases.
 
 ## Command-Line Options
 
@@ -12,6 +12,9 @@
 # Output format
 lawkit benf data.csv --format json
 lawkit benf data.csv --format yaml
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
 
 # International number support (automatic recognition)
 echo "１２３４５６" | lawkit benf      # Japanese numbers
@@ -22,28 +25,23 @@ lawkit benf data.csv --quiet     # Minimal output
 lawkit benf data.csv --verbose   # Detailed output
 ```
 
-### Data Filtering
-
-```bash
-# Number range filtering
-lawkit benf data.csv --filter ">=100"
-lawkit benf data.csv --filter "50-1000"
-
-# Minimum data requirements
-lawkit benf data.csv --min-count 50
-```
-
 ### Analysis Options
 
 ```bash
-# Custom thresholds
-lawkit benf data.csv --threshold high
-lawkit normal data.csv --confidence-level 0.99
+# Pareto analysis with threshold
+lawkit pareto data.csv --threshold 0.8
 
-# Specific analysis modes
-lawkit pareto data.csv --business-analysis
-lawkit normal data.csv --outliers
-lawkit poisson data.csv --predict
+# Multi-law analysis
+lawkit analyze data.csv --laws benford,pareto,normal
+
+# Analysis with focus
+lawkit analyze data.csv --laws benford --focus accuracy
+
+# Purpose-specific analysis
+lawkit analyze data.csv --laws all --purpose audit
+
+# Recommendations
+lawkit analyze data.csv --laws all --recommend
 ```
 
 ## Output Formats
@@ -115,55 +113,34 @@ echo "123 ４５６ 七八九" | lawkit benf
 
 ```bash
 # Select specific laws
-lawkit analyze data.csv --laws benf,pareto,normal
+lawkit analyze data.csv --laws benford,pareto,normal
 
-# Focus on specific analysis
-lawkit analyze data.csv --focus quality
-lawkit analyze data.csv --focus anomaly
+# Focus on specific analysis type
+lawkit analyze data.csv --laws benford --focus accuracy
 
-# Conflict detection
-lawkit diagnose data.csv --threshold 0.7 --report conflicting
+# Purpose-specific analysis
+lawkit analyze data.csv --laws all --purpose audit
 
 # Recommendation mode
-lawkit analyze data.csv --recommend --purpose fraud
+lawkit analyze data.csv --laws all --recommend
+
+# Validation mode
+lawkit validate data.csv --laws all
+
+# Diagnosis mode
+lawkit diagnose data.csv --laws all
 ```
 
 ### Analysis Purposes
 
 | Purpose | Best Laws | Use Case |
 |---------|-----------|----------|
-| `quality` | Benford + Normal | Data quality audit |
+| `audit` | Benford + Normal | Data quality audit |
 | `fraud` | Benford + Poisson | Fraud detection |
-| `concentration` | Pareto + Zipf | Business analysis |
-| `anomaly` | Normal + Poisson | Outlier detection |
-| `distribution` | All laws | General analysis |
+| `business` | Pareto + Zipf | Business analysis |
+| `research` | All laws | General analysis |
 
-## Environment Variables
-
-```bash
-# Default output format
-export LAWKIT_FORMAT=json
-
-# Disable colors
-export NO_COLOR=1
-```
-
-## Advanced Configuration
-
-### Custom Thresholds
-
-```bash
-# Benford Law
-lawkit benf data.csv --threshold low     # MAD < 4
-lawkit benf data.csv --threshold medium  # MAD < 8  
-lawkit benf data.csv --threshold high    # MAD < 15
-
-# Normal Distribution
-lawkit normal data.csv --confidence-level 0.95  # 95% confidence
-lawkit normal data.csv --confidence-level 0.99  # 99% confidence
-```
-
-### Batch Processing
+## Batch Processing
 
 ```bash
 # Process multiple files
@@ -171,8 +148,10 @@ for file in *.csv; do
   lawkit benf "$file" --format json > "results_${file%.csv}.json"
 done
 
-# Analyze results
-lawkit analyze data1.csv data2.csv data3.csv --report summary
+# Analyze with different laws
+lawkit analyze data1.csv --laws benford --format json
+lawkit analyze data2.csv --laws pareto --format json
+lawkit analyze data3.csv --laws normal --format json
 ```
 
 ## Performance Tuning
@@ -180,24 +159,24 @@ lawkit analyze data1.csv data2.csv data3.csv --report summary
 ### Large Datasets
 
 ```bash
-# Minimum data filtering for performance
-lawkit benf large_data.csv --min-count 1000
+# Use quiet mode for better performance
+lawkit benf large_data.csv --quiet
 
 # Focus on specific analysis
-lawkit analyze large_data.csv --focus quality --laws benf,normal
+lawkit analyze large_data.csv --laws benford --quiet
 ```
 
 ### Memory Management
 
-- Files > 1GB: Consider data sampling
+- Files > 1GB: Consider data preprocessing
 - Use `--quiet` for minimal memory usage
-- Stream processing with `--` stdin input
+- Stream processing with stdin input
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"Insufficient data"** - Increase `--min-count` or provide more data
+1. **"Insufficient data"** - Provide more data or check file format
 2. **"No numbers found"** - Check data format and encoding
 3. **"Format error"** - Verify file format matches content
 
@@ -210,6 +189,17 @@ lawkit benf data.csv --verbose
 # Check data parsing
 lawkit benf data.csv --format json | jq '.numbers_analyzed'
 ```
+
+## Future Configuration Features
+
+The following features are planned for future versions:
+
+- Configuration file support (`lawkit.toml`)
+- Environment variable settings
+- Custom threshold configuration
+- Profile-based settings
+- Data filtering options
+- Advanced analysis options
 
 ## Next Steps
 

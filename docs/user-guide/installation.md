@@ -106,5 +106,5 @@ export PATH="$HOME/.cargo/bin:$PATH"
 ## Next Steps
 
 - [Getting Started](getting-started.md) - Learn the basics
-- [Configuration](configuration.md) - Customize settings
+- [Getting Started](getting-started.md) - Learn the basics
 - [Examples](examples.md) - See real-world usage

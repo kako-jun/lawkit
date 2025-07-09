@@ -8,13 +8,13 @@
 
 ```bash
 # 経費データの基本分析
-lawkit benf expenses_2024.csv --columns "金額" --output json
+lawkit benf expenses_2024.csv --format json
 
 # 詳細分析（日本語数字対応）
-lawkit benf expenses_2024.csv  --verbose
+lawkit benf expenses_2024.csv --verbose
 
 # 複数法則での包括分析
-lawkit analyze expenses_2024.csv --laws benford,normal --consistency-check
+lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
 **期待される結果**: 
@@ -26,10 +26,10 @@ lawkit analyze expenses_2024.csv --laws benford,normal --consistency-check
 
 ```bash
 # 月次売上の分析
-lawkit benf monthly_sales.csv --min-value 1000 --confidence 0.99
+lawkit benf monthly_sales.csv --verbose
 
 # 地域別分析
-lawkit benf sales_by_region.csv --columns "北海道,東北,関東,中部,関西,中国,四国,九州"
+lawkit benf sales_by_region.csv --verbose
 ```
 
 ## 2. ビジネス分析
@@ -38,13 +38,13 @@ lawkit benf sales_by_region.csv --columns "北海道,東北,関東,中部,関西
 
 ```bash
 # 80/20分析
-lawkit pareto customer_sales.csv --threshold 0.8 --gini
+lawkit pareto customer_sales.csv --threshold 0.8
 
 # 90/10分析（より厳密な上位顧客特定）
 lawkit pareto customer_sales.csv --threshold 0.9
 
 # 可視化用データ出力
-lawkit pareto customer_sales.csv --output csv > pareto_results.csv
+lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
 **活用方法**:
@@ -56,7 +56,7 @@ lawkit pareto customer_sales.csv --output csv > pareto_results.csv
 
 ```bash
 # 商品別在庫回転率のパレート分析
-lawkit pareto inventory_turnover.csv --columns "回転率"
+lawkit pareto inventory_turnover.csv --verbose
 
 # 在庫金額の分析
 lawkit pareto inventory_value.csv --threshold 0.7
@@ -68,13 +68,13 @@ lawkit pareto inventory_value.csv --threshold 0.7
 
 ```bash
 # 製品寸法の正規性検定
-lawkit normal product_dimensions.csv --control-chart
+lawkit normal product_dimensions.csv --verbose
 
 # 工程能力評価
-lawkit normal process_data.csv --capability --spec-limits 98.5,101.5
+lawkit normal process_data.csv --verbose
 
 # 異常値検出
-lawkit normal quality_measurements.csv --outliers --method iqr
+lawkit normal quality_measurements.csv --verbose
 ```
 
 **品質管理での活用**:
@@ -86,10 +86,10 @@ lawkit normal quality_measurements.csv --outliers --method iqr
 
 ```bash
 # 不良品発生のポアソン分析
-lawkit poisson defect_counts.csv --interval day
+lawkit poisson defect_counts.csv --verbose
 
 # 予測分析
-lawkit poisson defect_history.csv --forecast 30 --confidence 0.95
+lawkit poisson defect_history.csv --verbose
 ```
 
 ## 4. テキスト分析
@@ -98,19 +98,20 @@ lawkit poisson defect_history.csv --forecast 30 --confidence 0.95
 
 ```bash
 # 日本語テキストの分析
-lawkit zipf customer_feedback.txt  --min-frequency 3
+lawkit zipf customer_feedback.txt --verbose
 
 # キーワード頻度の抽出
-lawkit zipf reviews.txt --max-words 100 --output json
+lawkit zipf reviews.txt --format json
 ```
 
 ### ケース: ソーシャルメディア投稿の分析
 
 ```bash
 # 複数言語対応分析
-lawkit zipf social_posts.txt 
+lawkit zipf social_posts.txt --verbose
+
 # トレンド分析用データ出力
-lawkit zipf tweets.txt --output csv --columns "単語,頻度,順位"
+lawkit zipf tweets.txt --format csv
 ```
 
 ## 5. 金融・投資分析
@@ -119,20 +120,20 @@ lawkit zipf tweets.txt --output csv --columns "単語,頻度,順位"
 
 ```bash
 # 株価変動の正規性分析
-lawkit normal stock_returns.csv --columns "日次収益率"
+lawkit normal stock_returns.csv --verbose
 
 # 異常取引の検出
-lawkit benf trading_volumes.csv --min-value 1000000
+lawkit benf trading_volumes.csv --verbose
 ```
 
 ### ケース: ポートフォリオ分析
 
 ```bash
 # 投資配分のパレート分析
-lawkit pareto portfolio_weights.csv --gini
+lawkit pareto portfolio_weights.csv --verbose
 
 # リスク要因の分析
-lawkit normal risk_factors.csv --outliers
+lawkit normal risk_factors.csv --verbose
 ```
 
 ## 6. 学術研究・データサイエンス
@@ -144,17 +145,17 @@ lawkit normal risk_factors.csv --outliers
 lawkit benf experimental_data.csv --verbose
 
 # 測定データの分布確認
-lawkit normal measurements.csv --normality-tests shapiro,anderson,ks
+lawkit normal measurements.csv --verbose
 ```
 
 ### ケース: 大規模データセットの要約
 
 ```bash
 # 包括的データ分析
-lawkit analyze large_dataset.csv --laws all --recommend
+lawkit analyze large_dataset.csv --laws all
 
 # サンプリング分析
-lawkit benf big_data.csv --sample-size 50000
+lawkit benf big_data.csv --verbose
 ```
 
 ## 7. 運用・監視
@@ -163,20 +164,20 @@ lawkit benf big_data.csv --sample-size 50000
 
 ```bash
 # アクセスログの分析
-lawkit zipf access.log --min-frequency 10
+lawkit zipf access.log --verbose
 
 # レスポンス時間の分析
-lawkit normal response_times.csv --outliers
+lawkit normal response_times.csv --verbose
 ```
 
 ### ケース: イベント発生予測
 
 ```bash
 # サーバーダウンの予測
-lawkit poisson downtime_events.csv --forecast 7 --interval day
+lawkit poisson downtime_events.csv --verbose
 
 # アラート頻度の分析
-lawkit poisson alert_counts.csv --confidence 0.99
+lawkit poisson alert_counts.csv --verbose
 ```
 
 ## 8. バッチ処理とパイプライン
@@ -191,13 +192,13 @@ for file in reports/2024-*.csv; do
     echo "Processing $file..."
     
     # ベンフォード分析
-    lawkit benf "$file" --output json > "results/benf_$(basename "$file" .csv).json"
+    lawkit benf "$file" --format json > "results/benf_$(basename "$file" .csv).json"
     
     # パレート分析
-    lawkit pareto "$file" --output json > "results/pareto_$(basename "$file" .csv).json"
+    lawkit pareto "$file" --format json > "results/pareto_$(basename "$file" .csv).json"
     
     # 包括分析
-    lawkit analyze "$file" --laws benford,pareto --output json > "results/analyze_$(basename "$file" .csv).json"
+    lawkit analyze "$file" --laws benford,pareto --format json > "results/analyze_$(basename "$file" .csv).json"
 done
 
 echo "Batch processing complete!"
@@ -226,7 +227,7 @@ jobs:
       - name: Quality Analysis
         run: |
           for file in data/*.csv; do
-            lawkit analyze "$file" --laws benford,normal --consistency-check --output json > "qa_$(basename "$file" .csv).json"
+            lawkit analyze "$file" --laws benford,normal --format json > "qa_$(basename "$file" .csv).json"
           done
           
       - name: Upload Results
@@ -255,19 +256,19 @@ echo "=== 包括的データ監査開始: $DATA_FILE ==="
 
 # 1. 基本統計とデータ品質
 echo "1. データ品質分析..."
-lawkit analyze "$DATA_FILE" --laws all --recommend --output json > "$OUTPUT_DIR/quality_${TIMESTAMP}.json"
+lawkit analyze "$DATA_FILE" --laws all --format json > "$OUTPUT_DIR/quality_${TIMESTAMP}.json"
 
 # 2. 不正検知（ベンフォード法則）
 echo "2. 不正検知分析..."
-lawkit benf "$DATA_FILE" --confidence 0.99 --output json > "$OUTPUT_DIR/fraud_${TIMESTAMP}.json"
+lawkit benf "$DATA_FILE" --format json > "$OUTPUT_DIR/fraud_${TIMESTAMP}.json"
 
 # 3. ビジネス分析（パレート法則）
 echo "3. ビジネス分析..."
-lawkit pareto "$DATA_FILE" --gini --output json > "$OUTPUT_DIR/business_${TIMESTAMP}.json"
+lawkit pareto "$DATA_FILE" --format json > "$OUTPUT_DIR/business_${TIMESTAMP}.json"
 
 # 4. 統計的分析（正規分布）
 echo "4. 統計分析..."
-lawkit normal "$DATA_FILE" --outliers --capability --output json > "$OUTPUT_DIR/statistics_${TIMESTAMP}.json"
+lawkit normal "$DATA_FILE" --format json > "$OUTPUT_DIR/statistics_${TIMESTAMP}.json"
 
 # 5. 要約レポート生成
 echo "5. 要約レポート生成..."
@@ -287,7 +288,7 @@ cat > "$OUTPUT_DIR/summary_${TIMESTAMP}.md" << EOF
 
 ## 推奨事項
 
-詳細は quality_${TIMESTAMP}.json の recommend セクションを参照してください。
+詳細は quality_${TIMESTAMP}.json の results セクションを参照してください。
 
 EOF
 
