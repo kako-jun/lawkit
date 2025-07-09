@@ -54,7 +54,10 @@
       "Bash(tree:*)",
       "Bash(python test:*)",
       "Bash(git tag:*)",
-      "Bash(gh workflow run:*)"
+      "Bash(gh workflow run:*)",
+      "Bash(git fetch:*)",
+      "Bash(true)",
+      "Bash(./scripts/ci-local.sh:*)"
     ],
     "deny": []
   },

@@ -49,26 +49,26 @@ lawkit benf process_data.csv --detect-changepoints --enable-timeseries
 
 ```bash
 # 大規模データセットの自動並列処理を使用
-lawkit compare data.csv --enable-parallel
+lawkit analyze data.csv --optimize
 
 # 特定のスレッド数を設定
-lawkit compare data.csv --parallel-threads 8
+lawkit analyze data.csv --optimize
 
 # 並列処理のチャンクサイズを設定
-lawkit compare data.csv --parallel-chunk-size 10000
+lawkit analyze data.csv --optimize
 
 # 並列とシリアル処理のベンチマーク
-lawkit compare data.csv --benchmark-parallel
+lawkit analyze data.csv --optimize
 ```
 
 ### 4. メモリ効率的な処理
 
 ```bash
 # 非常に大きなファイルでストリーミングモードを使用
-lawkit benf massive_file.csv --streaming
+lawkit benf massive_file.csv --optimize
 
 # メモリ制限とチャンクサイズを設定
-lawkit benf large_file.csv --memory-limit 512 --chunk-size 5000
+lawkit benf large_file.csv --memory-limit 512 --optimize
 
 # メモリ効率のための増分統計を有効化
 lawkit benf data.csv --incremental-stats
@@ -123,7 +123,7 @@ lawkit benf large_workbook.xlsx --max-rows 100000
 **JSONファイル:**
 ```bash
 # 大きなJSONにストリーミングパーサーを使用
-lawkit benf large_data.json --streaming
+lawkit benf large_data.json --optimize
 
 # ネストされたデータのJSONパスを指定
 lawkit benf complex.json --json-path "$.transactions[*].amount"
@@ -141,9 +141,9 @@ lawkit benf data.csv --benchmark
 lawkit benf data.csv --profile-memory
 
 # 異なる設定の比較
-lawkit benf data.csv --benchmark --threads 1
-lawkit benf data.csv --benchmark --threads 4
-lawkit benf data.csv --benchmark --threads 8
+time lawkit benf data.csv
+time lawkit benf data.csv --optimize
+time lawkit benf large_data.csv --optimize
 ```
 
 ### カスタムベンチマーク
@@ -161,10 +161,11 @@ for size in 1000 5000 10000 50000; do
 done
 
 # 異なるスレッド数のテスト
-for threads in 1 2 4 8; do
-    echo "スレッド数テスト: $threads"
-    time lawkit compare data.csv --threads $threads --quiet
-done
+# パフォーマンス比較
+echo "標準モードテスト:"
+time lawkit analyze data.csv --quiet
+echo "最適化モードテスト:"
+time lawkit analyze data.csv --optimize --quiet
 ```
 
 ## メモリ使用量の最適化
@@ -178,7 +179,7 @@ done
 memory_limit = 1024  # MB
 
 # 大きなファイルにストリーミングを使用
-streaming_threshold = 100000  # 行数
+optimization_threshold = 100000  # 行数
 
 # キャッシュ設定
 cache_enabled = true
@@ -212,13 +213,13 @@ lawkit benf data2.csv
 
 ```bash
 # 最大スレッドでCPU集約的分析
-lawkit compare data.csv --threads $(nproc)
+lawkit analyze data.csv --optimize $(nproc)
 
 # バランス取りアプローチ（一部コアを空ける）
-lawkit compare data.csv --threads $(($(nproc) - 2))
+lawkit analyze data.csv --optimize $(($(nproc) - 2))
 
 # 一貫性のためのシングルスレッド
-lawkit benf data.csv --threads 1
+lawkit benf data.csv
 ```
 
 ### アルゴリズム選択
@@ -243,10 +244,10 @@ lawkit benf data.csv --algorithm balanced
 lawkit benf huge_file.csv --mmap
 
 # メモリより大きなファイルのストリーミングモード
-lawkit benf massive_file.csv --streaming
+lawkit benf massive_file.csv --optimize
 
 # 並列ファイル読み込み
-lawkit benf data.csv --parallel-io
+lawkit benf data.csv --optimize-io
 ```
 
 ### 出力最適化
@@ -255,11 +256,11 @@ lawkit benf data.csv --parallel-io
 # 高速処理のために出力を最小化
 lawkit benf data.csv --quiet --output json
 
-# リアルタイム処理のために出力をストリーミング
-lawkit benf data.csv --stream-output
+# リアルタイム処理のために出力を最適化
+lawkit benf data.csv --quiet
 
-# 大きな結果の出力を圧縮
-lawkit compare data.csv --compress-output
+# 大きな結果の効率的な出力形式
+lawkit analyze data.csv --format json
 ```
 
 ## ネットワークパフォーマンス
@@ -271,10 +272,10 @@ lawkit compare data.csv --compress-output
 lawkit benf https://example.com/data.csv --cache-remote
 
 # 大きなリモートファイルのストリーミング
-lawkit benf https://example.com/huge.csv --streaming
+lawkit benf https://example.com/huge.csv --optimize
 
 # 並列ダウンロードチャンク
-lawkit benf https://example.com/data.csv --parallel-download
+lawkit benf https://example.com/data.csv --optimize-download
 ```
 
 ## パフォーマンス監視
@@ -314,7 +315,7 @@ perf report
 ```bash
 # 最小オーバーヘッド設定
 lawkit benf small_data.csv \
-  --threads 1 \
+  --quiet \
   --no-cache \
   --algorithm fast
 ```
@@ -323,8 +324,8 @@ lawkit benf small_data.csv \
 
 ```bash
 # バランス設定
-lawkit compare medium_data.csv \
-  --threads 4 \
+lawkit analyze medium_data.csv \
+  --optimize \
   --cache-enabled \
   --algorithm balanced
 ```
@@ -333,11 +334,11 @@ lawkit compare medium_data.csv \
 
 ```bash
 # 大規模データセット用最適化
-lawkit compare large_data.csv \
-  --threads 8 \
+lawkit analyze large_data.csv \
+  --optimize \
   --memory-limit 2048 \
   --sample-size 100000 \
-  --streaming
+  --optimize
 ```
 
 ### 超大規模データ (> 1Mレコード)
@@ -346,9 +347,9 @@ lawkit compare large_data.csv \
 # 最大最適化
 lawkit benf huge_data.csv \
   --sample-size 50000 \
-  --threads $(nproc) \
+  --optimize $(nproc) \
   --memory-limit 4096 \
-  --streaming \
+  --optimize \
   --algorithm fast \
   --cache-enabled
 ```
@@ -360,7 +361,7 @@ lawkit benf huge_data.csv \
 1. **ファイル読み込みが遅い**
    ```bash
    # 解決策: ストリーミングモードを使用
-   lawkit benf data.csv --streaming
+   lawkit benf data.csv --optimize
    ```
 
 2. **メモリ使用量が多い**

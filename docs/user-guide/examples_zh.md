@@ -61,7 +61,7 @@ lawkit normal response_times.csv --outliers --threshold critical
 lawkit poisson error_events.csv --predict --time-unit hour
 
 # 多维度质量分析
-lawkit compare performance_metrics.csv --laws normal,poisson --recommend
+lawkit analyze performance_metrics.csv --laws normal,poisson --recommend
 ```
 
 ## 市场研究
@@ -98,7 +98,7 @@ lawkit normal seasonal_sales.csv --enable-timeseries --timeseries-window 52
 
 ```bash
 # 综合数据质量检查
-lawkit compare dataset.csv --laws all --quality-focus --recommend
+lawkit analyze dataset.csv --laws all --quality-focus --recommend
 
 # 数据分布验证
 lawkit normal training_data.csv --quality-control --outliers
@@ -117,7 +117,7 @@ lawkit normal ab_test_results.csv --quality-control --verbose
 lawkit benf random_samples.csv --threshold critical --mad-threshold 2.0
 
 # 实验组比较
-lawkit compare control_group.csv treatment_group.csv --conflict-detection
+lawkit analyze control_group.csv treatment_group.csv --conflict-detection
 ```
 
 ## 业务智能
@@ -132,7 +132,7 @@ lawkit poisson daily_sales.csv --predict --time-unit day --verbose
 lawkit normal monthly_revenue.csv --enable-timeseries --format json
 
 # 多指标综合分析
-lawkit compare sales_metrics.csv --laws pareto,normal,poisson --recommend
+lawkit analyze sales_metrics.csv --laws pareto,normal,poisson --recommend
 ```
 
 ### 风险评估
@@ -153,14 +153,14 @@ lawkit poisson incident_reports.csv --rare-events --predict
 ### 大文件分析
 
 ```bash
-# 流式处理大文件
-lawkit benf huge_dataset.csv --streaming --chunk-size 100000 --parallel
+# 性能优化大文件
+lawkit benf huge_dataset.csv --optimize
 
 # 内存优化分析
-lawkit compare large_files/*.csv --optimize --memory-limit 2GB
+lawkit analyze large_files/*.csv --optimize
 
 # 分布式处理
-find ./big_data -name "*.csv" | parallel -j8 lawkit benf {} --format json
+find ./big_data -name "*.csv" | xargs -P 8 -I {} lawkit benf {} --format json
 ```
 
 ### 实时数据分析
@@ -199,7 +199,7 @@ lawkit benf international_data.csv --auto-detect --verbose
 
 ```bash
 # 多地区销售比较
-lawkit compare us_sales.csv eu_sales.csv asia_sales.csv --recommend
+lawkit analyze us_sales.csv eu_sales.csv asia_sales.csv --recommend
 
 # 国际财务合规检查
 find ./regional_reports -name "*_financial.csv" | \
@@ -218,7 +218,7 @@ lawkit normal exchange_rates.csv --enable-timeseries --outliers
 # 数据质量检查脚本
 
 # 分析新数据
-lawkit compare new_data.csv baseline.csv --quality-focus --format json > quality_report.json
+lawkit analyze new_data.csv baseline.csv --quality-focus --format json > quality_report.json
 
 # 检查是否有质量问题
 risk_level=$(jq -r '.risk_level' quality_report.json)
@@ -275,10 +275,10 @@ cat raw_data.csv | \
 ```bash
 # 性能比较
 time lawkit benf large_dataset.csv
-time lawkit benf large_dataset.csv --parallel --threads 8
-time lawkit benf large_dataset.csv --streaming 
+time lawkit benf large_dataset.csv --optimize
+time lawkit benf large_dataset.csv --optimize
 # 内存使用分析
-/usr/bin/time -v lawkit benf huge_file.csv --streaming --memory-monitor
+/usr/bin/time -v lawkit benf huge_file.csv --optimize
 ```
 
 ## 故障排除示例
@@ -287,10 +287,10 @@ time lawkit benf large_dataset.csv --streaming
 
 ```bash
 # 内存不足
-lawkit benf large_file.csv --streaming --chunk-size 1000
+lawkit benf large_file.csv --optimize
 
 # 性能优化
-lawkit compare *.csv --parallel --threads 4 
+lawkit analyze *.csv --optimize
 # 编码问题
 lawkit benf data.csv --input-encoding utf-8 --debug
 

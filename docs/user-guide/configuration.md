@@ -13,10 +13,9 @@
 lawkit benf data.csv --format json
 lawkit benf data.csv --format yaml
 
-# Language support
-lawkit benf data.csv --lang ja    # Japanese
-lawkit benf data.csv --lang zh    # Chinese
-lawkit benf data.csv --lang auto  # Auto-detect
+# International number support (automatic recognition)
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
 
 # Verbosity
 lawkit benf data.csv --quiet     # Minimal output
@@ -112,21 +111,21 @@ echo "123 ４５６ 七八九" | lawkit benf
 
 ## Integration Analysis
 
-### Compare Command Configuration
+### Multi-Law Analysis Configuration
 
 ```bash
 # Select specific laws
-lawkit compare data.csv --laws benf,pareto,normal
+lawkit analyze data.csv --laws benf,pareto,normal
 
 # Focus on specific analysis
-lawkit compare data.csv --focus quality
-lawkit compare data.csv --focus anomaly
+lawkit analyze data.csv --focus quality
+lawkit analyze data.csv --focus anomaly
 
 # Conflict detection
-lawkit compare data.csv --threshold 0.7 --report conflicting
+lawkit diagnose data.csv --threshold 0.7 --report conflicting
 
 # Recommendation mode
-lawkit compare data.csv --recommend --purpose fraud
+lawkit analyze data.csv --recommend --purpose fraud
 ```
 
 ### Analysis Purposes
@@ -142,9 +141,6 @@ lawkit compare data.csv --recommend --purpose fraud
 ## Environment Variables
 
 ```bash
-# Default language
-export LAWKIT_LANG=ja
-
 # Default output format
 export LAWKIT_FORMAT=json
 
@@ -175,8 +171,8 @@ for file in *.csv; do
   lawkit benf "$file" --format json > "results_${file%.csv}.json"
 done
 
-# Compare results
-lawkit compare data1.csv data2.csv data3.csv --report summary
+# Analyze results
+lawkit analyze data1.csv data2.csv data3.csv --report summary
 ```
 
 ## Performance Tuning
@@ -188,7 +184,7 @@ lawkit compare data1.csv data2.csv data3.csv --report summary
 lawkit benf large_data.csv --min-count 1000
 
 # Focus on specific analysis
-lawkit compare large_data.csv --focus quality --laws benf,normal
+lawkit analyze large_data.csv --focus quality --laws benf,normal
 ```
 
 ### Memory Management

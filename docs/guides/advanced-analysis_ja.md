@@ -117,7 +117,7 @@ lawkit normal measurements.csv \
 lawkit benf network_logs.csv \
   --outlier-method isolation \
   --outlier-depth 12 \
-  --parallel-processing \
+   \
   --real-time
 ```
 
@@ -256,7 +256,7 @@ lawkit normal sensor_readings.csv \
   --real-time-alerts
 
 # ビジネスメトリクス追跡
-lawkit compare monthly_kpis.csv \
+lawkit analyze monthly_kpis.csv \
   --enable-timeseries \
   --trend-analysis \
   --forecast-steps 6 \
@@ -272,7 +272,7 @@ lawkit compare monthly_kpis.csv \
 
 ```bash
 # 自動並列化を有効化
-lawkit compare large_dataset.csv --enable-parallel
+lawkit analyze large_dataset.csv --enable-parallel
 
 # lawkitに最適スレッド数を決定させる
 lawkit benf huge_file.csv --enable-parallel --auto-threads
@@ -282,13 +282,13 @@ lawkit benf huge_file.csv --enable-parallel --auto-threads
 
 ```bash
 # スレッド数を指定
-lawkit compare data.csv --parallel-threads 8
+lawkit analyze data.csv 
 
 # 利用可能な全コアを使用
-lawkit benf data.csv --parallel-threads $(nproc)
+lawkit benf data.csv 
 
 # 他のプロセス用にいくつかのコアを残す
-lawkit compare data.csv --parallel-threads $(($(nproc) - 2))
+lawkit analyze data.csv 
 ```
 
 ### チャンクベース処理
@@ -297,20 +297,20 @@ lawkit compare data.csv --parallel-threads $(($(nproc) - 2))
 # メモリ効率のためのチャンクサイズ設定
 lawkit benf large_data.csv \
   --enable-parallel \
-  --parallel-chunk-size 10000
+  
 
 # 適応的チャンクサイジング
-lawkit compare massive_file.csv \
+lawkit analyze massive_file.csv \
   --enable-parallel \
   --adaptive-chunks \
-  --memory-limit 2048
+  
 ```
 
 ### パフォーマンス監視
 
 ```bash
 # 並列パフォーマンスをベンチマーク
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --benchmark-parallel \
   --show-speedup
@@ -319,7 +319,7 @@ lawkit compare data.csv \
 lawkit benf data.csv \
   --enable-parallel \
   --performance-report \
-  --threads-efficiency
+  
 ```
 
 ### 並列処理の例
@@ -328,23 +328,21 @@ lawkit benf data.csv \
 # 大規模詐欺検出
 lawkit benf transactions.csv \
   --enable-parallel \
-  --parallel-threads 16 \
+  \
   --outlier-method ensemble \
-  --parallel-chunk-size 50000
+  
 
 # マルチファイル比較分析
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
-  --parallel-threads 8 \
-  --memory-limit 4096 \
+  \
+   \
   --output-format json
 
-# リアルタイムストリーム処理
-lawkit benf data_stream.csv \
-  --enable-parallel \
-  --streaming \
-  --parallel-threads 4 \
-  --real-time-output
+# リアルタイムデータ処理
+lawkit benf data.csv \
+  --optimize \
+  --quiet
 ```
 
 ## メモリ効率的な処理
@@ -355,13 +353,13 @@ lawkit benf data_stream.csv \
 
 ```bash
 # 大ファイルの基本ストリーミング
-lawkit benf massive_dataset.csv --streaming
+lawkit benf massive_dataset.csv 
 
 # カスタムチャンクサイズでのストリーミング
-lawkit benf huge_file.csv --streaming --chunk-size 5000
+lawkit benf huge_file.csv  
 
 # メモリ制限ストリーミング
-lawkit benf data.csv --streaming --memory-limit 512
+lawkit benf data.csv  
 ```
 
 ### 増分統計
@@ -371,7 +369,7 @@ lawkit benf data.csv --streaming --memory-limit 512
 lawkit benf large_data.csv --incremental-stats
 
 # 定期的結果での増分処理
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --incremental-stats \
   --progress-interval 10000
 
@@ -386,19 +384,19 @@ lawkit benf data.csv \
 
 ```bash
 # メモリ制限を設定
-lawkit benf data.csv --memory-limit 1024
+lawkit benf data.csv 
 
 # リソース監視
-lawkit compare large_files/*.csv \
+lawkit analyze large_files/*.csv \
   --monitor-resources \
-  --memory-limit 2048 \
+   \
   --cpu-limit 80
 
 # ガベージコレクション最適化
 lawkit benf data.csv \
-  --streaming \
+   \
   --optimize-gc \
-  --memory-limit 512
+  
 ```
 
 ### メモリ効率的な例
@@ -406,25 +404,25 @@ lawkit benf data.csv \
 ```bash
 # 4GB RAMで10GB以上のデータセットを処理
 lawkit benf massive_financial_data.csv \
-  --streaming \
-  --memory-limit 1024 \
-  --chunk-size 1000 \
+   \
+   \
+   \
   --incremental-stats \
   --progress-reporting
 
 # 継続的データ処理
-lawkit benf continuous_stream.csv \
-  --streaming \
+lawkit benf continuous_data.csv \
+   \
   --real-time \
-  --memory-limit 512 \
+   \
   --buffer-size 100 \
   --live-updates
 
 # マルチギガバイト比較
-lawkit compare huge_datasets/*.csv \
-  --streaming \
+lawkit analyze huge_datasets/*.csv \
+   \
   --enable-parallel \
-  --memory-limit 2048 \
+   \
   --incremental-stats \
   --summary-only
 ```
@@ -440,7 +438,7 @@ lawkit compare huge_datasets/*.csv \
 lawkit benf financial_data.csv \
   --outlier-method ensemble \
   --time-series-analysis \
-  --parallel-processing
+  
 
 # マルチスケールベンフォード分析
 lawkit benf data.csv \
@@ -485,15 +483,15 @@ lawkit normal time_data.csv \
 
 ```bash
 # 包括的統計分析
-lawkit compare complex_data.csv \
+lawkit analyze complex_data.csv \
   --all-laws \
   --advanced-outliers \
   --time-series-analysis \
-  --parallel-processing \
+   \
   --detailed-report
 
 # 合意ベース分析
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --law-ensemble \
   --outlier-consensus \
   --confidence-aggregation \
@@ -508,24 +506,24 @@ lawkit compare data.csv \
 
 **小規模データセット (< 10Kレコード):**
 ```bash
-lawkit benf data.csv --threads 1 --no-streaming
+lawkit benf data.csv  
 ```
 
 **中規模データセット (10K - 1Mレコード):**
 ```bash
 lawkit benf data.csv \
   --enable-parallel \
-  --parallel-threads 4 \
-  --chunk-size 10000
+  \
+  
 ```
 
 **大規模データセット (1M+レコード):**
 ```bash
 lawkit benf data.csv \
-  --streaming \
+   \
   --enable-parallel \
-  --parallel-threads 8 \
-  --memory-limit 2048 \
+  \
+   \
   --incremental-stats
 ```
 
@@ -533,8 +531,8 @@ lawkit benf data.csv \
 
 **リアルタイム分析:**
 ```bash
-lawkit benf stream.csv \
-  --streaming \
+lawkit benf data.csv \
+   \
   --real-time \
   --outlier-method isolation \
   --fast-mode
@@ -542,9 +540,9 @@ lawkit benf stream.csv \
 
 **バッチ処理:**
 ```bash
-lawkit compare datasets/*.csv \
+lawkit analyze datasets/*.csv \
   --enable-parallel \
-  --parallel-threads $(nproc) \
+  \
   --batch-mode \
   --summary-only
 ```
@@ -562,18 +560,18 @@ lawkit benf data.csv \
 
 **CPU集約的ワークロード:**
 ```bash
-lawkit compare data.csv \
+lawkit analyze data.csv \
   --enable-parallel \
   --cpu-intensive \
-  --parallel-threads $(nproc) \
+  \
   --no-io-limit
 ```
 
 **メモリ制約システム:**
 ```bash
 lawkit benf data.csv \
-  --streaming \
-  --memory-limit 256 \
+   \
+   \
   --minimal-cache \
   --compress-intermediate
 ```
@@ -581,7 +579,7 @@ lawkit benf data.csv \
 **ストレージ最適化:**
 ```bash
 lawkit benf data.csv \
-  --streaming \
+   \
   --direct-io \
   --minimal-memory \
   --compress-output

@@ -339,14 +339,14 @@ else
     print_fail "lawkit executable not found for pipeline test"
 fi
 
-# Test 18: Multi-law compare functionality
-print_test "Multi-law compare functionality"
+# Test 18: Multi-law analyze functionality
+print_test "Multi-law analyze functionality"
 if [ -f "$LAWKIT" ]; then
-    compare_result=$($LAWKIT compare audit-sample/sample1.csv --laws benford,pareto --min-count 5 --format json 2>/dev/null | grep -c '"analysis_results"' || echo "0")
-    if [ "$compare_result" -gt 0 ]; then
-        print_pass "Multi-law compare works"
+    analyze_result=$($LAWKIT analyze audit-sample/sample1.csv --laws benford,pareto --min-count 5 --format json 2>/dev/null | grep -c '"analysis_results"' || echo "0")
+    if [ "$analyze_result" -gt 0 ]; then
+        print_pass "Multi-law analyze works"
     else
-        print_fail "Multi-law compare failed"
+        print_fail "Multi-law analyze failed"
     fi
 else
     print_fail "lawkit executable not found for compare test"
@@ -445,7 +445,7 @@ if [ -f "$LAWKIT" ]; then
     doc_tests=0
     
     # Test comprehensive data quality assessment
-    if $LAWKIT compare audit-sample/sample1.csv --laws benford,pareto,normal --min-count 5 --format json >/dev/null 2>&1; then
+    if $LAWKIT analyze audit-sample/sample1.csv --laws benford,pareto,normal --min-count 5 --format json >/dev/null 2>&1; then
         doc_tests=$((doc_tests + 1))
     fi
     

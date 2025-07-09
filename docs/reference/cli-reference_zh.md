@@ -36,12 +36,7 @@ lawkit [GLOBAL_OPTIONS] <SUBCOMMAND> [OPTIONS] [INPUT]
 
 | 选项 | 描述 | 默认值 |
 |------|------|--------|
-| `--parallel` | 启用并行处理 | `false` |
-| `--threads <N>` | 线程数 | CPU核心数 |
-| `--streaming` | 流式处理大文件 | `false` |
-| `--chunk-size <N>` | 块大小 | `10000` |
 | `--optimize` | 启用优化模式 | `false` |
-| `--memory-limit <SIZE>` | 内存使用限制 | 无限制 |
 
 ## 子命令
 
@@ -74,6 +69,9 @@ lawkit benf accounting.csv --threshold critical --mad-threshold 2.0
 
 # 特定列分析
 lawkit benf sales.csv --columns "revenue,profit" --verbose
+
+# 繁体字金融数字支持（防伪大写）
+echo "壹萬貳仟參佰肆拾伍 陸萬柒仟捌佰玖拾" | lawkit benf
 
 # 过滤小额交易
 lawkit benf transactions.csv --filter ">=1000" --format json
@@ -268,10 +266,10 @@ lawkit poisson incidents.csv --predict --time-unit day
 lawkit poisson failures.csv --rare-events --verbose
 ```
 
-### compare - 多法则比较
+### analyze - 多法则分析
 
 ```bash
-lawkit compare [OPTIONS] [INPUT]
+lawkit analyze [OPTIONS] [INPUT]
 ```
 
 同时应用多种统计法则，提供综合分析和建议。
@@ -300,16 +298,16 @@ lawkit compare [OPTIONS] [INPUT]
 
 ```bash
 # 所有法则比较
-lawkit compare dataset.csv
+lawkit analyze dataset.csv
 
 # 特定法则组合
-lawkit compare financial.csv --laws "benf,pareto" --recommend
+lawkit analyze financial.csv --laws "benf,pareto" --recommend
 
 # 冲突检测
-lawkit compare data.csv --conflict-detection --quality-focus
+lawkit analyze data.csv --conflict-detection --quality-focus
 
 # 质量专注分析
-lawkit compare measurements.csv --quality-focus --format json
+lawkit analyze measurements.csv --quality-focus --format json
 ```
 
 ### generate - 数据生成
@@ -450,7 +448,7 @@ lawkit list examples     # 使用示例
 | 变量名 | 描述 | 默认值 |
 |--------|------|--------|
 | `LAWKIT_FORMAT` | 默认输出格式 | `text` |
-| `LAWKIT_THREADS` | 默认线程数 | CPU核心数 |
+| `LAWKIT_OPTIMIZE` | 默认优化模式 | `false` |
 | `LAWKIT_DEBUG` | 调试模式 | `false` |
 | `LAWKIT_CONFIG` | 配置文件路径 | `~/.config/lawkit/config.yaml` |
 
@@ -475,8 +473,7 @@ lawkit支持YAML配置文件：
 default:
   format: json
   verbose: true
-  parallel: true
-  threads: 8
+  optimize: true
 
 benf:
   threshold: medium
@@ -490,7 +487,7 @@ normal:
   outliers: true
   outlier_method: ensemble
 
-compare:
+analyze:
   recommend: true
   conflict_detection: true
 ```
@@ -525,7 +522,7 @@ find . -name "*.csv" | parallel lawkit benf {} --format json
 lawkit benf data.csv --config custom_config.yaml
 
 # 性能监控
-time lawkit benf large_file.csv --streaming --verbose
+time lawkit benf large_file.csv --optimize --verbose
 ```
 
 ### 自动化脚本

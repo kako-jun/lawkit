@@ -130,7 +130,7 @@ fi
 
 # 阶段2: 分布类型识别
 echo "阶段2: 分布识别"
-lawkit compare "$INPUT_FILE" --laws all --format json > "$OUTPUT_DIR/distribution_analysis.json"
+lawkit analyze "$INPUT_FILE" --laws all --format json > "$OUTPUT_DIR/distribution_analysis.json"
 
 best_fit=$(jq -r '.recommendations[0].law' "$OUTPUT_DIR/distribution_analysis.json")
 echo "最佳拟合分布: $best_fit"
@@ -230,8 +230,8 @@ DATA_DIR="$1"
 RESULTS_DIR="batch_analysis_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$RESULTS_DIR"
 
-# 并行处理所有文件
-find "$DATA_DIR" -name "*.csv" | parallel -j8 --eta "
+# 批量处理所有文件
+find "$DATA_DIR" -name "*.csv" | xargs -P 8 -I {} bash -c "
     echo '处理文件: {}'
     
     # 创建文件特定的结果目录

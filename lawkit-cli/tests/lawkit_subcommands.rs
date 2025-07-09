@@ -89,7 +89,9 @@ fn test_lawkit_list() {
     assert!(stdout.contains("zipf"));
     assert!(stdout.contains("normal"));
     assert!(stdout.contains("poisson"));
-    assert!(stdout.contains("compare"));
+    assert!(stdout.contains("analyze"));
+    assert!(stdout.contains("validate"));
+    assert!(stdout.contains("diagnose"));
 }
 
 #[test]
@@ -226,11 +228,11 @@ fn test_lawkit_poisson_basic() {
 }
 
 #[test]
-fn test_lawkit_compare_basic() {
+fn test_lawkit_analyze_basic() {
     let test_data = generate_test_data();
-    let output = run_lawkit_command_with_file("compare", &test_data, &[]);
+    let output = run_lawkit_command_with_file("analyze", &test_data, &[]);
 
-    // compareコマンドは矛盾検出時に非ゼロ終了コードを返すことがある
+    // analyzeコマンドは矛盾検出時に非ゼロ終了コードを返すことがある
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
@@ -307,8 +309,8 @@ fn test_configuration_examples() {
 fn test_multi_law_examples() {
     let test_data = generate_test_data();
 
-    // Compare all laws
-    let output = run_lawkit_command_with_file("compare", &test_data, &[]);
+    // Analyze all laws
+    let output = run_lawkit_command_with_file("analyze", &test_data, &[]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
@@ -316,14 +318,14 @@ fn test_multi_law_examples() {
 
     // Focus on concentration analysis
     let output =
-        run_lawkit_command_with_file("compare", &test_data, &["--laws", "benf,pareto,normal"]);
+        run_lawkit_command_with_file("analyze", &test_data, &["--laws", "benf,pareto,normal"]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
     ));
 
     // Recommendation mode
-    let output = run_lawkit_command_with_file("compare", &test_data, &["--recommend"]);
+    let output = run_lawkit_command_with_file("diagnose", &test_data, &["--recommend"]);
     assert!(matches!(
         output.status.code(),
         Some(0) | Some(10) | Some(11) | Some(12)
