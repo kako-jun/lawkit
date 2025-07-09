@@ -97,13 +97,21 @@ fn output_consistency_check_result(
     writeln!(writer)?;
 
     if result.consistency_score < threshold {
-        writeln!(writer, "{}", colors::level_warning("Consistency below threshold"))?;
+        writeln!(
+            writer,
+            "{}",
+            colors::level_warning("Consistency below threshold")
+        )?;
         writeln!(
             writer,
             "Recommendation: Review data quality and collection methods"
         )?;
     } else {
-        writeln!(writer, "{}", colors::level_pass("Data consistency meets requirements"))?;
+        writeln!(
+            writer,
+            "{}",
+            colors::level_pass("Data consistency meets requirements")
+        )?;
     }
 
     writeln!(writer)?;

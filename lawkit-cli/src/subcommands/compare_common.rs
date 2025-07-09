@@ -139,7 +139,11 @@ fn output_integration_text(
     if !result.conflicts.is_empty() {
         writeln!(writer, "{}:", get_text("conflicts", "en"))?;
         for conflict in &result.conflicts {
-            writeln!(writer, "  {}", colors::level_conflict(&conflict.description))?;
+            writeln!(
+                writer,
+                "  {}",
+                colors::level_conflict(&conflict.description)
+            )?;
             writeln!(
                 writer,
                 "     {}: {}",

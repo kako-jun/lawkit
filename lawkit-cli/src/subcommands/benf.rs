@@ -4,8 +4,8 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
-        streaming_io::OptimizedFileReader,
         risk::RiskLevel,
+        streaming_io::OptimizedFileReader,
     },
     error::{BenfError, Result},
     laws::benford::BenfordResult,

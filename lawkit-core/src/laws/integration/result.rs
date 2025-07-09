@@ -399,7 +399,8 @@ impl IntegrationResult {
                                 "Unexpected change detected for {}",
                                 get_law_display_name(law_name)
                             ),
-                            likely_cause: "Analysis configuration or law selection inconsistency".to_string(),
+                            likely_cause: "Analysis configuration or law selection inconsistency"
+                                .to_string(),
                             resolution_suggestion: "Please verify the analysis target law settings"
                                 .to_string(),
                         };
@@ -412,7 +413,10 @@ impl IntegrationResult {
                             conflict_type: ConflictType::MethodologicalConflict,
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.8,
-                            description: format!("Score type changed for {}", get_law_display_name(law_name)),
+                            description: format!(
+                                "Score type changed for {}",
+                                get_law_display_name(law_name)
+                            ),
                             likely_cause: "Internal analysis error or data corruption".to_string(),
                             resolution_suggestion: "Please re-run the analysis".to_string(),
                         };
@@ -426,7 +430,7 @@ impl IntegrationResult {
     /// diffx-core強化版スコア矛盾検出
     fn detect_score_conflicts(&mut self) {
         let laws: Vec<String> = self.law_scores.keys().cloned().collect();
-        
+
         // diffx-coreを使用した構造化比較用のJSONオブジェクト作成
         for i in 0..laws.len() {
             for j in i + 1..laws.len() {
@@ -456,7 +460,7 @@ impl IntegrationResult {
 
                     // diffx-coreで構造的差分を検出
                     let diff_results = diff(&law_a_profile, &law_b_profile, None, Some(0.1), None);
-                    
+
                     // 従来の単純差分計算
                     let score_diff = (score_a - score_b).abs();
                     let max_score = score_a.max(score_b);
@@ -465,10 +469,12 @@ impl IntegrationResult {
                         let conflict_ratio = score_diff / max_score;
 
                         // diffx-coreの結果と組み合わせた強化判定
-                        let has_structural_conflict = !diff_results.is_empty() && 
-                            diff_results.iter().any(|result| {
+                        let has_structural_conflict = !diff_results.is_empty()
+                            && diff_results.iter().any(|result| {
                                 if let DiffResult::Modified(path, _old_val, _new_val) = result {
-                                    if path.contains("confidence_level") || path.contains("score_category") {
+                                    if path.contains("confidence_level")
+                                        || path.contains("score_category")
+                                    {
                                         return true;
                                     }
                                 }
@@ -509,19 +515,22 @@ impl IntegrationResult {
         diff_results: &[DiffResult],
     ) -> Conflict {
         let conflict_type = self.classify_conflict_type(&law_a, &law_b);
-        
+
         // diffx-coreの差分情報から詳細な説明を生成
         let mut detailed_description = format!(
             "{} and {} show significantly different evaluations (difference: {:.3})",
-            get_law_display_name(&law_a), get_law_display_name(&law_b), (score_a - score_b).abs()
+            get_law_display_name(&law_a),
+            get_law_display_name(&law_b),
+            (score_a - score_b).abs()
         );
 
         if !diff_results.is_empty() {
             detailed_description.push_str(" with structural differences in: ");
-            let diff_details: Vec<String> = diff_results.iter()
+            let diff_details: Vec<String> = diff_results
+                .iter()
                 .filter_map(|result| {
                     if let DiffResult::Modified(path, old_val, new_val) = result {
-                        Some(format!("{} ({:?} → {:?})", path, old_val, new_val))
+                        Some(format!("{path} ({old_val:?} → {new_val:?})"))
                     } else {
                         None
                     }
@@ -530,8 +539,10 @@ impl IntegrationResult {
             detailed_description.push_str(&diff_details.join(", "));
         }
 
-        let likely_cause = self.diagnose_enhanced_conflict_cause(&law_a, &law_b, score_a, score_b, diff_results);
-        let resolution_suggestion = self.suggest_enhanced_conflict_resolution(&law_a, &law_b, &conflict_type, diff_results);
+        let likely_cause =
+            self.diagnose_enhanced_conflict_cause(&law_a, &law_b, score_a, score_b, diff_results);
+        let resolution_suggestion =
+            self.suggest_enhanced_conflict_resolution(&law_a, &law_b, &conflict_type, diff_results);
 
         Conflict {
             conflict_type,
@@ -566,14 +577,18 @@ impl IntegrationResult {
 
     /// ヘルパーメソッド: 相対順位取得
     fn get_relative_rank(&self, law_name: &str) -> usize {
-        let mut scores: Vec<(String, f64)> = self.law_scores.iter()
+        let mut scores: Vec<(String, f64)> = self
+            .law_scores
+            .iter()
             .map(|(name, &score)| (name.clone(), score))
             .collect();
         scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-        
-        scores.iter()
+
+        scores
+            .iter()
             .position(|(name, _)| name == law_name)
-            .unwrap_or(0) + 1
+            .unwrap_or(0)
+            + 1
     }
 
     /// 強化版原因診断
@@ -586,10 +601,11 @@ impl IntegrationResult {
         diff_results: &[DiffResult],
     ) -> String {
         let mut cause = self.diagnose_conflict_cause(law_a, law_b, score_a, score_b);
-        
+
         if !diff_results.is_empty() {
             cause.push_str(" Additionally, structural analysis reveals: ");
-            let structural_issues: Vec<String> = diff_results.iter()
+            let structural_issues: Vec<String> = diff_results
+                .iter()
                 .filter_map(|result| {
                     if let DiffResult::Modified(path, _, _) = result {
                         if path.contains("confidence_level") {
@@ -606,7 +622,7 @@ impl IntegrationResult {
                 .collect();
             cause.push_str(&structural_issues.join(", "));
         }
-        
+
         cause
     }
 
@@ -619,14 +635,15 @@ impl IntegrationResult {
         diff_results: &[DiffResult],
     ) -> String {
         let mut suggestion = self.suggest_conflict_resolution(law_a, law_b, conflict_type);
-        
+
         if !diff_results.is_empty() {
             suggestion.push_str(" Consider deep structural analysis of data characteristics affecting confidence levels and score categories.");
         }
-        
+
         suggestion
     }
 
+    #[allow(dead_code)]
     fn create_conflict(
         &self,
         law_a: String,
