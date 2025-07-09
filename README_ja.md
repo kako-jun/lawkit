@@ -22,19 +22,19 @@ JSON、CSV等の構造化出力で、AIツールや自動化ワークフロー�
 ```bash
 # 不正検知のためのベンフォード法則分析
 $ lawkit benf test_data.txt
-Benford's Law Analysis Results
+Benford Law Analysis Results
 
 Dataset: test_data.txt
 Numbers analyzed: 500
-Attention Level: Critical
+CRITICAL: Dataset analysis
 
 # 統計法則に従うテストデータ生成
 $ lawkit generate pareto --samples 100 | head -5
-1.11
-2.34
-4.74
-2.97
-1.09
+5.48
+1.03
+1.04
+1.42
+1.61
 
 # スマート統合による多法則分析
 $ lawkit analyze test_data.txt
@@ -42,12 +42,13 @@ Statistical Laws Integration Analysis
 
 Dataset: test_data.txt
 Numbers Analyzed: 500
-Laws Executed: 4 (benf, pareto, zipf, normal)
+Laws Executed: 5 (benf, pareto, zipf, normal, poisson)
 
 Integration Metrics:
-  Overall Quality Score: 0.239
-  Consistency Score: 0.484
-  Conflicts Detected: 10
+  Overall Quality Score: 0.394
+  Consistency Score: 0.821
+  Conflicts Detected: 14
+  Recommendation Confidence: 0.100
 ```
 
 ## ✨ 主な機能

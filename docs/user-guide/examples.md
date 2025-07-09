@@ -18,8 +18,8 @@ lawkit analyze expenses_2024.csv --laws benford,normal --detect-conflicts
 ```
 
 **Expected Results**: 
-- Deviations from Benford's Law may indicate artificial manipulation
-- Normal distribution analysis identifies outliers
+- Deviations from Benford Law may indicate artificial manipulation
+- Normal Distribution analysis identifies outliers
 - Conflict detection highlights items requiring further investigation
 
 ### Case: Sales Data Reliability Verification
