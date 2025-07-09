@@ -71,3 +71,32 @@ pub fn alert(text: &str) -> String {
         text.to_string()
     }
 }
+
+/// 統一レベル表記システム
+pub fn level_critical(message: &str) -> String {
+    format!("{}: {}", critical("CRITICAL"), message)
+}
+
+pub fn level_high(message: &str) -> String {
+    format!("{}: {}", fail("HIGH"), message)
+}
+
+pub fn level_medium(message: &str) -> String {
+    format!("{}: {}", warn("MEDIUM"), message)
+}
+
+pub fn level_low(message: &str) -> String {
+    format!("{}: {}", pass("LOW"), message)
+}
+
+pub fn level_warning(message: &str) -> String {
+    format!("{}: {}", warn("WARNING"), message)
+}
+
+pub fn level_pass(message: &str) -> String {
+    format!("{}: {}", pass("PASS"), message)
+}
+
+pub fn level_conflict(message: &str) -> String {
+    format!("{}: {}", fail("CONFLICT"), message)
+}

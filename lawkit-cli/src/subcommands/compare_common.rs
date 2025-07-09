@@ -1,3 +1,4 @@
+use crate::colors;
 use crate::common_options::{get_optimized_reader, setup_optimization_config};
 use chrono;
 use clap::ArgMatches;
@@ -138,7 +139,7 @@ fn output_integration_text(
     if !result.conflicts.is_empty() {
         writeln!(writer, "{}:", get_text("conflicts", "en"))?;
         for conflict in &result.conflicts {
-            writeln!(writer, "  CONFLICT: {}", conflict.description)?;
+            writeln!(writer, "  {}", colors::level_conflict(&conflict.description))?;
             writeln!(
                 writer,
                 "     {}: {}",

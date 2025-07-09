@@ -31,7 +31,7 @@ p-value: 0.117
 Attention: PASS
 
 # 生成帕累托分布数据
-$ lawkit generate pareto --size 100 | head -5
+$ lawkit generate pareto --samples 100 | head -5
 4.312
 1.827
 12.543
@@ -65,6 +65,68 @@ Conflicts:
      Suggestion: Focus on Zipf analysis for frequency data
 
 Risk Assessment: MEDIUM (Score: 0.743)
+
+# 一致性检查的数据验证
+$ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
+Data Validation and Consistency Analysis
+
+Dataset: transactions.csv
+Numbers analyzed: 2500
+Laws validated: 3 (benford, pareto, normal)
+
+Validation Results:
+  Data Quality Score: 0.891
+  Cross-validation Consistency: 0.943
+  Statistical Reliability: HIGH
+
+Individual Law Validation:
+  ✅ Benford Law: PASSED (Score: 0.834, p-value: 0.023)
+  ✅ Pareto Analysis: PASSED (Gini: 0.78, Alpha: 2.12)
+  ⚠️ Normal Distribution: MARGINAL (Shapiro-Wilk: 0.032)
+
+Consistency Analysis:
+  Benford-Pareto Agreement: 0.912 (HIGH)
+  Benford-Normal Agreement: 0.643 (MEDIUM)
+  Pareto-Normal Agreement: 0.587 (MEDIUM)
+
+Data Quality Assessment: RELIABLE (Validation Score: 0.891)
+
+# 详细冲突分析和建议
+$ lawkit diagnose --laws all suspicious_data.csv --report detailed
+Detailed Conflict Detection and Diagnostic Report
+
+Dataset: suspicious_data.csv
+Numbers analyzed: 1500
+Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
+
+⚠️ CONFLICTS DETECTED: 3 Critical Issues
+
+Critical Conflict #1: Score Deviation
+  Laws: Benford vs Normal Distribution
+  Conflict Score: 0.847 (HIGH)
+  Description: Benford and Normal Distribution show significantly different 
+              evaluations (difference: 0.623) with structural differences in: 
+              confidence_level ("high" → "low"), score_category ("good" → "poor")
+  Root Cause: 本福德法则表明潜在的数据操作，而正态分布表明
+             合法的自然分布模式
+  Resolution: 调查数据源完整性；考虑时间序列分析以识别操作期间
+
+Critical Conflict #2: Distribution Mismatch  
+  Laws: Pareto vs Poisson Distribution
+  Conflict Score: 0.793 (HIGH)
+  Description: 幂律分布与离散事件建模冲突
+  Root Cause: 数据包含混合模式（连续财富分布和离散事件计数）
+  Resolution: 分析前按类型分割数据；对金额应用帕累托，对频率应用泊松
+
+Critical Conflict #3: Methodological Conflict
+  Laws: Zipf vs Normal Distribution  
+  Conflict Score: 0.651 (MEDIUM)
+  Description: 基于频率的分析与连续分布冲突
+  Root Cause: 数据集可能包含文本频率数据和数值测量值
+  Resolution: 将频率分析与统计分布测试分离
+
+Risk Assessment: CRITICAL (检测到多个根本冲突)
+Recommendation: 自动决策前需要手动数据审查
 ```
 
 ## ✨ 主要功能
@@ -87,6 +149,8 @@ $ lawkit analyze data.csv     # 多法则分析: ~850ms
 
 
 ## 🏗️ 工作原理
+
+### 核心分析引擎
 
 ```mermaid
 graph TB
@@ -120,6 +184,31 @@ graph TB
     F3 --> G
     F4 --> G
 ```
+
+### 三阶段分析工作流
+
+```mermaid
+graph LR
+    subgraph "阶段1：基础分析"
+        A[📊 lawkit analyze<br/>多法则集成] --> A1[整体质量评分<br/>法则兼容性<br/>初步洞察]
+    end
+    
+    subgraph "阶段2：验证"
+        A1 --> B[🔍 lawkit validate<br/>数据质量检查] 
+        B --> B1[一致性分析<br/>交叉验证<br/>可靠性评估]
+    end
+    
+    subgraph "阶段3：深度诊断"
+        B1 --> C[🩺 lawkit diagnose<br/>冲突检测]
+        C --> C1[详细根本原因<br/>解决策略<br/>风险评估]
+    end
+    
+    style A fill:#e3f2fd
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+```
+
+**analyze** → **validate** → **diagnose**: 从广泛开始，验证发现，最后深入研究具体问题和冲突。
 
 lawkit通过多个统计镜头同时分析您的数据，然后整合结果提供全面的洞察和建议。
 
