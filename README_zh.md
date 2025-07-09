@@ -26,7 +26,7 @@ Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
-LOW: Dataset analysis
+[LOW] Dataset analysis
 
 # 生成帕累托分布数据
 $ lawkit generate pareto --samples 100 | head -5
@@ -58,11 +58,11 @@ Law Results:
   Poisson Distribution: 0.634
 
 Conflicts:
-  CONFLICT: Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
+  [CONFLICT] Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
      Likely Cause: Different distribution assumptions
      Suggestion: Focus on Zipf analysis for frequency data
 
-Risk Assessment: MEDIUM
+Risk Assessment: [MEDIUM]
 
 # 一致性检查的数据验证
 $ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
@@ -78,9 +78,9 @@ Validation Results:
   Statistical Reliability: HIGH
 
 Individual Law Validation:
-  PASS: Benford Law validation (Score: 0.834, p-value: 0.023)
-  PASS: Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
-  WARNING: Normal Distribution validation (Shapiro-Wilk: 0.032)
+  [PASS] Benford Law validation (Score: 0.834, p-value: 0.023)
+  [PASS] Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
+  [WARNING] Normal Distribution validation (Shapiro-Wilk: 0.032)
 
 Consistency Analysis:
   Benford-Pareto Agreement: 0.912 (HIGH)
@@ -97,7 +97,7 @@ Dataset: suspicious_data.csv
 Numbers analyzed: 1500
 Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
 
-CONFLICT: 3 Critical Issues Detected
+[CONFLICT] 3 Critical Issues Detected
 
 Critical Conflict #1: Score Deviation
   Laws: Benford Law vs Normal Distribution
@@ -123,7 +123,7 @@ Critical Conflict #3: Methodological Conflict
   Root Cause: 数据集可能包含文本频率数据和数值测量值
   Resolution: 将频率分析与统计分布测试分离
 
-Risk Assessment: CRITICAL (检测到多个根本冲突)
+Risk Assessment: [CRITICAL] (检测到多个根本冲突)
 Recommendation: 自动决策前需要手动数据审查
 ```
 

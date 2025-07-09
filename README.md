@@ -26,7 +26,7 @@ Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
-LOW: Dataset analysis
+[LOW] Dataset analysis
 
 # Generate test data following statistical laws
 $ lawkit generate pareto --samples 100 | head -5
@@ -268,11 +268,11 @@ Law Results:
   Poisson Distribution: 0.634
 
 Conflicts:
-  CONFLICT: Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
+  [CONFLICT] Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
      Likely Cause: Different distribution assumptions
      Suggestion: Focus on Zipf analysis for frequency data
 
-Risk Assessment: MEDIUM
+Risk Assessment: [MEDIUM]
 
 # Stage 2: Data validation with consistency checks
 $ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
@@ -288,9 +288,9 @@ Validation Results:
   Statistical Reliability: HIGH
 
 Individual Law Validation:
-  PASS: Benford Law validation (Score: 0.834, p-value: 0.023)
-  PASS: Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
-  WARNING: Normal Distribution validation (Shapiro-Wilk: 0.032)
+  [PASS] Benford Law validation (Score: 0.834, p-value: 0.023)
+  [PASS] Pareto Principle validation (Gini: 0.78, Alpha: 2.12)
+  [WARNING] Normal Distribution validation (Shapiro-Wilk: 0.032)
 
 Consistency Analysis:
   Benford-Pareto Agreement: 0.912 (HIGH)
@@ -307,7 +307,7 @@ Dataset: suspicious_data.csv
 Numbers analyzed: 1500
 Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
 
-CONFLICT: 3 Critical Issues Detected
+[CONFLICT] 3 Critical Issues Detected
 
 Critical Conflict #1: Score Deviation
   Laws: Benford Law vs Normal Distribution
@@ -336,7 +336,7 @@ Critical Conflict #3: Methodological Conflict
   Root Cause: Dataset may contain both textual frequency data and numerical measurements
   Resolution: Separate frequency analysis from statistical distribution testing
 
-Risk Assessment: CRITICAL (Multiple fundamental conflicts detected)
+Risk Assessment: [CRITICAL] (Multiple fundamental conflicts detected)
 Recommendation: Manual data review required before automated decision-making
 ```
 

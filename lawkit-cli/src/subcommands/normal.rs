@@ -1,3 +1,4 @@
+use crate::colors;
 use crate::common_options::{get_optimized_reader, setup_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
@@ -470,7 +471,6 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
 }
 
 fn print_normal_interpretation(result: &NormalResult) {
-    use crate::colors;
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
