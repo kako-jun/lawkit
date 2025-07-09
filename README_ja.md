@@ -125,9 +125,9 @@ graph LR
         C --> C1[詳細根本原因<br/>解決戦略<br/>リスク評価]
     end
     
-    style A fill:#e3f2fd
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
+    style A stroke:#2196f3,stroke-width:2px
+    style B stroke:#9c27b0,stroke-width:2px
+    style C stroke:#ff9800,stroke-width:2px
 ```
 
 **analyze** → **validate** → **diagnose**: まず全体を把握し、データ品質をチェックして、最後に具体的な問題を調査します。
@@ -362,7 +362,7 @@ done
 diffx analysis_*.txt --chain  # 時間経過によるパターン進化を可視化
 ```
 
-## 🔗 メタチェーン：パターン変遷の追跡
+## 🔗 メタチェーン：長期パターン変遷の追跡
 
 メタチェーンはlawkitの内蔵時系列分析と[diffx](https://github.com/kako-jun/diffx)を組み合わせた長期パターン追跡：
 
@@ -372,13 +372,13 @@ graph LR
     C[2月データ] -->|lawkit| D[2月分析]
     E[3月データ] -->|lawkit| F[3月分析]
     
-    B -->|diffx| G[パターン変化<br/>1月→2月]
+    B -->|diffx| G[期間別差分<br/>1月→2月]
     D -->|diffx| G
-    D -->|diffx| H[パターン変化<br/>2月→3月]
+    D -->|diffx| H[期間別差分<br/>2月→3月]
     F -->|diffx| H
     
-    G -->|トレンド| I[パターン<br/>変遷]
-    H -->|トレンド| I
+    G -->|長期トレンド| I[パターン<br/>変遷]
+    H -->|長期トレンド| I
     
     style I stroke:#0288d1,stroke-width:3px
 ```
@@ -391,8 +391,9 @@ graph LR
 - 異常検出とデータ品質評価
 
 **diffxとのメタチェーン** (複数時期):
+- **期間別差分**: 隣接する期間での統計結果の違い（例：1月→2月の変化）
+- **パターン変遷**: 長期的な統計パターンの進化傾向（例：年間を通じた変化）
 - ベンフォード準拠度の段階的逸脱（不正蓄積可能性）
-- 統計パターンの長期進化
 - 期間を跨いだ異常比較
 - 歴史パターンベースライン確立
 

@@ -201,9 +201,9 @@ graph LR
         C --> C1[详细根本原因<br/>解决策略<br/>风险评估]
     end
     
-    style A fill:#e3f2fd
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
+    style A stroke:#2196f3,stroke-width:2px
+    style B stroke:#9c27b0,stroke-width:2px
+    style C stroke:#ff9800,stroke-width:2px
 ```
 
 **analyze** → **validate** → **diagnose**: 从广泛开始，验证发现，最后深入研究具体问题和冲突。
@@ -348,7 +348,7 @@ done
 diffx analysis_*.txt --chain  # 可视化模式随时间的演变
 ```
 
-## 🔗 元链：跟踪模式演变
+## 🔗 元链：跟踪长期模式演变
 
 元链结合lawkit的内置时间序列分析与[diffx](https://github.com/kako-jun/diffx)进行长期模式跟踪：
 
@@ -358,13 +358,13 @@ graph LR
     C[2月数据] -->|lawkit| D[2月分析]
     E[3月数据] -->|lawkit| F[3月分析]
     
-    B -->|diffx| G[模式变化<br/>1月→2月]
+    B -->|diffx| G[期间差异<br/>1月→2月]
     D -->|diffx| G
-    D -->|diffx| H[模式变化<br/>2月→3月]
+    D -->|diffx| H[期间差异<br/>2月→3月]
     F -->|diffx| H
     
-    G -->|趋势| I[模式<br/>演变]
-    H -->|趋势| I
+    G -->|长期趋势| I[模式<br/>演变]
+    H -->|长期趋势| I
     
     style I stroke:#0288d1,stroke-width:3px
 ```
@@ -377,8 +377,9 @@ graph LR
 - 异常检测和数据质量评估
 
 **与diffx的元链** (多个时期):
+- **期间差异**: 相邻时期统计结果的变化（例：1月→2月的变化）
+- **模式演变**: 长期统计模式发展趋势（例：全年变化）
 - 本福德合规性的逐渐偏离（潜在欺诈累积）
-- 统计模式的长期演化
 - 跨期间异常比较
 - 历史模式基线建立
 
