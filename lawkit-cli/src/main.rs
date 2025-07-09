@@ -364,11 +364,11 @@ fn run_selftest() -> Result<(), LawkitError> {
         match law {
             &"benf" => {
                 // Mock success for demonstration
-                println!("{}", colors::pass("[PASS]"));
+                println!("{}", colors::level_pass(""));
                 passed += 1;
             }
             _ => {
-                println!("{}", colors::pass("[PASS] (placeholder)"));
+                println!("{}", colors::level_pass("(placeholder)"));
                 passed += 1;
             }
         }
@@ -380,13 +380,13 @@ fn run_selftest() -> Result<(), LawkitError> {
     if passed == total {
         println!(
             "{}",
-            colors::pass("[PASS] All tests passed! lawkit is working correctly.")
+            colors::level_pass("All tests passed! lawkit is working correctly.")
         );
         Ok(())
     } else {
         println!(
             "{}",
-            colors::fail("[FAIL] Some tests failed. Please check the implementation.")
+            colors::level_fail("Some tests failed. Please check the implementation.")
         );
         std::process::exit(1);
     }
