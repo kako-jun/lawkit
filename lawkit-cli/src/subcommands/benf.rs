@@ -1,9 +1,11 @@
+use crate::colors;
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
         streaming_io::OptimizedFileReader,
+        risk::RiskLevel,
     },
     error::{BenfError, Result},
     laws::benford::BenfordResult,
@@ -162,7 +164,12 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool) {
     println!();
     println!("Dataset: {}", result.dataset_name);
     println!("Numbers analyzed: {}", result.numbers_analyzed);
-    println!("Attention Level: {:?}", result.risk_level);
+    match result.risk_level {
+        RiskLevel::Critical => println!("{}", colors::level_critical("Dataset analysis")),
+        RiskLevel::High => println!("{}", colors::level_high("Dataset analysis")),
+        RiskLevel::Medium => println!("{}", colors::level_medium("Dataset analysis")),
+        RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
+    }
 
     if verbose {
         println!();

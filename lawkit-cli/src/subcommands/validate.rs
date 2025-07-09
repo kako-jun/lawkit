@@ -1,3 +1,4 @@
+use crate::colors;
 use crate::common_options;
 use crate::subcommands::compare_common::{
     get_dataset_name, get_numbers_from_input, output_integration_result,
@@ -96,13 +97,13 @@ fn output_consistency_check_result(
     writeln!(writer)?;
 
     if result.consistency_score < threshold {
-        writeln!(writer, "⚠️  WARNING: Consistency below threshold")?;
+        writeln!(writer, "{}", colors::level_warning("Consistency below threshold"))?;
         writeln!(
             writer,
             "Recommendation: Review data quality and collection methods"
         )?;
     } else {
-        writeln!(writer, "✅ PASS: Data consistency meets requirements")?;
+        writeln!(writer, "{}", colors::level_pass("Data consistency meets requirements"))?;
     }
 
     writeln!(writer)?;

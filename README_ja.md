@@ -20,51 +20,34 @@
 JSON、CSV等の構造化出力で、AIツールや自動化ワークフローと完璧に連携するよう設計されています。不正検知、データ品質チェック、ビジネスインテリジェンスに最適。
 
 ```bash
-# 単一法則分析 - ベンフォード法則
-$ lawkit benf financial_data.csv
-Benford Law Analysis Results
+# 不正検知のためのベンフォード法則分析
+$ lawkit benf test_data.txt
+Benford's Law Analysis Results
 
-Dataset: financial_data.csv
-Numbers analyzed: 2500
-Chi-square: 12.834
-p-value: 0.117
-Attention: PASS
+Dataset: test_data.txt
+Numbers analyzed: 500
+Attention Level: Critical
 
-# パレート分布データの生成
-$ lawkit generate pareto --size 100 | head -5
-4.312
-1.827
-12.543
-2.156
-6.789
+# 統計法則に従うテストデータ生成
+$ lawkit generate pareto --samples 100 | head -5
+1.11
+2.34
+4.74
+2.97
+1.09
 
-# 包括的な多法則分析
-$ lawkit analyze --laws all data.csv
+# スマート統合による多法則分析
+$ lawkit analyze test_data.txt
 Statistical Laws Integration Analysis
 
-Dataset: data.csv
-Numbers analyzed: 1000
-Laws executed: 5 (benford, pareto, zipf, normal, poisson)
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
 
 Integration Metrics:
-  Overall Quality: 0.743
-  Consistency: 0.823
-  Conflicts Detected: 2
-  Recommendation Confidence: 0.892
-
-Law Results:
-  Benford Law: 0.652
-  Pareto Analysis: 0.845
-  Zipf Law: 0.423
-  Normal Distribution: 0.912
-  Poisson Distribution: 0.634
-
-Conflicts:
-  ⚠️ Benford and Zipf laws show conflicting patterns
-     Cause: Different distribution assumptions
-     Suggestion: Focus on Zipf analysis for frequency data
-
-Risk Assessment: MEDIUM (Score: 0.743)
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
 ```
 
 ## ✨ 主な機能
@@ -87,6 +70,8 @@ $ lawkit analyze data.csv     # 多法則分析: ~850ms
 
 
 ## 🏗️ 仕組み
+
+### コア分析エンジン
 
 ```mermaid
 graph TB
@@ -121,7 +106,32 @@ graph TB
     F4 --> G
 ```
 
-lawkitは複数の統計レンズを通してデータを同時に分析し、結果を統合して包括的な洞察と推奨事項を提供します。
+### 3段階分析ワークフロー
+
+```mermaid
+graph LR
+    subgraph "段階1：基本分析"
+        A[📊 lawkit analyze<br/>多法則統合] --> A1[全体品質スコア<br/>法則適合性<br/>初期インサイト]
+    end
+    
+    subgraph "段階2：検証"
+        A1 --> B[🔍 lawkit validate<br/>データ品質チェック] 
+        B --> B1[一貫性分析<br/>クロスバリデーション<br/>信頼性評価]
+    end
+    
+    subgraph "段階3：詳細診断"
+        B1 --> C[🩺 lawkit diagnose<br/>矛盾検出]
+        C --> C1[詳細根本原因<br/>解決戦略<br/>リスク評価]
+    end
+    
+    style A fill:#e3f2fd
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+```
+
+**analyze** → **validate** → **diagnose**: まず全体を把握し、データ品質をチェックして、最後に具体的な問題を調査します。
+
+lawkitは複数の角度からデータを同時に分析し、結果をまとめて分かりやすい洞察と実用的な推奨事項を提供します。
 
 ## 仕様
 
@@ -220,21 +230,111 @@ lawkit-download-binary  # CLIバイナリをダウンロード (pip installの�
 
 ## 基本的な使用方法
 
+### 単一法則分析
 ```bash
-# 様々な入力形式での単一法則分析
-lawkit benf financial_data.csv
-lawkit pareto sales_report.json
-lawkit zipf word_frequencies.txt
-lawkit normal measurements.xlsx
-lawkit poisson server_logs.tsv
+# 個別統計法則分析
+lawkit benf financial_data.csv      # 不正検知
+lawkit pareto sales_report.json     # 80/20分析
+lawkit zipf word_frequencies.txt    # 頻度パターン
+lawkit normal measurements.xlsx     # 品質管理
+lawkit poisson server_logs.tsv      # 稀少事象
+```
 
-# 異なる出力形式での多法則比較
-lawkit analyze --laws all transactions.csv
-lawkit validate --laws all inventory.json --format yaml
-lawkit diagnose --laws benf,zipf document.txt --format json
+### 3段階分析ワークフロー
+
+しっかりとしたデータ分析には **analyze** → **validate** → **diagnose** の順番を推奨します：
+
+```bash
+# 段階1：基本的な多法則分析
+$ lawkit analyze test_data.txt
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford's Law: 0.944
+  Pareto Principle: -0.868
+  Normal Distribution: 0.125
+  Zipf's Law: 0.813
+
+Conflicts:
+  CONFLICT: Law 'benf' score (0.944) significantly deviates from expected (0.254) - deviation: 272.2%
+     Likely Cause: Law 'benf' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'benf'
+
+# 段階2：整合性チェック付きデータ検証
+$ lawkit validate --laws benf,pareto,normal test_data.txt --consistency-check
+Data Validation and Consistency Check
+
+Dataset: test_data.txt
+Threshold: 0.500
+Consistency Score: 0.484
+
+⚠️  WARNING: Consistency below threshold
+Recommendation: Review data quality and collection methods
+
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford's Law: 0.944
+  Zipf's Law: 0.813
+  Pareto Principle: -0.868
+
+# 段階3：詳細な矛盾分析と推奨事項
+$ lawkit diagnose --laws all test_data.txt --report detailed
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford's Law: 0.944
+  Pareto Principle: -0.868
+  Normal Distribution: 0.125
+  Zipf's Law: 0.813
+
+Conflicts:
+  CONFLICT: Law 'benf' score (0.944) significantly deviates from expected (0.254) - deviation: 272.2%
+     Likely Cause: Law 'benf' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'benf'
+  CONFLICT: Law 'normal' score (0.125) significantly deviates from expected (0.254) - deviation: 50.8%
+     Likely Cause: Law 'normal' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'normal'
+  CONFLICT: Law 'pareto' score (-0.868) significantly deviates from expected (0.254) - deviation: 442.1%
+     Likely Cause: Law 'pareto' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'pareto'
+```
+
+### 高度な使用方法
+```bash
 
 # テストデータ生成
-lawkit generate pareto --size 1000 > test_data.txt
+lawkit generate pareto --samples 1000 > test_data.txt
 lawkit generate normal --mean 100 --std 15 --size 500
 
 # 内蔵時系列分析

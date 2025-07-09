@@ -335,10 +335,10 @@ impl IntegrationResult {
                     laws_involved: self.law_scores.keys().cloned().collect(),
                     conflict_score: 0.6,
                     description:
-                        "全ての統計法則が同一スコアを示しており、データまたは分析に問題がある可能性"
+                        "All statistical laws show identical scores, indicating potential data or analysis issues"
                             .to_string(),
-                    likely_cause: "データの多様性不足または分析アルゴリズムの問題".to_string(),
-                    resolution_suggestion: "データの品質と分析手法を再確認してください".to_string(),
+                    likely_cause: "Insufficient data diversity or analysis algorithm issues".to_string(),
+                    resolution_suggestion: "Please review data quality and analysis methods".to_string(),
                 };
                 self.conflicts.push(conflict);
             }
@@ -360,14 +360,14 @@ impl IntegrationResult {
                                     laws_involved: vec![law_name.to_string()],
                                     conflict_score: deviation.min(1.0),
                                     description: format!(
-                                        "法則 '{}' のスコア ({:.3}) が期待値 ({:.3}) から大きく乖離（偏差率: {:.1}%）",
+                                        "Law '{}' score ({:.3}) significantly deviates from expected ({:.3}) - deviation: {:.1}%",
                                         law_name, actual, expected, deviation * 100.0
                                     ),
                                     likely_cause: format!(
-                                        "法則 '{law_name}' がデータパターンに適合していない可能性"
+                                        "Law '{law_name}' may not be compatible with the data pattern"
                                     ),
                                     resolution_suggestion: format!(
-                                        "法則 '{law_name}' の適用条件やデータ品質を再確認してください"
+                                        "Please review application conditions and data quality for law '{law_name}'"
                                     ),
                                 };
                                 self.conflicts.push(conflict);
@@ -382,10 +382,10 @@ impl IntegrationResult {
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.5,
                             description: format!(
-                                "法則 '{law_name}' の予期しない変更が検出されました"
+                                "Unexpected change detected for law '{law_name}'"
                             ),
-                            likely_cause: "分析設定または法則選択の不整合".to_string(),
-                            resolution_suggestion: "分析対象の法則設定を確認してください"
+                            likely_cause: "Analysis configuration or law selection inconsistency".to_string(),
+                            resolution_suggestion: "Please verify the analysis target law settings"
                                 .to_string(),
                         };
                         self.conflicts.push(conflict);
@@ -397,9 +397,9 @@ impl IntegrationResult {
                             conflict_type: ConflictType::MethodologicalConflict,
                             laws_involved: vec![law_name.to_string()],
                             conflict_score: 0.8,
-                            description: format!("法則 '{law_name}' のスコア型が変更されました"),
-                            likely_cause: "内部分析エラーまたはデータ破損".to_string(),
-                            resolution_suggestion: "分析を再実行してください".to_string(),
+                            description: format!("Score type changed for law '{law_name}'"),
+                            likely_cause: "Internal analysis error or data corruption".to_string(),
+                            resolution_suggestion: "Please re-run the analysis".to_string(),
                         };
                         self.conflicts.push(conflict);
                     }
@@ -408,9 +408,11 @@ impl IntegrationResult {
         }
     }
 
-    /// 従来のスコア差分ベース矛盾検出
+    /// diffx-core強化版スコア矛盾検出
     fn detect_score_conflicts(&mut self) {
         let laws: Vec<String> = self.law_scores.keys().cloned().collect();
+        
+        // diffx-coreを使用した構造化比較用のJSONオブジェクト作成
         for i in 0..laws.len() {
             for j in i + 1..laws.len() {
                 let law_a = &laws[i];
@@ -419,20 +421,59 @@ impl IntegrationResult {
                 if let (Some(&score_a), Some(&score_b)) =
                     (self.law_scores.get(law_a), self.law_scores.get(law_b))
                 {
+                    // 法則Aの詳細構造
+                    let law_a_profile = serde_json::json!({
+                        "law_name": law_a,
+                        "score": score_a,
+                        "confidence_level": self.get_confidence_level(score_a),
+                        "score_category": self.categorize_score(score_a),
+                        "relative_rank": self.get_relative_rank(law_a)
+                    });
+
+                    // 法則Bの詳細構造
+                    let law_b_profile = serde_json::json!({
+                        "law_name": law_b,
+                        "score": score_b,
+                        "confidence_level": self.get_confidence_level(score_b),
+                        "score_category": self.categorize_score(score_b),
+                        "relative_rank": self.get_relative_rank(law_b)
+                    });
+
+                    // diffx-coreで構造的差分を検出
+                    let diff_results = diff(&law_a_profile, &law_b_profile, None, Some(0.1), None);
+                    
+                    // 従来の単純差分計算
                     let score_diff = (score_a - score_b).abs();
                     let max_score = score_a.max(score_b);
 
                     if max_score > 0.0 {
                         let conflict_ratio = score_diff / max_score;
 
-                        if conflict_ratio > 0.5 {
-                            // 矛盾閾値
-                            let conflict = self.create_conflict(
+                        // diffx-coreの結果と組み合わせた強化判定
+                        let has_structural_conflict = !diff_results.is_empty() && 
+                            diff_results.iter().any(|result| {
+                                if let DiffResult::Modified(path, _old_val, _new_val) = result {
+                                    if path.contains("confidence_level") || path.contains("score_category") {
+                                        return true;
+                                    }
+                                }
+                                false
+                            });
+
+                        if conflict_ratio > 0.5 || has_structural_conflict {
+                            let enhanced_conflict_score = if has_structural_conflict {
+                                conflict_ratio * 1.5 // 構造的矛盾があれば重みを増加
+                            } else {
+                                conflict_ratio
+                            };
+
+                            let conflict = self.create_enhanced_conflict(
                                 law_a.clone(),
                                 law_b.clone(),
-                                conflict_ratio,
+                                enhanced_conflict_score.min(1.0),
                                 score_a,
                                 score_b,
+                                &diff_results,
                             );
                             self.conflicts.push(conflict);
                         }
@@ -440,6 +481,135 @@ impl IntegrationResult {
                 }
             }
         }
+    }
+
+    /// diffx-core結果を含む強化版矛盾オブジェクト作成
+    fn create_enhanced_conflict(
+        &self,
+        law_a: String,
+        law_b: String,
+        conflict_score: f64,
+        score_a: f64,
+        score_b: f64,
+        diff_results: &[DiffResult],
+    ) -> Conflict {
+        let conflict_type = self.classify_conflict_type(&law_a, &law_b);
+        
+        // diffx-coreの差分情報から詳細な説明を生成
+        let mut detailed_description = format!(
+            "{} and {} show significantly different evaluations (difference: {:.3})",
+            law_a, law_b, (score_a - score_b).abs()
+        );
+
+        if !diff_results.is_empty() {
+            detailed_description.push_str(" with structural differences in: ");
+            let diff_details: Vec<String> = diff_results.iter()
+                .filter_map(|result| {
+                    if let DiffResult::Modified(path, old_val, new_val) = result {
+                        Some(format!("{} ({:?} → {:?})", path, old_val, new_val))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            detailed_description.push_str(&diff_details.join(", "));
+        }
+
+        let likely_cause = self.diagnose_enhanced_conflict_cause(&law_a, &law_b, score_a, score_b, diff_results);
+        let resolution_suggestion = self.suggest_enhanced_conflict_resolution(&law_a, &law_b, &conflict_type, diff_results);
+
+        Conflict {
+            conflict_type,
+            laws_involved: vec![law_a, law_b],
+            conflict_score,
+            description: detailed_description,
+            likely_cause,
+            resolution_suggestion,
+        }
+    }
+
+    /// ヘルパーメソッド: 信頼度レベル計算
+    fn get_confidence_level(&self, score: f64) -> String {
+        match score {
+            s if s >= 0.8 => "high".to_string(),
+            s if s >= 0.6 => "medium".to_string(),
+            s if s >= 0.4 => "low".to_string(),
+            _ => "very_low".to_string(),
+        }
+    }
+
+    /// ヘルパーメソッド: スコア分類
+    fn categorize_score(&self, score: f64) -> String {
+        match score {
+            s if s >= 0.9 => "excellent".to_string(),
+            s if s >= 0.7 => "good".to_string(),
+            s if s >= 0.5 => "fair".to_string(),
+            s if s >= 0.3 => "poor".to_string(),
+            _ => "very_poor".to_string(),
+        }
+    }
+
+    /// ヘルパーメソッド: 相対順位取得
+    fn get_relative_rank(&self, law_name: &str) -> usize {
+        let mut scores: Vec<(String, f64)> = self.law_scores.iter()
+            .map(|(name, &score)| (name.clone(), score))
+            .collect();
+        scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        
+        scores.iter()
+            .position(|(name, _)| name == law_name)
+            .unwrap_or(0) + 1
+    }
+
+    /// 強化版原因診断
+    fn diagnose_enhanced_conflict_cause(
+        &self,
+        law_a: &str,
+        law_b: &str,
+        score_a: f64,
+        score_b: f64,
+        diff_results: &[DiffResult],
+    ) -> String {
+        let mut cause = self.diagnose_conflict_cause(law_a, law_b, score_a, score_b);
+        
+        if !diff_results.is_empty() {
+            cause.push_str(" Additionally, structural analysis reveals: ");
+            let structural_issues: Vec<String> = diff_results.iter()
+                .filter_map(|result| {
+                    if let DiffResult::Modified(path, _, _) = result {
+                        if path.contains("confidence_level") {
+                            Some("confidence level mismatch".to_string())
+                        } else if path.contains("score_category") {
+                            Some("score category divergence".to_string())
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            cause.push_str(&structural_issues.join(", "));
+        }
+        
+        cause
+    }
+
+    /// 強化版解決策提案
+    fn suggest_enhanced_conflict_resolution(
+        &self,
+        law_a: &str,
+        law_b: &str,
+        conflict_type: &ConflictType,
+        diff_results: &[DiffResult],
+    ) -> String {
+        let mut suggestion = self.suggest_conflict_resolution(law_a, law_b, conflict_type);
+        
+        if !diff_results.is_empty() {
+            suggestion.push_str(" Consider deep structural analysis of data characteristics affecting confidence levels and score categories.");
+        }
+        
+        suggestion
     }
 
     fn create_conflict(

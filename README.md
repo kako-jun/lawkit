@@ -20,51 +20,22 @@ Traditional tools analyze one pattern at a time. lawkit analyzes multiple statis
 Designed for modern automation with JSON, CSV, and other structured outputs that work perfectly with AI tools and automated workflows. Ideal for fraud detection, data quality checks, and business intelligence.
 
 ```bash
-# Single law analysis - Benford's Law
+# Single law analysis - Benford's Law for fraud detection
 $ lawkit benf financial_data.csv
 Benford Law Analysis Results
+Dataset: financial_data.csv, Numbers analyzed: 2500
+Chi-square: 12.834, p-value: 0.117, Attention: PASS
 
-Dataset: financial_data.csv
-Numbers analyzed: 2500
-Chi-square: 12.834
-p-value: 0.117
-Attention: PASS
-
-# Generate data following Pareto distribution
+# Generate test data following statistical laws
 $ lawkit generate pareto --size 100 | head -5
 4.312
 1.827
 12.543
-2.156
-6.789
 
-# Comprehensive multi-law analysis
+# Multi-law analysis with smart integration
 $ lawkit analyze --laws all data.csv
-Statistical Laws Integration Analysis
-
-Dataset: data.csv
-Numbers analyzed: 1000
-Laws executed: 5 (benford, pareto, zipf, normal, poisson)
-
-Integration Metrics:
-  Overall Quality: 0.743
-  Consistency: 0.823
-  Conflicts Detected: 2
-  Recommendation Confidence: 0.892
-
-Law Results:
-  Benford Law: 0.652
-  Pareto Analysis: 0.845
-  Zipf Law: 0.423
-  Normal Distribution: 0.912
-  Poisson Distribution: 0.634
-
-Conflicts:
-  ⚠️ Benford and Zipf laws show conflicting patterns
-     Cause: Different distribution assumptions
-     Suggestion: Focus on Zipf analysis for frequency data
-
-Risk Assessment: MEDIUM (Score: 0.743)
+Overall Quality: 0.743, Consistency: 0.823, Conflicts: 2
+Risk Assessment: MEDIUM
 ```
 
 ## ✨ Key Features
@@ -87,6 +58,8 @@ $ lawkit analyze data.csv     # Multi-law analysis: ~850ms
 
 
 ## 🏗️ How It Works
+
+### Core Analysis Engine
 
 ```mermaid
 graph TB
@@ -121,7 +94,32 @@ graph TB
     F4 --> G
 ```
 
-lawkit analyzes your data through multiple statistical lenses simultaneously, then integrates the results to provide comprehensive insights and recommendations.
+### Three-Stage Analysis Workflow
+
+```mermaid
+graph LR
+    subgraph "Stage 1: Basic Analysis"
+        A[📊 lawkit analyze<br/>Multi-law Integration] --> A1[Overall Quality Score<br/>Law Compatibility<br/>Initial Insights]
+    end
+    
+    subgraph "Stage 2: Validation"
+        A1 --> B[🔍 lawkit validate<br/>Data Quality Checks] 
+        B --> B1[Consistency Analysis<br/>Cross-validation<br/>Reliability Assessment]
+    end
+    
+    subgraph "Stage 3: Deep Diagnosis"
+        B1 --> C[🩺 lawkit diagnose<br/>Conflict Detection]
+        C --> C1[Detailed Root Cause<br/>Resolution Strategies<br/>Risk Assessment]
+    end
+    
+    style A fill:#e3f2fd
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+```
+
+**analyze** → **validate** → **diagnose**: Start with a broad overview, then check data quality, and finally investigate any specific problems.
+
+lawkit looks at your data from multiple angles at once, then combines what it finds to give you clear insights and practical recommendations.
 
 ## Specification
 
@@ -220,18 +218,117 @@ lawkit-download-binary  # Download CLI binary (available after pip install)
 
 ## Basic Usage
 
+### Single Law Analysis
 ```bash
-# Single law analysis with various input formats
-lawkit benf financial_data.csv
-lawkit pareto sales_report.json
-lawkit zipf word_frequencies.txt
-lawkit normal measurements.xlsx
-lawkit poisson server_logs.tsv
+# Individual statistical law analysis
+lawkit benf financial_data.csv      # Fraud detection
+lawkit pareto sales_report.json     # 80/20 analysis
+lawkit zipf word_frequencies.txt    # Frequency patterns
+lawkit normal measurements.xlsx     # Quality control
+lawkit poisson server_logs.tsv      # Rare events
+```
 
-# Multi-law analysis with different outputs
-lawkit analyze --laws all transactions.csv
-lawkit validate --laws all inventory.json --format yaml
-lawkit diagnose --laws benf,zipf document.txt --format json
+### Three-Stage Analysis Workflow
+
+We recommend the **analyze** → **validate** → **diagnose** approach for thorough data analysis:
+
+```bash
+# Stage 1: Basic multi-law analysis
+$ lawkit analyze --laws all data.csv
+Statistical Laws Integration Analysis
+
+Dataset: data.csv
+Numbers analyzed: 1000
+Laws executed: 5 (benford, pareto, zipf, normal, poisson)
+
+Integration Metrics:
+  Overall Quality: 0.743
+  Consistency: 0.823
+  Conflicts Detected: 2
+  Recommendation Confidence: 0.892
+
+Law Results:
+  Benford Law: 0.652
+  Pareto Analysis: 0.845
+  Zipf Law: 0.423
+  Normal Distribution: 0.912
+  Poisson Distribution: 0.634
+
+Conflicts:
+  ⚠️ Benford and Zipf laws show conflicting patterns
+     Cause: Different distribution assumptions
+     Suggestion: Focus on Zipf analysis for frequency data
+
+Risk Assessment: MEDIUM (Score: 0.743)
+
+# Stage 2: Data validation with consistency checks
+$ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
+Data Validation and Consistency Analysis
+
+Dataset: transactions.csv
+Numbers analyzed: 2500
+Laws validated: 3 (benford, pareto, normal)
+
+Validation Results:
+  Data Quality Score: 0.891
+  Cross-validation Consistency: 0.943
+  Statistical Reliability: HIGH
+
+Individual Law Validation:
+  ✅ Benford Law: PASSED (Score: 0.834, p-value: 0.023)
+  ✅ Pareto Analysis: PASSED (Gini: 0.78, Alpha: 2.12)
+  ⚠️ Normal Distribution: MARGINAL (Shapiro-Wilk: 0.032)
+
+Consistency Analysis:
+  Benford-Pareto Agreement: 0.912 (HIGH)
+  Benford-Normal Agreement: 0.643 (MEDIUM)
+  Pareto-Normal Agreement: 0.587 (MEDIUM)
+
+Data Quality Assessment: RELIABLE (Validation Score: 0.891)
+
+# Stage 3: Deep conflict analysis and recommendations
+$ lawkit diagnose --laws all suspicious_data.csv --report detailed
+Detailed Conflict Detection and Diagnostic Report
+
+Dataset: suspicious_data.csv
+Numbers analyzed: 1500
+Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
+
+⚠️ CONFLICTS DETECTED: 3 Critical Issues
+
+Critical Conflict #1: Score Deviation
+  Laws: Benford vs Normal Distribution
+  Conflict Score: 0.847 (HIGH)
+  Description: Benford and Normal Distribution show significantly different 
+              evaluations (difference: 0.623) with structural differences in: 
+              confidence_level ("high" → "low"), score_category ("good" → "poor")
+  Root Cause: Benford indicates potential data manipulation while Normal 
+             suggests legitimate natural distribution pattern
+  Resolution: Investigate data source integrity; consider temporal analysis 
+             to identify manipulation periods
+
+Critical Conflict #2: Distribution Mismatch  
+  Laws: Pareto vs Poisson Distribution
+  Conflict Score: 0.793 (HIGH)
+  Description: Power law distribution conflicts with discrete event modeling
+  Root Cause: Data contains mixed patterns (continuous wealth distribution 
+             and discrete event counts)
+  Resolution: Segment data by type before analysis; apply Pareto to amounts, 
+             Poisson to frequencies
+
+Critical Conflict #3: Methodological Conflict
+  Laws: Zipf vs Normal Distribution  
+  Conflict Score: 0.651 (MEDIUM)
+  Description: Frequency-based analysis conflicts with continuous distribution
+  Root Cause: Dataset may contain both textual frequency data and numerical measurements
+  Resolution: Separate frequency analysis from statistical distribution testing
+
+Risk Assessment: CRITICAL (Multiple fundamental conflicts detected)
+Recommendation: Manual data review required before automated decision-making
+```
+
+### Advanced Usage
+```bash
 
 # Generate test data
 lawkit generate pareto --samples 1000 > test_data.txt
