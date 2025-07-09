@@ -8,6 +8,10 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+  actions: read
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -97,7 +101,38 @@ jobs:
         # Create new release
         gh release create ${{ github.event.inputs.tag }} \
           --title "Release ${{ github.event.inputs.tag }}" \
-          --notes "Release ${{ github.event.inputs.tag }}" \
+          --notes "$(cat <<'EOF'
+## 🛠️ ${{ github.event.inputs.tag }} - Documentation and Quality Improvements
+
+### 📚 Documentation Enhancements
+- **Terminology Clarity**: Improved meta-chaining section to distinguish between "period differences" and "pattern evolution"
+- **Dark Theme Compatibility**: Fixed Mermaid diagram styling for better readability in dark themes
+- **Multi-Language Consistency**: Standardized CLI parameter names across English, Japanese, and Chinese documentation
+
+### 🔧 Technical Fixes
+- **CI/CD Improvements**: Resolved Clippy warnings and dead code issues
+- **Code Quality**: Enhanced format string usage and code formatting
+- **Test Coverage**: All 179 tests passing (99 core + 73 integration + 14 readme + 23 subcommand)
+
+### 🎯 Changes from v2.1.0
+- Clearer documentation terminology for better user understanding
+- Improved diagram readability across different themes
+- Enhanced code quality with resolved warnings
+- Consistent multi-language documentation updates
+
+### 📦 Installation
+\`\`\`bash
+# From crates.io
+cargo install lawkit
+
+# From releases (Linux)
+wget https://github.com/kako-jun/lawkit/releases/download/${{ github.event.inputs.tag }}/lawkit-linux-x86_64.tar.gz
+tar -xzf lawkit-linux-x86_64.tar.gz
+\`\`\`
+
+This patch release focuses on improving user experience through better documentation and maintaining high code quality standards.
+EOF
+)" \
           --draft
         
         # Upload all artifacts
