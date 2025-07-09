@@ -1,6 +1,6 @@
 {
   "name": "lawkit-js",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A Node.js wrapper for the lawkit CLI tool - statistical law analysis toolkit for fraud detection, data quality assessment, and audit compliance.",
   "keywords": ["statistics", "benford", "pareto", "zipf", "normal", "poisson", "fraud-detection", "data-quality", "audit", "compliance", "cli", "statistical-analysis", "financial-analysis"],
   "main": "index.js",
