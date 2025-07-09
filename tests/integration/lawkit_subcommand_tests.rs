@@ -1309,6 +1309,46 @@ mod selftest_functionality_tests {
     }
 
     #[test]
+    fn test_output_format_levels() {
+        // Test that output uses [LEVEL] format instead of old LEVEL: format
+        let mut test_file = NamedTempFile::new().unwrap();
+
+        // Use any test data - we just want to verify format pattern
+        write!(test_file, "123 456 789 101 121 131 141 151 161 171 181 191 201 211 221 231 241 251 261 271 281 291 301 311 321 331 341 351 361 371 381 391 401 411 421 431 441 451 461 471 481 491 501 511 521 531 541 551 561 571 581 591 601 611 621 631 641 651 661 671 681 691 701 711 721 731 741 751 761 771 781 791 801 811 821 831 841 851 861 871 881 891 901 911 921 931 941 951 961 971 981 991").unwrap();
+
+        test_file.flush().unwrap();
+
+        // Test benf command format
+        let test_path = test_file.path().to_str().unwrap();
+        let output = run_lawkit_command("benf", &[test_path]);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+
+        // Should contain [LEVEL] format pattern (any of the main levels)
+        let has_bracket_format = stdout.contains("[CRITICAL]")
+            || stdout.contains("[HIGH]")
+            || stdout.contains("[MEDIUM]")
+            || stdout.contains("[LOW]");
+        assert!(
+            has_bracket_format,
+            "Should use [LEVEL] format, got: {stdout}"
+        );
+
+        // Should not contain old LEVEL: format
+        assert!(
+            !stdout.contains("CRITICAL:")
+                && !stdout.contains("HIGH:")
+                && !stdout.contains("MEDIUM:")
+                && !stdout.contains("LOW:"),
+            "Should not contain old LEVEL: format, got: {stdout}"
+        );
+
+        // Test PASS level format (from selftest)
+        let output = run_lawkit_command("selftest", &[]);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("[PASS]"), "Should output [PASS] format");
+    }
+
+    #[test]
     fn test_selftest_comprehensive() {
         let output = run_lawkit_command("selftest", &[]);
         assert!(matches!(

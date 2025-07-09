@@ -173,11 +173,17 @@ fn print_pareto_interpretation(result: &ParetoResult) {
 
     match result.risk_level {
         RiskLevel::Low => {
-            println!("{}", colors::level_pass("Ideal Pareto distribution detected"));
+            println!(
+                "{}",
+                colors::level_pass("Ideal Pareto distribution detected")
+            );
             println!("   80/20 principle is maintained");
         }
         RiskLevel::Medium => {
-            println!("{}", colors::level_warn("Slight deviation from Pareto principle"));
+            println!(
+                "{}",
+                colors::level_warn("Slight deviation from Pareto principle")
+            );
             println!("   Monitoring recommended");
         }
         RiskLevel::High => {
