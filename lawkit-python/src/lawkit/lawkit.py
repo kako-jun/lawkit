@@ -22,20 +22,33 @@ LawType = Literal["benf", "pareto", "zipf", "normal", "poisson"]
 class LawkitOptions:
     """Options for lawkit operations"""
     format: Optional[Format] = None
-    output: Optional[OutputFormat] = None
-    min_count: Optional[int] = None
-    threshold: Optional[float] = None
-    confidence: Optional[float] = None
+    quiet: bool = False
     verbose: bool = False
+    filter: Optional[str] = None
+    min_count: Optional[int] = None
     optimize: bool = False
-    international: bool = False
+    
+    # Integration-specific options
+    laws: Optional[str] = None  # "benf,pareto,zipf,normal,poisson"
+    focus: Optional[str] = None  # "quality", "concentration", "distribution", "anomaly"
+    threshold: Optional[float] = None  # Conflict detection threshold
+    recommend: bool = False
+    report: Optional[str] = None  # "summary", "detailed", "conflicting"
+    consistency_check: bool = False
+    cross_validation: bool = False
+    confidence_level: Optional[float] = None
+    purpose: Optional[str] = None  # "quality", "fraud", "concentration", "anomaly", "distribution", "general"
+    
     # Law-specific options
     gini_coefficient: bool = False
     percentiles: Optional[str] = None
     business_analysis: bool = False
+    concentration: Optional[float] = None
+    
     # Statistical options
     test_type: Optional[str] = None
     alpha: Optional[float] = None
+    
     # Advanced options
     outlier_detection: bool = False
     time_series: bool = False
@@ -195,7 +208,7 @@ def analyze_benford(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
             return LawkitResult(json_data, "benford")
@@ -238,6 +251,9 @@ def analyze_pareto(
     _add_common_options(args, options)
     
     # Add Pareto-specific options
+    if options.concentration is not None:
+        args.extend(["--concentration", str(options.concentration)])
+    
     if options.gini_coefficient:
         args.append("--gini-coefficient")
     
@@ -250,7 +266,7 @@ def analyze_pareto(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
             return LawkitResult(json_data, "pareto")
@@ -294,7 +310,7 @@ def analyze_zipf(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
             return LawkitResult(json_data, "zipf")
@@ -347,7 +363,7 @@ def analyze_normal(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
             return LawkitResult(json_data, "normal")
@@ -391,7 +407,7 @@ def analyze_poisson(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
             return LawkitResult(json_data, "poisson")
@@ -402,12 +418,12 @@ def analyze_poisson(
     return stdout
 
 
-def compare_laws(
+def analyze_laws(
     input_data: str,
     options: Optional[LawkitOptions] = None
 ) -> Union[str, LawkitResult]:
     """
-    Compare multiple statistical laws on the same data
+    Analyze data using multiple statistical laws (basic analysis)
     
     Args:
         input_data: Path to input file or '-' for stdin
@@ -417,17 +433,17 @@ def compare_laws(
         String output for text format, or LawkitResult for JSON format
         
     Examples:
-        >>> result = compare_laws('dataset.csv')
+        >>> result = analyze_laws('dataset.csv')
         >>> print(result)
         
-        >>> json_result = compare_laws('complex_data.json', 
-        ...                          LawkitOptions(output='json'))
+        >>> json_result = analyze_laws('complex_data.json', 
+        ...                          LawkitOptions(format='json'))
         >>> print(f"Risk level: {json_result.risk_level}")
     """
     if options is None:
         options = LawkitOptions()
     
-    args = ["compare", input_data]
+    args = ["analyze", input_data]
     
     # Add common options
     _add_common_options(args, options)
@@ -435,15 +451,107 @@ def compare_laws(
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
-    if options.output == "json":
+    if options.format == "json":
         try:
             json_data = json.loads(stdout)
-            return LawkitResult(json_data, "compare")
+            return LawkitResult(json_data, "analyze")
         except json.JSONDecodeError as e:
             raise LawkitError(f"Failed to parse JSON output: {e}", -1, "")
     
     # Return raw output for other formats
     return stdout
+
+
+def validate_laws(
+    input_data: str,
+    options: Optional[LawkitOptions] = None
+) -> Union[str, LawkitResult]:
+    """
+    Validate data consistency using multiple statistical laws
+    
+    Args:
+        input_data: Path to input file or '-' for stdin
+        options: Analysis options
+        
+    Returns:
+        String output for text format, or LawkitResult for JSON format
+        
+    Examples:
+        >>> result = validate_laws('dataset.csv')
+        >>> print(result)
+        
+        >>> json_result = validate_laws('complex_data.json', 
+        ...                           LawkitOptions(format='json'))
+        >>> print(f"Validation result: {json_result.data}")
+    """
+    if options is None:
+        options = LawkitOptions()
+    
+    args = ["validate", input_data]
+    
+    # Add common options
+    _add_common_options(args, options)
+    
+    stdout, stderr = _execute_lawkit(args)
+    
+    # If output format is JSON, parse the result
+    if options.format == "json":
+        try:
+            json_data = json.loads(stdout)
+            return LawkitResult(json_data, "validate")
+        except json.JSONDecodeError as e:
+            raise LawkitError(f"Failed to parse JSON output: {e}", -1, "")
+    
+    # Return raw output for other formats
+    return stdout
+
+
+def diagnose_laws(
+    input_data: str,
+    options: Optional[LawkitOptions] = None
+) -> Union[str, LawkitResult]:
+    """
+    Diagnose conflicts and generate detailed analysis report
+    
+    Args:
+        input_data: Path to input file or '-' for stdin
+        options: Analysis options
+        
+    Returns:
+        String output for text format, or LawkitResult for JSON format
+        
+    Examples:
+        >>> result = diagnose_laws('dataset.csv')
+        >>> print(result)
+        
+        >>> json_result = diagnose_laws('complex_data.json', 
+        ...                           LawkitOptions(format='json'))
+        >>> print(f"Diagnosis: {json_result.data}")
+    """
+    if options is None:
+        options = LawkitOptions()
+    
+    args = ["diagnose", input_data]
+    
+    # Add common options
+    _add_common_options(args, options)
+    
+    stdout, stderr = _execute_lawkit(args)
+    
+    # If output format is JSON, parse the result
+    if options.format == "json":
+        try:
+            json_data = json.loads(stdout)
+            return LawkitResult(json_data, "diagnose")
+        except json.JSONDecodeError as e:
+            raise LawkitError(f"Failed to parse JSON output: {e}", -1, "")
+    
+    # Return raw output for other formats
+    return stdout
+
+
+# Backward compatibility alias
+compare_laws = analyze_laws
 
 
 def generate_data(
@@ -471,7 +579,10 @@ def generate_data(
         >>> normal_data = generate_data('normal', samples=500, mean=100, stddev=15)
         >>> pareto_data = generate_data('pareto', samples=1000, concentration=0.8)
     """
-    args = ["generate", law_type, "--samples", str(samples)]
+    args = ["generate", law_type]
+    
+    if samples != 1000:
+        args.extend(["--samples", str(samples)])
     
     if seed is not None:
         args.extend(["--seed", str(seed)])
@@ -539,29 +650,52 @@ def _add_common_options(args: List[str], options: LawkitOptions) -> None:
     if options.format:
         args.extend(["--format", options.format])
     
-    if options.output:
-        args.extend(["--output", options.output])
-    
-    if options.min_count is not None:
-        args.extend(["--min-count", str(options.min_count)])
-    
-    if options.threshold is not None:
-        args.extend(["--threshold", str(options.threshold)])
-    
-    if options.confidence is not None:
-        args.extend(["--confidence", str(options.confidence)])
-    
-    if options.alpha is not None:
-        args.extend(["--alpha", str(options.alpha)])
+    if options.quiet:
+        args.append("--quiet")
     
     if options.verbose:
         args.append("--verbose")
     
+    if options.filter:
+        args.extend(["--filter", options.filter])
+    
+    if options.min_count is not None:
+        args.extend(["--min-count", str(options.min_count)])
+    
     if options.optimize:
         args.append("--optimize")
     
-    if options.international:
-        args.append("--international")
+    # Integration-specific options
+    if options.laws:
+        args.extend(["--laws", options.laws])
+    
+    if options.focus:
+        args.extend(["--focus", options.focus])
+    
+    if options.threshold is not None:
+        args.extend(["--threshold", str(options.threshold)])
+    
+    if options.recommend:
+        args.append("--recommend")
+    
+    if options.report:
+        args.extend(["--report", options.report])
+    
+    if options.consistency_check:
+        args.append("--consistency-check")
+    
+    if options.cross_validation:
+        args.append("--cross-validation")
+    
+    if options.confidence_level is not None:
+        args.extend(["--confidence-level", str(options.confidence_level)])
+    
+    if options.purpose:
+        args.extend(["--purpose", options.purpose])
+    
+    # Advanced options
+    if options.alpha is not None:
+        args.extend(["--alpha", str(options.alpha)])
     
     if options.time_series:
         args.append("--time-series")

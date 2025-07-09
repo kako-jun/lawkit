@@ -22,7 +22,7 @@ print(result)
 # Get structured JSON output
 json_result = lawkit.analyze_benford(
     'accounting.csv',
-    lawkit.LawkitOptions(format='csv', output='json')
+    lawkit.LawkitOptions(format='json')
 )
 print(f"Risk level: {json_result.risk_level}")
 print(f"P-value: {json_result.p_value}")
@@ -30,7 +30,7 @@ print(f"P-value: {json_result.p_value}")
 # Check if data follows Pareto principle (80/20 rule)
 pareto_result = lawkit.analyze_pareto(
     'sales_data.csv',
-    lawkit.LawkitOptions(output='json', gini_coefficient=True)
+    lawkit.LawkitOptions(format='json', gini_coefficient=True)
 )
 print(f"Gini coefficient: {pareto_result.gini_coefficient}")
 print(f"80/20 concentration: {pareto_result.concentration_80_20}")
@@ -119,13 +119,27 @@ if normal_result.p_value < 0.05:
     if normal_result.outliers:
         print(f"Found {len(normal_result.outliers)} outliers")
 
-# Multi-law comparison
-comparison = lawkit.compare_laws(
+# Multi-law analysis
+analysis = lawkit.analyze_laws(
     'complex_dataset.csv',
-    lawkit.LawkitOptions(output='json')
+    lawkit.LawkitOptions(format='json', laws='benf,pareto,zipf')
 )
-print(f"Best fitting law: {comparison.data.get('best_law')}")
-print(f"Overall risk level: {comparison.risk_level}")
+print(f"Analysis results: {analysis.data}")
+print(f"Overall risk level: {analysis.risk_level}")
+
+# Data validation
+validation = lawkit.validate_laws(
+    'complex_dataset.csv',
+    lawkit.LawkitOptions(format='json', consistency_check=True)
+)
+print(f"Validation status: {validation.data}")
+
+# Conflict diagnosis
+diagnosis = lawkit.diagnose_laws(
+    'complex_dataset.csv',
+    lawkit.LawkitOptions(format='json', report='detailed')
+)
+print(f"Diagnosis: {diagnosis.data}")
 ```
 
 ### Generate Sample Data
@@ -165,7 +179,7 @@ csv_data = """amount
 result = lawkit.analyze_string(
     csv_data,
     'benf',
-    lawkit.LawkitOptions(format='csv', output='json')
+    lawkit.LawkitOptions(format='json')
 )
 print(f"Risk assessment: {result.risk_level}")
 
@@ -174,7 +188,7 @@ json_data = '{"values": [12, 23, 34, 45, 56, 67, 78, 89]}'
 result = lawkit.analyze_string(
     json_data,
     'normal',
-    lawkit.LawkitOptions(format='json', output='json')
+    lawkit.LawkitOptions(format='json')
 )
 print(f"Is normal: {result.p_value > 0.05}")
 ```
@@ -359,7 +373,10 @@ print(f"Power law exponent: {result.exponent:.3f}")
 - `analyze_zipf(input_data, options)` - Zipf Law analysis
 - `analyze_normal(input_data, options)` - Normal distribution analysis
 - `analyze_poisson(input_data, options)` - Poisson distribution analysis
-- `compare_laws(input_data, options)` - Multi-law comparison
+- `analyze_laws(input_data, options)` - Multi-law analysis
+- `validate_laws(input_data, options)` - Data validation and consistency check
+- `diagnose_laws(input_data, options)` - Conflict diagnosis and detailed reporting
+- `compare_laws(input_data, options)` - Alias for analyze_laws (backward compatibility)
 - `generate_data(law_type, samples, **kwargs)` - Generate sample data
 - `analyze_string(content, law_type, options)` - Analyze string data directly
 
