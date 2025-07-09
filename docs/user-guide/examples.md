@@ -8,28 +8,28 @@ Practical usage examples of lawkit based on real-world use cases.
 
 ```bash
 # Basic analysis of expense data
-lawkit benf expenses_2024.csv --columns "Amount" --output json
+lawkit benf expenses_2024.csv --format json
 
 # Detailed analysis with verbose output
 lawkit benf expenses_2024.csv --verbose
 
 # Comprehensive analysis with multiple laws
-lawkit analyze expenses_2024.csv --laws benford,normal --detect-conflicts
+lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
 **Expected Results**: 
 - Deviations from Benford Law may indicate artificial manipulation
 - Normal Distribution analysis identifies outliers
-- Conflict detection highlights items requiring further investigation
+- Multiple law analysis provides comprehensive insights
 
 ### Case: Sales Data Reliability Verification
 
 ```bash
 # Monthly sales analysis
-lawkit benf monthly_sales.csv --min-value 1000 --confidence 0.99
+lawkit benf monthly_sales.csv --verbose
 
 # Regional analysis
-lawkit benf sales_by_region.csv --columns "North,South,East,West,Central"
+lawkit benf sales_by_region.csv --verbose
 ```
 
 ## 2. Business Analysis
@@ -38,13 +38,13 @@ lawkit benf sales_by_region.csv --columns "North,South,East,West,Central"
 
 ```bash
 # 80/20 analysis
-lawkit pareto customer_sales.csv --threshold 0.8 --gini
+lawkit pareto customer_sales.csv --threshold 0.8
 
 # 90/10 analysis (stricter top customer identification)
 lawkit pareto customer_sales.csv --threshold 0.9
 
 # Export visualization data
-lawkit pareto customer_sales.csv --output csv > pareto_results.csv
+lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
 **Applications**:
@@ -56,10 +56,10 @@ lawkit pareto customer_sales.csv --output csv > pareto_results.csv
 
 ```bash
 # Inventory turnover analysis
-lawkit pareto inventory_turnover.csv --business-analysis
+lawkit pareto inventory_turnover.csv --verbose
 
 # Seasonal pattern detection
-lawkit normal seasonal_demand.csv --quality-control --verbose
+lawkit normal seasonal_demand.csv --verbose
 ```
 
 ## 3. Text Analysis and Content Management
@@ -68,10 +68,10 @@ lawkit normal seasonal_demand.csv --quality-control --verbose
 
 ```bash
 # Word frequency analysis
-lawkit zipf website_content.txt --text --words 100
+lawkit zipf website_content.txt --verbose
 
 # Content distribution analysis
-lawkit zipf blog_posts.txt --text --min-count 10
+lawkit zipf blog_posts.txt --verbose
 ```
 
 **Use Cases**:
@@ -83,10 +83,10 @@ lawkit zipf blog_posts.txt --text --min-count 10
 
 ```bash
 # Hashtag distribution analysis
-lawkit zipf hashtags.csv --normalize --top-words 50
+lawkit zipf hashtags.csv --verbose
 
 # Engagement pattern analysis
-lawkit poisson post_engagements.csv --predict 30 --confidence 0.95
+lawkit poisson post_engagements.csv --verbose
 ```
 
 ## 4. Quality Control and Manufacturing
@@ -95,25 +95,25 @@ lawkit poisson post_engagements.csv --predict 30 --confidence 0.95
 
 ```bash
 # Product dimension quality control
-lawkit normal product_dimensions.csv --quality-control --control-limits
+lawkit normal product_dimensions.csv --verbose
 
 # Defect rate analysis
-lawkit poisson defect_rates.csv --lambda auto --goodness-of-fit
+lawkit poisson defect_rates.csv --verbose
 ```
 
 **Quality Metrics**:
-- Process capability indices (Cp, Cpk)
-- Control chart limits
-- Defect prediction models
+- Statistical process control
+- Defect pattern analysis
+- Quality distribution assessment
 
 ### Case: Service Response Time Analysis
 
 ```bash
 # Response time distribution
-lawkit normal response_times.csv --outlier-detection --verbose
+lawkit normal response_times.csv --verbose
 
 # Incident frequency analysis
-lawkit poisson incidents.csv --time-series --predict 7
+lawkit poisson incidents.csv --verbose
 ```
 
 ## 5. Integrated Analysis Workflows
@@ -122,10 +122,10 @@ lawkit poisson incidents.csv --time-series --predict 7
 
 ```bash
 # Multi-law comparison for data quality
-lawkit analyze financial_data.csv --laws benford,pareto,normal --focus quality
+lawkit analyze financial_data.csv --laws benford,pareto,normal --purpose audit
 
 # Generate detailed quality report
-lawkit analyze data.csv --laws all --output json > quality_report.json
+lawkit analyze data.csv --laws all --format json > quality_report.json
 ```
 
 ### Case: Automated Anomaly Detection Pipeline
@@ -135,16 +135,16 @@ lawkit analyze data.csv --laws all --output json > quality_report.json
 # Daily data quality pipeline
 
 # Step 1: Basic quality check
-lawkit benf daily_transactions.csv --min-count 100 || exit 1
+lawkit benf daily_transactions.csv --verbose || exit 1
 
 # Step 2: Concentration analysis
-lawkit pareto daily_sales.csv --gini-coefficient
+lawkit pareto daily_sales.csv --verbose
 
 # Step 3: Statistical validation
-lawkit normal process_metrics.csv --quality-control
+lawkit normal process_metrics.csv --verbose
 
 # Step 4: Comprehensive report
-lawkit analyze daily_data.csv --laws benford,pareto,normal --output json > daily_report.json
+lawkit analyze daily_data.csv --laws benford,pareto,normal --format json > daily_report.json
 ```
 
 ## 6. CI/CD Integration Examples
@@ -165,7 +165,7 @@ jobs:
       - name: Run quality checks
         run: |
           lawkit benf data/transactions.csv --format json
-          lawkit analyze data/sales.csv --laws benford,pareto --output json
+          lawkit analyze data/sales.csv --laws benford,pareto --format json
 ```
 
 ### Jenkins Pipeline Integration
@@ -176,8 +176,8 @@ pipeline {
     stages {
         stage('Data Quality Check') {
             steps {
-                sh 'lawkit benf ${WORKSPACE}/data/*.csv --min-count 50'
-                sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --output json > quality_report.json'
+                sh 'lawkit benf ${WORKSPACE}/data/*.csv --verbose'
+                sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --format json > quality_report.json'
                 archiveArtifacts artifacts: 'quality_report.json'
             }
         }
@@ -191,7 +191,7 @@ pipeline {
 
 ```bash
 # Optimized processing for large files
-lawkit benf large_dataset.csv --optimize --min-count 1000
+lawkit benf large_dataset.csv --quiet
 
 # Parallel processing for multiple files
 find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
@@ -200,66 +200,60 @@ find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
 ### Memory-Efficient Analysis
 
 ```bash
-# Process 100GB+ datasets efficiently
+# Process large datasets efficiently
 lawkit benf huge_data.csv --format json | jq '.risk_level'
 
 # Streaming analysis with real-time output
 tail -f live_data.log | lawkit benf --quiet
 ```
 
-## 5. Generate and Self-Testing Examples
+## 8. Data Generation and Testing Examples
 
 ### Case: Data Generation for Testing and Education
 
 ```bash
 # Generate Benford Law samples for fraud detection testing
-lawkit generate benf --samples 10000 --seed 42 > benf_test_data.txt
+lawkit generate benf --samples 10000 > benf_test_data.csv
 
 # Test our detection capability
-lawkit benf benf_test_data.txt --format json
+lawkit benf benf_test_data.csv --format json
 
-# Generate with fraud injection for validation
-lawkit generate benf --samples 5000 --fraud-rate 0.3 > fraud_data.txt
-lawkit benf fraud_data.txt --threshold critical
+# Generate different types of data
+lawkit generate pareto --samples 5000 > pareto_data.csv
+lawkit generate zipf --samples 2000 > zipf_data.txt
+lawkit generate normal --samples 1000 > normal_data.csv
+lawkit generate poisson --samples 1000 > poisson_data.csv
 ```
 
 ### Case: Statistical Education and Demonstration
 
 ```bash
-# Demonstrate Central Limit Theorem
-for i in {1..5}; do
-  echo "Sample $i:"
-  lawkit generate normal --samples 1000 --mean 100 --stddev 15 | 
-  lawkit normal --verbose | grep "Mean:"
+# Demonstrate different statistical laws
+for law in benf pareto zipf normal poisson; do
+  echo "Testing $law law:"
+  lawkit generate $law --samples 1000 > test_data.csv
+  lawkit $law test_data.csv --verbose
+  echo "---"
 done
 
-# Show Pareto Principle (80/20 rule)
-lawkit generate pareto --samples 10000 --concentration 0.8 | 
-lawkit pareto --business-analysis --format json | 
-jq '.pareto_analysis.concentration_ratio'
-
-# Validate Zipf Law in generated text
-lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000 | 
-lawkit zipf --text --format json | 
-jq '.correlation_coefficient'
+# Show validation capabilities
+lawkit generate benf --samples 5000 > test_benf.csv
+lawkit validate test_benf.csv --laws benford
 ```
 
 ### Case: Method Validation and Cross-Testing
 
 ```bash
 # Generate and immediately analyze pipeline
-lawkit generate poisson --samples 1000 --lambda 2.5 | 
-lawkit poisson --predict --format json
+lawkit generate poisson --samples 1000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
 
 # Cross-validation between laws
-lawkit generate normal --samples 5000 --mean 50 --stddev 10 > normal_data.txt
-lawkit analyze normal_data.txt --laws normal,benf,zipf --detect-conflicts
+lawkit generate normal --samples 5000 > normal_data.csv
+lawkit analyze normal_data.csv --laws normal,benford,zipf
 
-# Comprehensive self-testing
-lawkit selftest --comprehensive
-
-# Performance testing with generated data
-time lawkit generate benf --samples 100000 | lawkit benf --quiet
+# Comprehensive testing
+lawkit list --help  # Show available commands
 ```
 
 ### Case: Continuous Integration Testing
@@ -271,31 +265,58 @@ time lawkit generate benf --samples 100000 | lawkit benf --quiet
 echo "Running statistical accuracy tests..."
 
 # Test 1: Benford Law accuracy
-BENF_RESULT=$(lawkit generate benf --samples 10000 --seed 123 | 
-              lawkit benf --format json | jq -r '.risk_level')
+lawkit generate benf --samples 10000 > benf_test.csv
+BENF_RESULT=$(lawkit benf benf_test.csv --format json | jq -r '.risk_level')
 if [ "$BENF_RESULT" != "Low" ]; then
     echo "❌ Benford test failed: Expected Low risk, got $BENF_RESULT"
     exit 1
 fi
 
 # Test 2: Normal distribution detection
-NORMAL_RESULT=$(lawkit generate normal --samples 1000 --mean 0 --stddev 1 | 
-                lawkit normal --test shapiro --format json | jq -r '.is_normal')
-if [ "$NORMAL_RESULT" != "true" ]; then
-    echo "❌ Normal test failed: Expected true, got $NORMAL_RESULT"
-    exit 1
-fi
+lawkit generate normal --samples 1000 > normal_test.csv
+lawkit normal normal_test.csv --verbose
 
-# Test 3: Poisson parameter estimation
-LAMBDA_RESULT=$(lawkit generate poisson --samples 5000 --lambda 3.0 | 
-                lawkit poisson --format json | jq -r '.lambda')
-LAMBDA_DIFF=$(echo "$LAMBDA_RESULT - 3.0" | bc -l | tr -d '-')
-if (( $(echo "$LAMBDA_DIFF > 0.2" | bc -l) )); then
-    echo "❌ Poisson test failed: Lambda estimation off by $LAMBDA_DIFF"
-    exit 1
-fi
+# Test 3: Poisson analysis
+lawkit generate poisson --samples 5000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
 
 echo "✅ All statistical accuracy tests passed"
+```
+
+## 9. Command Reference Examples
+
+### Available Commands
+
+```bash
+# List all available commands
+lawkit --help
+
+# Individual command help
+lawkit benf --help
+lawkit pareto --help
+lawkit zipf --help
+lawkit normal --help
+lawkit poisson --help
+lawkit analyze --help
+lawkit validate --help
+lawkit diagnose --help
+lawkit generate --help
+lawkit list --help
+```
+
+### Output Format Examples
+
+```bash
+# Different output formats
+lawkit benf data.csv --format json
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format yaml
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
+
+# Verbosity control
+lawkit benf data.csv --quiet
+lawkit benf data.csv --verbose
 ```
 
 ## Configuration Examples

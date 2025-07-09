@@ -195,7 +195,8 @@ lawkit设计用于处理从小样本（100+数据点）到企业级数据集（�
 ### 命令行界面
 
 - **子命令结构**: `lawkit <法则> [选项] <输入>`
-- **配置管理**: CLI参数和配置文件
+- **可用命令**: benf, pareto, zipf, normal, poisson, compare, generate, list, selftest
+- **配置管理**: CLI参数和运行时选项
 - **错误处理**: 全面错误报告和恢复
 - **国际数字支持**: 5种语言数字格式自动识别
 
@@ -208,6 +209,7 @@ lawkit设计用于处理从小样本（100+数据点）到企业级数据集（�
 
 ### 未来扩展（计划中）
 
+- **命令分割**: analyze, validate, diagnose 命令（替换compare）
 - **RESTful API**: 用于Web集成的HTTP API
 - **GraphQL支持**: 灵活查询接口
 - **WebSocket流**: 实时分析更新

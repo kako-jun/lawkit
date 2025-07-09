@@ -16,10 +16,10 @@ lawkit benf data.csv
 lawkit benf data.csv --verbose
 
 # JSON形式で出力
-lawkit benf data.csv --output json
+lawkit benf data.csv --format json
 
-# 特定の列を分析
-lawkit benf data.csv --columns "金額,売上"
+# 閾値を指定して分析
+lawkit benf data.csv --threshold high
 ```
 
 ### 2. パレート分析（80/20法則）
@@ -31,10 +31,10 @@ lawkit benf data.csv --columns "金額,売上"
 lawkit pareto sales.csv
 
 # 閾値を指定（80/20ではなく90/10分析）
-lawkit pareto sales.csv --threshold 0.9
+lawkit pareto sales.csv --concentration 0.9
 
 # Gini係数も計算
-lawkit pareto sales.csv --gini
+lawkit pareto sales.csv --gini-coefficient
 ```
 
 ### 3. ジップ法則分析
@@ -45,11 +45,11 @@ lawkit pareto sales.csv --gini
 # テキストファイルの分析
 lawkit zipf document.txt
 
-# テキスト分析
+# 日本語テキスト分析
 lawkit zipf japanese_text.txt
 
 # 最小出現回数を指定
-lawkit zipf text.txt --min-frequency 5
+lawkit zipf text.txt --min-count 5
 ```
 
 ### 4. 正規分布分析
@@ -60,11 +60,11 @@ lawkit zipf text.txt --min-frequency 5
 # 正規性検定
 lawkit normal measurements.csv
 
-# 管理図の作成
-lawkit normal quality_data.csv --control-chart
+# 詳細な正規性検定
+lawkit normal quality_data.csv --verbose
 
-# 工程能力評価
-lawkit normal process_data.csv --capability
+# 異常値も検出
+lawkit normal process_data.csv --outliers
 ```
 
 ### 5. ポアソン分布分析
@@ -75,11 +75,11 @@ lawkit normal process_data.csv --capability
 # 基本的なポアソン分析
 lawkit poisson events.csv
 
-# 時間間隔を指定
-lawkit poisson events.csv --interval hour
+# 詳細なポアソン分析
+lawkit poisson events.csv --verbose
 
-# 予測期間を指定
-lawkit poisson events.csv --forecast 30
+# 予測モード
+lawkit poisson events.csv --predict
 ```
 
 ### 6. 複数法則比較
@@ -88,13 +88,13 @@ lawkit poisson events.csv --forecast 30
 
 ```bash
 # 複数法則の比較
-lawkit analyze data.csv --laws benford,pareto,normal
+lawkit compare data.csv --laws benf,pareto,normal
 
 # 矛盾検出
-lawkit analyze data.csv --laws all --detect-conflicts
+lawkit compare data.csv --laws all --consistency-check
 
 # 推奨システム
-lawkit analyze data.csv --recommend
+lawkit compare data.csv --recommend
 ```
 
 ## サンプルデータでの実習
@@ -175,20 +175,20 @@ echo "五万六千七百八十九" | lawkit benf
 
 ```bash
 # 特定の範囲のデータのみ分析
-lawkit benf data.csv --min-value 1000 --max-value 100000
+lawkit benf data.csv --filter ">=1000"
 
 # 閾値設定
-lawkit pareto sales.csv --threshold 0.95
+lawkit pareto sales.csv --concentration 0.95
 ```
 
 ### パフォーマンス調整
 
 ```bash
 # 大きなファイルの場合、サンプリング
-lawkit benf large_data.csv --sample-size 10000
+lawkit benf large_data.csv --optimize
 
 # 並列処理のスレッド数指定
-lawkit analyze data.csv --optimize
+lawkit compare data.csv --optimize
 ```
 
 ## よく使われるワークフロー
@@ -196,22 +196,22 @@ lawkit analyze data.csv --optimize
 ### 1. データ品質チェック
 ```bash
 # 総合的なデータ品質評価
-lawkit analyze financial_data.csv --laws benford,normal --detect-conflicts
+lawkit compare financial_data.csv --laws benf,normal --consistency-check
 ```
 
 ### 2. 不正検知パイプライン
 ```bash
 # ベンフォード法則で初期スクリーニング
-lawkit benf transactions.csv --output json > results.json
+lawkit benf transactions.csv --format json > results.json
 
 # 異常値を詳細分析
-lawkit normal suspicious_data.csv --outliers
+lawkit normal suspicious_data.csv --verbose
 ```
 
 ### 3. ビジネス分析
 ```bash
 # 売上のパレート分析
-lawkit pareto monthly_sales.csv --gini
+lawkit pareto monthly_sales.csv --gini-coefficient
 
 # 顧客分析
 lawkit zipf customer_feedback.txt
@@ -219,6 +219,6 @@ lawkit zipf customer_feedback.txt
 
 ## 次のステップ
 
-- [設定ガイド](configuration_ja.md) - カスタマイズと高度な設定
 - [使用例](examples_ja.md) - 実際のユースケース
 - [CLIリファレンス](../reference/cli-reference_ja.md) - 全コマンド詳細
+- [アーキテクチャ](../guides/architecture_ja.md) - システム設計

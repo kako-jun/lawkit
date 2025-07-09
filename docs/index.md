@@ -24,7 +24,7 @@ lawkit benf data.csv
 lawkit pareto sales.csv
 
 # Multi-law comparison
-lawkit analyze data.csv --laws benford,pareto,normal
+lawkit analyze data.csv --laws benf,pareto,normal
 ```
 
 ## Documentation

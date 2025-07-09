@@ -100,6 +100,59 @@
 - ✅ **中国語ドキュメント**: 10個の包括的ドキュメントファイル作成
 - ✅ **統一フォーマット**: バッジ・構造・リンクの完全統一
 
+## 📝 **未実装機能リスト（ドキュメントから削除予定）**
+
+### **設定システム（全体未実装）**
+- `lawkit config` - 設定管理コマンド
+  - `lawkit config show` - 全設定表示
+  - `lawkit config show <section>` - セクション別表示
+  - `lawkit config path` - 設定ファイルパス表示
+  - `lawkit config validate` - 設定検証
+  - `lawkit config init` - 設定初期化
+- 設定ファイル対応: `lawkit.toml`, `~/.config/lawkit/config.toml`, `/etc/lawkit/config.toml`
+- `--profile <name>` - 設定プロファイル指定
+
+### **各コマンドの未実装オプション**
+
+#### benf:
+- `--columns <COLUMNS>` - カラム選択
+- `--min-value <VALUE>` - 最小値フィルタ
+- `--confidence <LEVEL>` - 信頼度レベル
+- `--sample-size <NUMBER>` - サンプルサイズ指定
+
+#### pareto:
+- `--columns <COLUMNS>` - カラム選択
+
+#### zipf:
+- `--min-frequency <NUMBER>` - 最小頻度フィルタ
+- `--max-words <NUMBER>` - 最大単語数
+- `--columns <COLUMNS>` - カラム選択
+
+#### normal:
+- `--control-chart` - 管理図生成
+- `--capability` - 工程能力分析
+- `--normality-tests <TESTS>` - 正規性検定選択
+- `--columns <COLUMNS>` - カラム選択
+
+#### poisson:
+- `--interval <INTERVAL>` - 時間間隔指定
+- `--forecast <DAYS>` - 将来予測
+- `--confidence <LEVEL>` - 信頼度レベル
+
+#### generate:
+- `--columns <COLUMNS>` - 出力カラム指定
+
+### **環境変数（未実装）**
+- `LAWKIT_OUTPUT` - デフォルト出力形式
+- `LAWKIT_VERBOSE` - 詳細モード
+- `LAWKIT_OPTIMIZE` - 最適化モード
+
+### **その他の未実装機能**
+- バッチ処理モード
+- レポート生成（PDF/HTML）
+- プラグインシステム
+- エクスポート/インポート機能
+
 ## 🔧 **詳細ドキュメント（Claude自動参照対象）**
 
 ### 統計法則仕様
