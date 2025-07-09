@@ -160,7 +160,7 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool) {
         return;
     }
 
-    println!("Benford's Law Analysis Results");
+    println!("Benford Law Analysis Results");
     println!();
     println!("Dataset: {}", result.dataset_name);
     println!("Numbers analyzed: {}", result.numbers_analyzed);
