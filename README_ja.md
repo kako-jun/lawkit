@@ -26,7 +26,7 @@ Benford Law Analysis Results
 
 Dataset: test_data.txt
 Numbers analyzed: 500
-CRITICAL: Dataset analysis
+[CRITICAL] Dataset analysis
 
 # 統計法則に従うテストデータ生成
 $ lawkit generate pareto --samples 100 | head -5
@@ -267,7 +267,7 @@ Law Results:
   Zipf Law: 0.813
 
 Conflicts:
-  CONFLICT: Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+  [CONFLICT] Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
      Likely Cause: Benford Law may not be compatible with the data pattern
      Suggestion: Please review application conditions and data quality for Benford Law
 
@@ -279,7 +279,7 @@ Dataset: test_data.txt
 Threshold: 0.500
 Consistency Score: 0.484
 
-WARNING: Consistency below threshold
+[WARNING] Consistency below threshold
 Recommendation: Review data quality and collection methods
 
 Statistical Laws Integration Analysis
@@ -320,13 +320,13 @@ Law Results:
   Zipf Law: 0.813
 
 Conflicts:
-  CONFLICT: Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+  [CONFLICT] Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
      Likely Cause: Benford Law may not be compatible with the data pattern
      Suggestion: Please review application conditions and data quality for Benford Law
-  CONFLICT: Law 'normal' score (0.125) significantly deviates from expected (0.254) - deviation: 50.8%
+  [CONFLICT] Law 'normal' score (0.125) significantly deviates from expected (0.254) - deviation: 50.8%
      Likely Cause: Law 'normal' may not be compatible with the data pattern
      Suggestion: Please review application conditions and data quality for law 'normal'
-  CONFLICT: Law 'pareto' score (-0.868) significantly deviates from expected (0.254) - deviation: 442.1%
+  [CONFLICT] Law 'pareto' score (-0.868) significantly deviates from expected (0.254) - deviation: 442.1%
      Likely Cause: Law 'pareto' may not be compatible with the data pattern
      Suggestion: Please review application conditions and data quality for law 'pareto'
 ```

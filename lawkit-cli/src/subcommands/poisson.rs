@@ -1,3 +1,4 @@
+use crate::colors;
 use crate::common_options::{get_optimized_reader, setup_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
