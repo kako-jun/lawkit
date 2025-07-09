@@ -262,7 +262,7 @@ fn detect_changepoints(timestamps: &[f64], values: &[f64]) -> Result<Vec<ChangeP
 
         // diffx-coreで構造的差分を検出
         let diff_results = diff(&before_stats, &after_stats, None, Some(0.1), None);
-        
+
         // 平均の変化を検出
         let mean_change = (after_mean - before_mean).abs();
         let pooled_std = ((before_var + after_var) / 2.0).sqrt();
