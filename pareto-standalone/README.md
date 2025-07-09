@@ -56,9 +56,9 @@ lawkit pareto project-efforts.xlsx --verbose --format json
 This `pareto` command is a convenience wrapper for `lawkit pareto`. For complete statistical analysis capabilities, use **lawkit**:
 
 ### Available Statistical Laws
-- **Benford's Law**: `lawkit benf` - Fraud detection and anomaly analysis
+- **Benford Law**: `lawkit benf` - Fraud detection and anomaly analysis
 - **Pareto Principle**: `lawkit pareto` - 80/20 rule and concentration measurement  
-- **Zipf's Law**: `lawkit zipf` - Power-law distribution analysis
+- **Zipf Law**: `lawkit zipf` - Power-law distribution analysis
 - **Normal Distribution**: `lawkit normal` - Normality testing and outlier detection
 - **Poisson Distribution**: `lawkit poisson` - Rare event analysis
 

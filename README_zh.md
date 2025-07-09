@@ -97,12 +97,12 @@ Dataset: suspicious_data.csv
 Numbers analyzed: 1500
 Laws analyzed: 5 (benford, pareto, zipf, normal, poisson)
 
-⚠️ CONFLICTS DETECTED: 3 Critical Issues
+CONFLICT: 3 Critical Issues Detected
 
 Critical Conflict #1: Score Deviation
-  Laws: Benford vs Normal Distribution
+  Laws: Benford Law vs Normal Distribution
   Conflict Score: 0.847 (HIGH)
-  Description: Benford and Normal Distribution show significantly different 
+  Description: Benford Law and Normal Distribution show significantly different 
               evaluations (difference: 0.623) with structural differences in: 
               confidence_level ("high" → "low"), score_category ("good" → "poor")
   Root Cause: 本福德法则表明潜在的数据操作，而正态分布表明
@@ -110,14 +110,14 @@ Critical Conflict #1: Score Deviation
   Resolution: 调查数据源完整性；考虑时间序列分析以识别操作期间
 
 Critical Conflict #2: Distribution Mismatch  
-  Laws: Pareto vs Poisson Distribution
+  Laws: Pareto Principle vs Poisson Distribution
   Conflict Score: 0.793 (HIGH)
   Description: 幂律分布与离散事件建模冲突
   Root Cause: 数据包含混合模式（连续财富分布和离散事件计数）
-  Resolution: 分析前按类型分割数据；对金额应用帕累托，对频率应用泊松
+  Resolution: 分析前按类型分割数据；对金额应用帕累托原则，对频率应用泊松分布
 
 Critical Conflict #3: Methodological Conflict
-  Laws: Zipf vs Normal Distribution  
+  Laws: Zipf Law vs Normal Distribution  
   Conflict Score: 0.651 (MEDIUM)
   Description: 基于频率的分析与连续分布冲突
   Root Cause: 数据集可能包含文本频率数据和数值测量值

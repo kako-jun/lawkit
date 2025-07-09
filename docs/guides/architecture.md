@@ -19,9 +19,9 @@ graph TB
     end
     
     subgraph "Analysis Engine"
-        D --> E[Benford's Law]
+        D --> E[Benford Law]
         D --> F[Pareto Analysis]
-        D --> G[Zipf's Law]
+        D --> G[Zipf Law]
         D --> H[Normal Distribution]
         D --> I[Poisson Distribution]
     end
@@ -46,7 +46,7 @@ graph TB
 
 ### Statistical Law Implementations
 
-#### 1. Benford's Law Engine
+#### 1. Benford Law Engine
 - **Purpose**: Fraud detection in numerical datasets
 - **Algorithm**: First-digit frequency distribution analysis
 - **Output**: Risk assessment with statistical significance testing
@@ -58,7 +58,7 @@ graph TB
 - **Output**: Concentration ratios and business insights
 - **Use Cases**: Business optimization, quality control
 
-#### 3. Zipf's Law Engine
+#### 3. Zipf Law Engine
 - **Purpose**: Frequency analysis and power-law detection
 - **Algorithm**: Rank-frequency correlation analysis
 - **Output**: Power-law parameters and text analytics
@@ -152,9 +152,9 @@ pub trait StatisticalLaw {
 
 ### Computational Complexity
 
-- **Benford's Law**: O(n) - linear in dataset size
+- **Benford Law**: O(n) - linear in dataset size
 - **Pareto Analysis**: O(n log n) - dominated by sorting
-- **Zipf's Law**: O(n log n) - frequency counting and sorting
+- **Zipf Law**: O(n log n) - frequency counting and sorting
 - **Normal Distribution**: O(n) - statistical computations
 - **Poisson Distribution**: O(n) - parameter estimation
 

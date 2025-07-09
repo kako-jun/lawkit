@@ -153,7 +153,7 @@ export NO_COLOR=1
 ### Custom Thresholds
 
 ```bash
-# Benford's Law
+# Benford Law
 lawkit benf data.csv --threshold low     # MAD < 4
 lawkit benf data.csv --threshold medium  # MAD < 8  
 lawkit benf data.csv --threshold high    # MAD < 15

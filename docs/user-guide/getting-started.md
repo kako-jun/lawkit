@@ -6,9 +6,9 @@ Welcome to `lawkit`! This guide will help you get started with the statistical l
 
 `lawkit` is a comprehensive toolkit for analyzing data using multiple statistical laws:
 
-- **Benford's Law** - Detect anomalies and assess data quality
+- **Benford Law** - Detect anomalies and assess data quality
 - **Pareto Principle** - 80/20 analysis and concentration measurement
-- **Zipf's Law** - Frequency distribution and ranking analysis
+- **Zipf Law** - Frequency distribution and ranking analysis
 - **Normal Distribution** - Normality testing and outlier detection
 - **Poisson Distribution** - Event occurrence and rare event analysis
 
@@ -17,7 +17,7 @@ Welcome to `lawkit`! This guide will help you get started with the statistical l
 ### Basic Analysis
 
 ```bash
-# Analyze with Benford's Law
+# Analyze with Benford Law
 lawkit benf data.csv
 
 # Analyze with Pareto Principle
@@ -44,9 +44,9 @@ lawkit analyze data.csv --report detailed
 
 ### Statistical Laws
 Each law provides unique insights:
-- **Quality assurance** → Benford's Law
+- **Quality assurance** → Benford Law
 - **Business efficiency** → Pareto Principle  
-- **Frequency patterns** → Zipf's Law
+- **Frequency patterns** → Zipf Law
 - **Anomaly detection** → Normal Distribution
 - **Event modeling** → Poisson Distribution
 

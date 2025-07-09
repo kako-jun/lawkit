@@ -212,7 +212,7 @@ tail -f live_data.log | lawkit benf --quiet
 ### Case: Data Generation for Testing and Education
 
 ```bash
-# Generate Benford's Law samples for fraud detection testing
+# Generate Benford Law samples for fraud detection testing
 lawkit generate benf --samples 10000 --seed 42 > benf_test_data.txt
 
 # Test our detection capability
@@ -238,7 +238,7 @@ lawkit generate pareto --samples 10000 --concentration 0.8 |
 lawkit pareto --business-analysis --format json | 
 jq '.pareto_analysis.concentration_ratio'
 
-# Validate Zipf's Law in generated text
+# Validate Zipf Law in generated text
 lawkit generate zipf --samples 2000 --exponent 1.0 --vocabulary-size 1000 | 
 lawkit zipf --text --format json | 
 jq '.correlation_coefficient'
@@ -270,7 +270,7 @@ time lawkit generate benf --samples 100000 | lawkit benf --quiet
 
 echo "Running statistical accuracy tests..."
 
-# Test 1: Benford's Law accuracy
+# Test 1: Benford Law accuracy
 BENF_RESULT=$(lawkit generate benf --samples 10000 --seed 123 | 
               lawkit benf --format json | jq -r '.risk_level')
 if [ "$BENF_RESULT" != "Low" ]; then

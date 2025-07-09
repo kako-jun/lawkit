@@ -15,7 +15,7 @@ This will automatically download the appropriate `lawkit` binary for your system
 ```python
 import lawkit
 
-# Analyze financial data with Benford's Law
+# Analyze financial data with Benford Law
 result = lawkit.analyze_benford('financial_data.csv')
 print(result)
 
@@ -40,9 +40,9 @@ print(f"80/20 concentration: {pareto_result.concentration_80_20}")
 
 ### Statistical Laws Supported
 
-- **Benford's Law**: Detect fraud and anomalies in numerical data
+- **Benford Law**: Detect fraud and anomalies in numerical data
 - **Pareto Principle**: Analyze 80/20 distributions and concentration
-- **Zipf's Law**: Analyze word frequencies and power-law distributions
+- **Zipf Law**: Analyze word frequencies and power-law distributions
 - **Normal Distribution**: Test for normality and detect outliers
 - **Poisson Distribution**: Analyze rare events and count data
 
@@ -69,7 +69,7 @@ print(f"80/20 concentration: {pareto_result.concentration_80_20}")
 ```python
 import lawkit
 
-# Analyze with Benford's Law
+# Analyze with Benford Law
 result = lawkit.analyze_benford('invoice_data.csv')
 print(result)
 
@@ -133,7 +133,7 @@ print(f"Overall risk level: {comparison.risk_level}")
 ```python
 import lawkit
 
-# Generate Benford's Law compliant data
+# Generate Benford Law compliant data
 benford_data = lawkit.generate_data('benf', samples=1000, seed=42)
 print(benford_data)
 
@@ -298,7 +298,7 @@ result = lawkit.analyze_benford('invoices.csv',
 if result.risk_level in ['High', 'Critical']:
     print("🚨 Potential fraud detected in invoice data")
     print(f"Statistical significance: p={result.p_value:.6f}")
-    print(f"Deviation from Benford's Law: {result.mad:.2f}%")
+    print(f"Deviation from Benford Law: {result.mad:.2f}%")
 ```
 
 ### Business Intelligence
@@ -346,7 +346,7 @@ import lawkit
 result = lawkit.analyze_zipf('document.txt',
                             lawkit.LawkitOptions(output='json'))
 
-print(f"Text follows Zipf's Law: {result.p_value > 0.05}")
+print(f"Text follows Zipf Law: {result.p_value > 0.05}")
 print(f"Power law exponent: {result.exponent:.3f}")
 ```
 
@@ -354,9 +354,9 @@ print(f"Power law exponent: {result.exponent:.3f}")
 
 ### Main Functions
 
-- `analyze_benford(input_data, options)` - Benford's Law analysis
+- `analyze_benford(input_data, options)` - Benford Law analysis
 - `analyze_pareto(input_data, options)` - Pareto principle analysis  
-- `analyze_zipf(input_data, options)` - Zipf's Law analysis
+- `analyze_zipf(input_data, options)` - Zipf Law analysis
 - `analyze_normal(input_data, options)` - Normal distribution analysis
 - `analyze_poisson(input_data, options)` - Poisson distribution analysis
 - `compare_laws(input_data, options)` - Multi-law comparison
