@@ -20,8 +20,14 @@ lawkit benf financial-data.csv
 # Business analysis with Pareto principle
 lawkit pareto sales.csv --business-analysis
 
-# Multi-law comparison
-lawkit compare data.csv --laws all
+# Multi-law analysis
+lawkit analyze data.csv --laws benf,pareto,zipf
+
+# Data validation
+lawkit validate data.csv --consistency-check
+
+# Conflict diagnosis
+lawkit diagnose data.csv --report detailed
 ```
 
 ### Programmatic Usage
@@ -29,11 +35,18 @@ lawkit compare data.csv --laws all
 const { runLawkit } = require('lawkit-js');
 
 async function analyzeFraud() {
-  const result = await runLawkit(['benf', 'data.csv', '--format', 'json']);
+  // Benford analysis for fraud detection
+  const benf = await runLawkit(['benf', 'data.csv', '--format', 'json']);
   
-  if (result.code === 0) {
-    const analysis = JSON.parse(result.stdout);
-    if (analysis.risk_level === 'High') {
+  // Multi-law analysis for comprehensive insights
+  const analysis = await runLawkit(['analyze', 'data.csv', '--format', 'json', '--laws', 'benf,pareto']);
+  
+  // Data validation for consistency check
+  const validation = await runLawkit(['validate', 'data.csv', '--format', 'json']);
+  
+  if (benf.code === 0) {
+    const result = JSON.parse(benf.stdout);
+    if (result.risk_level === 'High') {
       console.log('⚠️  Potential fraud detected!');
     }
   }
@@ -47,7 +60,9 @@ async function analyzeFraud() {
 - **Zipf Law**: Text analysis and frequency patterns
 - **Normal Distribution**: Quality control and outlier detection
 - **Poisson Distribution**: Event prediction and risk assessment
-- **Multi-Law Compare**: Comprehensive analysis integration
+- **Multi-Law Analysis**: Comprehensive statistical integration
+- **Data Validation**: Consistency checking and quality assessment
+- **Conflict Diagnosis**: Detailed anomaly detection and reporting
 
 ## Platforms
 
