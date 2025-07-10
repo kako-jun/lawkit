@@ -1,8 +1,8 @@
 # 使用例
 
-実際のユースケースに基づいた、lawkitの実践的な使用例を紹介します。
+実世界のユースケースに基づいたlawkitの実践的な使用例。
 
-## 1. 会計監査での不正検知
+## 1. 会計監査における不正検知
 
 ### ケース: 経費報告書の検証
 
@@ -10,22 +10,31 @@
 # 経費データの基本分析
 lawkit benf expenses_2024.csv --format json
 
-# 詳細分析（日本語数字対応）
+# 詳細な分析（冗長出力）
 lawkit benf expenses_2024.csv --verbose
 
-# 複数法則での包括分析
+# 高信頼度の監査分析（99%信頼水準）
+lawkit benf expenses_2024.csv --confidence 0.99 --verbose
+
+# ノイズとなる小さな金額をフィルタリング
+lawkit benf expenses_2024.csv --min-value 50 --threshold high
+
+# 大規模データセットのパフォーマンス最適化
+lawkit benf expenses_2024.csv --sample-size 10000 --optimize
+
+# 複数法則による包括的分析
 lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
 **期待される結果**: 
-- ベンフォード法則からの逸脱がある場合、人為的操作の可能性
-- 正規分布分析で異常値を特定
-- 矛盾検出で追加調査が必要な項目を識別
+- ベンフォード法則からの逸脱は人為的操作の可能性を示唆
+- 正規分布分析により外れ値を特定
+- 複数法則分析により包括的な洞察を提供
 
 ### ケース: 売上データの信頼性検証
 
 ```bash
-# 月次売上の分析
+# 月次売上分析
 lawkit benf monthly_sales.csv --verbose
 
 # 地域別分析
@@ -40,265 +49,292 @@ lawkit benf sales_by_region.csv --verbose
 # 80/20分析
 lawkit pareto customer_sales.csv --threshold 0.8
 
-# 90/10分析（より厳密な上位顧客特定）
+# 90/10分析（より厳密な上位顧客の特定）
 lawkit pareto customer_sales.csv --threshold 0.9
 
-# 可視化用データ出力
+# 可視化データのエクスポート
 lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
 **活用方法**:
-- 売上の80%を占める20%の顧客を特定
-- Gini係数で売上集中度を評価
-- 営業戦略の優先順位付け
+- 売上の80%を占める重要顧客を特定
+- 高価値セグメントに営業活動を集中
+- 顧客サービスリソースの最適配分
 
-### ケース: 在庫管理の最適化
+### ケース: 在庫管理分析
 
 ```bash
-# 商品別在庫回転率のパレート分析
+# 在庫回転率分析
 lawkit pareto inventory_turnover.csv --verbose
 
-# 在庫金額の分析
-lawkit pareto inventory_value.csv --threshold 0.7
+# 季節パターンの検出
+lawkit normal seasonal_demand.csv --verbose
 ```
 
-## 3. 品質管理
+## 3. テキスト分析とコンテンツ管理
 
-### ケース: 製造工程の品質監視
+### ケース: ウェブサイトコンテンツ分析
 
 ```bash
-# 製品寸法の正規性検定
+# 単語頻度分析
+lawkit zipf website_content.txt --verbose
+
+# コンテンツ分布分析
+lawkit zipf blog_posts.txt --verbose
+```
+
+**ユースケース**:
+- SEOキーワード最適化
+- コンテンツ戦略の計画
+- 自然なコンテンツと人工的なコンテンツの検出
+
+### ケース: ソーシャルメディア分析
+
+```bash
+# ハッシュタグ分布分析
+lawkit zipf hashtags.csv --verbose
+
+# エンゲージメントパターン分析
+lawkit poisson post_engagements.csv --verbose
+```
+
+## 4. 品質管理と製造
+
+### ケース: 製造プロセス管理
+
+```bash
+# 製品寸法の品質管理
 lawkit normal product_dimensions.csv --verbose
 
-# 工程能力評価
-lawkit normal process_data.csv --verbose
-
-# 異常値検出
-lawkit normal quality_measurements.csv --verbose
+# 高信頼度での不良率分析
+lawkit poisson defect_rates.csv --confidence 0.99 --verbose
 ```
 
-**品質管理での活用**:
-- 工程が統計的管理状態にあるかの確認
-- 工程能力指数（Cp, Cpk）の計算
-- 異常値の早期検出
+**品質メトリクス**:
+- 統計的プロセス管理
+- 不良パターン分析
+- 品質分布評価
 
-### ケース: 不良品発生パターンの分析
-
-```bash
-# 不良品発生のポアソン分析
-lawkit poisson defect_counts.csv --verbose
-
-# 予測分析
-lawkit poisson defect_history.csv --verbose
-```
-
-## 4. テキスト分析
-
-### ケース: 顧客フィードバックの分析
+### ケース: サービス応答時間分析
 
 ```bash
-# 日本語テキストの分析
-lawkit zipf customer_feedback.txt --verbose
-
-# キーワード頻度の抽出
-lawkit zipf reviews.txt --format json
-```
-
-### ケース: ソーシャルメディア投稿の分析
-
-```bash
-# 複数言語対応分析
-lawkit zipf social_posts.txt --verbose
-
-# トレンド分析用データ出力
-lawkit zipf tweets.txt --format csv
-```
-
-## 5. 金融・投資分析
-
-### ケース: 株価データの異常検知
-
-```bash
-# 株価変動の正規性分析
-lawkit normal stock_returns.csv --verbose
-
-# 異常取引の検出
-lawkit benf trading_volumes.csv --verbose
-```
-
-### ケース: ポートフォリオ分析
-
-```bash
-# 投資配分のパレート分析
-lawkit pareto portfolio_weights.csv --verbose
-
-# リスク要因の分析
-lawkit normal risk_factors.csv --verbose
-```
-
-## 6. 学術研究・データサイエンス
-
-### ケース: 実験データの検証
-
-```bash
-# データの自然性検証
-lawkit benf experimental_data.csv --verbose
-
-# 測定データの分布確認
-lawkit normal measurements.csv --verbose
-```
-
-### ケース: 大規模データセットの要約
-
-```bash
-# 包括的データ分析
-lawkit analyze large_dataset.csv --laws all
-
-# サンプリング分析
-lawkit benf big_data.csv --verbose
-```
-
-## 7. 運用・監視
-
-### ケース: システムログの異常検知
-
-```bash
-# アクセスログの分析
-lawkit zipf access.log --verbose
-
-# レスポンス時間の分析
+# 応答時間分布
 lawkit normal response_times.csv --verbose
+
+# 信頼水準を指定したインシデント頻度分析
+lawkit poisson incidents.csv --confidence 0.95 --verbose
 ```
 
-### ケース: イベント発生予測
+## 5. 統合分析ワークフロー
+
+### ケース: 包括的データ品質評価
 
 ```bash
-# サーバーダウンの予測
-lawkit poisson downtime_events.csv --verbose
+# データ品質のための多法則比較
+lawkit analyze financial_data.csv --laws benford,pareto,normal --purpose audit
 
-# アラート頻度の分析
-lawkit poisson alert_counts.csv --verbose
+# 詳細な品質レポートの生成
+lawkit analyze data.csv --laws all --format json > quality_report.json
 ```
 
-## 8. バッチ処理とパイプライン
-
-### 複数ファイルの一括処理
+### ケース: 自動異常検出パイプライン
 
 ```bash
 #!/bin/bash
-# 月次レポートの一括分析
+# 日次データ品質パイプライン
 
-for file in reports/2024-*.csv; do
-    echo "Processing $file..."
-    
-    # ベンフォード分析
-    lawkit benf "$file" --format json > "results/benf_$(basename "$file" .csv).json"
-    
-    # パレート分析
-    lawkit pareto "$file" --format json > "results/pareto_$(basename "$file" .csv).json"
-    
-    # 包括分析
-    lawkit analyze "$file" --laws benford,pareto --format json > "results/analyze_$(basename "$file" .csv).json"
-done
+# ステップ1: 基本的な品質チェック
+lawkit benf daily_transactions.csv --verbose || exit 1
 
-echo "Batch processing complete!"
+# ステップ2: 集中度分析
+lawkit pareto daily_sales.csv --verbose
+
+# ステップ3: 統計的検証
+lawkit normal process_metrics.csv --verbose
+
+# ステップ4: 包括的レポート
+lawkit analyze daily_data.csv --laws benford,pareto,normal --format json > daily_report.json
 ```
 
-### CI/CDでの品質チェック
+## 6. CI/CD統合例
+
+### GitHub Actions統合
 
 ```yaml
-# .github/workflows/data-quality.yml
-name: Data Quality Check
-
-on:
-  push:
-    paths:
-      - 'data/**/*.csv'
+name: データ品質チェック
+on: [push, pull_request]
 
 jobs:
   quality-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install lawkit
+      - uses: actions/checkout@v3
+      - name: lawkitのインストール
         run: cargo install lawkit
-        
-      - name: Quality Analysis
+      - name: 品質チェックの実行
         run: |
-          for file in data/*.csv; do
-            lawkit analyze "$file" --laws benford,normal --format json > "qa_$(basename "$file" .csv).json"
-          done
-          
-      - name: Upload Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: quality-reports
-          path: qa_*.json
+          lawkit benf data/transactions.csv --format json
+          lawkit analyze data/sales.csv --laws benford,pareto --format json
 ```
 
-## 9. 統合ワークフロー例
+### Jenkinsパイプライン統合
 
-### 包括的データ監査パイプライン
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('データ品質チェック') {
+            steps {
+                sh 'lawkit benf ${WORKSPACE}/data/*.csv --verbose'
+                sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --format json > quality_report.json'
+                archiveArtifacts artifacts: 'quality_report.json'
+            }
+        }
+    }
+}
+```
+
+## 7. パフォーマンス最適化例
+
+### 大規模データセット処理
+
+```bash
+# 大規模ファイルの最適化処理
+lawkit benf large_dataset.csv --quiet
+
+# 複数ファイルの並列処理
+find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
+```
+
+### メモリ効率的な分析
+
+```bash
+# 大規模データセットの効率的処理
+lawkit benf huge_data.csv --format json | jq '.risk_level'
+
+# リアルタイム出力によるストリーミング分析
+tail -f live_data.log | lawkit benf --quiet
+```
+
+## 8. データ生成とテスト例
+
+### ケース: テストと教育のためのデータ生成
+
+```bash
+# 不正検知テスト用のベンフォード法則サンプル生成
+lawkit generate benf --samples 10000 > benf_test_data.csv
+
+# 検出能力のテスト
+lawkit benf benf_test_data.csv --format json
+
+# 異なるタイプのデータ生成
+lawkit generate pareto --samples 5000 > pareto_data.csv
+lawkit generate zipf --samples 2000 > zipf_data.txt
+lawkit generate normal --samples 1000 > normal_data.csv
+lawkit generate poisson --samples 1000 > poisson_data.csv
+```
+
+### ケース: 統計教育とデモンストレーション
+
+```bash
+# 異なる統計法則のデモンストレーション
+for law in benf pareto zipf normal poisson; do
+  echo "$law 法則のテスト:"
+  lawkit generate $law --samples 1000 > test_data.csv
+  lawkit $law test_data.csv --verbose
+  echo "---"
+done
+
+# 検証能力の表示
+lawkit generate benf --samples 5000 > test_benf.csv
+lawkit validate test_benf.csv --laws benford
+```
+
+### ケース: メソッド検証とクロステスト
+
+```bash
+# 生成と即時分析のパイプライン
+lawkit generate poisson --samples 1000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
+
+# 法則間のクロス検証
+lawkit generate normal --samples 5000 > normal_data.csv
+lawkit analyze normal_data.csv --laws normal,benford,zipf
+
+# 包括的テスト
+lawkit list --help  # 利用可能なコマンドを表示
+```
+
+### ケース: 継続的インテグレーションテスト
 
 ```bash
 #!/bin/bash
-# comprehensive_audit.sh - 包括的データ監査スクリプト
+# 生成データを使用したCI/CDテストスクリプト
 
-DATA_FILE="$1"
-OUTPUT_DIR="audit_results"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+echo "統計精度テストの実行..."
 
-# 出力ディレクトリ作成
-mkdir -p "$OUTPUT_DIR"
+# テスト1: ベンフォード法則の精度
+lawkit generate benf --samples 10000 > benf_test.csv
+BENF_RESULT=$(lawkit benf benf_test.csv --format json | jq -r '.risk_level')
+if [ "$BENF_RESULT" != "Low" ]; then
+    echo "❌ ベンフォードテスト失敗: Lowリスクを期待、実際は $BENF_RESULT"
+    exit 1
+fi
 
-echo "=== 包括的データ監査開始: $DATA_FILE ==="
+# テスト2: 正規分布検出
+lawkit generate normal --samples 1000 > normal_test.csv
+lawkit normal normal_test.csv --verbose
 
-# 1. 基本統計とデータ品質
-echo "1. データ品質分析..."
-lawkit analyze "$DATA_FILE" --laws all --format json > "$OUTPUT_DIR/quality_${TIMESTAMP}.json"
+# テスト3: ポアソン分析
+lawkit generate poisson --samples 5000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
 
-# 2. 不正検知（ベンフォード法則）
-echo "2. 不正検知分析..."
-lawkit benf "$DATA_FILE" --format json > "$OUTPUT_DIR/fraud_${TIMESTAMP}.json"
-
-# 3. ビジネス分析（パレート法則）
-echo "3. ビジネス分析..."
-lawkit pareto "$DATA_FILE" --format json > "$OUTPUT_DIR/business_${TIMESTAMP}.json"
-
-# 4. 統計的分析（正規分布）
-echo "4. 統計分析..."
-lawkit normal "$DATA_FILE" --format json > "$OUTPUT_DIR/statistics_${TIMESTAMP}.json"
-
-# 5. 要約レポート生成
-echo "5. 要約レポート生成..."
-cat > "$OUTPUT_DIR/summary_${TIMESTAMP}.md" << EOF
-# データ監査レポート
-
-**対象ファイル**: $DATA_FILE  
-**分析日時**: $(date)  
-**分析ID**: ${TIMESTAMP}
-
-## 実行した分析
-
-1. **データ品質分析**: [quality_${TIMESTAMP}.json](quality_${TIMESTAMP}.json)
-2. **不正検知分析**: [fraud_${TIMESTAMP}.json](fraud_${TIMESTAMP}.json)  
-3. **ビジネス分析**: [business_${TIMESTAMP}.json](business_${TIMESTAMP}.json)
-4. **統計的分析**: [statistics_${TIMESTAMP}.json](statistics_${TIMESTAMP}.json)
-
-## 推奨事項
-
-詳細は quality_${TIMESTAMP}.json の results セクションを参照してください。
-
-EOF
-
-echo "=== 監査完了: 結果は $OUTPUT_DIR に保存されました ==="
+echo "✅ すべての統計精度テストに合格"
 ```
 
-使用方法:
+## 9. コマンドリファレンス例
+
+### 利用可能なコマンド
+
 ```bash
-chmod +x comprehensive_audit.sh
-./comprehensive_audit.sh financial_data.csv
+# すべての利用可能なコマンドをリスト
+lawkit --help
+
+# 個別コマンドのヘルプ
+lawkit benf --help
+lawkit pareto --help
+lawkit zipf --help
+lawkit normal --help
+lawkit poisson --help
+lawkit analyze --help
+lawkit validate --help
+lawkit diagnose --help
+lawkit generate --help
+lawkit list --help
 ```
 
-これらの例を参考に、あなたの具体的なユースケースに合わせてlawkitを活用してください。
+### 出力形式の例
+
+```bash
+# 異なる出力形式
+lawkit benf data.csv --format json
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format yaml
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
+
+# 冗長性の制御
+lawkit benf data.csv --quiet
+lawkit benf data.csv --verbose
+```
+
+## 設定例
+
+詳細なセットアップ手順と高度な設定オプションについては、[設定ガイド](configuration_ja.md)を参照してください。
+
+## 次のステップ
+
+- [インストールガイド](installation_ja.md) - セットアップとインストール手順
+- [CLIリファレンス](../reference/cli-reference_ja.md) - 完全なコマンドドキュメント
+- [統合ガイド](../guides/integrations_ja.md) - CI/CD自動化
+- [パフォーマンスガイド](../guides/performance_ja.md) - 最適化テクニック
