@@ -1,351 +1,340 @@
 # 使用示例
 
-本指南提供了lawkit在各种实际场景中的详细使用示例。
+基于实际使用案例的lawkit实用示例。
 
-## 财务分析
+## 1. 财务审计中的欺诈检测
 
-### 会计欺诈检测
+### 案例：费用报告验证
 
 ```bash
-# 基本欺诈检测
-lawkit benf accounting_records.csv
+# 费用数据的基本分析
+lawkit benf expenses_2024.csv --format json
 
-# 详细分析报告
-lawkit benf financial_statements.csv --verbose --format json > fraud_report.json
+# 详细分析（带详细输出）
+lawkit benf expenses_2024.csv --verbose
 
-# 批量文件分析
-find ./monthly_reports -name "*.csv" -exec lawkit benf {} --format csv \; > batch_analysis.csv
+# 高置信度审计分析（99%置信水平）
+lawkit benf expenses_2024.csv --confidence 0.99 --verbose
 
-# 实时监控
-tail -f transaction_log.csv | lawkit benf --format json | jq 'select(.risk_level == "HIGH")'
+# 过滤掉增加噪音的小额数值
+lawkit benf expenses_2024.csv --min-value 50 --threshold high
+
+# 大数据集的性能优化
+lawkit benf expenses_2024.csv --sample-size 10000 --optimize
+
+# 使用多个法则进行综合分析
+lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
-### 销售数据分析
+**预期结果**：
+- 偏离本福特定律可能表明人为操纵
+- 正态分布分析识别异常值
+- 多法则分析提供全面洞察
+
+### 案例：销售数据可靠性验证
 
 ```bash
-# 帕累托分析（80/20法则）
-lawkit pareto monthly_sales.csv --threshold 80
+# 月度销售分析
+lawkit benf monthly_sales.csv --verbose
 
-# 客户贡献度分析
-lawkit pareto customer_revenue.csv --verbose --format json
-
-# 产品销售分布
-lawkit pareto product_sales.csv --threshold 90 --verbose
+# 区域分析
+lawkit benf sales_by_region.csv --verbose
 ```
 
-## 质量控制
+## 2. 业务分析
 
-### 制造业质量管理
+### 案例：客户销售帕累托分析
 
 ```bash
-# 正态分布检验
-lawkit normal quality_measurements.csv --verbose
+# 80/20分析
+lawkit pareto customer_sales.csv --threshold 0.8
 
-# 异常值检测
-lawkit normal production_data.csv --verbose --format json
+# 90/10分析（更严格的顶级客户识别）
+lawkit pareto customer_sales.csv --threshold 0.9
 
-# 工艺能力分析
-lawkit normal process_data.csv --format json
-
-# 时间序列质量趋势
-lawkit normal daily_quality.csv --verbose --format csv
+# 导出可视化数据
+lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
-### 服务质量监控
+**应用方式**：
+- 识别贡献80%收入的关键客户
+- 将销售努力集中在高价值细分市场
+- 优化客户服务资源分配
+
+### 案例：库存管理分析
 
 ```bash
-# 响应时间分析
+# 库存周转率分析
+lawkit pareto inventory_turnover.csv --verbose
+
+# 季节性模式检测
+lawkit normal seasonal_demand.csv --verbose
+```
+
+## 3. 文本分析和内容管理
+
+### 案例：网站内容分析
+
+```bash
+# 词频分析
+lawkit zipf website_content.txt --verbose
+
+# 内容分布分析
+lawkit zipf blog_posts.txt --verbose
+```
+
+**使用案例**：
+- SEO关键词优化
+- 内容策略规划
+- 自然与人工内容检测
+
+### 案例：社交媒体分析
+
+```bash
+# 标签分布分析
+lawkit zipf hashtags.csv --verbose
+
+# 参与度模式分析
+lawkit poisson post_engagements.csv --verbose
+```
+
+## 4. 质量控制和制造
+
+### 案例：制造过程控制
+
+```bash
+# 产品尺寸质量控制
+lawkit normal product_dimensions.csv --verbose
+
+# 高置信度缺陷率分析
+lawkit poisson defect_rates.csv --confidence 0.99 --verbose
+```
+
+**质量指标**：
+- 统计过程控制
+- 缺陷模式分析
+- 质量分布评估
+
+### 案例：服务响应时间分析
+
+```bash
+# 响应时间分布
 lawkit normal response_times.csv --verbose
 
-# 系统性能监控
-lawkit poisson error_events.csv --verbose --format json
-
-# 多维度质量分析
-lawkit analyze performance_metrics.csv --laws normal,poisson --recommend
+# 指定置信水平的事件频率分析
+lawkit poisson incidents.csv --confidence 0.95 --verbose
 ```
 
-## 市场研究
+## 5. 集成分析工作流
 
-### 文本分析
+### 案例：综合数据质量评估
 
 ```bash
-# 社交媒体词频分析
-lawkit zipf social_media_posts.csv --verbose
+# 数据质量的多法则比较
+lawkit analyze financial_data.csv --laws benford,pareto,normal --purpose audit
 
-# 新闻内容分析
-lawkit zipf news_articles.csv --format json
-
-# 多语言文本分析
-lawkit zipf multilingual_content.csv --verbose --format json
+# 生成详细的质量报告
+lawkit analyze data.csv --laws all --format json > quality_report.json
 ```
 
-### 消费者行为分析
-
-```bash
-# 购买频率分析
-lawkit poisson purchase_events.csv --verbose --format json
-
-# 用户活跃度分析
-lawkit zipf user_activity.csv --format csv
-
-# 季节性购买模式
-lawkit normal seasonal_sales.csv --verbose --format json
-```
-
-## 数据科学
-
-### 数据质量评估
-
-```bash
-# 综合数据质量检查
-lawkit analyze dataset.csv --laws all --recommend
-
-# 数据分布验证
-lawkit normal training_data.csv --verbose
-
-# 特征重要性分析
-lawkit pareto feature_importance.csv --threshold 70 --format json
-```
-
-### 实验数据分析
-
-```bash
-# A/B测试结果分析
-lawkit normal ab_test_results.csv --verbose
-
-# 随机性验证
-lawkit benf random_samples.csv --verbose --format json
-
-# 实验组比较
-lawkit analyze control_group.csv --laws normal,benf --recommend
-```
-
-## 业务智能
-
-### 销售预测
-
-```bash
-# 销售事件预测
-lawkit poisson daily_sales.csv --verbose --format json
-
-# 季节性趋势分析
-lawkit normal monthly_revenue.csv --verbose --format json
-
-# 多指标综合分析
-lawkit analyze sales_metrics.csv --laws pareto,normal,poisson --recommend
-```
-
-### 风险评估
-
-```bash
-# 信贷风险分析
-lawkit benf loan_applications.csv --verbose --format json
-
-# 投资组合分析
-lawkit pareto portfolio_returns.csv --threshold 80 --verbose
-
-# 操作风险监控
-lawkit poisson incident_reports.csv --verbose --format json
-```
-
-## 大数据处理
-
-### 大文件分析
-
-```bash
-# 性能优化大文件
-lawkit benf huge_dataset.csv --verbose
-
-# 内存优化分析
-lawkit analyze large_files/*.csv --verbose
-
-# 分布式处理
-find ./big_data -name "*.csv" | xargs -P 8 -I {} lawkit benf {} --format json
-```
-
-### 实时数据分析
-
-```bash
-# 实时日志监控
-tail -f application.log | lawkit benf --format json | \
-  jq 'select(.risk_level == "HIGH")' | \
-  while read alert; do
-    echo "ALERT: $alert" | mail -s "Fraud Detection Alert" admin@company.com
-  done
-
-# 流式事件分析
-kafka-console-consumer --topic events | \
-  lawkit poisson --format json
-```
-
-## 国际数据处理
-
-### 多语言数字格式
-
-```bash
-# 中文财务数据
-lawkit benf chinese_financial.csv --verbose
-# 支持：一千二百三十四，１２３４，壹贰叁肆
-
-# 日文数据分析
-lawkit benf japanese_data.csv --format json
-# 支持：一千二百三十四，１２３４，全角数字
-
-# 混合格式数据
-lawkit benf international_data.csv --verbose --format json
-```
-
-### 跨国业务分析
-
-```bash
-# 多地区销售比较
-lawkit analyze us_sales.csv --laws pareto,normal --recommend
-
-# 国际财务合规检查
-find ./regional_reports -name "*_financial.csv" | \
-  xargs -I {} lawkit benf {} --format json > compliance_report.json
-
-# 汇率影响分析
-lawkit normal exchange_rates.csv --verbose --format json
-```
-
-## 自动化工作流
-
-### CI/CD集成
+### 案例：自动异常检测管道
 
 ```bash
 #!/bin/bash
-# 数据质量检查脚本
+# 每日数据质量管道
 
-# 分析新数据
-lawkit analyze new_data.csv --laws all --recommend --format json > quality_report.json
+# 步骤1：基本质量检查
+lawkit benf daily_transactions.csv --verbose || exit 1
 
-# 检查是否有质量问题
-risk_level=$(jq -r '.risk_level' quality_report.json)
+# 步骤2：集中度分析
+lawkit pareto daily_sales.csv --verbose
 
-if [ "$risk_level" = "HIGH" ] || [ "$risk_level" = "CRITICAL" ]; then
-    echo "Data quality issue detected!"
+# 步骤3：统计验证
+lawkit normal process_metrics.csv --verbose
+
+# 步骤4：综合报告
+lawkit analyze daily_data.csv --laws benford,pareto,normal --format json > daily_report.json
+```
+
+## 6. CI/CD集成示例
+
+### GitHub Actions集成
+
+```yaml
+name: 数据质量检查
+on: [push, pull_request]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 安装lawkit
+        run: cargo install lawkit
+      - name: 运行质量检查
+        run: |
+          lawkit benf data/transactions.csv --format json
+          lawkit analyze data/sales.csv --laws benford,pareto --format json
+```
+
+### Jenkins管道集成
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('数据质量检查') {
+            steps {
+                sh 'lawkit benf ${WORKSPACE}/data/*.csv --verbose'
+                sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --format json > quality_report.json'
+                archiveArtifacts artifacts: 'quality_report.json'
+            }
+        }
+    }
+}
+```
+
+## 7. 性能优化示例
+
+### 大数据集处理
+
+```bash
+# 大文件的优化处理
+lawkit benf large_dataset.csv --quiet
+
+# 多文件并行处理
+find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
+```
+
+### 内存高效分析
+
+```bash
+# 高效处理大数据集
+lawkit benf huge_data.csv --format json | jq '.risk_level'
+
+# 实时输出的流式分析
+tail -f live_data.log | lawkit benf --quiet
+```
+
+## 8. 数据生成和测试示例
+
+### 案例：测试和教育的数据生成
+
+```bash
+# 生成本福特定律样本用于欺诈检测测试
+lawkit generate benf --samples 10000 > benf_test_data.csv
+
+# 测试我们的检测能力
+lawkit benf benf_test_data.csv --format json
+
+# 生成不同类型的数据
+lawkit generate pareto --samples 5000 > pareto_data.csv
+lawkit generate zipf --samples 2000 > zipf_data.txt
+lawkit generate normal --samples 1000 > normal_data.csv
+lawkit generate poisson --samples 1000 > poisson_data.csv
+```
+
+### 案例：统计教育和演示
+
+```bash
+# 演示不同的统计法则
+for law in benf pareto zipf normal poisson; do
+  echo "测试 $law 法则："
+  lawkit generate $law --samples 1000 > test_data.csv
+  lawkit $law test_data.csv --verbose
+  echo "---"
+done
+
+# 展示验证能力
+lawkit generate benf --samples 5000 > test_benf.csv
+lawkit validate test_benf.csv --laws benford
+```
+
+### 案例：方法验证和交叉测试
+
+```bash
+# 生成并立即分析管道
+lawkit generate poisson --samples 1000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
+
+# 法则之间的交叉验证
+lawkit generate normal --samples 5000 > normal_data.csv
+lawkit analyze normal_data.csv --laws normal,benford,zipf
+
+# 综合测试
+lawkit list --help  # 显示可用命令
+```
+
+### 案例：持续集成测试
+
+```bash
+#!/bin/bash
+# 使用生成数据的CI/CD测试脚本
+
+echo "运行统计准确性测试..."
+
+# 测试1：本福特定律准确性
+lawkit generate benf --samples 10000 > benf_test.csv
+BENF_RESULT=$(lawkit benf benf_test.csv --format json | jq -r '.risk_level')
+if [ "$BENF_RESULT" != "Low" ]; then
+    echo "❌ 本福特测试失败：预期Low风险，实际得到 $BENF_RESULT"
     exit 1
 fi
 
-echo "Data quality check passed"
+# 测试2：正态分布检测
+lawkit generate normal --samples 1000 > normal_test.csv
+lawkit normal normal_test.csv --verbose
+
+# 测试3：泊松分析
+lawkit generate poisson --samples 5000 > poisson_test.csv
+lawkit poisson poisson_test.csv --format json
+
+echo "✅ 所有统计准确性测试通过"
 ```
 
-### 定期监控
+## 9. 命令参考示例
+
+### 可用命令
 
 ```bash
-#!/bin/bash
-# 每日数据监控脚本
+# 列出所有可用命令
+lawkit --help
 
-DATE=$(date +%Y-%m-%d)
-LOG_FILE="daily_analysis_$DATE.log"
-
-# 财务数据检查
-lawkit benf daily_transactions.csv --format json >> $LOG_FILE
-
-# 销售分析
-lawkit pareto daily_sales.csv --threshold 80 --format json >> $LOG_FILE
-
-# 质量控制
-lawkit normal quality_metrics.csv --verbose --format json >> $LOG_FILE
-
-# 发送报告
-python send_daily_report.py $LOG_FILE
-```
-
-## 高级用法
-
-### 自定义管道
-
-```bash
-# 数据生成和验证管道
-lawkit generate benf --samples 10000 | \
-  lawkit benf --format json | \
-  jq '.chi_square < 20 and .p_value > 0.05'
-
-# 多阶段分析管道
-cat raw_data.csv | \
-  lawkit normal --verbose --format csv | \
-  lawkit pareto --threshold 80 --format json | \
-  jq '.recommendations[]'
-```
-
-### 性能基准测试
-
-```bash
-# 性能比较
-time lawkit benf large_dataset.csv
-time lawkit benf large_dataset.csv --quiet
-time lawkit benf large_dataset.csv --quiet --format json
-
-# 内存使用分析
-/usr/bin/time -v lawkit benf huge_file.csv --quiet
-```
-
-## 故障排除示例
-
-### 常见问题解决
-
-```bash
-# 内存不足
-lawkit benf large_file.csv --quiet
-
-# 性能优化
-lawkit analyze *.csv --quiet --format json
-
-# 编码问题
-lawkit benf data.csv --verbose --format json
-
-# 数据格式问题
-lawkit benf messy_data.csv --verbose --format csv
-```
-
-## 生成和验证示例
-
-### 数据生成
-
-```bash
-# 生成样本数据
-lawkit generate benf --samples 1000 > sample_data.csv
-
-# 生成所有法则数据
-lawkit generate pareto --samples 500 --format json > pareto_data.json
-lawkit generate zipf --samples 800 --format csv > zipf_data.csv
-lawkit generate normal --samples 1200 --format yaml > normal_data.yaml
-lawkit generate poisson --samples 600 --format xml > poisson_data.xml
-```
-
-### 数据验证
-
-```bash
-# 验证生成的数据
-lawkit validate benf_data.csv --laws benf --format json
-
-# 综合验证
-lawkit validate mixed_data.csv --laws all --verbose
-
-# 诊断数据问题
-lawkit diagnose problematic_data.csv --laws pareto,normal --format json
-```
-
-## 命令列表
-
-### 获取帮助
-
-```bash
-# 查看所有可用命令
-lawkit list
-
-# 查看可用的统计法则
-lawkit list --laws
-
-# 查看特定命令帮助
+# 单个命令帮助
 lawkit benf --help
+lawkit pareto --help
+lawkit zipf --help
+lawkit normal --help
+lawkit poisson --help
 lawkit analyze --help
+lawkit validate --help
+lawkit diagnose --help
+lawkit generate --help
+lawkit list --help
 ```
+
+### 输出格式示例
+
+```bash
+# 不同的输出格式
+lawkit benf data.csv --format json
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format yaml
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
+
+# 详细程度控制
+lawkit benf data.csv --quiet
+lawkit benf data.csv --verbose
+```
+
+## 配置示例
+
+有关详细的设置说明和高级配置选项，请参阅[配置指南](configuration_zh.md)。
 
 ## 下一步
 
-- 查看[CLI参考文档](../reference/cli-reference_zh.md)了解所有可用选项
-- 阅读[配置指南](configuration_zh.md)了解高级配置
-- 参考[性能优化指南](../guides/performance_zh.md)提升分析速度
+- [安装指南](installation_zh.md) - 设置和安装说明
+- [CLI参考](../reference/cli-reference_zh.md) - 完整的命令文档
+- [集成指南](../guides/integrations_zh.md) - CI/CD自动化
+- [性能指南](../guides/performance_zh.md) - 优化技术
