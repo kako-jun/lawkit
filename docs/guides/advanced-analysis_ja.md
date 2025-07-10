@@ -4,23 +4,23 @@
 
 ## 目次
 
-- [複数法則分析](#複数法則分析)
+- [多法則分析](#多法則分析)
 - [高度なベンフォード分析](#高度なベンフォード分析)
-- [ビジネス洞察付きパレート分析](#ビジネス洞察付きパレート分析)
+- [ビジネス洞察を含むパレート分析](#ビジネス洞察を含むパレート分析)
 - [メモリ効率的な処理](#メモリ効率的な処理)
 - [統計法則との統合](#統計法則との統合)
 - [パフォーマンス最適化](#パフォーマンス最適化)
 
-## 複数法則分析
+## 多法則分析
 
 lawkitは複数の統計法則を同時に使用した包括的な分析を提供します。
 
-### 基本的な複数法則分析
+### 基本的な多法則分析
 
 複数の統計法則に対してデータを分析し、最適な適合を見つけます。
 
 ```bash
-# 基本的な複数法則分析
+# 基本的な多法則分析
 lawkit analyze financial_data.csv
 
 # 特定の法則のみを分析
@@ -33,10 +33,10 @@ lawkit analyze data.csv --focus quality --verbose
 ### 高度な分析オプション
 
 ```bash
-# 推奨機能付き品質重視分析
+# 推奨付き品質重視分析
 lawkit analyze data.csv --purpose quality --recommend --format json
 
-# 詐欺検出分析
+# 不正検知分析
 lawkit analyze transactions.csv --purpose fraud --threshold 0.3 --verbose
 
 # 詳細レポート付き分布分析
@@ -46,11 +46,11 @@ lawkit analyze dataset.csv --purpose distribution --report detailed
 ### 検証と診断
 
 ```bash
-# データ検証と一貫性チェック
+# データ検証と整合性チェック
 lawkit validate financial_data.csv --consistency-check --verbose
 
 # 異なる法則間の矛盾を診断
-lawkit diagnose complex_data.csv --cross-validation
+lawkit diagnose complex_data.csv --cross-validation --confidence-level 0.99
 
 # 詳細レポート付き包括的診断
 lawkit diagnose data.csv --report conflicting --format json
@@ -58,7 +58,7 @@ lawkit diagnose data.csv --report conflicting --format json
 
 ## 高度なベンフォード分析
 
-高度なフィルタリングと閾値オプションを備えたベンフォード法則分析。
+高度なフィルタリングと閾値オプションを持つベンフォード法則分析。
 
 ### 基本的なベンフォード分析
 
@@ -66,7 +66,7 @@ lawkit diagnose data.csv --report conflicting --format json
 # 基本的なベンフォード分析
 lawkit benf financial_data.csv
 
-# 詳細出力付き詳細分析
+# 詳細出力での詳細分析
 lawkit benf data.csv --verbose --format json
 
 # データフィルタリング付き分析
@@ -75,13 +75,13 @@ lawkit benf transactions.csv --filter ">=100" --verbose
 
 ### 閾値分析
 
-異常検出の感度を調整します。
+異常検知感度を調整します。
 
 ```bash
-# 高感度異常検出
+# 高感度異常検知
 lawkit benf data.csv --threshold high --verbose
 
-# 詐欺検出のための臨界レベル分析
+# 不正検知のための重要レベル分析
 lawkit benf financial_data.csv --threshold critical --format json
 
 # 範囲フィルタリング付きカスタム閾値
@@ -90,7 +90,7 @@ lawkit benf logs.csv --threshold medium --filter "1000-50000"
 
 ### 高度なフィルタリング
 
-分析前にさまざまな条件でデータをフィルタリングします。
+分析前にさまざまな基準でデータをフィルタリングします。
 
 ```bash
 # 範囲ベースフィルタリング
@@ -103,9 +103,9 @@ lawkit benf dataset.csv --filter "50-500" --min-count 100
 lawkit benf measurements.csv --filter ">=100" --threshold high
 ```
 
-## ビジネス洞察付きパレート分析
+## ビジネス洞察を含むパレート分析
 
-ビジネス重視の機能を備えたパレート原理分析。
+ビジネス重視機能を持つパレート原理分析。
 
 ### 基本的なパレート分析
 
@@ -113,7 +113,7 @@ lawkit benf measurements.csv --filter ">=100" --threshold high
 # 基本的なパレート分析
 lawkit pareto sales_data.csv
 
-# カスタム集中度閾値付き分析
+# カスタム集中度閾値での分析
 lawkit pareto data.csv --concentration 0.7 --verbose
 
 # ジニ係数付きビジネス洞察
@@ -129,11 +129,11 @@ lawkit pareto data.csv --percentiles "70,80,90,95" --format json
 # 包括的ビジネス分析
 lawkit pareto customer_data.csv --business-analysis --gini-coefficient --verbose
 
-# フィルター付きパレート分析
+# フィルタ付きパレート分析
 lawkit pareto transactions.csv --filter ">=1000" --concentration 0.9
 ```
 
-### ビジネス用途
+### ビジネスユースケース
 
 ```bash
 # 顧客収益分析
@@ -148,81 +148,55 @@ lawkit pareto resource_usage.csv --business-analysis --format json
 
 ## メモリ効率的な処理
 
-内蔵の最適化機能を使用して大きなデータセットを効率的に処理します。
+最適化された処理とインクリメンタルアルゴリズムを使用して、利用可能なRAMより大きなデータセットを処理します。
 
 ### 最適化処理モード
 
 ```bash
-# 大ファイルの基本最適化処理
+# 大きなファイルの基本最適化処理
 lawkit benf massive_dataset.csv --optimize
 
-# 最小出力での最適化処理
-lawkit benf huge_file.csv --optimize --quiet
+# メモリ管理付き最適化処理
+lawkit benf huge_file.csv --optimize
 
-# JSON出力での最適化分析
-lawkit analyze large_data.csv --optimize --format json
-```
-
-### 大規模データセットの取り扱い
-
-```bash
-# 最小メモリで大規模データセットを処理
-lawkit benf large_data.csv --optimize --min-count 1000
-
-# 最適化でのバッチ処理
-lawkit analyze datasets/*.csv --optimize --quiet
-
-# メモリ効率的な詐欺検出
-lawkit benf transactions.csv --optimize --threshold high --format json
-```
-
-### パフォーマンス例
-
-```bash
-# 大規模金融データセット分析
-lawkit benf financial_data.csv --optimize --verbose --format json
-
-# 最適化でのマルチファイル分析
-lawkit analyze data_files/*.csv --optimize --laws benf,pareto --quiet
-
-# 高パフォーマンスパレート分析
-lawkit pareto large_sales.csv --optimize --business-analysis --format json
+# メモリ制限付き最適化処理
+lawkit benf data.csv --optimize
 ```
 
 ## 統計法則との統合
 
-包括的な分析のために複数の統計法則を組み合わせます。
+包括的分析のために複数の統計法則を組み合わせます。
 
-### マルチ法則分析
+### 多法則分析
 
 ```bash
 # すべての法則での包括的分析
 lawkit analyze financial_data.csv --laws benf,pareto,normal,poisson --verbose
 
-# 品質重視のマルチ法則分析
+# 品質重視多法則分析
 lawkit analyze data.csv --purpose quality --laws benf,normal --recommend
 
-# 複数法則での詐欺検出
+# 複数法則での不正検知
 lawkit analyze transactions.csv --purpose fraud --laws benf,pareto --format json
 ```
 
 ### 高度な統合機能
 
 ```bash
-# クロスバリデーション分析
-lawkit validate data.csv --cross-validation
+# クロス検証分析
+lawkit validate data.csv --cross-validation --confidence-level 0.95
 
 # 法則間の矛盾検出
 lawkit diagnose complex_data.csv --report conflicting --threshold 0.3
 
-# 一貫性チェック
+# 整合性チェック
 lawkit validate dataset.csv --consistency-check --verbose --format json
 ```
 
-### 特化分析ワークフロー
+### 専門分析ワークフロー
 
 ```bash
-# 金融データ包括的分析
+# 金融データ包括分析
 lawkit analyze financial_data.csv \
   --purpose fraud \
   --laws benf,pareto \
@@ -250,17 +224,17 @@ lawkit analyze market_data.csv \
 
 ### データセットサイズガイドライン
 
-**小規模データセット (< 10Kレコード):**
+**小さなデータセット (< 1万レコード):**
 ```bash
 lawkit benf data.csv
 ```
 
-**中規模データセット (10K - 1Mレコード):**
+**中サイズデータセット (1万 - 100万レコード):**
 ```bash
 lawkit benf data.csv --optimize --min-count 100
 ```
 
-**大規模データセット (1M+レコード):**
+**大きなデータセット (100万+ レコード):**
 ```bash
 lawkit benf data.csv --optimize --quiet --format json
 ```
@@ -294,14 +268,14 @@ lawkit analyze data.csv --format json --laws benf,pareto --quiet
 lawkit pareto sales_data.csv --format csv --business-analysis
 ```
 
-**人間が読むためのテキスト:**
+**人間による読み取り用テキスト:**
 ```bash
 lawkit benf financial_data.csv --verbose --threshold critical
 ```
 
 ### データ生成とテスト
 
-**テストデータの生成:**
+**テストデータ生成:**
 ```bash
 # ベンフォードテストデータ生成
 lawkit generate benf --samples 10000 --output-file test_benf.csv
@@ -309,10 +283,10 @@ lawkit generate benf --samples 10000 --output-file test_benf.csv
 # パレートテストデータ生成
 lawkit generate pareto --samples 5000 --output-file test_pareto.csv
 
-# 特定パラメータでの生成
+# 特定パラメータで生成
 lawkit generate normal --samples 1000 --output-file test_normal.csv
 
-# テスト用詐欺注入での生成
+# テスト用不正注入で生成
 lawkit generate benf --samples 1000 --fraud-rate 0.1 --output-file fraud_test.csv
 ```
 
@@ -321,7 +295,7 @@ lawkit generate benf --samples 1000 --fraud-rate 0.1 --output-file fraud_test.cs
 # 包括的セルフテスト実行
 lawkit selftest
 
-# 利用可能法則一覧
+# 利用可能法則リスト
 lawkit list
 ```
 
