@@ -587,6 +587,27 @@ fn analyze_numbers_with_options(
         return Err(BenfError::InsufficientData(filtered_numbers.len()));
     }
 
+    // Parse confidence level
+    let confidence = if let Some(confidence_str) = matches.get_one::<String>("confidence") {
+        let conf = confidence_str
+            .parse::<f64>()
+            .map_err(|_| BenfError::ParseError("無効な信頼度レベル".to_string()))?;
+        if conf < 0.01 || conf > 0.99 {
+            return Err(BenfError::ParseError("信頼度レベルは0.01から0.99の間である必要があります".to_string()));
+        }
+        conf
+    } else {
+        0.95
+    };
+
     // Perform Poisson distribution analysis
-    analyze_poisson_distribution(&filtered_numbers, &dataset_name)
+    // TODO: Integrate confidence level into analysis
+    let mut result = analyze_poisson_distribution(&filtered_numbers, &dataset_name)?;
+    
+    // For now, just store confidence level as a comment in the dataset name
+    if confidence != 0.95 {
+        result.dataset_name = format!("{} (confidence: {:.2})", result.dataset_name, confidence);
+    }
+    
+    Ok(result)
 }

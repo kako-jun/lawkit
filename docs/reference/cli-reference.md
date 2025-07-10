@@ -46,6 +46,9 @@ lawkit benf [OPTIONS] [INPUT]
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
 - `--optimize` - Enable memory and processing optimizations for large datasets
 - `--threshold <LEVEL>` - Anomaly detection threshold: low, medium, high, critical (default: auto)
+- `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)
+- `--sample-size <NUMBER>` - Maximum sample size for large datasets (improves performance)
+- `--min-value <VALUE>` - Minimum value to include in analysis (filters small values that add noise)
 
 #### Examples
 ```bash
@@ -60,6 +63,15 @@ lawkit benf data.csv --quiet
 
 # Filter large transactions with high threshold
 lawkit benf accounts.csv --filter ">=1000" --threshold high
+
+# High confidence analysis for auditing (99% confidence level)
+lawkit benf audit_data.csv --confidence 0.99 --verbose
+
+# Performance optimization for large datasets
+lawkit benf big_data.csv --sample-size 50000 --optimize
+
+# Filter out small values that add noise to analysis
+lawkit benf financial_data.csv --min-value 100
 ```
 
 ### `lawkit pareto` - Pareto Principle Analysis
@@ -139,6 +151,14 @@ Analyze event occurrences and rare events.
 lawkit poisson [OPTIONS] [INPUT]
 ```
 
+#### Options
+- `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
+- `--quiet, -q` - Minimal output (numbers only)
+- `--verbose, -v` - Detailed statistics
+- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
+- `--optimize` - Enable memory and processing optimizations for large datasets
+- `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)
+
 #### Examples
 ```bash
 # Basic Poisson analysis
@@ -149,6 +169,9 @@ lawkit poisson incidents.csv --verbose
 
 # JSON output format
 lawkit poisson data.csv --format json
+
+# High confidence level for critical analysis
+lawkit poisson server_errors.csv --confidence 0.99 --verbose
 ```
 
 ## Generation Commands

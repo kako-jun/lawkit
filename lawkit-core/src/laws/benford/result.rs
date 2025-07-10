@@ -71,4 +71,70 @@ impl BenfordResult {
             verdict,
         })
     }
+
+    pub fn new_with_confidence(
+        dataset_name: String,
+        numbers: &[f64],
+        threshold: &RiskThreshold,
+        min_count: usize,
+        confidence_level: f64,
+    ) -> Result<Self> {
+        if numbers.is_empty() {
+            return Err(BenfError::NoNumbersFound);
+        }
+
+        // Check minimum count requirement
+        if numbers.len() < min_count {
+            return Err(BenfError::InsufficientData(numbers.len()));
+        }
+
+        // Issue warning for small datasets but continue analysis
+        if numbers.len() < 30 {
+            eprintln!("Warning: {numbers_analyzed} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.", numbers_analyzed=numbers.len());
+        }
+
+        let digit_distribution = super::analysis::calculate_digit_distribution(numbers);
+        let expected_distribution = super::analysis::BENFORD_EXPECTED_PERCENTAGES;
+        let chi_square = crate::common::statistics::calculate_chi_square(
+            &digit_distribution,
+            &expected_distribution,
+        );
+        
+        // Use standard p-value calculation (confidence level adjustment in interpretation)
+        let p_value = crate::common::statistics::calculate_p_value(chi_square, 8);
+        
+        let mean_absolute_deviation =
+            crate::common::statistics::calculate_mad(&digit_distribution, &expected_distribution);
+
+        // Adjust risk assessment based on confidence level
+        let adjusted_alpha = 1.0 - confidence_level;
+        let risk_level = if p_value < adjusted_alpha / 4.0 {
+            RiskLevel::Critical
+        } else if p_value < adjusted_alpha / 2.0 {
+            RiskLevel::High  
+        } else if p_value < adjusted_alpha {
+            RiskLevel::Medium
+        } else {
+            RiskLevel::Low
+        };
+
+        let verdict = match risk_level {
+            RiskLevel::Low => "NORMAL_DISTRIBUTION".to_string(),
+            RiskLevel::Medium => "SLIGHT_DEVIATION".to_string(),
+            RiskLevel::High => "SIGNIFICANT_DEVIATION".to_string(),
+            RiskLevel::Critical => "STRONG_EVIDENCE_OF_MANIPULATION".to_string(),
+        };
+
+        Ok(BenfordResult {
+            dataset_name,
+            numbers_analyzed: numbers.len(),
+            digit_distribution,
+            expected_distribution,
+            chi_square,
+            p_value,
+            mean_absolute_deviation,
+            risk_level,
+            verdict,
+        })
+    }
 }

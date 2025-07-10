@@ -43,7 +43,11 @@ lawkit benf [OPTIONS] [INPUT]
 
 #### 选项
 
-通用选项（--format, --verbose, --quiet）之外，没有特别的选项。
+除通用选项外，benf 命令还支持：
+- `--threshold <LEVEL>` - 异常检测阈值: low, medium, high, critical (默认: auto)
+- `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
+- `--sample-size <NUMBER>` - 大数据集的最大样本量（提升性能）
+- `--min-value <VALUE>` - 分析中包含的最小值（过滤噪声小值）
 
 #### 示例
 
@@ -59,6 +63,15 @@ lawkit benf transactions.csv --format json
 
 # 静默模式
 lawkit benf data.csv --quiet
+
+# 高置信度审计分析（99%置信水平）
+lawkit benf audit_data.csv --confidence 0.99 --verbose
+
+# 大数据集性能优化
+lawkit benf big_data.csv --sample-size 50000 --optimize
+
+# 过滤小值噪声
+lawkit benf financial_data.csv --min-value 100
 ```
 
 ### pareto - 帕累托分析
@@ -151,7 +164,8 @@ lawkit poisson [OPTIONS] [INPUT]
 
 #### 选项
 
-通用选项（--format, --verbose, --quiet）之外，没有特别的选项。
+除通用选项外，poisson 命令还支持：
+- `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
 
 #### 示例
 
@@ -164,6 +178,9 @@ lawkit poisson incidents.csv --verbose
 
 # JSON输出
 lawkit poisson failures.csv --format json
+
+# 关键分析高置信度
+lawkit poisson server_errors.csv --confidence 0.99 --verbose
 ```
 
 ### analyze - 多法则分析

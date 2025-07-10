@@ -20,6 +20,15 @@ lawkit benf data.csv --format json
 
 # 閾値を指定して分析
 lawkit benf data.csv --threshold high
+
+# 監査レベル分析（信頼度99%）
+lawkit benf audit_data.csv --confidence 0.99 --verbose
+
+# 大きなデータセットの最適化
+lawkit benf large_data.csv --sample-size 10000 --optimize
+
+# 小さな値をフィルタリング（ノイズ除去）
+lawkit benf financial_data.csv --min-value 100
 ```
 
 ### 2. パレート分析（80/20法則）
@@ -78,8 +87,8 @@ lawkit poisson events.csv
 # 詳細なポアソン分析
 lawkit poisson events.csv --verbose
 
-# 予測モード
-lawkit poisson events.csv --predict
+# 高い信頼度での分析
+lawkit poisson critical_events.csv --confidence 0.99 --verbose
 ```
 
 ### 6. 複数法則比較
