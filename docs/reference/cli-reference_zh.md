@@ -1,380 +1,367 @@
-# CLI 参考文档
+# CLI参考文档
 
-lawkit命令行界面的完整参考文档。
+`lawkit`命令行界面完整文档。
 
-## 全局选项
+## 全局命令
 
-所有子命令都支持以下全局选项：
+### `lawkit --help`
+显示主命令或子命令的帮助信息。
+
+### `lawkit --version`
+显示版本信息。
+
+### `lawkit list`
+列出所有可用的统计法则及其描述。
 
 ```bash
-lawkit [GLOBAL_OPTIONS] <SUBCOMMAND> [OPTIONS] [INPUT]
+$ lawkit list
+可用的统计法则:
+  benf    - 本福特定律分析
+  pareto  - 帕累托原理 (80/20法则) 分析
+  zipf    - 齐普夫定律分析
+  normal  - 正态分布分析
+  poisson - 泊松分布分析
+
+集成命令:
+  analyze  - 多法则基本分析和推荐
+  validate - 数据验证和一致性检查
+  diagnose - 冲突检测和详细诊断
 ```
 
-### 通用选项
+## 统计法则命令
 
-| 选项 | 描述 | 默认值 |
-|------|------|--------|
-| `--help, -h` | 显示帮助信息 | - |
-| `--version, -V` | 显示版本信息 | - |
-| `--format <FORMAT>` | 输出格式 | `text` |
-| `--quiet, -q` | 静默模式（最少输出） | `false` |
-| `--verbose, -v` | 详细输出 | `false` |
+### `lawkit benf` - 本福特定律分析
 
-### 输出格式
-
-| 格式 | 描述 | 文件扩展名 |
-|------|------|------------|
-| `text` | 人类可读的文本格式 | `.txt` |
-| `json` | JSON格式 | `.json` |
-| `csv` | 逗号分隔值 | `.csv` |
-| `yaml` | YAML格式 | `.yaml` |
-| `toml` | TOML格式 | `.toml` |
-| `xml` | XML格式 | `.xml` |
-
-## 子命令
-
-### benf - 本福德定律分析
+使用本福特定律检测异常并评估数据质量。
 
 ```bash
 lawkit benf [OPTIONS] [INPUT]
 ```
 
-检测数据是否符合本福德定律，常用于欺诈检测和数据质量评估。
-
 #### 选项
-
-除通用选项外，benf 命令还支持：
+- `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml (默认: text)
+- `--quiet, -q` - 最小输出（仅数字）
+- `--verbose, -v` - 详细统计
+- `--filter <RANGE>` - 按范围过滤数字 (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
+- `--optimize` - 为大数据集启用内存和处理优化
 - `--threshold <LEVEL>` - 异常检测阈值: low, medium, high, critical (默认: auto)
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
-- `--sample-size <NUMBER>` - 大数据集的最大样本量（提升性能）
-- `--min-value <VALUE>` - 分析中包含的最小值（过滤噪声小值）
+- `--sample-size <NUMBER>` - 大数据集的最大样本大小（提高性能）
+- `--min-value <VALUE>` - 分析中包含的最小值（过滤增加噪音的小值）
 
 #### 示例
-
 ```bash
 # 基本分析
-lawkit benf financial_data.csv
+lawkit benf data.csv
 
-# 详细输出
-lawkit benf accounting.csv --verbose
+# JSON格式的详细输出
+lawkit benf transactions.json --verbose --format json
 
-# JSON输出
-lawkit benf transactions.csv --format json
-
-# 静默模式
+# 最小输出的安静模式
 lawkit benf data.csv --quiet
 
-# 高置信度审计分析（99%置信水平）
+# 高阈值下的大交易过滤
+lawkit benf accounts.csv --filter ">=1000" --threshold high
+
+# 审计用高置信度分析（99%置信水平）
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
-# 大数据集性能优化
+# 大数据集的性能优化
 lawkit benf big_data.csv --sample-size 50000 --optimize
 
-# 过滤小值噪声
+# 过滤给分析增加噪音的小值
 lawkit benf financial_data.csv --min-value 100
 ```
 
-### pareto - 帕累托分析
+### `lawkit pareto` - 帕累托原理分析
+
+分析集中度并应用80/20法则。
 
 ```bash
 lawkit pareto [OPTIONS] [INPUT]
 ```
 
-分析数据的集中度，应用80/20法则进行业务洞察。
-
-#### 选项
-
-| 选项 | 描述 | 默认值 |
-|------|------|--------|
-| `--threshold <RATIO>` | 集中度阈值 | `0.8` |
+#### 特定选项
+- `--concentration <THRESHOLD>` - 集中度阈值 (0.0-1.0) (默认: 0.8)
+- `--gini-coefficient` - 计算不平等测量的基尼系数
+- `--percentiles <PERCENTILES>` - 计算自定义百分位数 (例: 70,80,90)
+- `--business-analysis` - 启用商业分析洞察
 
 #### 示例
-
 ```bash
 # 基本帕累托分析
-lawkit pareto sales_data.csv
+lawkit pareto sales.csv
 
 # 自定义阈值
-lawkit pareto customer_revenue.csv --concentration 0.9
+lawkit pareto data.csv --concentration 0.9
 
-# 带基尼系数的业务分析
-lawkit pareto product_sales.csv --business-analysis --gini-coefficient
+# 带基尼系数的商业分析
+lawkit pareto customers.csv --business-analysis --gini-coefficient
 
 # 自定义百分位数
-lawkit pareto inventory.csv --percentiles 70,80,90,95
+lawkit pareto revenue.csv --percentiles 70,80,90,95
 ```
 
-### zipf - 齐夫定律分析
+### `lawkit zipf` - 齐普夫定律分析
+
+分析频率分布和排名模式。
 
 ```bash
 lawkit zipf [OPTIONS] [INPUT]
 ```
 
-分析数据的频率分布，特别适用于文本分析和排名数据。
-
-#### 选项
-
-通用选项（--format, --verbose, --quiet）之外，没有特别的选项。
-
 #### 示例
-
 ```bash
-# 数值频率分析
+# 基本齐普夫分析
 lawkit zipf frequency_data.csv
 
 # 详细输出
 lawkit zipf rankings.csv --verbose
 
-# JSON输出
+# JSON输出格式
 lawkit zipf data.csv --format json
 ```
 
-### normal - 正态分布分析
+### `lawkit normal` - 正态分布分析
+
+测试正态性并检测异常值。
 
 ```bash
 lawkit normal [OPTIONS] [INPUT]
 ```
 
-检验数据是否符合正态分布，进行质量控制和异常检测。
-
-#### 选项
-
-通用选项（--format, --verbose, --quiet）之外，没有特别的选项。
-
 #### 示例
-
 ```bash
-# 基本正态性检验
-lawkit normal quality_data.csv
+# 基本正态性测试
+lawkit normal data.csv
 
 # 详细输出
 lawkit normal measurements.csv --verbose
 
-# JSON输出
-lawkit normal process_data.csv --format json
+# JSON输出格式
+lawkit normal quality_data.csv --format json
 ```
 
-### poisson - 泊松分布分析
+### `lawkit poisson` - 泊松分布分析
+
+分析事件发生和罕见事件。
 
 ```bash
 lawkit poisson [OPTIONS] [INPUT]
 ```
 
-分析事件发生率，适用于预测和稀有事件分析。
-
 #### 选项
-
-除通用选项外，poisson 命令还支持：
+- `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml (默认: text)
+- `--quiet, -q` - 最小输出（仅数字）
+- `--verbose, -v` - 详细统计
+- `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
+- `--optimize` - 为大数据集启用内存和处理优化
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
 
 #### 示例
-
 ```bash
 # 基本泊松分析
-lawkit poisson event_counts.csv
+lawkit poisson events.csv
 
 # 详细输出
 lawkit poisson incidents.csv --verbose
 
-# JSON输出
-lawkit poisson failures.csv --format json
+# JSON输出格式
+lawkit poisson data.csv --format json
 
-# 关键分析高置信度
+# 关键分析的高置信水平
 lawkit poisson server_errors.csv --confidence 0.99 --verbose
 ```
 
-### analyze - 多法则分析
+## 生成命令
 
-```bash
-lawkit analyze [OPTIONS] [INPUT]
-```
+### `lawkit generate` - 样本数据生成
 
-同时应用多种统计法则，提供综合分析和建议。
-
-#### 选项
-
-| 选项 | 描述 | 默认值 |
-|------|------|--------|
-| `--laws <LIST>` | 指定法则（如"benf,pareto,normal"） | `all` |
-| `--focus <FOCUS>` | 分析重点（quality,concentration,distribution,anomaly） | `general` |
-| `--purpose <PURPOSE>` | 分析目的（quality,fraud,concentration,anomaly,distribution,general） | `general` |
-| `--recommend` | 显示分析建议 | `false` |
-
-#### 支持的法则
-
-| 法则代码 | 完整名称 | 描述 |
-|----------|----------|------|
-| `benf` | Benford Law | 本福德定律 |
-| `pareto` | Pareto Principle | 帕累托法则 |
-| `zipf` | Zipf Law | 齐夫定律 |
-| `normal` | Normal Distribution | 正态分布 |
-| `poisson` | Poisson Distribution | 泊松分布 |
-| `all` | All Laws | 所有法则 |
-
-#### 示例
-
-```bash
-# 所有法则比较
-lawkit analyze dataset.csv
-
-# 特定法则组合
-lawkit analyze financial.csv --laws benf,pareto --recommend
-
-# 专注质量分析
-lawkit analyze measurements.csv --focus quality --verbose
-
-# JSON输出
-lawkit analyze data.csv --format json
-```
-
-### validate - 数据验证
-
-```bash
-lawkit validate [OPTIONS] [INPUT]
-```
-
-验证数据一致性和质量。
-
-#### 示例
-
-```bash
-# 基本验证
-lawkit validate data.csv
-
-# 详细输出
-lawkit validate dataset.csv --verbose
-```
-
-### diagnose - 诊断分析
-
-```bash
-lawkit diagnose [OPTIONS] [INPUT]
-```
-
-检测冲突并提供详细诊断。
-
-#### 示例
-
-```bash
-# 基本诊断
-lawkit diagnose data.csv
-
-# 详细输出
-lawkit diagnose dataset.csv --verbose
-```
-
-### generate - 数据生成
+生成遵循特定统计法则的样本数据用于测试和验证。
 
 ```bash
 lawkit generate <LAW> [OPTIONS]
 ```
 
-生成符合特定统计法则的样本数据，用于测试和教学。
+#### 可用法则
+- `benf` - 生成符合本福特定律的数据
+- `pareto` - 生成帕累托分布数据
+- `zipf` - 生成齐普夫定律数据
+- `normal` - 生成正态分布数据
+- `poisson` - 生成泊松分布数据
 
-#### 支持的法则
+#### 通用生成选项
+- `--samples <NUMBER>` - 生成的样本数 (默认: 1000)
+- `--seed <NUMBER>` - 可重现生成的随机种子
+- `--output-file <FILE>` - 输出文件路径 (默认: stdout)
 
-```bash
-lawkit generate benf [OPTIONS]      # 本福德定律数据
-lawkit generate pareto [OPTIONS]    # 帕累托分布数据
-lawkit generate zipf [OPTIONS]      # 齐夫分布数据
-lawkit generate normal [OPTIONS]    # 正态分布数据
-lawkit generate poisson [OPTIONS]   # 泊松分布数据
-```
+#### 法则特定选项
 
-#### 通用选项
-
-| 选项 | 描述 | 默认值 |
-|------|------|--------|
-| `--samples <N>` | 样本数量 | `1000` |
+**本福特生成:**
+- `--fraud-rate <RATE>` - 测试用欺诈注入率 (0.0-1.0) (默认: 0.0)
+- `--range <MIN,MAX>` - 生成的数字范围 (例: 1,10000) (默认: 1,100000)
 
 #### 示例
-
 ```bash
-# 生成本福德定律数据
+# 生成本福特定律数据
 lawkit generate benf --samples 5000
 
-# 生成帕累托分布数据
-lawkit generate pareto --samples 2000
+# 生成带欺诈注入的本福特数据
+lawkit generate benf --samples 2000 --fraud-rate 0.1
 
-# 生成正态分布数据
-lawkit generate normal --samples 1000
+# 生成自定义范围的可重现数据
+lawkit generate benf --samples 1000 --seed 42 --range 1,50000
 
-# 生成泊松分布数据
-lawkit generate poisson --samples 500
-
-# 生成齐夫分布数据
-lawkit generate zipf --samples 1000
+# 生成并保存到文件
+lawkit generate normal --samples 1000 --output-file test_data.csv
 ```
 
-### list - 列出信息
+## 集成命令
+
+### `lawkit analyze` - 多法则分析
+
+执行带推荐的基本多法则分析以进行全面数据评估。
 
 ```bash
-lawkit list
+lawkit analyze [OPTIONS] [INPUT]
 ```
 
-列出可用的统计法则和描述。
+### `lawkit validate` - 数据验证
+
+跨多个统计模式验证数据一致性和质量。
+
+```bash
+lawkit validate [OPTIONS] [INPUT]
+```
+
+### `lawkit diagnose` - 冲突检测
+
+检测统计法则结果之间的冲突并提供详细诊断。
+
+```bash
+lawkit diagnose [OPTIONS] [INPUT]
+```
+
+#### 选项
+- `--laws <LAWS>` - 要分析的特定法则: benf,pareto,zipf,normal,poisson
+- `--focus <FOCUS>` - 分析焦点: quality, concentration, distribution, anomaly
+- `--purpose <PURPOSE>` - 分析目的: quality, fraud, concentration, anomaly, distribution, general
+- `--recommend` - 启用最优法则推荐模式
+- `--threshold <THRESHOLD>` - 冲突检测阈值 (0.0-1.0) (默认: 0.5)
+- `--report <TYPE>` - 集成报告类型: summary, detailed, conflicting (默认: summary)
+- `--consistency-check` - 启用一致性检查
+- `--cross-validation` - 启用交叉验证分析
+- `--confidence-level <LEVEL>` - 置信水平 (默认: 0.95)
 
 #### 示例
-
 ```bash
-# 基本列表
-lawkit list
+# 比较所有法则
+lawkit analyze data.csv
+
+# 专注于欺诈检测
+lawkit analyze transactions.csv --purpose fraud --recommend
+
+# 自定义法则选择
+lawkit analyze data.csv --laws benf,normal --focus quality
+
+# JSON格式的详细输出
+lawkit analyze dataset.csv --verbose --format json
+```
+
+## 通用选项
+
+所有命令都支持这些通用选项:
+
+### 输入/输出
+- `[INPUT]` - 输入数据（文件路径、URL或stdin用'-'）
+- `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml
+- `--quiet, -q` - 最小输出
+- `--verbose, -v` - 详细输出
+- `--optimize` - 为大数据集启用内存和处理优化
+
+### 数据处理
+- `--filter <RANGE>` - 数字过滤 (>=100, <1000, 50-500)
+- `--min-count <NUMBER>` - 所需的最小数据点数 (默认: 10)
+
+## 输入格式
+
+`lawkit`支持多种输入格式:
+
+- **文本文件** - 用空格/逗号分隔的数字
+- **CSV** - 逗号分隔值
+- **JSON** - 结构化数据
+- **YAML** - YAML配置文件
+- **TOML** - TOML配置文件
+- **XML** - XML数据文件
+
+## 输出格式
+
+### 文本格式（默认）
+包含分析结果、解释和推荐的人类可读输出。
+
+### JSON格式
+用于API和自动化的机器可读结构化输出:
+```json
+{
+  "dataset": "data.csv",
+  "numbers_analyzed": 1000,
+  "risk_level": "Low",
+  "analysis_results": {...}
+}
+```
+
+### CSV格式
+用于电子表格导入的表格格式:
+```csv
+dataset,numbers_analyzed,risk_level,score
+data.csv,1000,Low,0.85
 ```
 
 ## 退出代码
 
-| 代码 | 含义 |
-|------|------|
-| `0` | 成功执行 |
-| `1` | 一般错误 |
-| `2` | 命令行参数错误 |
-| `10` | 低风险检测 |
-| `11` | 中等风险检测 |
-| `12` | 高风险检测 |
-| `13` | 关键风险检测 |
+- `0` - 成功，低风险
+- `10` - 检测到中等风险
+- `11` - 检测到高风险
+- `12` - 检测到关键风险
+- `1` - 分析错误
+- `2` - 无效参数
+- `3` - 文件/网络错误
 
-## 管道和重定向
+## 按用例的示例
 
+### 欺诈检测
 ```bash
-# 标准输入
-echo "123 456 789" | lawkit benf
+# 金融交易分析
+lawkit benf transactions.csv --verbose
 
-# 输出重定向
-lawkit benf data.csv > results.txt
-
-# 错误重定向
-lawkit benf data.csv 2> errors.log
-
-# 管道链
-lawkit generate benf --samples 1000 | lawkit benf --format json
-
-# 批量处理
-find . -name "*.csv" -exec lawkit benf {} \;
+# 多法则欺诈检测
+lawkit analyze suspicious_data.csv --purpose fraud --recommend
 ```
 
-## 高级用法
-
-### 批量处理
+### 数据质量评估
 ```bash
-# 多文件处理
-for file in *.csv; do
-    lawkit benf "$file" --format json > "${file%.csv}_result.json"
-done
+# 全面质量检查
+lawkit analyze dataset.csv --purpose quality --verbose
 
-# 性能监控
-time lawkit benf large_file.csv --verbose
+# 专注于正态性
+lawkit normal dataset.csv --verbose
 ```
 
-### 自动化脚本
+### 商业智能
 ```bash
-#!/bin/bash
-for file in *.csv; do
-    result=$(lawkit benf "$file" --format json)
-    risk=$(echo "$result" | jq -r '.risk_level')
-    if [ "$risk" = "HIGH" ]; then
-        echo "Alert: $file has high risk"
-    fi
-done
+# 80/20分析
+lawkit pareto sales.csv --threshold 0.8
+
+# 客户分析
+lawkit zipf customer_frequency.csv --verbose
 ```
 
-更多详细示例请参考[使用示例](../user-guide/examples_zh.md)。
+### 异常检测
+```bash
+# 正态性和异常值分析
+lawkit normal data.csv --verbose
+
+# 事件分析
+lawkit poisson incidents.csv --verbose
+```
