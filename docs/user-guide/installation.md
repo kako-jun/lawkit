@@ -1,110 +1,145 @@
 # Installation Guide
 
-## Prerequisites
+This guide explains how to install lawkit on your system.
 
-- **Rust 1.75+** (for building from source)
-- **Operating System**: Linux, macOS, or Windows
+## System Requirements
+
+- **OS**: Windows, macOS, Linux
+- **Rust**: 1.70.0 or higher (when installing from Cargo)
+- **Memory**: Minimum 512MB (2GB+ recommended for large file processing)
 
 ## Installation Methods
 
-### Method 1: Cargo Install (Recommended)
+### 1. Install from Cargo (Recommended)
 
 ```bash
-# Install latest stable version
+# Install latest version
 cargo install lawkit
 
 # Install specific version
-cargo install lawkit --version 2.0.1
+cargo install lawkit --version 2.0.0
 ```
 
-### Method 2: Download Pre-built Binaries
-
-1. Go to [GitHub Releases](https://github.com/kako-jun/lawkit/releases)
-2. Download the appropriate binary for your platform:
-   - `lawkit-linux-x86_64.tar.gz` (Linux)
-   - `lawkit-windows-x86_64.zip` (Windows)
-   - `lawkit-macos-x86_64.tar.gz` (macOS Intel)
-   - `lawkit-macos-aarch64.tar.gz` (macOS Apple Silicon)
-
-3. Extract and add to PATH:
-
-#### Linux/macOS
-```bash
-tar -xzf lawkit-linux-x86_64.tar.gz
-sudo mv lawkit benf /usr/local/bin/
-```
-
-#### Windows
-```powershell
-# Extract lawkit-windows-x86_64.zip
-# Add extracted directory to PATH
-```
-
-### Method 3: Build from Source
+### 2. Build from Source
 
 ```bash
 # Clone repository
-git clone https://github.com/kako-jun/lawkit.git
+git clone https://github.com/user/lawkit.git
 cd lawkit
 
-# Build release version
+# Build and install
 cargo build --release
-
-# Install locally
-cargo install --path ./lawkit-cli
+cargo install --path .
 ```
 
-## Verification
+### 3. Binary Download
 
-Test your installation:
+Download the binary for your platform from [GitHub Releases](https://github.com/user/lawkit/releases).
+
+#### Windows
+```powershell
+# Run in PowerShell
+Invoke-WebRequest -Uri "https://github.com/user/lawkit/releases/latest/download/lawkit-windows.zip" -OutFile "lawkit.zip"
+Expand-Archive lawkit.zip
+```
+
+#### macOS
+```bash
+# Install with Homebrew (planned)
+brew install lawkit
+
+# Or manual download
+curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-macos.tar.gz | tar xz
+```
+
+#### Linux
+```bash
+# Manual download
+curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-linux.tar.gz | tar xz
+sudo mv lawkit /usr/local/bin/
+```
+
+## Verify Installation
+
+Confirm that installation was successful:
 
 ```bash
 # Check version
 lawkit --version
 
-# List available laws
-lawkit list
-
-# Run help
+# Display help
 lawkit --help
+
+# Show available statistical laws
+lawkit list
+```
+
+## Migration from Legacy benf
+
+If you're using the existing `benf` tool:
+
+```bash
+# Legacy usage
+benf data.csv
+
+# Equivalent new usage
+lawkit benf data.csv
+```
+
+100% compatibility is maintained, so you can use existing scripts as-is.
+
+## Updates
+
+### If installed via Cargo
+```bash
+cargo install lawkit --force
+```
+
+### If installed via binary
+Download and replace with the new binary.
+
+## Uninstallation
+
+### If installed via Cargo
+```bash
+cargo uninstall lawkit
+```
+
+### If installed manually
+```bash
+# Check binary location
+which lawkit
+
+# Remove file
+sudo rm /usr/local/bin/lawkit
 ```
 
 ## Troubleshooting
 
-### Rust Installation Issues
-If you don't have Rust installed:
+### Compilation Errors
+May be due to outdated Rust version:
 ```bash
-# Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.cargo/env
+rustup update stable
 ```
 
-### Path Issues
-Make sure the installation directory is in your PATH:
+### Path Configuration
+If binary is not in PATH:
 ```bash
-# Check if lawkit is in PATH
-which lawkit
-
-# Add to PATH (add to ~/.bashrc or ~/.zshrc)
+# Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Platform-Specific Issues
-
-#### Linux
-- Ensure you have `build-essential` installed for building from source
-- Some distributions may require additional packages
-
-#### macOS
-- Xcode Command Line Tools may be required: `xcode-select --install`
-- On Apple Silicon, use the `aarch64` binary
-
-#### Windows
-- Use PowerShell or Command Prompt
-- Windows Defender may flag the binary - add exception if needed
+### Permission Errors
+If permission errors occur on Linux:
+```bash
+sudo chown $USER:$USER ~/.cargo/bin/lawkit
+chmod +x ~/.cargo/bin/lawkit
+```
 
 ## Next Steps
 
-- [Getting Started](getting-started.md) - Learn the basics
-- [Getting Started](getting-started.md) - Learn the basics
-- [Examples](examples.md) - See real-world usage
+Once installation is complete, learn basic usage in [Getting Started](getting-started.md).
+
+- [Getting Started](getting-started.md) - Basic usage
+- [Examples](examples.md) - Real-world examples
+- [CLI Reference](../reference/cli-reference.md) - Command details
