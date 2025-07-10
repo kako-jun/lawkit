@@ -6,8 +6,8 @@
 
 ### パッケージ配布
 - [x] **Rust crates.io**: コアとCLIパッケージ公開済み
-- [ ] **npmパッケージ**: JavaScriptラッパー完成・公開  
-- [ ] **PyPIパッケージ**: Pythonラッパー完成・公開
+- [x] **npmパッケージ**: JavaScriptラッパー完成・公開  
+- [x] **PyPIパッケージ**: Pythonラッパー完成・公開
 - [ ] **Homebrewフォーミュラ**: macOSパッケージマネージャー対応
 
 ### 追加統計法則
