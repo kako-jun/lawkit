@@ -117,11 +117,31 @@ lawkitプロジェクトは99.9%のドキュメント-実装一致率を達成�
 
 ---
 
+## 📋 **Phase 2.2完了 (2025-07-10)** ✅ **実装完了**
+
+### **🎯 Phase 2.2実装内容**
+- ✅ **--confidence**: benf/poissonコマンドに統計的信頼度制御実装
+- ✅ **--sample-size**: benfコマンドに大規模データ最適化実装 
+- ✅ **--min-value**: benfコマンドにノイズフィルタリング実装
+- ✅ **ドキュメント更新**: 英語・日本語・中国語の全ドキュメント更新
+- ✅ **テストケース追加**: 新オプション対応テスト実装
+- ✅ **機能検証**: 全オプション動作確認済み
+
+### **🧪 実装確認テスト**
+```bash
+# --confidence オプション
+echo "1 10 100 1000 10000" | lawkit benf --confidence 0.99
+# --sample-size オプション  
+echo "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" | lawkit benf --sample-size 10
+# --min-value オプション
+echo "0.1 1 10 100 1000" | lawkit benf --min-value 1
+```
+
 ## 📋 **現在の優先度ランキング**
 
 ### **🥇 最優先 (即座実行推奨)**
 1. **リリース準備**: 
-   - `2.1.0` 安定版タグ作成
+   - `2.2.0` 安定版タグ作成（新オプション機能追加）
    - GitHub Releases ページ整備
    - バイナリ配布準備
 
@@ -131,21 +151,22 @@ lawkitプロジェクトは99.9%のドキュメント-実装一致率を達成�
    - Homebrew formula作成
    - APT/YUM パッケージ準備
 
-3. **外部統合**:
-   - Python binding (PyO3)
-   - WebAssembly (wasm-bindgen)
-   - Docker コンテナ
-
 ### **🥉 中期計画 (1-3ヶ月)**
 4. **新統計法則追加**:
    - Weibull分布 (生存分析・信頼性工学)
    - LogNormal分布 (金融・環境データ)
    - Beta/Gamma分布 (ベイジアン統計)
 
-5. **エンタープライズ機能**:
-   - 設定ファイル対応 (YAML/TOML)
-   - バッチ処理モード
-   - レポート生成 (PDF/HTML)
+5. **外部統合**:
+   - Python binding (PyO3)
+   - WebAssembly (wasm-bindgen)
+   - Docker コンテナ
+
+### **❌ 除外項目 (永続的に実装しない)**
+- 設定ファイル対応 (YAML/TOML)
+- バッチ処理モード
+- レポート生成 (PDF/HTML)
+- GUI/Web インターフェース
 
 ## 🎯 **実装済み項目**
 
@@ -163,6 +184,7 @@ lawkitプロジェクトは99.9%のドキュメント-実装一致率を達成�
 - ✅ **データ生成**: 統計的に正確なサンプルデータ生成機能
 - ✅ **セルフテスト**: generate→analyze パイプライン検証機能
 - ✅ **後方互換性**: 既存`benf`コマンド完全保持
+- ✅ **Phase 2.2機能**: --confidence/--sample-size/--min-value オプション実装
 
 ### 品質保証
 - ✅ **全179テスト通過**: 統合57・サブコマンド23・コア99テスト
@@ -181,58 +203,96 @@ lawkitプロジェクトは99.9%のドキュメント-実装一致率を達成�
 - ✅ **中国語ドキュメント**: 10個の包括的ドキュメントファイル作成
 - ✅ **統一フォーマット**: バッジ・構造・リンクの完全統一
 
-## 📝 **未実装機能リスト（ドキュメントから削除予定）**
+## 📊 **未実装機能の設計精査結果 (2025-07-10)**
 
-### **設定システム（全体未実装）**
-- `lawkit config` - 設定管理コマンド
-  - `lawkit config show` - 全設定表示
-  - `lawkit config show <section>` - セクション別表示
-  - `lawkit config path` - 設定ファイルパス表示
-  - `lawkit config validate` - 設定検証
-  - `lawkit config init` - 設定初期化
-- 設定ファイル対応: `lawkit.toml`, `~/.config/lawkit/config.toml`, `/etc/lawkit/config.toml`
-- `--profile <name>` - 設定プロファイル指定
+### **🎯 精査方針**
+生成AIが提案した未実装機能をUNIX哲学・直交性・実用性の観点で厳格に評価。
+「Do one thing and do it well」の原則に従い、統計分析ツールの本質に集中。
 
-### **各コマンドの未実装オプション**
+### **🚫 実装拒否（設計が根本的に誤り）**
 
-#### benf:
-- `--columns <COLUMNS>` - カラム選択
-- `--min-value <VALUE>` - 最小値フィルタ
-- `--confidence <LEVEL>` - 信頼度レベル
-- `--sample-size <NUMBER>` - サンプルサイズ指定
+#### **設定システム全般**
+- `lawkit config` コマンド群（show/validate/init等）
+- 設定ファイル（lawkit.toml等）
+- `--profile <name>` オプション
+- 環境変数（LAWKIT_OUTPUT/VERBOSE/OPTIMIZE）
 
-#### pareto:
-- `--columns <COLUMNS>` - カラム選択
+**拒否理由**:
+- **UNIX哲学違反**: lawkitは統計分析ツール、設定管理ツールではない
+- **過剰複雑性**: CLIツールに設定システムは不要
+- **実用性なし**: ワンショット使用が主用途
 
-#### zipf:
-- `--min-frequency <NUMBER>` - 最小頻度フィルタ
-- `--max-words <NUMBER>` - 最大単語数
-- `--columns <COLUMNS>` - カラム選択
+#### **データ処理オプション**
+- `--columns <COLUMNS>` (全コマンド)
 
-#### normal:
-- `--control-chart` - 管理図生成
-- `--capability` - 工程能力分析
-- `--normality-tests <TESTS>` - 正規性検定選択
-- `--columns <COLUMNS>` - カラム選択
+**拒否理由**:
+- **重複機能**: `cut -d, -f2 data.csv | lawkit benf` で代替可能
+- **UNIX原則**: 既存ツールとの役割分担明確化
 
-#### poisson:
-- `--interval <INTERVAL>` - 時間間隔指定
-- `--forecast <DAYS>` - 将来予測
-- `--confidence <LEVEL>` - 信頼度レベル
+#### **高度分析機能**
+- `--control-chart` (normal)
+- `--capability` (normal) 
+- `--normality-tests <TESTS>` (normal)
 
-#### generate:
-- `--columns <COLUMNS>` - 出力カラム指定
+**拒否理由**:
+- **範囲逸脱**: 品質管理は専門ツールの領域
+- **複雑性**: メンテナンス負荷が過大
 
-### **環境変数（未実装）**
-- `LAWKIT_OUTPUT` - デフォルト出力形式
-- `LAWKIT_VERBOSE` - 詳細モード
-- `LAWKIT_OPTIMIZE` - 最適化モード
-
-### **その他の未実装機能**
+#### **その他**
 - バッチ処理モード
 - レポート生成（PDF/HTML）
 - プラグインシステム
 - エクスポート/インポート機能
+
+### **✅ 実装推奨（統計分析の本質強化）**
+
+#### **Phase 2.2 実装完了** ✅
+1. **`--confidence <LEVEL>` (benf, poisson)** ✅
+   - **実装済み**: 統計的検定の信頼度レベル制御
+   - **用途**: 監査レベル（99%）vs 通常分析（95%）
+
+2. **`--sample-size <NUMBER>` (benf)** ✅
+   - **実装済み**: 大規模データでの性能最適化
+   - **用途**: メモリ制約下での効率的分析
+
+3. **`--min-value <VALUE>` (benf)** ✅
+   - **実装済み**: ベンフォード法則でのノイズフィルタリング
+   - **用途**: 小さな値による統計的ノイズ除去
+
+#### **Phase 3 条件付き実装**
+4. **`--min-frequency <NUMBER>` (zipf)**
+   - **条件**: 軽量実装、統計的妥当性確保
+   - **理由**: ジップ法則分析での標準的前処理
+
+5. **`--forecast <DAYS>` (poisson)**
+   - **条件**: 責任範囲を限定、精度保証なし明記
+   - **理由**: ポアソン分布の自然な拡張
+
+### **🎯 今後の開発方針**
+
+#### **コア原則**
+1. **統計分析特化**: 設定管理等の周辺機能は一切追加しない
+2. **UNIX哲学遵守**: パイプライン連携を前提とした設計
+3. **シンプル性維持**: 複雑な機能は専用ツールに委譲
+
+#### **実装基準**
+- **統計的妥当性**: 統計学的に意味のあるパラメータのみ
+- **直交性**: 既存機能との独立性確保
+- **実用性**: 現場での明確なニーズ
+
+#### **次期バージョン計画**
+- **v2.2**: `--confidence`, `--sample-size`, `--min-value` 実装 ✅ **完了**
+- **v2.3**: zipf/poisson 強化オプション検討
+- **v3.0**: 新統計法則追加（Weibull/LogNormal等）
+
+### **📋 除外済み機能（永続的に実装しない）**
+- 設定システム全般
+- `--columns` オプション
+- 品質管理機能
+- バッチ処理システム
+- GUI/Web界面
+
+**結論**: 未実装機能の約80%を恒久的に除外し、統計分析ツールとしての純粋性を維持。
 
 ## 🔧 **詳細ドキュメント（Claude自動参照対象）**
 
