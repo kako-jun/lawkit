@@ -1,356 +1,367 @@
 # CLIリファレンス
 
-lawkitの全コマンドとオプションの詳細リファレンスです。
+`lawkit`のコマンドライン・インターフェース完全ドキュメント。
 
-## 基本構文
+## グローバルコマンド
+
+### `lawkit --help`
+メインコマンドまたはサブコマンドのヘルプ情報を表示。
+
+### `lawkit --version`
+バージョン情報を表示。
+
+### `lawkit list`
+利用可能なすべての統計法則とその説明をリスト表示。
 
 ```bash
-lawkit [サブコマンド] [ファイル] [オプション]
+$ lawkit list
+利用可能な統計法則:
+  benf    - ベンフォード法則分析
+  pareto  - パレート原理 (80/20ルール) 分析
+  zipf    - ジップ法則分析
+  normal  - 正規分布分析
+  poisson - ポアソン分布分析
+
+統合コマンド:
+  analyze  - 多法則基本分析と推奨
+  validate - データ検証と整合性チェック
+  diagnose - 矛盾検出と詳細診断
 ```
 
-## グローバルオプション
+## 統計法則コマンド
 
-すべてのサブコマンドで使用可能なオプション：
+### `lawkit benf` - ベンフォード法則分析
 
-| オプション | 短縮形 | 説明 | デフォルト |
-|------------|--------|------|-----------|
-| `--format` | `-f` | 出力形式 | `text` |
-| `--verbose` | `-v` | 詳細出力 | `false` |
-| `--quiet` | `-q` | 簡潔出力 | `false` |
-| `--help` | `-h` | ヘルプ表示 | - |
-| `--version` | `-V` | バージョン表示 | - |
-
-### 出力形式
-
-- `text` - 人間が読みやすいテキスト形式
-- `json` - JSON形式
-- `csv` - CSV形式
-- `yaml` - YAML形式
-- `toml` - TOML形式
-- `xml` - XML形式
-
-
-## サブコマンド
-
-### lawkit benf - ベンフォード法則分析
-
-**用途**: 会計データ、選挙結果、自然データの不正検知
+ベンフォード法則を使用して異常を検出し、データ品質を評価。
 
 ```bash
-lawkit benf [ファイル] [オプション]
+lawkit benf [OPTIONS] [INPUT]
 ```
 
 #### オプション
-
-共通オプション（--format, --verbose, --quiet）に加えて、特別なオプションはありません。
+- `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--quiet, -q` - 最小限の出力（数値のみ）
+- `--verbose, -v` - 詳細統計
+- `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
+- `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
+- `--threshold <LEVEL>` - 異常検出閾値: low, medium, high, critical (デフォルト: auto)
+- `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
+- `--sample-size <NUMBER>` - 大規模データセットの最大サンプルサイズ（性能向上）
+- `--min-value <VALUE>` - 分析に含める最小値（ノイズとなる小さな値をフィルタ）
 
 #### 例
-
 ```bash
-# 基本的な分析
+# 基本分析
 lawkit benf data.csv
 
-# 詳細出力
-lawkit benf transactions.json --verbose
+# JSON形式での詳細出力
+lawkit benf transactions.json --verbose --format json
 
-# JSON出力
-lawkit benf data.csv --format json
+# 最小限出力のためのクワイエットモード
+lawkit benf data.csv --quiet
 
-# 簡潔出力
-lawkit benf accounts.csv --quiet
-
-# 高額取引をフィルタリングし、高い闾値で分析
+# 高閾値での大規模取引フィルタ
 lawkit benf accounts.csv --filter ">=1000" --threshold high
+
+# 監査用の高信頼度分析（99%信頼度レベル）
+lawkit benf audit_data.csv --confidence 0.99 --verbose
+
+# 大規模データセットのパフォーマンス最適化
+lawkit benf big_data.csv --sample-size 50000 --optimize
+
+# 分析にノイズを加える小さな値をフィルタ
+lawkit benf financial_data.csv --min-value 100
 ```
 
-### lawkit pareto - パレート法則分析
+### `lawkit pareto` - パレート原理分析
 
-**用途**: 80/20分析、売上分析、在庫管理
+集中度を分析し、80/20ルールを適用。
 
 ```bash
-lawkit pareto [ファイル] [オプション]
+lawkit pareto [OPTIONS] [INPUT]
 ```
 
-#### オプション
-
-| オプション | 型 | 説明 | デフォルト |
-|------------|-----|------|-----------|
-| `--threshold` | 数値 | パレート閾値（0.0-1.0） | 0.8 |
+#### 固有オプション
+- `--concentration <THRESHOLD>` - 集中度閾値 (0.0-1.0) (デフォルト: 0.8)
+- `--gini-coefficient` - 不平等測定のためのジニ係数を計算
+- `--percentiles <PERCENTILES>` - 計算するカスタムパーセンタイル (例: 70,80,90)
+- `--business-analysis` - ビジネス分析洞察を有効化
 
 #### 例
-
 ```bash
-# 基本的なパレート分析（80/20）
+# 基本パレート分析
 lawkit pareto sales.csv
 
-# 90/10分析
-lawkit pareto customers.csv --concentration 0.9
+# カスタム閾値
+lawkit pareto data.csv --concentration 0.9
 
-# Gini係数付きビジネス分析
-lawkit pareto revenue.csv --business-analysis --gini-coefficient
+# ジニ係数付きビジネス分析
+lawkit pareto customers.csv --business-analysis --gini-coefficient
 
-# カスタム百分位数
-lawkit pareto products.csv --percentiles 70,80,90,95
+# カスタムパーセンタイル
+lawkit pareto revenue.csv --percentiles 70,80,90,95
 ```
 
-### lawkit zipf - ジップ法則分析
+### `lawkit zipf` - ジップ法則分析
 
-**用途**: テキスト分析、単語頻度分析
+頻度分布とランキングパターンを分析。
 
 ```bash
-lawkit zipf [ファイル] [オプション]
+lawkit zipf [OPTIONS] [INPUT]
 ```
-
-#### オプション
-
-共通オプション（--format, --verbose, --quiet）に加えて、特別なオプションはありません。
 
 #### 例
-
 ```bash
-# 基本的な分析
+# 基本ジップ分析
 lawkit zipf frequency_data.csv
 
 # 詳細出力
 lawkit zipf rankings.csv --verbose
 
-# JSON出力
+# JSON出力形式
 lawkit zipf data.csv --format json
 ```
 
-### lawkit normal - 正規分布分析
+### `lawkit normal` - 正規分布分析
 
-**用途**: 品質管理、異常値検出、工程能力評価
+正規性をテストし、外れ値を検出。
 
 ```bash
-lawkit normal [ファイル] [オプション]
+lawkit normal [OPTIONS] [INPUT]
 ```
 
-#### オプション
-
-共通オプション（--format, --verbose, --quiet）に加えて、特別なオプションはありません。
-
 #### 例
-
 ```bash
-# 基本的な正規性分析
-lawkit normal measurements.csv
+# 基本正規性テスト
+lawkit normal data.csv
 
 # 詳細出力
-lawkit normal quality_data.csv --verbose
+lawkit normal measurements.csv --verbose
 
-# JSON出力
-lawkit normal data.csv --format json
+# JSON出力形式
+lawkit normal quality_data.csv --format json
 ```
 
-### lawkit poisson - ポアソン分布分析
+### `lawkit poisson` - ポアソン分布分析
 
-**用途**: イベント発生予測、稀少事象分析
+イベント発生と稀な事象を分析。
 
 ```bash
-lawkit poisson [ファイル] [オプション]
+lawkit poisson [OPTIONS] [INPUT]
 ```
 
 #### オプション
-
-共通オプション（--format, --verbose, --quiet）に加えて、特別なオプションはありません。
+- `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--quiet, -q` - 最小限の出力（数値のみ）
+- `--verbose, -v` - 詳細統計
+- `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
+- `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
+- `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
 
 #### 例
-
 ```bash
-# 基本的なポアソン分析
+# 基本ポアソン分析
 lawkit poisson events.csv
 
 # 詳細出力
 lawkit poisson incidents.csv --verbose
 
-# JSON出力
-lawkit poisson defects.csv --format json
+# JSON出力形式
+lawkit poisson data.csv --format json
+
+# 重要分析用の高信頼度レベル
+lawkit poisson server_errors.csv --confidence 0.99 --verbose
 ```
 
-### lawkit generate - サンプルデータ生成
+## 生成コマンド
 
-**用途**: テスト用データ生成、法則検証、ベンチマーク
+### `lawkit generate` - サンプルデータ生成
+
+テストと検証のために特定の統計法則に従うサンプルデータを生成。
 
 ```bash
-lawkit generate [法則] [オプション]
+lawkit generate <LAW> [OPTIONS]
 ```
 
 #### 利用可能な法則
-- `benf` - ベンフォード法則準拠データ生成
-- `pareto` - パレート分布データ生成
-- `zipf` - Zipf法則データ生成
-- `normal` - 正規分布データ生成
-- `poisson` - ポアソン分布データ生成
+- `benf` - ベンフォード法則準拠データを生成
+- `pareto` - パレート分布データを生成
+- `zipf` - ジップ法則データを生成
+- `normal` - 正規分布データを生成
+- `poisson` - ポアソン分布データを生成
 
-#### 共通オプション
+#### 共通生成オプション
+- `--samples <NUMBER>` - 生成するサンプル数 (デフォルト: 1000)
+- `--seed <NUMBER>` - 再現可能な生成のためのランダムシード
+- `--output-file <FILE>` - 出力ファイルパス (デフォルト: stdout)
 
-| オプション | 型 | 説明 | デフォルト |
-|------------|-----|------|-----------|
-| `--samples` | 整数 | 生成サンプル数 | 1000 |
+#### 法則固有オプション
+
+**ベンフォード生成:**
+- `--fraud-rate <RATE>` - テスト用の不正注入率 (0.0-1.0) (デフォルト: 0.0)
+- `--range <MIN,MAX>` - 生成のための数値範囲 (例: 1,10000) (デフォルト: 1,100000)
 
 #### 例
-
 ```bash
-# ベンフォード法則データ生成
+# ベンフォード法則データの生成
 lawkit generate benf --samples 5000
 
-# 不正注入付きベンフォードデータ生成
+# 不正注入付きベンフォードデータの生成
 lawkit generate benf --samples 2000 --fraud-rate 0.1
 
-# カスタム範囲の再現可能なデータ生成
+# カスタム範囲での再現可能なデータ生成
 lawkit generate benf --samples 1000 --seed 42 --range 1,50000
 
-# ファイルに保存
+# 生成してファイルに保存
 lawkit generate normal --samples 1000 --output-file test_data.csv
 ```
 
-### lawkit analyze - 複数法則比較
+## 統合コマンド
 
-**用途**: 複数法則の統合分析、矛盾検出、推奨システム
+### `lawkit analyze` - 多法則分析
+
+包括的なデータ評価のための推奨付き基本多法則分析を実行。
 
 ```bash
-lawkit analyze [ファイル] [オプション]
+lawkit analyze [OPTIONS] [INPUT]
+```
+
+### `lawkit validate` - データ検証
+
+複数の統計パターンでデータの整合性と品質を検証。
+
+```bash
+lawkit validate [OPTIONS] [INPUT]
+```
+
+### `lawkit diagnose` - 矛盾検出
+
+統計法則結果間の矛盾を検出し、詳細診断を提供。
+
+```bash
+lawkit diagnose [OPTIONS] [INPUT]
 ```
 
 #### オプション
-
-| オプション | 型 | 説明 | デフォルト |
-|------------|-----|------|-----------|
-| `--laws` | 文字列 | 適用法則（benf,pareto,zipf,normal,poisson） | all |
-| `--focus` | 文字列 | 分析フォーカス（quality,concentration,distribution,anomaly） | general |
-| `--purpose` | 文字列 | 分析目的（quality,fraud,concentration,anomaly,distribution,general） | general |
-| `--recommend` | - | 推奨システム | false |
+- `--laws <LAWS>` - 分析する特定の法則: benf,pareto,zipf,normal,poisson
+- `--focus <FOCUS>` - 分析焦点: quality, concentration, distribution, anomaly
+- `--purpose <PURPOSE>` - 分析目的: quality, fraud, concentration, anomaly, distribution, general
+- `--recommend` - 最適法則推奨モードを有効化
+- `--threshold <THRESHOLD>` - 矛盾検出閾値 (0.0-1.0) (デフォルト: 0.5)
+- `--report <TYPE>` - 統合レポートタイプ: summary, detailed, conflicting (デフォルト: summary)
+- `--consistency-check` - 整合性チェックを有効化
+- `--cross-validation` - クロス検証分析を有効化
+- `--confidence-level <LEVEL>` - 信頼度レベル (デフォルト: 0.95)
 
 #### 例
-
 ```bash
-# 全法則での比較分析
+# すべての法則を比較
 lawkit analyze data.csv
 
-# 特定法則のみ
-lawkit analyze financial.csv --laws benf,normal
+# 不正検出に焦点
+lawkit analyze transactions.csv --purpose fraud --recommend
 
-# 推奨システム付き
-lawkit analyze dataset.csv --recommend
+# カスタム法則選択
+lawkit analyze data.csv --laws benf,normal --focus quality
 
-# 矛盾検出と一貫性チェック
-lawkit analyze data.csv --consistency-check --report conflicting
-
-# 詳細出力
-lawkit analyze data.csv --verbose --format json
+# JSON形式での詳細出力
+lawkit analyze dataset.csv --verbose --format json
 ```
 
-### lawkit validate - データ検証
+## 共通オプション
 
-**用途**: データの一貫性と品質を複数の統計パターンで検証
+すべてのコマンドは以下の共通オプションをサポート:
 
+### 入出力
+- `[INPUT]` - 入力データ（ファイルパス、URL、または標準入力の場合は '-'）
+- `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml
+- `--quiet, -q` - 最小限の出力
+- `--verbose, -v` - 詳細出力
+- `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
+
+### データ処理
+- `--filter <RANGE>` - 数値フィルタリング (>=100, <1000, 50-500)
+- `--min-count <NUMBER>` - 必要な最小データポイント数 (デフォルト: 10)
+
+## 入力形式
+
+`lawkit`は複数の入力形式をサポート:
+
+- **テキストファイル** - 空白/カンマで区切られた数値
+- **CSV** - カンマ区切り値
+- **JSON** - 構造化データ
+- **YAML** - YAML設定ファイル
+- **TOML** - TOML設定ファイル
+- **XML** - XMLデータファイル
+
+## 出力形式
+
+### テキスト形式（デフォルト）
+分析結果、解釈、推奨を含む人間が読みやすい出力。
+
+### JSON形式
+APIと自動化のための機械可読構造化出力:
+```json
+{
+  "dataset": "data.csv",
+  "numbers_analyzed": 1000,
+  "risk_level": "Low",
+  "analysis_results": {...}
+}
+```
+
+### CSV形式
+スプレッドシートインポート用の表形式:
+```csv
+dataset,numbers_analyzed,risk_level,score
+data.csv,1000,Low,0.85
+```
+
+## 終了コード
+
+- `0` - 成功、低リスク
+- `10` - 中リスク検出
+- `11` - 高リスク検出
+- `12` - 危険リスク検出
+- `1` - 分析エラー
+- `2` - 無効な引数
+- `3` - ファイル/ネットワークエラー
+
+## ユースケース別の例
+
+### 不正検出
 ```bash
-lawkit validate [ファイル] [オプション]
+# 金融取引分析
+lawkit benf transactions.csv --verbose
+
+# 多法則不正検出
+lawkit analyze suspicious_data.csv --purpose fraud --recommend
 ```
 
-#### 例
-
+### データ品質評価
 ```bash
-# 基本的な検証
-lawkit validate data.csv
+# 包括的品質チェック
+lawkit analyze dataset.csv --purpose quality --verbose
 
-# 詳細出力
-lawkit validate dataset.csv --verbose
+# 正規性に焦点
+lawkit normal dataset.csv --verbose
 ```
 
-### lawkit diagnose - 診断
-
-**用途**: 統計法則間の矛盾検出と詳細診断
-
+### ビジネスインテリジェンス
 ```bash
-lawkit diagnose [ファイル] [オプション]
+# 80/20分析
+lawkit pareto sales.csv --threshold 0.8
+
+# 顧客分析
+lawkit zipf customer_frequency.csv --verbose
 ```
 
-#### 例
-
+### 異常検出
 ```bash
-# 基本的な診断
-lawkit diagnose data.csv
+# 正規性と外れ値分析
+lawkit normal data.csv --verbose
 
-# 詳細出力
-lawkit diagnose dataset.csv --verbose
+# イベント分析
+lawkit poisson incidents.csv --verbose
 ```
-
-### lawkit list - 利用可能な法則一覧
-
-```bash
-lawkit list
-```
-
-#### 例
-
-```bash
-# 基本的な一覧表示
-lawkit list
-```
-
-## 高度な使用例
-
-### バッチ処理
-
-```bash
-# 複数ファイルの一括処理
-for file in data/*.csv; do
-    lawkit benf "$file" --format json > "results/$(basename "$file" .csv)_benf.json"
-done
-```
-
-### パイプライン処理
-
-```bash
-# フィルタリング後の分析
-cat large_data.csv | head -1000 | lawkit benf
-
-# 前処理との組み合わせ
-preprocess_data.py input.xlsx | lawkit pareto --threshold 0.9
-```
-
-## エラーハンドリング
-
-### 終了コード
-
-- `0` - 成功
-- `1` - 一般エラー
-- `2` - ファイル読み込みエラー
-- `3` - データ形式エラー
-- `4` - 統計計算エラー
-- `5` - 出力エラー
-
-### よくあるエラーと対処法
-
-```bash
-# ファイルが見つからない
-lawkit benf nonexistent.csv
-# → ファイルパスを確認
-
-# データが不足
-lawkit benf small_data.csv
-# → より多くのデータを提供
-
-# メモリ不足
-lawkit benf huge_file.csv
-# → 入力データのサイズを小さくする
-```
-
-## パフォーマンスチューニング
-
-### 大きなファイルの処理
-
-```bash
-# 基本的な分析
-lawkit benf large_file.csv
-
-# 詳細出力
-lawkit analyze data.csv --verbose
-
-# 複数法則の並列処理
-lawkit analyze data.csv --laws benf,pareto,normal
-```
-
-このリファレンスを使用して、lawkitの全機能を効果的に活用してください。
