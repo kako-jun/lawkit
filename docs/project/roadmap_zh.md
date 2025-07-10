@@ -6,8 +6,8 @@
 
 ### 包分发
 - [x] **Rust crates.io**: 核心和CLI包已发布
-- [ ] **npm包**: JavaScript包装器完成和发布  
-- [ ] **PyPI包**: Python包装器完成和发布
+- [x] **npm包**: JavaScript包装器完成和发布  
+- [x] **PyPI包**: Python包装器完成和发布
 - [ ] **Homebrew公式**: macOS包管理器支持
 
 ### 附加统计法则
