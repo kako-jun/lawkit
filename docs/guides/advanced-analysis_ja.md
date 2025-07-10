@@ -50,7 +50,7 @@ lawkit analyze dataset.csv --purpose distribution --report detailed
 lawkit validate financial_data.csv --consistency-check --verbose
 
 # 異なる法則間の矛盾を診断
-lawkit diagnose complex_data.csv --cross-validation --confidence-level 0.99
+lawkit diagnose complex_data.csv --cross-validation
 
 # 詳細レポート付き包括的診断
 lawkit diagnose data.csv --report conflicting --format json
@@ -210,7 +210,7 @@ lawkit analyze transactions.csv --purpose fraud --laws benf,pareto --format json
 
 ```bash
 # クロスバリデーション分析
-lawkit validate data.csv --cross-validation --confidence-level 0.95
+lawkit validate data.csv --cross-validation
 
 # 法則間の矛盾検出
 lawkit diagnose complex_data.csv --report conflicting --threshold 0.3
