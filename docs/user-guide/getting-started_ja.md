@@ -109,7 +109,7 @@ echo "取引ID,金額,日付
 3,3456,2024-01-03" > accounting.csv
 
 # ベンフォード法則で分析
-lawkit benf accounting.csv --columns 金額
+lawkit benf accounting.csv
 ```
 
 ### 売上データのパレート分析

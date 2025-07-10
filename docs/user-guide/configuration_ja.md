@@ -1,303 +1,225 @@
 # 設定ガイド
 
-lawkitの動作をカスタマイズするための設定方法を説明します。
+lawkitの基本的な使用方法とコマンドラインオプションについて説明します。
 
-## 設定ファイル
+## 基本的なオプション
 
-lawkitは以下の場所で設定ファイルを検索します：
-
-1. `./lawkit.toml` (現在のディレクトリ)
-2. `~/.config/lawkit/config.toml` (ユーザー設定)
-3. `/etc/lawkit/config.toml` (システム設定)
-
-### 基本的な設定例
-
-```toml
-# lawkit.toml
-
-[general]
-# デフォルト出力形式
-default_output = "json"
-# 注: 出力言語は英語で統一されています
-# 並列処理のスレッド数
-optimize = true
-
-[benford]
-# ベンフォード法則のデフォルト設定
-confidence_level = 0.95
-chi_squared_threshold = 0.05
-
-[pareto]
-# パレート法則のデフォルト設定
-default_threshold = 0.8
-include_gini = true
-
-[zipf]
-# ジップ法則のデフォルト設定
-min_frequency = 2
-max_words = 1000
-
-[normal]
-# 正規分布のデフォルト設定
-normality_tests = ["shapiro", "anderson", "ks"]
-outlier_method = "iqr"
-
-[poisson]
-# ポアソン分布のデフォルト設定
-confidence_interval = 0.95
-forecast_periods = 30
-
-[integration]
-# 統合分析のデフォルト設定
-conflict_detection = true
-auto_recommend = true
-```
-
-## 環境変数
-
-設定は環境変数でも指定できます：
+lawkitでは以下の基本オプションが利用できます：
 
 ```bash
-# 出力形式
-export LAWKIT_OUTPUT=json
+# 出力形式の指定
+lawkit benf data.csv --output json
+lawkit benf data.csv --output csv
+lawkit benf data.csv --output yaml
 
 # 詳細出力
-export LAWKIT_VERBOSE=true
+lawkit benf data.csv --verbose
 
-# 詳細出力
-export LAWKIT_VERBOSE=true
-
-# 最適化モード
-export LAWKIT_OPTIMIZE=true
+# 最適化モード（大きなファイル用）
+lawkit benf data.csv --optimize
 ```
 
-## 言語設定
+## 多言語数字認識
 
-### 対応言語
+lawkitは以下の数字形式を自動認識します：
 
-| 言語コード | 言語名 | 数字認識 |
-|------------|--------|----------|
-| `en` | 英語 | 123,456.78 |
-| `ja` | 日本語 | 123,456.78, １２３４５６ |
-| `zh` | 中国語 | 123,456.78, 壹貳參 |
-| `hi` | ヒンディー語 | 123,456.78, १२३४५६ |
-| `ar` | アラビア語 | 123,456.78, ١٢٣٤٥٦ |
-
-### 言語設定例
+| 言語 | 数字認識例 |
+|------|------------|
+| 英語 | 123,456.78 |
+| 日本語 | 123,456.78, １２３４５６, 五万六千 |
+| 中国語 | 123,456.78, 壹貳參肆伍, 一万二千 |
+| ヒンディー語 | 123,456.78, १२३४५६ |
+| アラビア語 | 123,456.78, ١٢٣٤٥٦ |
 
 ```bash
-# コマンドラインで指定
 # 国際数字フォーマットは自動認識されます
 lawkit benf data.csv
 
-# 設定ファイルで指定
 # 出力は英語に統一されています
-
-# 環境変数で指定
-export LAWKIT_OPTIMIZE=true
+lawkit benf japanese_numbers.csv --verbose
 ```
 
-## 入力設定
+## 入力データ形式
 
-### ファイル形式の設定
+lawkitは以下の入力形式に対応しています：
 
-```toml
-[input]
-# CSVの区切り文字
-csv_delimiter = ","
-# CSVのヘッダー行の有無
-csv_has_header = true
-# Excelの最大行数
-excel_max_rows = 100000
-# PDFのテキスト抽出方法
-pdf_extraction_method = "advanced"
+```bash
+# CSV ファイル
+lawkit benf data.csv
+
+# テキストファイル（ジップ法則用）
+lawkit zipf document.txt
+
+# 標準入力からのデータ
+echo "1234 5678 9012" | lawkit benf
+
+# 複数ファイルの処理
+lawkit benf file1.csv file2.csv
 ```
 
-### 数字認識の設定
+## 出力形式
 
-```toml
-[parsing]
-# 国際数字形式の認識
-international_numbers = true
-# 通貨記号の無視
-ignore_currency = true
-# パーセント記号の処理
-handle_percentages = true
+lawkitは複数の出力形式に対応しています：
+
+```bash
+# テキスト形式（デフォルト）
+lawkit benf data.csv
+
+# JSON形式
+lawkit benf data.csv --output json
+
+# CSV形式
+lawkit benf data.csv --output csv
+
+# YAML形式
+lawkit benf data.csv --output yaml
+
+# XML形式
+lawkit benf data.csv --output xml
+
+# TOML形式
+lawkit benf data.csv --output toml
 ```
 
-## 出力設定
-
-### 出力形式のカスタマイズ
-
-```toml
-[output]
-# デフォルト出力形式
-default_format = "json"
-# 精度（小数点以下の桁数）
-precision = 6
-# 科学的記数法の使用
-scientific_notation = false
-
-[output.json]
-# JSON出力の整形
-pretty_print = true
-# null値の出力
-include_nulls = false
-
-[output.csv]
-# CSV出力の区切り文字
-delimiter = ","
-# ヘッダー行の出力
-include_header = true
-```
-
-## 統計法則別設定
+## 統計法則別オプション
 
 ### ベンフォード法則
 
-```toml
-[benford]
-# 信頼度レベル
-confidence_level = 0.95
-# カイ二乗検定の閾値
-chi_squared_threshold = 0.05
-# 最小データ数
-min_data_points = 30
-# 日本語数字の認識
-japanese_numbers = true
+```bash
+# 基本分析
+lawkit benf financial_data.csv
+
+# 閾値指定
+lawkit benf data.csv --threshold high
+
+# 詳細出力
+lawkit benf data.csv --verbose
 ```
 
 ### パレート法則
 
-```toml
-[pareto]
-# デフォルト閾値（80/20の80）
-default_threshold = 0.8
-# Gini係数の計算
-include_gini = true
-# ローレンツ曲線の描画
-draw_lorenz_curve = false
+```bash
+# 基本分析
+lawkit pareto sales_data.csv
+
+# 濃度指定（90/10分析）
+lawkit pareto data.csv --concentration 0.9
+
+# Gini係数計算
+lawkit pareto data.csv --gini-coefficient
+
+# パーセンタイル分析
+lawkit pareto data.csv --percentiles 80,90,95
 ```
 
 ### ジップ法則
 
-```toml
-[zipf]
-# 最小出現頻度
-min_frequency = 2
-# 最大単語数
-max_words = 1000
-# ストップワードの除去
-remove_stopwords = true
-# 大文字小文字の区別
-case_sensitive = false
+```bash
+# 基本分析
+lawkit zipf document.txt
+
+# 最小出現回数指定
+lawkit zipf text.txt --min-count 5
+
+# 詳細出力
+lawkit zipf document.txt --verbose
 ```
 
-## パフォーマンス設定
+## パフォーマンス最適化
 
-### メモリ使用量
-
-```toml
-[performance]
-# 並列処理のスレッド数
-optimize = true
-# メモリ制限（MB）
-memory_limit = 1024
-# 大きなファイルの処理方法
-optimize = true
-```
-
-### キャッシュ設定
-
-```toml
-[cache]
-# キャッシュの有効化
-enabled = true
-# キャッシュディレクトリ
-directory = "~/.cache/lawkit"
-# キャッシュの有効期限（秒）
-ttl = 3600
-```
-
-## ログ設定
-
-```toml
-[logging]
-# ログレベル
-level = "info"
-# ログファイル
-file = "/var/log/lawkit.log"
-# ローテーション設定
-rotate = true
-max_size = "10MB"
-```
-
-## プロファイル設定
-
-異なる用途に応じた設定プロファイルを作成できます：
-
-```toml
-[profiles.audit]
-# 監査用設定
-default_output = "json"
-benford.confidence_level = 0.99
-logging.level = "debug"
-
-[profiles.quick]
-# 高速分析用設定
-performance.optimize = true
-cache.enabled = true
-benford.min_data_points = 10
-
-[profiles.comprehensive]
-# 包括分析用設定
-integration.conflict_detection = true
-integration.auto_recommend = true
-normal.normality_tests = ["shapiro", "anderson", "ks", "jarque_bera"]
-```
-
-プロファイルの使用：
+大きなファイルを処理する際のオプション：
 
 ```bash
-# 監査用設定で実行
-lawkit benf data.csv --profile audit
+# 最適化モード（サンプリング使用）
+lawkit benf large_file.csv --optimize
 
-# 高速分析用設定で実行
-lawkit benf data.csv --profile quick
+# 詳細な進捗表示
+lawkit benf big_data.csv --verbose
+
+# 複数ファイルの並列処理
+lawkit benf file1.csv file2.csv file3.csv --optimize
 ```
 
-## 設定の確認
-
-現在の設定を確認するには：
+## 高度な分析機能
 
 ```bash
-# 全設定を表示
-lawkit config show
+# 複数法則での統合分析
+lawkit analyze data.csv --laws benf,pareto,normal
 
-# 特定のセクションを表示
-lawkit config show benford
+# データ検証
+lawkit validate data.csv --laws all
 
-# 設定ファイルの場所を表示
-lawkit config path
+# 診断レポート
+lawkit diagnose data.csv --focus conflict
+
+# 異常値検出
+lawkit normal data.csv --outliers
+
+# 時系列分析
+lawkit normal timeseries.csv --time-series
+```
+
+## データ生成機能
+
+lawkitでは検証用のサンプルデータを生成できます：
+
+```bash
+# ベンフォード分布に従うデータ生成
+lawkit generate benf --size 1000
+
+# パレート分布データ生成
+lawkit generate pareto --size 500 --alpha 1.5
+
+# 正規分布データ生成
+lawkit generate normal --size 1000 --mean 50 --std 10
+
+# ポアソン分布データ生成
+lawkit generate poisson --size 100 --lambda 3.5
+
+# ジップ分布データ生成
+lawkit generate zipf --size 1000 --alpha 1.0
+```
+
+## 利用可能なコマンド一覧
+
+```bash
+# 全コマンドとオプションの表示
+lawkit --help
+
+# 特定のコマンドのヘルプ
+lawkit benf --help
+lawkit pareto --help
+lawkit zipf --help
+lawkit normal --help
+lawkit poisson --help
+
+# 利用可能な法則の一覧
+lawkit list
 ```
 
 ## トラブルシューティング
 
-### 設定が反映されない場合
+### よくある問題と解決方法
 
-1. 設定ファイルの構文確認：
+1. **ファイルが読み込めない場合**：
    ```bash
-   lawkit config validate
+   # ファイルの存在確認
+   ls -la data.csv
+   
+   # 権限の確認
+   file data.csv
    ```
 
-2. 設定の優先順位確認：
+2. **メモリ不足の場合**：
    ```bash
-   lawkit config show --source
+   # 最適化モードを使用
+   lawkit benf large_file.csv --optimize
    ```
 
-3. 権限の確認：
+3. **予期しない結果の場合**：
    ```bash
-   ls -la ~/.config/lawkit/config.toml
+   # 詳細出力で原因を確認
+   lawkit benf data.csv --verbose
    ```
 
-**注意**: このドキュメントに記載されている設定機能の多くは、現在実装されていません。実際に使用できる機能については、`lawkit --help` および各サブコマンドの `--help` を参照してください。
+**注意**: 実際に使用できる機能については、`lawkit --help` および各サブコマンドの `--help` を参照してください。
