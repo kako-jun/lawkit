@@ -303,6 +303,57 @@ fn analyze_numbers_with_options(
         5
     };
 
+    // Parse confidence level
+    let confidence = if let Some(confidence_str) = matches.get_one::<String>("confidence") {
+        let conf = confidence_str
+            .parse::<f64>()
+            .map_err(|_| BenfError::ParseError("無効な信頼度レベル".to_string()))?;
+        if conf < 0.01 || conf > 0.99 {
+            return Err(BenfError::ParseError("信頼度レベルは0.01から0.99の間である必要があります".to_string()));
+        }
+        conf
+    } else {
+        0.95
+    };
+
+    // Parse sample size limit
+    let mut working_numbers = filtered_numbers.clone();
+    if let Some(sample_size_str) = matches.get_one::<String>("sample-size") {
+        let max_size = sample_size_str
+            .parse::<usize>()
+            .map_err(|_| BenfError::ParseError("無効なサンプルサイズ".to_string()))?;
+        
+        if working_numbers.len() > max_size {
+            eprintln!(
+                "大規模データセット: {}個の数値を{}個にサンプリングしました",
+                working_numbers.len(),
+                max_size
+            );
+            // Simple random sampling by taking every nth element
+            let step = working_numbers.len() / max_size;
+            working_numbers = working_numbers.iter().step_by(step.max(1)).cloned().take(max_size).collect();
+        }
+    }
+
+    // Apply minimum value filter
+    if let Some(min_value_str) = matches.get_one::<String>("min-value") {
+        let min_val = min_value_str
+            .parse::<f64>()
+            .map_err(|_| BenfError::ParseError("無効な最小値".to_string()))?;
+        
+        let original_len = working_numbers.len();
+        working_numbers.retain(|&x| x >= min_val);
+        
+        if working_numbers.len() != original_len {
+            eprintln!(
+                "最小値フィルタ適用: {}個の数値が{}個に絞り込まれました (>= {})",
+                original_len,
+                working_numbers.len(),
+                min_val
+            );
+        }
+    }
+
     // Perform Benford analysis with custom options
-    BenfordResult::new_with_threshold(dataset_name, &filtered_numbers, &threshold, min_count)
+    BenfordResult::new_with_confidence(dataset_name, &working_numbers, &threshold, min_count, confidence)
 }

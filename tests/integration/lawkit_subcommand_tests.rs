@@ -252,6 +252,48 @@ mod benford_law_tests {
     }
 
     #[test]
+    fn test_lawkit_benf_confidence_level() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("benf", &["--confidence", "0.99", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Benford") || stdout.contains("confidence"));
+    }
+
+    #[test]
+    fn test_lawkit_benf_sample_size() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("benf", &["--sample-size", "100", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Benford") || stdout.contains("sample"));
+    }
+
+    #[test]
+    fn test_lawkit_benf_min_value() {
+        let test_data = generate_test_data();
+        let output = run_lawkit_command("benf", &["--min-value", "50", &test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Benford") || stdout.contains("minimum"));
+    }
+
+    #[test]
     fn test_lawkit_benf_verbose() {
         let test_data = generate_test_data();
         let output = run_lawkit_command("benf", &["--verbose", &test_data]);
@@ -535,6 +577,20 @@ mod poisson_distribution_tests {
         assert!(
             stdout.contains("Test statistic") || stdout.contains("P-value") || stdout.contains("λ")
         );
+    }
+
+    #[test]
+    fn test_lawkit_poisson_confidence_level() {
+        let test_data = "1 2 3 0 1 2 4 1 0 3 2 1 5 2 1 0 3 2 1 4";
+        let output = run_lawkit_command("poisson", &["--confidence", "0.99", test_data]);
+
+        assert!(matches!(
+            output.status.code(),
+            Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
+        ));
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("Poisson") || stdout.contains("confidence"));
     }
 
     #[test]

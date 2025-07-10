@@ -66,6 +66,25 @@ pub fn add_benf_options(cmd: Command) -> Command {
             .help("Anomaly detection threshold: low, medium, high, critical")
             .default_value("auto"),
     )
+    .arg(
+        Arg::new("confidence")
+            .long("confidence")
+            .value_name("LEVEL")
+            .help("Statistical confidence level for tests (0.01-0.99)")
+            .default_value("0.95"),
+    )
+    .arg(
+        Arg::new("sample-size")
+            .long("sample-size")
+            .value_name("NUMBER")
+            .help("Maximum sample size for large datasets (improves performance)"),
+    )
+    .arg(
+        Arg::new("min-value")
+            .long("min-value")
+            .value_name("VALUE")
+            .help("Minimum value to include in analysis (filters small values that add noise)"),
+    )
 }
 
 /// サブコマンド固有のオプション：パレート法則  
@@ -200,6 +219,13 @@ pub fn add_poisson_options(cmd: Command) -> Command {
             .short('R')
             .help("Focus on rare event analysis")
             .action(clap::ArgAction::SetTrue),
+    )
+    .arg(
+        Arg::new("confidence")
+            .long("confidence")
+            .value_name("LEVEL")
+            .help("Statistical confidence level for tests (0.01-0.99)")
+            .default_value("0.95"),
     )
 }
 

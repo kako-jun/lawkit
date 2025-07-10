@@ -249,6 +249,78 @@ fn test_readme_pipeline_stdin() {
 }
 
 #[test]
+fn test_benf_confidence_option() {
+    // New option test: lawkit benf audit_data.csv --confidence 0.99 --verbose
+    let audit_data = generate_financial_data();
+    let output = run_lawkit_command_with_file(
+        "benf",
+        &audit_data,
+        &["--confidence", "0.99", "--verbose"],
+    );
+
+    assert!(matches!(
+        output.status.code(),
+        Some(0) | Some(10) | Some(11) | Some(12) | Some(13)
+    ));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Benford") || stdout.contains("confidence"));
+}
+
+#[test]
+fn test_benf_sample_size_option() {
+    // New option test: lawkit benf big_data.csv --sample-size 50000 --optimize
+    let big_data = generate_financial_data();
+    let output = run_lawkit_command_with_file(
+        "benf",
+        &big_data,
+        &["--sample-size", "50000", "--optimize"],
+    );
+
+    assert!(matches!(
+        output.status.code(),
+        Some(0) | Some(10) | Some(11) | Some(12) | Some(13)
+    ));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Benford") || stdout.contains("sample"));
+}
+
+#[test]
+fn test_benf_min_value_option() {
+    // New option test: lawkit benf financial_data.csv --min-value 100
+    let financial_data = generate_financial_data();
+    let output = run_lawkit_command_with_file(
+        "benf",
+        &financial_data,
+        &["--min-value", "100"],
+    );
+
+    assert!(matches!(
+        output.status.code(),
+        Some(0) | Some(10) | Some(11) | Some(12) | Some(13)
+    ));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Benford") || stdout.contains("minimum"));
+}
+
+#[test]
+fn test_poisson_confidence_option() {
+    // New option test: lawkit poisson server_errors.csv --confidence 0.99 --verbose
+    let poisson_data = "1\n2\n0\n3\n1\n4\n2\n1\n0\n2";
+    let output = run_lawkit_command_with_file(
+        "poisson",
+        poisson_data,
+        &["--confidence", "0.99", "--verbose"],
+    );
+
+    assert!(matches!(
+        output.status.code(),
+        Some(0) | Some(10) | Some(11) | Some(12) | Some(13)
+    ));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Poisson") || stdout.contains("confidence"));
+}
+
+#[test]
 fn test_readme_generate_pipeline() {
     // README: lawkit generate zipf --samples 10000 | lawkit analyze --laws all -
     let generate_output = run_lawkit_command("generate", &["zipf", "--samples", "10000"]);

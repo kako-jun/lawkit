@@ -13,6 +13,15 @@ lawkit benf expenses_2024.csv --format json
 # Detailed analysis with verbose output
 lawkit benf expenses_2024.csv --verbose
 
+# High-confidence audit analysis (99% confidence level)
+lawkit benf expenses_2024.csv --confidence 0.99 --verbose
+
+# Filter out small amounts that add noise
+lawkit benf expenses_2024.csv --min-value 50 --threshold high
+
+# Performance optimization for large datasets
+lawkit benf expenses_2024.csv --sample-size 10000 --optimize
+
 # Comprehensive analysis with multiple laws
 lawkit analyze expenses_2024.csv --laws benford,normal
 ```
@@ -97,8 +106,8 @@ lawkit poisson post_engagements.csv --verbose
 # Product dimension quality control
 lawkit normal product_dimensions.csv --verbose
 
-# Defect rate analysis
-lawkit poisson defect_rates.csv --verbose
+# Defect rate analysis with high confidence
+lawkit poisson defect_rates.csv --confidence 0.99 --verbose
 ```
 
 **Quality Metrics**:
@@ -112,8 +121,8 @@ lawkit poisson defect_rates.csv --verbose
 # Response time distribution
 lawkit normal response_times.csv --verbose
 
-# Incident frequency analysis
-lawkit poisson incidents.csv --verbose
+# Incident frequency analysis with confidence level
+lawkit poisson incidents.csv --confidence 0.95 --verbose
 ```
 
 ## 5. Integrated Analysis Workflows
