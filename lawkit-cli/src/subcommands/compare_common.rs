@@ -330,7 +330,7 @@ fn create_enhanced_integration_json(
         serde_json::json!({
             "tool": "lawkit",
             "enhanced_with": "diffx-core",
-            "format_version": "2.1.0",
+            "format_version": "2.2.0",
             "generation_timestamp": chrono::Utc::now().to_rfc3339()
         }),
     );
