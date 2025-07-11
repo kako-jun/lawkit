@@ -123,6 +123,10 @@ fn print_text_output(result: &ZipfResult, quiet: bool, verbose: bool) {
         RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
     }
 
+    println!();
+    println!("Rank-Frequency Distribution:");
+    println!("{}", format_rank_frequency_chart(result));
+
     if verbose {
         println!();
         println!("Zipf Metrics:");
@@ -319,4 +323,50 @@ fn analyze_numbers_with_options(
 
     // Perform Zipf analysis
     analyze_numeric_zipf(&filtered_numbers, &dataset_name)
+}
+
+fn format_rank_frequency_chart(result: &ZipfResult) -> String {
+    let mut output = String::new();
+    const CHART_WIDTH: usize = 50;
+    
+    if result.rank_frequency_pairs.is_empty() {
+        return "No data available for chart".to_string();
+    }
+    
+    // 最大頻度を取得（正規化用）
+    let max_frequency = result.rank_frequency_pairs
+        .iter()
+        .map(|(_, freq)| *freq)
+        .fold(0.0, f64::max);
+    
+    if max_frequency == 0.0 {
+        return "All frequencies are zero".to_string();
+    }
+    
+    // ランク-頻度ペアを表示（上位10項目）
+    for (rank, frequency) in result.rank_frequency_pairs.iter().take(10) {
+        let normalized_freq = frequency / max_frequency;
+        let bar_length = (normalized_freq * CHART_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(CHART_WIDTH);
+        
+        let filled_bar = "█".repeat(bar_length);
+        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
+        let full_bar = format!("{}{}", filled_bar, background_bar);
+        
+        // パーセンテージ計算
+        let percentage = (frequency / result.total_observations as f64) * 100.0;
+        
+        output.push_str(&format!(
+            "#{:2}: {} {:>6.2}% (freq: {:.0})\n",
+            rank, full_bar, percentage, frequency
+        ));
+    }
+    
+    // Zipf法則の適合度情報
+    output.push_str(&format!(
+        "\nZipf Exponent: {:.3} (ideal: 1.0), Correlation: {:.3}",
+        result.zipf_exponent, result.correlation_coefficient
+    ));
+    
+    output
 }

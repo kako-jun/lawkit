@@ -344,6 +344,10 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool) {
     println!("Quality Level: {:?}", result.risk_level);
 
     println!();
+    println!("Probability Distribution:");
+    println!("{}", format_poisson_probability_chart(result));
+
+    println!();
     println!("Poisson Parameters:");
     println!("  λ (rate parameter): {:.3}", result.lambda);
     println!("  Sample mean: {:.3}", result.sample_mean);
@@ -610,4 +614,80 @@ fn analyze_numbers_with_options(
     }
     
     Ok(result)
+}
+
+fn format_poisson_probability_chart(result: &PoissonResult) -> String {
+    let mut output = String::new();
+    const CHART_WIDTH: usize = 50;
+    
+    let lambda = result.lambda;
+    
+    // 確率が十分小さくなるまでの範囲を計算（通常λ + 3√λ程度）
+    let max_k = ((lambda + 3.0 * lambda.sqrt()).ceil() as u32).max(10).min(20);
+    
+    // 各値の理論確率を計算
+    let mut probabilities = Vec::new();
+    let mut max_prob: f64 = 0.0;
+    
+    for k in 0..=max_k {
+        // ポアソン確率質量関数: P(X=k) = (λ^k * e^(-λ)) / k!
+        let prob = poisson_pmf(k, lambda);
+        probabilities.push((k, prob));
+        max_prob = max_prob.max(prob);
+    }
+    
+    // 確率分布を表示
+    for (k, prob) in &probabilities {
+        if max_prob > 0.0 {
+            let normalized_prob = prob / max_prob;
+            let bar_length = (normalized_prob * CHART_WIDTH as f64).round() as usize;
+            let bar_length = bar_length.min(CHART_WIDTH);
+            
+            let filled_bar = "█".repeat(bar_length);
+            let background_bar = "░".repeat(CHART_WIDTH - bar_length);
+            let full_bar = format!("{}{}", filled_bar, background_bar);
+            
+            output.push_str(&format!(
+                "P(X={:2}): {} {:>6.3}\n",
+                k, full_bar, prob
+            ));
+        }
+    }
+    
+    // 重要な確率値を表示
+    output.push_str(&format!(
+        "\nKey Probabilities: P(X=0)={:.3}, P(X=1)={:.3}, P(X≥2)={:.3}",
+        result.probability_zero,
+        result.probability_one,
+        result.probability_two_or_more
+    ));
+    
+    // λとポアソン性の評価
+    output.push_str(&format!(
+        "\nλ={:.2}, Variance/Mean={:.3} (ideal: 1.0), Fit Score={:.3}",
+        lambda, result.variance_ratio, result.goodness_of_fit_score
+    ));
+    
+    output
+}
+
+// ポアソン確率質量関数
+fn poisson_pmf(k: u32, lambda: f64) -> f64 {
+    if lambda <= 0.0 {
+        return 0.0;
+    }
+    
+    // P(X=k) = (λ^k * e^(-λ)) / k!
+    // 対数計算で数値的安定性を確保
+    let log_prob = k as f64 * lambda.ln() - lambda - log_factorial(k);
+    log_prob.exp()
+}
+
+// 対数階乗の計算（数値的安定性のため）
+fn log_factorial(n: u32) -> f64 {
+    if n <= 1 {
+        0.0
+    } else {
+        (2..=n).map(|i| (i as f64).ln()).sum()
+    }
 }

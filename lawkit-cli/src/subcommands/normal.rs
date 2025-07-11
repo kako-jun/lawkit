@@ -418,6 +418,10 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
     println!("Quality Level: {:?}", result.risk_level);
 
     println!();
+    println!("Distribution Histogram:");
+    println!("{}", format_normal_histogram(result));
+
+    println!();
     println!("Distribution Parameters:");
     println!("  Mean: {:.3}", result.mean);
     println!("  Standard Deviation: {:.3}", result.std_dev);
@@ -809,4 +813,69 @@ fn output_timeseries_result(_matches: &ArgMatches, result: &TimeSeriesAnalysis) 
         result.statistics.data_quality.outlier_ratio * 100.0
     );
     println!("  Noise level: {:.3}", result.statistics.noise_level);
+}
+
+fn format_normal_histogram(result: &NormalResult) -> String {
+    let mut output = String::new();
+    const CHART_WIDTH: usize = 50;
+    const BINS: usize = 10;
+    
+    // 仮想データでヒストグラムをシミュレート（実際のデータはNormalResultから取得不可）
+    // 平均、標準偏差を使って理論的な正規分布カーブを表示
+    let mean = result.mean;
+    let std_dev = result.std_dev;
+    
+    // -3σから+3σの範囲でビンを作成
+    let range_start = mean - 3.0 * std_dev;
+    let range_end = mean + 3.0 * std_dev;
+    let bin_width = (range_end - range_start) / BINS as f64;
+    
+    // 各ビンの理論的確率密度を計算
+    let mut bin_densities = Vec::new();
+    let mut max_density: f64 = 0.0;
+    
+    for i in 0..BINS {
+        let bin_center = range_start + (i as f64 + 0.5) * bin_width;
+        let z_score = (bin_center - mean) / std_dev;
+        
+        // 正規分布の確率密度関数
+        let density = (-0.5 * z_score * z_score).exp() / (std_dev * (2.0 * std::f64::consts::PI).sqrt());
+        bin_densities.push(density);
+        max_density = max_density.max(density);
+    }
+    
+    // ヒストグラムを表示
+    for (i, &density) in bin_densities.iter().enumerate() {
+        let bin_start = range_start + i as f64 * bin_width;
+        let bin_end = bin_start + bin_width;
+        
+        let normalized_density = if max_density > 0.0 { density / max_density } else { 0.0 };
+        let bar_length = (normalized_density * CHART_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(CHART_WIDTH);
+        
+        let filled_bar = "█".repeat(bar_length);
+        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
+        let full_bar = format!("{}{}", filled_bar, background_bar);
+        
+        output.push_str(&format!(
+            "{:6.2}-{:6.2}: {} {:>5.1}%\n",
+            bin_start, bin_end, full_bar, normalized_density * 100.0
+        ));
+    }
+    
+    // 統計情報を追加
+    output.push_str(&format!(
+        "\nDistribution: μ={:.2}, σ={:.2}, Range: [{:.2}, {:.2}]",
+        mean, std_dev, range_start, range_end
+    ));
+    
+    // σ範囲の情報
+    output.push_str(&format!(
+        "\n1σ: {:.1}%, 2σ: {:.1}%, 3σ: {:.1}%",
+        result.within_1_sigma_percent,
+        result.within_2_sigma_percent,
+        result.within_3_sigma_percent
+    ));
+    
+    output
 }

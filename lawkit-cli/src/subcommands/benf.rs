@@ -171,6 +171,10 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool) {
         RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
     }
 
+    println!();
+    println!("First Digit Distribution:");
+    println!("{}", format_distribution_bars(result));
+
     if verbose {
         println!();
         println!("First Digit Distribution:");
@@ -356,4 +360,29 @@ fn analyze_numbers_with_options(
 
     // Perform Benford analysis with custom options
     BenfordResult::new_with_confidence(dataset_name, &working_numbers, &threshold, min_count, confidence)
+}
+
+fn format_distribution_bars(result: &BenfordResult) -> String {
+    let mut output = String::new();
+    const BAR_WIDTH: usize = 40;
+
+    for i in 0..9 {
+        let digit = i + 1;
+        let observed = result.digit_distribution[i];
+        let expected = result.expected_distribution[i];
+        let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
+        
+        // Create bar with filled and background portions
+        let filled_bar = "█".repeat(bar_length);
+        let background_bar = "░".repeat(BAR_WIDTH - bar_length);
+        let full_bar = format!("{}{}", filled_bar, background_bar);
+
+        output.push_str(&format!(
+            "{:1}: {} {:>5.1}% (expected: {:>5.1}%)\n",
+            digit, full_bar, observed, expected
+        ));
+    }
+
+    output
 }
