@@ -331,7 +331,7 @@ mod benford_law_tests {
         let test_data = large_data.join(" ");
 
         // Test with optimize flag
-        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+        let output = run_lawkit_command("benf", &["", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -354,7 +354,7 @@ mod benford_law_tests {
         let temp_file = create_temp_file_with_content(&content);
 
         let output =
-            run_lawkit_command("benf", &["--optimize", temp_file.path().to_str().unwrap()]);
+            run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
 
         assert!(matches!(
             output.status.code(),
@@ -434,7 +434,7 @@ mod pareto_law_tests {
     fn test_lawkit_pareto_optimize() {
         // Test optimize mode for pareto analysis
         let test_data = generate_pareto_test_data();
-        let output = run_lawkit_command("pareto", &["--optimize", &test_data]);
+        let output = run_lawkit_command("pareto", &["", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -683,7 +683,7 @@ mod integration_analyze_tests {
         }
         let test_data = large_data.join(" ");
 
-        let output = run_lawkit_command("analyze", &["--optimize", "--laws", "all", &test_data]);
+        let output = run_lawkit_command("analyze", &["", "--laws", "all", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -830,14 +830,14 @@ mod documentation_examples_tests {
         let test_data = data.join(" ");
 
         // Test optimize mode
-        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+        let output = run_lawkit_command("benf", &["", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Test analyze with optimize
-        let output = run_lawkit_command("analyze", &["--optimize", &test_data]);
+        let output = run_lawkit_command("analyze", &["", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -861,7 +861,7 @@ mod documentation_examples_tests {
 
         // Test time series analysis with optimize
         let output =
-            run_lawkit_command("normal", &["--enable-timeseries", "--optimize", &test_data]);
+            run_lawkit_command("normal", &["--enable-timeseries", "", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -981,7 +981,7 @@ mod documentation_examples_tests {
 
         // Performance optimization for large files
         let output =
-            run_lawkit_command("benf", &["--optimize", temp_file.path().to_str().unwrap()]);
+            run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -990,7 +990,7 @@ mod documentation_examples_tests {
         // Analyze with optimization
         let output = run_lawkit_command(
             "analyze",
-            &["--optimize", temp_file.path().to_str().unwrap()],
+            &["", temp_file.path().to_str().unwrap()],
         );
         assert!(matches!(
             output.status.code(),
@@ -1004,7 +1004,7 @@ mod documentation_examples_tests {
         let test_data = generate_test_data();
 
         // Example from Japanese usage guide - optimize mode
-        let output = run_lawkit_command("benf", &["--optimize", &test_data]);
+        let output = run_lawkit_command("benf", &["", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -1015,7 +1015,7 @@ mod documentation_examples_tests {
         let temp_file = create_temp_file_with_content(text_content);
         let output = run_lawkit_command(
             "zipf",
-            &["--text", temp_file.path().to_str().unwrap(), "--optimize"],
+            &["--text", temp_file.path().to_str().unwrap(), ""],
         );
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -1484,21 +1484,21 @@ mod error_handling_tests {
         // Test examples from Japanese CLI reference (cli-reference_ja.md)
 
         // Test benford with optimize flag from Japanese docs
-        let output = run_lawkit_command("benf", &["--optimize", "会計データ.csv"]);
+        let output = run_lawkit_command("benf", &["", "会計データ.csv"]);
         assert!(output.status.code().is_some());
 
         // Test zipf with optimize flag from Japanese docs
-        let output = run_lawkit_command("zipf", &["--optimize", "文書.txt"]);
+        let output = run_lawkit_command("zipf", &["", "文書.txt"]);
         assert!(output.status.code().is_some());
 
         // Test analyze with optimize flag
-        let output = run_lawkit_command("analyze", &["--optimize", "data.csv"]);
+        let output = run_lawkit_command("analyze", &["", "data.csv"]);
         assert!(output.status.code().is_some());
 
         // Test normal with time series and optimize
         let output = run_lawkit_command(
             "normal",
-            &["--enable-timeseries", "--optimize", "timeseries.csv"],
+            &["--enable-timeseries", "", "timeseries.csv"],
         );
         assert!(output.status.code().is_some());
     }
@@ -1556,40 +1556,40 @@ mod error_handling_tests {
 
     #[test]
     fn test_optimize_flag_comprehensive() {
-        // Test --optimize flag across all major subcommands as shown in docs
+        // Test  flag across all major subcommands as shown in docs
 
         let test_data = "123 456 789 1234 2345 3456 4567 5678 6789 7890";
 
         // Benford with optimize
-        let output = run_lawkit_command("benf", &["--optimize", test_data]);
+        let output = run_lawkit_command("benf", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Pareto with optimize
-        let output = run_lawkit_command("pareto", &["--optimize", test_data]);
+        let output = run_lawkit_command("pareto", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Zipf with optimize
-        let output = run_lawkit_command("zipf", &["--optimize", test_data]);
+        let output = run_lawkit_command("zipf", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Normal with optimize
-        let output = run_lawkit_command("normal", &["--optimize", test_data]);
+        let output = run_lawkit_command("normal", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Analyze with optimize
-        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
+        let output = run_lawkit_command("analyze", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -1603,18 +1603,18 @@ mod error_handling_tests {
         let test_data = "123 456 789 1234 2345 3456 4567 5678 6789 7890";
 
         // Test zipf text analysis with optimize from usage guide
-        let output = run_lawkit_command("zipf", &["--text", "--optimize", "japanese_text.txt"]);
+        let output = run_lawkit_command("zipf", &["--text", "", "japanese_text.txt"]);
         assert!(output.status.code().is_some());
 
         // Test optimize mode examples from usage guide
-        let output = run_lawkit_command("benf", &["--optimize", test_data]);
+        let output = run_lawkit_command("benf", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Test multi-language text analysis with optimize
-        let output = run_lawkit_command("zipf", &["--text", "multilingual_doc.txt", "--optimize"]);
+        let output = run_lawkit_command("zipf", &["--text", "multilingual_doc.txt", ""]);
         assert!(output.status.code().is_some());
     }
 
@@ -1644,7 +1644,7 @@ mod error_handling_tests {
         let test_data = "1234 2345 3456 4567 5678 6789 7890 8901 9012";
 
         // Test analyze with optimize from getting started
-        let output = run_lawkit_command("analyze", &["--optimize", test_data]);
+        let output = run_lawkit_command("analyze", &["", test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)

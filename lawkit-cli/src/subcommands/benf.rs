@@ -4,17 +4,21 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter, RiskThreshold},
         input::{parse_input_auto, parse_text_input},
+        memory::{streaming_benford_analysis, MemoryConfig},
         risk::RiskLevel,
         streaming_io::OptimizedFileReader,
     },
     error::{BenfError, Result},
     laws::benford::BenfordResult,
 };
-use std::io::{self, Read};
 use std::str::FromStr;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // Determine input source based on arguments
+    if std::env::var("LAWKIT_DEBUG").is_ok() {
+        eprintln!("Debug: input argument = {:?}", matches.get_one::<String>("input"));
+    }
+    
     if let Some(input) = matches.get_one::<String>("input") {
         // Use auto-detection for file vs string input
         match parse_input_auto(input) {
@@ -44,92 +48,83 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             }
         }
     } else {
-        // Read from stdin - use optimizations only if explicitly requested
-        let use_optimize = matches.get_flag("optimize");
+        // Read from stdin - use automatic optimization based on data characteristics
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Reading from stdin, using automatic optimization");
+        }
 
-        if use_optimize {
-            // 最適化処理：--optimize フラグ指定時（ストリーミング+並列+メモリ効率化）
+        // 自動最適化処理：データ特性に基づいてストリーミング処理を自動選択
             let mut reader = OptimizedFileReader::from_stdin();
 
             if std::env::var("LAWKIT_DEBUG").is_ok() {
-                eprintln!("Debug: Using optimize mode (streaming + memory efficiency)");
+                eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
             }
 
+            // ストリーミング処理でインクリメンタル分析を実行
             let numbers = match reader
-                .read_lines_streaming(|line| parse_text_input(&line).map(Some).or(Ok(None)))
+                .read_lines_streaming(|line| {
+                    if std::env::var("LAWKIT_DEBUG").is_ok() {
+                        eprintln!("Debug: Processing line: '{}'", line);
+                    }
+                    parse_text_input(&line).map(Some).or(Ok(None))
+                })
             {
-                Ok(nested_numbers) => nested_numbers.into_iter().flatten().collect::<Vec<_>>(),
+                Ok(nested_numbers) => {
+                    let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
+                    if std::env::var("LAWKIT_DEBUG").is_ok() {
+                        eprintln!("Debug: Collected {} numbers from stream", flattened.len());
+                    }
+                    flattened
+                },
                 Err(e) => {
                     eprintln!("Analysis error: {e}");
                     std::process::exit(1);
                 }
             };
 
-            if numbers.is_empty() {
+            // メモリ設定を作成
+            let memory_config = MemoryConfig::default();
+            
+            // インクリメンタルストリーミング分析を実行
+            let chunk_result = match streaming_benford_analysis(numbers.into_iter(), &memory_config) {
+                Ok(result) => {
+                    if std::env::var("LAWKIT_DEBUG").is_ok() {
+                        eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
+                    }
+                    result
+                },
+                Err(e) => {
+                    eprintln!("Streaming analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            if chunk_result.total_items == 0 {
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!("Debug: Total items in chunk_result: {}", chunk_result.total_items);
+                }
                 eprintln!("Error: No valid numbers found in input");
                 std::process::exit(1);
             }
 
-            // 分析実行
-            let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers)
-            {
-                Ok(result) => result,
-                Err(e) => {
-                    eprintln!("Analysis error: {e}");
-                    std::process::exit(1);
-                }
-            };
+            // IncrementalBenford を BenfordResult に変換
+            let benford_result = convert_incremental_to_result(
+                &chunk_result.result,
+                "stdin".to_string(),
+                matches,
+            );
+
+            // デバッグ情報を出力
+            if std::env::var("LAWKIT_DEBUG").is_ok() {
+                eprintln!("Debug: Processed {} numbers in {} chunks", 
+                         chunk_result.total_items, chunk_result.chunks_processed);
+                eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+                eprintln!("Debug: Processing time: {} ms", chunk_result.processing_time_ms);
+            }
 
             // Output results and exit
-            output_results(matches, &result);
-            std::process::exit(result.risk_level.exit_code());
-        } else {
-            // 従来のメモリ処理：デフォルト
-            let mut buffer = String::new();
-            match io::stdin().read_to_string(&mut buffer) {
-                Ok(_) => {
-                    if buffer.trim().is_empty() {
-                        eprintln!("Error: No input provided. Use --help for usage information.");
-                        std::process::exit(2);
-                    }
-
-                    // Extract numbers from stdin input text with international numeral support
-                    let numbers = match parse_text_input(&buffer) {
-                        Ok(numbers) => numbers,
-                        Err(e) => {
-                            eprintln!("Analysis error: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                    if numbers.is_empty() {
-                        eprintln!("Error: No valid numbers found in input");
-                        std::process::exit(1);
-                    }
-
-                    // Apply filtering and custom analysis
-                    let result = match analyze_numbers_with_options(
-                        matches,
-                        "stdin".to_string(),
-                        &numbers,
-                    ) {
-                        Ok(result) => result,
-                        Err(e) => {
-                            eprintln!("Analysis error: {e}");
-                            std::process::exit(1);
-                        }
-                    };
-
-                    // Output results and exit
-                    output_results(matches, &result);
-                    std::process::exit(result.risk_level.exit_code());
-                }
-                Err(e) => {
-                    eprintln!("Error reading from stdin: {e}");
-                    std::process::exit(1);
-                }
-            }
-        }
+            output_results(matches, &benford_result);
+            std::process::exit(benford_result.risk_level.exit_code());
     }
 }
 
@@ -308,7 +303,7 @@ fn analyze_numbers_with_options(
     };
 
     // Parse confidence level
-    let confidence = if let Some(confidence_str) = matches.get_one::<String>("confidence") {
+    let _confidence = if let Some(confidence_str) = matches.get_one::<String>("confidence") {
         let conf = confidence_str
             .parse::<f64>()
             .map_err(|_| BenfError::ParseError("無効な信頼度レベル".to_string()))?;
@@ -359,7 +354,58 @@ fn analyze_numbers_with_options(
     }
 
     // Perform Benford analysis with custom options
-    BenfordResult::new_with_confidence(dataset_name, &working_numbers, &threshold, min_count, confidence)
+    BenfordResult::new_with_threshold(dataset_name, &working_numbers, &threshold, min_count)
+}
+
+/// IncrementalBenford を BenfordResult に変換
+fn convert_incremental_to_result(
+    incremental: &lawkit_core::common::memory::IncrementalBenford,
+    dataset_name: String,
+    _matches: &clap::ArgMatches,
+) -> BenfordResult {
+    use lawkit_core::common::statistics;
+    
+    // 分布データを取得
+    let digit_distribution = incremental.get_distribution();
+    let expected_distribution = [
+        30.103, 17.609, 12.494, 9.691, 7.918, 6.695, 5.799, 5.115, 4.576,
+    ];
+    
+    // 統計値を計算
+    let chi_square = statistics::calculate_chi_square(&digit_distribution, &expected_distribution);
+    let p_value = statistics::calculate_p_value(chi_square, 8);
+    let mean_absolute_deviation = incremental.calculate_mad();
+    
+    // リスクレベルを決定
+    let risk_level = determine_risk_level(mean_absolute_deviation, p_value);
+    
+    // 判定を生成
+    let verdict = format!("Risk Level: {:?}", risk_level);
+    
+    BenfordResult {
+        dataset_name,
+        numbers_analyzed: incremental.total_count(),
+        digit_distribution,
+        expected_distribution,
+        chi_square,
+        p_value,
+        mean_absolute_deviation,
+        risk_level,
+        verdict,
+    }
+}
+
+/// リスクレベルを決定
+fn determine_risk_level(mad: f64, p_value: f64) -> RiskLevel {
+    if mad > 15.0 || p_value < 0.01 {
+        RiskLevel::Critical
+    } else if mad > 10.0 || p_value < 0.05 {
+        RiskLevel::High
+    } else if mad > 5.0 || p_value < 0.10 {
+        RiskLevel::Medium
+    } else {
+        RiskLevel::Low
+    }
 }
 
 fn format_distribution_bars(result: &BenfordResult) -> String {

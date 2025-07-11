@@ -1,5 +1,5 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_optimization_config};
+use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
@@ -20,8 +20,8 @@ use lawkit_core::{
 };
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // 最適化設定をセットアップ
-    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+    // 自動最適化設定をセットアップ
+    let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
 
     // 特殊モードの確認（フラグベースのモードを優先）
     if matches.get_flag("outliers") {
@@ -44,15 +44,15 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    // 最適化された入力読み込み
+    // 自動最適化された入力読み込み
     let input_data = if let Some(input) = matches.get_one::<String>("input") {
         if input == "-" {
-            get_optimized_reader(None, use_optimize)
+            get_optimized_reader(None)
         } else {
-            get_optimized_reader(Some(input), use_optimize)
+            get_optimized_reader(Some(input))
         }
     } else {
-        get_optimized_reader(None, use_optimize)
+        get_optimized_reader(None)
     };
 
     let buffer = match input_data {
@@ -225,16 +225,16 @@ fn run_quality_control_mode(matches: &ArgMatches) -> Result<()> {
 }
 
 fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
-    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+    let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
 
     let buffer = if let Some(input) = matches.get_one::<String>("input") {
         if input == "-" {
-            get_optimized_reader(None, use_optimize)
+            get_optimized_reader(None)
         } else {
-            get_optimized_reader(Some(input), use_optimize)
+            get_optimized_reader(Some(input))
         }
     } else {
-        get_optimized_reader(None, use_optimize)
+        get_optimized_reader(None)
     };
 
     let data = buffer.map_err(|e| BenfError::ParseError(e.to_string()))?;

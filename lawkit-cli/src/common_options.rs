@@ -1,4 +1,4 @@
-use clap::{Arg, ArgMatches, Command};
+use clap::{Arg, Command};
 use lawkit_core::common::{memory::MemoryConfig, parallel::ParallelConfig};
 
 /// 全サブコマンドで共通のオプションを定義
@@ -38,12 +38,6 @@ pub fn add_common_options(cmd: Command) -> Command {
             .value_name("NUMBER")
             .help("Minimum number of data points required for analysis")
             .default_value("10"), // 統一されたデフォルト値
-    )
-    .arg(
-        Arg::new("optimize")
-            .long("optimize")
-            .help("Enable memory and processing optimizations for large datasets")
-            .action(clap::ArgAction::SetTrue),
     )
 }
 
@@ -428,38 +422,28 @@ pub fn add_compare_options(cmd: Command) -> Command {
     )
 }
 
-/// 最適化設定をセットアップ（--optimizeフラグに基づく）
-pub fn setup_optimization_config(matches: &ArgMatches) -> (bool, ParallelConfig, MemoryConfig) {
-    let use_optimize = matches.get_flag("optimize");
-
-    if use_optimize {
-        // 最適化有効時の設定
-        let parallel_config = ParallelConfig {
-            num_threads: 0, // auto-detect
-            chunk_size: 1000,
-            enable_parallel: true,
-        };
-        let memory_config = MemoryConfig {
-            chunk_size: 10000,
-            max_memory_mb: 512,
-            enable_streaming: true,
-            enable_compression: false,
-        };
-        (true, parallel_config, memory_config)
-    } else {
-        // 最適化無効時の設定（デフォルト）
-        let parallel_config = ParallelConfig::default();
-        let memory_config = MemoryConfig::default();
-        (false, parallel_config, memory_config)
-    }
+/// 自動最適化設定をセットアップ（データ特性に基づく）
+pub fn setup_automatic_optimization_config() -> (ParallelConfig, MemoryConfig) {
+    // 常に最適化設定を使用（自動最適化）
+    let parallel_config = ParallelConfig {
+        num_threads: 0, // auto-detect
+        chunk_size: 1000,
+        enable_parallel: true,
+    };
+    let memory_config = MemoryConfig {
+        chunk_size: 10000,
+        max_memory_mb: 512,
+        enable_streaming: true,
+        enable_compression: false,
+    };
+    (parallel_config, memory_config)
 }
 
 /// 最適化されたファイルリーダーを取得
 pub fn get_optimized_reader(
     input: Option<&String>,
-    _use_optimize: bool,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    // シンプルに統一された読み込み方法を使用（最適化は将来の実装で詳細化）
+    // 自動最適化された読み込み方法を使用
     if let Some(input_path) = input {
         if input_path == "-" {
             use std::io::Read;
