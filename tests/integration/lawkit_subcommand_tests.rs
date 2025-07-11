@@ -160,7 +160,7 @@ mod lawkit_core_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(stdout.contains("lawkit"));
-        assert!(stdout.contains("2.1")); // Version should be 2.1+
+        assert!(stdout.contains("2.2")); // Version should be 2.2+
     }
 
     #[test]
