@@ -435,6 +435,353 @@ where
     })
 }
 
+/// インクリメンタルパレート分析
+#[derive(Debug, Clone)]
+pub struct IncrementalPareto {
+    values: Vec<f64>,
+    sorted_values: Vec<f64>,
+    needs_sorting: bool,
+    statistics: IncrementalStatistics,
+}
+
+impl Default for IncrementalPareto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IncrementalPareto {
+    pub fn new() -> Self {
+        Self {
+            values: Vec::new(),
+            sorted_values: Vec::new(),
+            needs_sorting: true,
+            statistics: IncrementalStatistics::new(),
+        }
+    }
+
+    pub fn add(&mut self, value: f64) {
+        self.values.push(value);
+        self.statistics.add(value);
+        self.needs_sorting = true;
+    }
+
+    pub fn add_batch(&mut self, values: &[f64]) {
+        for &value in values {
+            self.add(value);
+        }
+    }
+
+    pub fn merge(&mut self, other: &IncrementalPareto) {
+        self.values.extend_from_slice(&other.values);
+        self.statistics.merge(&other.statistics);
+        self.needs_sorting = true;
+    }
+
+    pub fn get_sorted_values(&mut self) -> &[f64] {
+        if self.needs_sorting {
+            self.sorted_values = self.values.clone();
+            self.sorted_values.sort_by(|a, b| b.partial_cmp(a).unwrap());
+            self.needs_sorting = false;
+        }
+        &self.sorted_values
+    }
+
+    pub fn statistics(&self) -> &IncrementalStatistics {
+        &self.statistics
+    }
+
+    pub fn count(&self) -> usize {
+        self.values.len()
+    }
+}
+
+/// インクリメンタルジップ分析
+#[derive(Debug, Clone)]
+pub struct IncrementalZipf {
+    frequency_map: std::collections::HashMap<String, usize>,
+    total_count: usize,
+}
+
+impl Default for IncrementalZipf {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IncrementalZipf {
+    pub fn new() -> Self {
+        Self {
+            frequency_map: std::collections::HashMap::new(),
+            total_count: 0,
+        }
+    }
+
+    pub fn add_word(&mut self, word: String) {
+        *self.frequency_map.entry(word).or_insert(0) += 1;
+        self.total_count += 1;
+    }
+
+    pub fn add_words(&mut self, words: &[String]) {
+        for word in words {
+            self.add_word(word.clone());
+        }
+    }
+
+    pub fn merge(&mut self, other: &IncrementalZipf) {
+        for (word, count) in &other.frequency_map {
+            *self.frequency_map.entry(word.clone()).or_insert(0) += count;
+        }
+        self.total_count += other.total_count;
+    }
+
+    pub fn get_sorted_frequencies(&self) -> Vec<(String, usize)> {
+        let mut frequencies: Vec<_> = self.frequency_map.iter()
+            .map(|(word, &count)| (word.clone(), count))
+            .collect();
+        frequencies.sort_by(|a, b| b.1.cmp(&a.1));
+        frequencies
+    }
+
+    pub fn total_count(&self) -> usize {
+        self.total_count
+    }
+
+    pub fn unique_words(&self) -> usize {
+        self.frequency_map.len()
+    }
+}
+
+/// インクリメンタル正規分布分析
+#[derive(Debug, Clone)]
+pub struct IncrementalNormal {
+    statistics: IncrementalStatistics,
+    values: Vec<f64>, // 正規性検定に必要
+}
+
+impl Default for IncrementalNormal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IncrementalNormal {
+    pub fn new() -> Self {
+        Self {
+            statistics: IncrementalStatistics::new(),
+            values: Vec::new(),
+        }
+    }
+
+    pub fn add(&mut self, value: f64) {
+        self.statistics.add(value);
+        self.values.push(value);
+    }
+
+    pub fn add_batch(&mut self, values: &[f64]) {
+        for &value in values {
+            self.add(value);
+        }
+    }
+
+    pub fn merge(&mut self, other: &IncrementalNormal) {
+        self.statistics.merge(&other.statistics);
+        self.values.extend_from_slice(&other.values);
+    }
+
+    pub fn statistics(&self) -> &IncrementalStatistics {
+        &self.statistics
+    }
+
+    pub fn values(&self) -> &[f64] {
+        &self.values
+    }
+
+    pub fn count(&self) -> usize {
+        self.statistics.count
+    }
+}
+
+/// インクリメンタルポアソン分析
+#[derive(Debug, Clone)]
+pub struct IncrementalPoisson {
+    event_counts: Vec<usize>,
+    statistics: IncrementalStatistics,
+}
+
+impl Default for IncrementalPoisson {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IncrementalPoisson {
+    pub fn new() -> Self {
+        Self {
+            event_counts: Vec::new(),
+            statistics: IncrementalStatistics::new(),
+        }
+    }
+
+    pub fn add_count(&mut self, count: usize) {
+        let count_f64 = count as f64;
+        self.event_counts.push(count);
+        self.statistics.add(count_f64);
+    }
+
+    pub fn add_counts(&mut self, counts: &[usize]) {
+        for &count in counts {
+            self.add_count(count);
+        }
+    }
+
+    pub fn merge(&mut self, other: &IncrementalPoisson) {
+        self.event_counts.extend_from_slice(&other.event_counts);
+        self.statistics.merge(&other.statistics);
+    }
+
+    pub fn statistics(&self) -> &IncrementalStatistics {
+        &self.statistics
+    }
+
+    pub fn event_counts(&self) -> &[usize] {
+        &self.event_counts
+    }
+
+    pub fn count(&self) -> usize {
+        self.event_counts.len()
+    }
+}
+
+/// ストリーミングパレート分析
+pub fn streaming_pareto_analysis<I>(
+    data_iter: I,
+    config: &MemoryConfig,
+) -> Result<ChunkAnalysisResult<IncrementalPareto>>
+where
+    I: Iterator<Item = f64>,
+{
+    let start_time = std::time::Instant::now();
+    let mut processor = StreamingProcessor::new(config);
+    let mut pareto = IncrementalPareto::new();
+    let mut chunks_processed = 0;
+
+    for value in data_iter {
+        if let Some(chunk) = processor.push(value) {
+            let mut chunk_pareto = IncrementalPareto::new();
+            chunk_pareto.add_batch(&chunk);
+            pareto.merge(&chunk_pareto);
+            chunks_processed += 1;
+        }
+    }
+
+    let mut total_processed = processor.processed_count();
+
+    if let Some(remaining) = processor.finish() {
+        total_processed += remaining.len();
+        let mut chunk_pareto = IncrementalPareto::new();
+        chunk_pareto.add_batch(&remaining);
+        pareto.merge(&chunk_pareto);
+        chunks_processed += 1;
+    }
+
+    let memory_used_mb = (total_processed * std::mem::size_of::<f64>()) as f64 / 1024.0 / 1024.0;
+
+    Ok(ChunkAnalysisResult {
+        chunks_processed,
+        total_items: total_processed,
+        memory_used_mb,
+        processing_time_ms: start_time.elapsed().as_millis() as u64,
+        result: pareto,
+    })
+}
+
+/// ストリーミング正規分布分析
+pub fn streaming_normal_analysis<I>(
+    data_iter: I,
+    config: &MemoryConfig,
+) -> Result<ChunkAnalysisResult<IncrementalNormal>>
+where
+    I: Iterator<Item = f64>,
+{
+    let start_time = std::time::Instant::now();
+    let mut processor = StreamingProcessor::new(config);
+    let mut normal = IncrementalNormal::new();
+    let mut chunks_processed = 0;
+
+    for value in data_iter {
+        if let Some(chunk) = processor.push(value) {
+            let mut chunk_normal = IncrementalNormal::new();
+            chunk_normal.add_batch(&chunk);
+            normal.merge(&chunk_normal);
+            chunks_processed += 1;
+        }
+    }
+
+    let mut total_processed = processor.processed_count();
+
+    if let Some(remaining) = processor.finish() {
+        total_processed += remaining.len();
+        let mut chunk_normal = IncrementalNormal::new();
+        chunk_normal.add_batch(&remaining);
+        normal.merge(&chunk_normal);
+        chunks_processed += 1;
+    }
+
+    let memory_used_mb = (total_processed * std::mem::size_of::<f64>()) as f64 / 1024.0 / 1024.0;
+
+    Ok(ChunkAnalysisResult {
+        chunks_processed,
+        total_items: total_processed,
+        memory_used_mb,
+        processing_time_ms: start_time.elapsed().as_millis() as u64,
+        result: normal,
+    })
+}
+
+/// ストリーミングポアソン分析
+pub fn streaming_poisson_analysis<I>(
+    data_iter: I,
+    config: &MemoryConfig,
+) -> Result<ChunkAnalysisResult<IncrementalPoisson>>
+where
+    I: Iterator<Item = usize>,
+{
+    let start_time = std::time::Instant::now();
+    let mut processor = StreamingProcessor::new(config);
+    let mut poisson = IncrementalPoisson::new();
+    let mut chunks_processed = 0;
+
+    for value in data_iter {
+        if let Some(chunk) = processor.push(value) {
+            let mut chunk_poisson = IncrementalPoisson::new();
+            chunk_poisson.add_counts(&chunk);
+            poisson.merge(&chunk_poisson);
+            chunks_processed += 1;
+        }
+    }
+
+    let mut total_processed = processor.processed_count();
+
+    if let Some(remaining) = processor.finish() {
+        total_processed += remaining.len();
+        let mut chunk_poisson = IncrementalPoisson::new();
+        chunk_poisson.add_counts(&remaining);
+        poisson.merge(&chunk_poisson);
+        chunks_processed += 1;
+    }
+
+    let memory_used_mb = (total_processed * std::mem::size_of::<usize>()) as f64 / 1024.0 / 1024.0;
+
+    Ok(ChunkAnalysisResult {
+        chunks_processed,
+        total_items: total_processed,
+        memory_used_mb,
+        processing_time_ms: start_time.elapsed().as_millis() as u64,
+        result: poisson,
+    })
+}
+
 /// リソース使用量監視
 #[derive(Debug, Clone)]
 pub struct ResourceMonitor {

@@ -1,10 +1,11 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
+use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config, parse_input_auto, OptimizedFileReader};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
         input::parse_text_input,
+        memory::{MemoryConfig, streaming_poisson_analysis},
     },
     error::{BenfError, Result},
     laws::poisson::{
@@ -35,42 +36,91 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     // 自動最適化設定をセットアップ
     let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
 
-    // 自動最適化された入力読み込み
-    let input_data = if let Some(input) = matches.get_one::<String>("input") {
-        if input == "-" {
-            get_optimized_reader(None)
-        } else {
-            get_optimized_reader(Some(input))
+    // 入力データ処理
+    let numbers = if let Some(input) = matches.get_one::<String>("input") {
+        // ファイル入力の場合
+        match parse_input_auto(input) {
+            Ok(numbers) => {
+                if numbers.is_empty() {
+                    eprintln!("Error: No valid numbers found in input");
+                    std::process::exit(1);
+                }
+                numbers
+            }
+            Err(e) => {
+                eprintln!("Error processing input '{input}': {e}");
+                std::process::exit(1);
+            }
         }
     } else {
-        get_optimized_reader(None)
-    };
+        // stdin入力の場合：ストリーミング処理を使用
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Reading from stdin, using automatic optimization");
+        }
 
-    let buffer = match input_data {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error reading input: {e}");
+        let mut reader = OptimizedFileReader::from_stdin();
+
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
+        }
+
+        let numbers = match reader
+            .read_lines_streaming(|line| {
+                parse_text_input(&line).map(Some).or(Ok(None))
+            })
+        {
+            Ok(nested_numbers) => {
+                let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!("Debug: Collected {} numbers from stream", flattened.len());
+                }
+                flattened
+            },
+            Err(e) => {
+                eprintln!("Analysis error: {e}");
+                std::process::exit(1);
+            }
+        };
+
+        if numbers.is_empty() {
+            eprintln!("Error: No valid numbers found in input");
             std::process::exit(1);
         }
-    };
 
-    if buffer.trim().is_empty() {
-        eprintln!("Error: No input provided. Use --help for usage information.");
-        std::process::exit(2);
-    }
+        // ポアソン分布は非負整数データを想定しているので、データを整数化
+        let event_counts: Vec<usize> = numbers.iter()
+            .filter_map(|&x| if x >= 0.0 { Some(x as usize) } else { None })
+            .collect();
 
-    let numbers = match parse_text_input(&buffer) {
-        Ok(numbers) => numbers,
-        Err(e) => {
-            eprintln!("Analysis error: {e}");
-            std::process::exit(1);
+        // インクリメンタルストリーミング分析を実行（大量データの場合）
+        if event_counts.len() > 10000 {
+            let memory_config = MemoryConfig::default();
+            let chunk_result = match streaming_poisson_analysis(event_counts.into_iter(), &memory_config) {
+                Ok(result) => {
+                    if std::env::var("LAWKIT_DEBUG").is_ok() {
+                        eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
+                    }
+                    result
+                },
+                Err(e) => {
+                    eprintln!("Streaming analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            if std::env::var("LAWKIT_DEBUG").is_ok() {
+                eprintln!("Debug: Processed {} numbers in {} chunks", 
+                         chunk_result.total_items, chunk_result.chunks_processed);
+                eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+            }
+
+            // usize から f64 に変換
+            chunk_result.result.event_counts().iter().map(|&x| x as f64).collect()
+        } else {
+            // 小さなデータセットの場合は直接処理
+            event_counts.iter().map(|&x| x as f64).collect()
         }
     };
-
-    if numbers.is_empty() {
-        eprintln!("Error: No valid numbers found in input");
-        std::process::exit(1);
-    }
 
     let dataset_name = matches
         .get_one::<String>("input")
