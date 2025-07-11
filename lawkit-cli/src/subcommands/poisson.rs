@@ -1,10 +1,11 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config, parse_input_auto, OptimizedFileReader};
+use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
-        input::parse_text_input,
+        input::{parse_input_auto, parse_text_input},
+        streaming_io::OptimizedFileReader,
         memory::{MemoryConfig, streaming_poisson_analysis},
     },
     error::{BenfError, Result},
@@ -65,7 +66,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
 
         let numbers = match reader
-            .read_lines_streaming(|line| {
+            .read_lines_streaming(|line: String| {
                 parse_text_input(&line).map(Some).or(Ok(None))
             })
         {
