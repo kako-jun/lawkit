@@ -9,7 +9,7 @@ description = "Python wrapper for lawkit - Statistical law analysis toolkit for 
 readme = "README.md"
 license = "MIT"
 authors = [
-    { name = "kako-jun", email = "kako.jun.42@gmail.com" }
+    { name = "kako-jun" }
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -59,12 +59,10 @@ Documentation = "https://github.com/kako-jun/lawkit/tree/main/docs"
 dev = [
     "pytest >= 6.0",
     "pytest-cov",
-    "pytest-asyncio",
     "black",
     "isort",
     "mypy",
-    "ruff",
-    "types-requests"
+    "ruff"
 ]
 
 [project.scripts]
@@ -76,6 +74,7 @@ packages = ["src/lawkit"]
 [tool.hatch.build.targets.sdist]
 include = [
     "/src",
+    "/scripts",
     "/README.md"
 ]
 

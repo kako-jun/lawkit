@@ -3,7 +3,7 @@
   "version": "2.1.2",
   "description": "A Node.js wrapper for the lawkit CLI tool - statistical law analysis toolkit for fraud detection, data quality assessment, and audit compliance.",
   "keywords": ["statistics", "benford", "pareto", "zipf", "normal", "poisson", "fraud-detection", "data-quality", "audit", "compliance", "cli", "statistical-analysis", "financial-analysis"],
-  "main": "index.js",
+  "main": "lib.js",
   "bin": {
     "lawkit": "./index.js"
   },
@@ -11,26 +11,35 @@
     "postinstall": "node scripts/download-binary.js",
     "test": "node test.js",
     "examples": "node examples.js",
-    "verify": "node index.js --help"
+    "verify": "node index.js --help",
+    "prepublish": "npm run verify"
   },
-  "author": "kako-jun <kako.jun.42@gmail.com>",
+  "author": "kako-jun",
   "license": "MIT",
   "homepage": "https://github.com/kako-jun/lawkit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kako-jun/lawkit.git"
+    "url": "https://github.com/kako-jun/lawkit.git",
+    "directory": "lawkit-npm"
   },
   "bugs": {
     "url": "https://github.com/kako-jun/lawkit/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/kako-jun"
   },
   "engines": {
     "node": ">=12.0.0"
   },
   "files": [
     "index.js",
+    "lib.js",
     "scripts/download-binary.js",
     "bin/",
-    "README.md"
+    "README.md",
+    "examples.js",
+    "test.js"
   ],
   "os": [
     "linux",
