@@ -75,7 +75,7 @@ impl BenfordResult {
     pub fn new_with_confidence(
         dataset_name: String,
         numbers: &[f64],
-        threshold: &RiskThreshold,
+        _threshold: &RiskThreshold,
         min_count: usize,
         confidence_level: f64,
     ) -> Result<Self> {

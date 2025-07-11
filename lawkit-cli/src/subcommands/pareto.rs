@@ -1,10 +1,11 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config, parse_input_auto, OptimizedFileReader};
+// Removed unused imports: get_optimized_reader, setup_automatic_optimization_config
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
-        input::parse_text_input,
+        input::{parse_input_auto, parse_text_input},
+        streaming_io::OptimizedFileReader,
         risk::RiskLevel,
         memory::{MemoryConfig, streaming_pareto_analysis},
     },
@@ -61,7 +62,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
         // ストリーミング処理でインクリメンタル分析を実行
         let numbers = match reader
-            .read_lines_streaming(|line| {
+            .read_lines_streaming(|line: String| {
                 if std::env::var("LAWKIT_DEBUG").is_ok() {
                     eprintln!("Debug: Processing line: '{}'", line);
                 }
@@ -110,9 +111,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
 
         // IncrementalParetoから通常のパレート結果に変換
-        let incremental_pareto = &chunk_result.result;
-        let mut sorted_values = incremental_pareto.values.clone();
-        sorted_values.sort_by(|a, b| b.partial_cmp(a).unwrap());
+        let mut incremental_pareto = chunk_result.result;
+        let sorted_values = incremental_pareto.get_sorted_values().to_vec();
 
         // パレート分析を実行
         let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &sorted_values) {
