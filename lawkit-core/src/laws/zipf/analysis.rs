@@ -17,6 +17,15 @@ pub fn analyze_text_zipf(text: &str, dataset_name: &str) -> Result<ZipfResult> {
     analyze_zipf_distribution(&frequencies, dataset_name)
 }
 
+/// 頻度データからZipf分析を実行
+pub fn analyze_text_zipf_from_frequencies(
+    frequencies: &[(String, usize)],
+    dataset_name: &str,
+) -> Result<ZipfResult> {
+    let freq_values: Vec<f64> = frequencies.iter().map(|(_, freq)| *freq as f64).collect();
+    analyze_zipf_distribution(&freq_values, dataset_name)
+}
+
 /// テキストから単語頻度を抽出
 fn extract_word_frequencies(text: &str) -> Vec<(String, usize)> {
     let mut word_counts = HashMap::new();

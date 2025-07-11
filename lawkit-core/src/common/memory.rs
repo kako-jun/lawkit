@@ -536,7 +536,9 @@ impl IncrementalZipf {
     }
 
     pub fn get_sorted_frequencies(&self) -> Vec<(String, usize)> {
-        let mut frequencies: Vec<_> = self.frequency_map.iter()
+        let mut frequencies: Vec<_> = self
+            .frequency_map
+            .iter()
             .map(|(word, &count)| (word.clone(), count))
             .collect();
         frequencies.sort_by(|a, b| b.1.cmp(&a.1));
@@ -779,6 +781,50 @@ where
         memory_used_mb,
         processing_time_ms: start_time.elapsed().as_millis() as u64,
         result: poisson,
+    })
+}
+
+/// ストリーミングZipf分析
+pub fn streaming_zipf_analysis<I>(
+    data_iter: I,
+    config: &MemoryConfig,
+) -> Result<ChunkAnalysisResult<IncrementalZipf>>
+where
+    I: Iterator<Item = String>,
+{
+    let start_time = std::time::Instant::now();
+    let mut processor = StreamingProcessor::new(config);
+    let mut zipf = IncrementalZipf::new();
+    let mut chunks_processed = 0;
+
+    for word in data_iter {
+        if let Some(chunk) = processor.push(word) {
+            let mut chunk_zipf = IncrementalZipf::new();
+            chunk_zipf.add_words(&chunk);
+            zipf.merge(&chunk_zipf);
+            chunks_processed += 1;
+        }
+    }
+
+    let mut total_processed = processor.processed_count();
+
+    if let Some(remaining) = processor.finish() {
+        total_processed += remaining.len();
+        let mut chunk_zipf = IncrementalZipf::new();
+        chunk_zipf.add_words(&remaining);
+        zipf.merge(&chunk_zipf);
+        chunks_processed += 1;
+    }
+
+    // String の平均サイズを推定（20バイトと仮定）
+    let memory_used_mb = (total_processed * 20) as f64 / 1024.0 / 1024.0;
+
+    Ok(ChunkAnalysisResult {
+        chunks_processed,
+        total_items: total_processed,
+        memory_used_mb,
+        processing_time_ms: start_time.elapsed().as_millis() as u64,
+        result: zipf,
     })
 }
 

@@ -353,8 +353,7 @@ mod benford_law_tests {
         let content = large_data.join("\n");
         let temp_file = create_temp_file_with_content(&content);
 
-        let output =
-            run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
+        let output = run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
 
         assert!(matches!(
             output.status.code(),
@@ -860,8 +859,7 @@ mod documentation_examples_tests {
         ));
 
         // Test time series analysis with optimize
-        let output =
-            run_lawkit_command("normal", &["--enable-timeseries", "", &test_data]);
+        let output = run_lawkit_command("normal", &["--enable-timeseries", "", &test_data]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -980,18 +978,14 @@ mod documentation_examples_tests {
         let temp_file = create_temp_file_with_content(&test_data);
 
         // Performance optimization for large files
-        let output =
-            run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
+        let output = run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Analyze with optimization
-        let output = run_lawkit_command(
-            "analyze",
-            &["", temp_file.path().to_str().unwrap()],
-        );
+        let output = run_lawkit_command("analyze", &["", temp_file.path().to_str().unwrap()]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
@@ -1013,10 +1007,8 @@ mod documentation_examples_tests {
         // Text analysis without language option
         let text_content = "これは テスト です テスト テスト データ";
         let temp_file = create_temp_file_with_content(text_content);
-        let output = run_lawkit_command(
-            "zipf",
-            &["--text", temp_file.path().to_str().unwrap(), ""],
-        );
+        let output =
+            run_lawkit_command("zipf", &["--text", temp_file.path().to_str().unwrap(), ""]);
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
             assert!(stdout.contains("Zipf") || stdout.contains("text"));
@@ -1496,10 +1488,7 @@ mod error_handling_tests {
         assert!(output.status.code().is_some());
 
         // Test normal with time series and optimize
-        let output = run_lawkit_command(
-            "normal",
-            &["--enable-timeseries", "", "timeseries.csv"],
-        );
+        let output = run_lawkit_command("normal", &["--enable-timeseries", "", "timeseries.csv"]);
         assert!(output.status.code().is_some());
     }
 

@@ -16,9 +16,12 @@ use std::str::FromStr;
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // Determine input source based on arguments
     if std::env::var("LAWKIT_DEBUG").is_ok() {
-        eprintln!("Debug: input argument = {:?}", matches.get_one::<String>("input"));
+        eprintln!(
+            "Debug: input argument = {:?}",
+            matches.get_one::<String>("input")
+        );
     }
-    
+
     if let Some(input) = matches.get_one::<String>("input") {
         // Use auto-detection for file vs string input
         match parse_input_auto(input) {
@@ -54,77 +57,85 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
 
         // 自動最適化処理：データ特性に基づいてストリーミング処理を自動選択
-            let mut reader = OptimizedFileReader::from_stdin();
+        let mut reader = OptimizedFileReader::from_stdin();
 
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!(
+                "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
+            );
+        }
+
+        // ストリーミング処理でインクリメンタル分析を実行
+        let numbers = match reader.read_lines_streaming(|line| {
             if std::env::var("LAWKIT_DEBUG").is_ok() {
-                eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
+                eprintln!("Debug: Processing line: '{line}'");
             }
-
-            // ストリーミング処理でインクリメンタル分析を実行
-            let numbers = match reader
-                .read_lines_streaming(|line| {
-                    if std::env::var("LAWKIT_DEBUG").is_ok() {
-                        eprintln!("Debug: Processing line: '{}'", line);
-                    }
-                    parse_text_input(&line).map(Some).or(Ok(None))
-                })
-            {
-                Ok(nested_numbers) => {
-                    let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
-                    if std::env::var("LAWKIT_DEBUG").is_ok() {
-                        eprintln!("Debug: Collected {} numbers from stream", flattened.len());
-                    }
-                    flattened
-                },
-                Err(e) => {
-                    eprintln!("Analysis error: {e}");
-                    std::process::exit(1);
-                }
-            };
-
-            // メモリ設定を作成
-            let memory_config = MemoryConfig::default();
-            
-            // インクリメンタルストリーミング分析を実行
-            let chunk_result = match streaming_benford_analysis(numbers.into_iter(), &memory_config) {
-                Ok(result) => {
-                    if std::env::var("LAWKIT_DEBUG").is_ok() {
-                        eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
-                    }
-                    result
-                },
-                Err(e) => {
-                    eprintln!("Streaming analysis error: {e}");
-                    std::process::exit(1);
-                }
-            };
-
-            if chunk_result.total_items == 0 {
+            parse_text_input(&line).map(Some).or(Ok(None))
+        }) {
+            Ok(nested_numbers) => {
+                let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
                 if std::env::var("LAWKIT_DEBUG").is_ok() {
-                    eprintln!("Debug: Total items in chunk_result: {}", chunk_result.total_items);
+                    eprintln!("Debug: Collected {} numbers from stream", flattened.len());
                 }
-                eprintln!("Error: No valid numbers found in input");
+                flattened
+            }
+            Err(e) => {
+                eprintln!("Analysis error: {e}");
                 std::process::exit(1);
             }
+        };
 
-            // IncrementalBenford を BenfordResult に変換
-            let benford_result = convert_incremental_to_result(
-                &chunk_result.result,
-                "stdin".to_string(),
-                matches,
-            );
+        // メモリ設定を作成
+        let memory_config = MemoryConfig::default();
 
-            // デバッグ情報を出力
-            if std::env::var("LAWKIT_DEBUG").is_ok() {
-                eprintln!("Debug: Processed {} numbers in {} chunks", 
-                         chunk_result.total_items, chunk_result.chunks_processed);
-                eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
-                eprintln!("Debug: Processing time: {} ms", chunk_result.processing_time_ms);
+        // インクリメンタルストリーミング分析を実行
+        let chunk_result = match streaming_benford_analysis(numbers.into_iter(), &memory_config) {
+            Ok(result) => {
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!(
+                        "Debug: Streaming analysis successful - {} items processed",
+                        result.total_items
+                    );
+                }
+                result
             }
+            Err(e) => {
+                eprintln!("Streaming analysis error: {e}");
+                std::process::exit(1);
+            }
+        };
 
-            // Output results and exit
-            output_results(matches, &benford_result);
-            std::process::exit(benford_result.risk_level.exit_code());
+        if chunk_result.total_items == 0 {
+            if std::env::var("LAWKIT_DEBUG").is_ok() {
+                eprintln!(
+                    "Debug: Total items in chunk_result: {}",
+                    chunk_result.total_items
+                );
+            }
+            eprintln!("Error: No valid numbers found in input");
+            std::process::exit(1);
+        }
+
+        // IncrementalBenford を BenfordResult に変換
+        let benford_result =
+            convert_incremental_to_result(&chunk_result.result, "stdin".to_string(), matches);
+
+        // デバッグ情報を出力
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!(
+                "Debug: Processed {} numbers in {} chunks",
+                chunk_result.total_items, chunk_result.chunks_processed
+            );
+            eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+            eprintln!(
+                "Debug: Processing time: {} ms",
+                chunk_result.processing_time_ms
+            );
+        }
+
+        // Output results and exit
+        output_results(matches, &benford_result);
+        std::process::exit(benford_result.risk_level.exit_code());
     }
 }
 
@@ -307,8 +318,10 @@ fn analyze_numbers_with_options(
         let conf = confidence_str
             .parse::<f64>()
             .map_err(|_| BenfError::ParseError("無効な信頼度レベル".to_string()))?;
-        if conf < 0.01 || conf > 0.99 {
-            return Err(BenfError::ParseError("信頼度レベルは0.01から0.99の間である必要があります".to_string()));
+        if !(0.01..=0.99).contains(&conf) {
+            return Err(BenfError::ParseError(
+                "信頼度レベルは0.01から0.99の間である必要があります".to_string(),
+            ));
         }
         conf
     } else {
@@ -321,7 +334,7 @@ fn analyze_numbers_with_options(
         let max_size = sample_size_str
             .parse::<usize>()
             .map_err(|_| BenfError::ParseError("無効なサンプルサイズ".to_string()))?;
-        
+
         if working_numbers.len() > max_size {
             eprintln!(
                 "大規模データセット: {}個の数値を{}個にサンプリングしました",
@@ -330,7 +343,12 @@ fn analyze_numbers_with_options(
             );
             // Simple random sampling by taking every nth element
             let step = working_numbers.len() / max_size;
-            working_numbers = working_numbers.iter().step_by(step.max(1)).cloned().take(max_size).collect();
+            working_numbers = working_numbers
+                .iter()
+                .step_by(step.max(1))
+                .cloned()
+                .take(max_size)
+                .collect();
         }
     }
 
@@ -339,10 +357,10 @@ fn analyze_numbers_with_options(
         let min_val = min_value_str
             .parse::<f64>()
             .map_err(|_| BenfError::ParseError("無効な最小値".to_string()))?;
-        
+
         let original_len = working_numbers.len();
         working_numbers.retain(|&x| x >= min_val);
-        
+
         if working_numbers.len() != original_len {
             eprintln!(
                 "最小値フィルタ適用: {}個の数値が{}個に絞り込まれました (>= {})",
@@ -364,24 +382,24 @@ fn convert_incremental_to_result(
     _matches: &clap::ArgMatches,
 ) -> BenfordResult {
     use lawkit_core::common::statistics;
-    
+
     // 分布データを取得
     let digit_distribution = incremental.get_distribution();
     let expected_distribution = [
         30.103, 17.609, 12.494, 9.691, 7.918, 6.695, 5.799, 5.115, 4.576,
     ];
-    
+
     // 統計値を計算
     let chi_square = statistics::calculate_chi_square(&digit_distribution, &expected_distribution);
     let p_value = statistics::calculate_p_value(chi_square, 8);
     let mean_absolute_deviation = incremental.calculate_mad();
-    
+
     // リスクレベルを決定
     let risk_level = determine_risk_level(mean_absolute_deviation, p_value);
-    
+
     // 判定を生成
-    let verdict = format!("Risk Level: {:?}", risk_level);
-    
+    let verdict = format!("Risk Level: {risk_level:?}");
+
     BenfordResult {
         dataset_name,
         numbers_analyzed: incremental.total_count(),
@@ -418,15 +436,14 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         let expected = result.expected_distribution[i];
         let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
-        
+
         // Create bar with filled and background portions
         let filled_bar = "█".repeat(bar_length);
         let background_bar = "░".repeat(BAR_WIDTH - bar_length);
-        let full_bar = format!("{}{}", filled_bar, background_bar);
+        let full_bar = format!("{filled_bar}{background_bar}");
 
         output.push_str(&format!(
-            "{:1}: {} {:>5.1}% (expected: {:>5.1}%)\n",
-            digit, full_bar, observed, expected
+            "{digit:1}: {full_bar} {observed:>5.1}% (expected: {expected:>5.1}%)\n"
         ));
     }
 

@@ -5,8 +5,8 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
+        memory::{streaming_poisson_analysis, MemoryConfig},
         streaming_io::OptimizedFileReader,
-        memory::{MemoryConfig, streaming_poisson_analysis},
     },
     error::{BenfError, Result},
     laws::poisson::{
@@ -62,13 +62,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         let mut reader = OptimizedFileReader::from_stdin();
 
         if std::env::var("LAWKIT_DEBUG").is_ok() {
-            eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
+            eprintln!(
+                "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
+            );
         }
 
         let numbers = match reader
-            .read_lines_streaming(|line: String| {
-                parse_text_input(&line).map(Some).or(Ok(None))
-            })
+            .read_lines_streaming(|line: String| parse_text_input(&line).map(Some).or(Ok(None)))
         {
             Ok(nested_numbers) => {
                 let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
@@ -76,7 +76,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     eprintln!("Debug: Collected {} numbers from stream", flattened.len());
                 }
                 flattened
-            },
+            }
             Err(e) => {
                 eprintln!("Analysis error: {e}");
                 std::process::exit(1);
@@ -89,34 +89,46 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
 
         // ポアソン分布は非負整数データを想定しているので、データを整数化
-        let event_counts: Vec<usize> = numbers.iter()
+        let event_counts: Vec<usize> = numbers
+            .iter()
             .filter_map(|&x| if x >= 0.0 { Some(x as usize) } else { None })
             .collect();
 
         // インクリメンタルストリーミング分析を実行（大量データの場合）
         if event_counts.len() > 10000 {
             let memory_config = MemoryConfig::default();
-            let chunk_result = match streaming_poisson_analysis(event_counts.into_iter(), &memory_config) {
-                Ok(result) => {
-                    if std::env::var("LAWKIT_DEBUG").is_ok() {
-                        eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
+            let chunk_result =
+                match streaming_poisson_analysis(event_counts.into_iter(), &memory_config) {
+                    Ok(result) => {
+                        if std::env::var("LAWKIT_DEBUG").is_ok() {
+                            eprintln!(
+                                "Debug: Streaming analysis successful - {} items processed",
+                                result.total_items
+                            );
+                        }
+                        result
                     }
-                    result
-                },
-                Err(e) => {
-                    eprintln!("Streaming analysis error: {e}");
-                    std::process::exit(1);
-                }
-            };
+                    Err(e) => {
+                        eprintln!("Streaming analysis error: {e}");
+                        std::process::exit(1);
+                    }
+                };
 
             if std::env::var("LAWKIT_DEBUG").is_ok() {
-                eprintln!("Debug: Processed {} numbers in {} chunks", 
-                         chunk_result.total_items, chunk_result.chunks_processed);
+                eprintln!(
+                    "Debug: Processed {} numbers in {} chunks",
+                    chunk_result.total_items, chunk_result.chunks_processed
+                );
                 eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
             }
 
             // usize から f64 に変換
-            chunk_result.result.event_counts().iter().map(|&x| x as f64).collect()
+            chunk_result
+                .result
+                .event_counts()
+                .iter()
+                .map(|&x| x as f64)
+                .collect()
         } else {
             // 小さなデータセットの場合は直接処理
             event_counts.iter().map(|&x| x as f64).collect()
@@ -647,8 +659,10 @@ fn analyze_numbers_with_options(
         let conf = confidence_str
             .parse::<f64>()
             .map_err(|_| BenfError::ParseError("無効な信頼度レベル".to_string()))?;
-        if conf < 0.01 || conf > 0.99 {
-            return Err(BenfError::ParseError("信頼度レベルは0.01から0.99の間である必要があります".to_string()));
+        if !(0.01..=0.99).contains(&conf) {
+            return Err(BenfError::ParseError(
+                "信頼度レベルは0.01から0.99の間である必要があります".to_string(),
+            ));
         }
         conf
     } else {
@@ -658,67 +672,62 @@ fn analyze_numbers_with_options(
     // Perform Poisson distribution analysis
     // TODO: Integrate confidence level into analysis
     let mut result = analyze_poisson_distribution(&filtered_numbers, &dataset_name)?;
-    
+
     // For now, just store confidence level as a comment in the dataset name
     if confidence != 0.95 {
         result.dataset_name = format!("{} (confidence: {:.2})", result.dataset_name, confidence);
     }
-    
+
     Ok(result)
 }
 
 fn format_poisson_probability_chart(result: &PoissonResult) -> String {
     let mut output = String::new();
     const CHART_WIDTH: usize = 50;
-    
+
     let lambda = result.lambda;
-    
+
     // 確率が十分小さくなるまでの範囲を計算（通常λ + 3√λ程度）
-    let max_k = ((lambda + 3.0 * lambda.sqrt()).ceil() as u32).max(10).min(20);
-    
+    let max_k = ((lambda + 3.0 * lambda.sqrt()).ceil() as u32).clamp(10, 20);
+
     // 各値の理論確率を計算
     let mut probabilities = Vec::new();
     let mut max_prob: f64 = 0.0;
-    
+
     for k in 0..=max_k {
         // ポアソン確率質量関数: P(X=k) = (λ^k * e^(-λ)) / k!
         let prob = poisson_pmf(k, lambda);
         probabilities.push((k, prob));
         max_prob = max_prob.max(prob);
     }
-    
+
     // 確率分布を表示
     for (k, prob) in &probabilities {
         if max_prob > 0.0 {
             let normalized_prob = prob / max_prob;
             let bar_length = (normalized_prob * CHART_WIDTH as f64).round() as usize;
             let bar_length = bar_length.min(CHART_WIDTH);
-            
+
             let filled_bar = "█".repeat(bar_length);
             let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-            let full_bar = format!("{}{}", filled_bar, background_bar);
-            
-            output.push_str(&format!(
-                "P(X={:2}): {} {:>6.3}\n",
-                k, full_bar, prob
-            ));
+            let full_bar = format!("{filled_bar}{background_bar}");
+
+            output.push_str(&format!("P(X={k:2}): {full_bar} {prob:>6.3}\n"));
         }
     }
-    
+
     // 重要な確率値を表示
     output.push_str(&format!(
         "\nKey Probabilities: P(X=0)={:.3}, P(X=1)={:.3}, P(X≥2)={:.3}",
-        result.probability_zero,
-        result.probability_one,
-        result.probability_two_or_more
+        result.probability_zero, result.probability_one, result.probability_two_or_more
     ));
-    
+
     // λとポアソン性の評価
     output.push_str(&format!(
         "\nλ={:.2}, Variance/Mean={:.3} (ideal: 1.0), Fit Score={:.3}",
         lambda, result.variance_ratio, result.goodness_of_fit_score
     ));
-    
+
     output
 }
 
@@ -727,7 +736,7 @@ fn poisson_pmf(k: u32, lambda: f64) -> f64 {
     if lambda <= 0.0 {
         return 0.0;
     }
-    
+
     // P(X=k) = (λ^k * e^(-λ)) / k!
     // 対数計算で数値的安定性を確保
     let log_prob = k as f64 * lambda.ln() - lambda - log_factorial(k);

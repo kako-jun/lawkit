@@ -440,9 +440,7 @@ pub fn setup_automatic_optimization_config() -> (ParallelConfig, MemoryConfig) {
 }
 
 /// 最適化されたファイルリーダーを取得
-pub fn get_optimized_reader(
-    input: Option<&String>,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub fn get_optimized_reader(input: Option<&String>) -> Result<String, Box<dyn std::error::Error>> {
     // 自動最適化された読み込み方法を使用
     if let Some(input_path) = input {
         if input_path == "-" {
