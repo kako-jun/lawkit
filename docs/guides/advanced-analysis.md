@@ -165,23 +165,6 @@ lawkit benf huge_file.csv
 lawkit benf data.csv
 ```
 
-### Incremental Statistics
-
-```bash
-# Use Welford's online algorithm
-lawkit benf large_data.csv --incremental-stats
-
-# Incremental processing with periodic results
-lawkit analyze data.csv \
-  --incremental-stats \
-  --progress-interval 10000
-
-# Memory monitoring
-lawkit benf data.csv \
-  --incremental-stats \
-  --monitor-memory \
-  --memory-alerts
-```
 
 ## Integration with Statistical Laws
 

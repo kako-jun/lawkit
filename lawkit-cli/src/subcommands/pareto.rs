@@ -1,72 +1,132 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
+use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config, parse_input_auto, OptimizedFileReader};
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
         input::parse_text_input,
         risk::RiskLevel,
+        memory::{MemoryConfig, streaming_pareto_analysis},
     },
     error::{BenfError, Result},
     laws::pareto::{analyze_pareto_distribution, ParetoResult},
 };
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // 自動最適化設定をセットアップ
-    let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
+    // Determine input source based on arguments
+    if std::env::var("LAWKIT_DEBUG").is_ok() {
+        eprintln!("Debug: input argument = {:?}", matches.get_one::<String>("input"));
+    }
+    
+    if let Some(input) = matches.get_one::<String>("input") {
+        // Use auto-detection for file vs string input
+        match parse_input_auto(input) {
+            Ok(numbers) => {
+                if numbers.is_empty() {
+                    eprintln!("Error: No valid numbers found in input");
+                    std::process::exit(1);
+                }
 
-    // 自動最適化された入力読み込み
-    let input_data = if let Some(input) = matches.get_one::<String>("input") {
-        if input == "-" {
-            get_optimized_reader(None)
-        } else {
-            get_optimized_reader(Some(input))
+                // Apply filtering and custom analysis
+                let result =
+                    match analyze_numbers_with_options(matches, input.to_string(), &numbers) {
+                        Ok(result) => result,
+                        Err(e) => {
+                            eprintln!("Analysis error: {e}");
+                            std::process::exit(1);
+                        }
+                    };
+
+                // Output results and exit
+                output_results(matches, &result);
+                std::process::exit(result.risk_level.exit_code());
+            }
+            Err(e) => {
+                eprintln!("Error processing input '{input}': {e}");
+                std::process::exit(1);
+            }
         }
     } else {
-        get_optimized_reader(None)
-    };
+        // Read from stdin - use automatic optimization based on data characteristics
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Reading from stdin, using automatic optimization");
+        }
 
-    let buffer = match input_data {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error reading input: {e}");
+        // 自動最適化処理：データ特性に基づいてストリーミング処理を自動選択
+        let mut reader = OptimizedFileReader::from_stdin();
+
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
+        }
+
+        // ストリーミング処理でインクリメンタル分析を実行
+        let numbers = match reader
+            .read_lines_streaming(|line| {
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!("Debug: Processing line: '{}'", line);
+                }
+                parse_text_input(&line).map(Some).or(Ok(None))
+            })
+        {
+            Ok(nested_numbers) => {
+                let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!("Debug: Collected {} numbers from stream", flattened.len());
+                }
+                flattened
+            },
+            Err(e) => {
+                eprintln!("Analysis error: {e}");
+                std::process::exit(1);
+            }
+        };
+
+        if numbers.is_empty() {
+            eprintln!("Error: No valid numbers found in input");
             std::process::exit(1);
         }
-    };
 
-    if buffer.trim().is_empty() {
-        eprintln!("Error: No input provided. Use --help for usage information.");
-        std::process::exit(2);
+        // メモリ設定を作成
+        let memory_config = MemoryConfig::default();
+        
+        // インクリメンタルストリーミング分析を実行
+        let chunk_result = match streaming_pareto_analysis(numbers.into_iter(), &memory_config) {
+            Ok(result) => {
+                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                    eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
+                }
+                result
+            },
+            Err(e) => {
+                eprintln!("Streaming analysis error: {e}");
+                std::process::exit(1);
+            }
+        };
+
+        if std::env::var("LAWKIT_DEBUG").is_ok() {
+            eprintln!("Debug: Processed {} numbers in {} chunks", 
+                     chunk_result.total_items, chunk_result.chunks_processed);
+            eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+        }
+
+        // IncrementalParetoから通常のパレート結果に変換
+        let incremental_pareto = &chunk_result.result;
+        let mut sorted_values = incremental_pareto.values.clone();
+        sorted_values.sort_by(|a, b| b.partial_cmp(a).unwrap());
+
+        // パレート分析を実行
+        let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &sorted_values) {
+            Ok(result) => result,
+            Err(e) => {
+                eprintln!("Analysis error: {e}");
+                std::process::exit(1);
+            }
+        };
+
+        // 結果出力
+        output_results(matches, &result);
+        std::process::exit(result.risk_level.exit_code());
     }
-
-    let numbers = match parse_text_input(&buffer) {
-        Ok(numbers) => numbers,
-        Err(e) => {
-            eprintln!("Analysis error: {e}");
-            std::process::exit(1);
-        }
-    };
-
-    if numbers.is_empty() {
-        eprintln!("Error: No valid numbers found in input");
-        std::process::exit(1);
-    }
-
-    let dataset_name = matches
-        .get_one::<String>("input")
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| "stdin".to_string());
-
-    let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
-        Ok(result) => result,
-        Err(e) => {
-            eprintln!("Analysis error: {e}");
-            std::process::exit(1);
-        }
-    };
-
-    output_results(matches, &result);
-    std::process::exit(result.risk_level.exit_code())
 }
 
 fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
