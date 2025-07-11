@@ -330,8 +330,8 @@ mod benford_law_tests {
         }
         let test_data = large_data.join(" ");
 
-        // Test with optimize flag
-        let output = run_lawkit_command("benf", &["", &test_data]);
+        // Test with automatic optimization (no flag needed)
+        let output = run_lawkit_command("benf", &[&test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -353,7 +353,7 @@ mod benford_law_tests {
         let content = large_data.join("\n");
         let temp_file = create_temp_file_with_content(&content);
 
-        let output = run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
+        let output = run_lawkit_command("benf", &[temp_file.path().to_str().unwrap()]);
 
         assert!(matches!(
             output.status.code(),
@@ -431,9 +431,9 @@ mod pareto_law_tests {
 
     #[test]
     fn test_lawkit_pareto_optimize() {
-        // Test optimize mode for pareto analysis
+        // Test automatic optimization for pareto analysis
         let test_data = generate_pareto_test_data();
-        let output = run_lawkit_command("pareto", &["", &test_data]);
+        let output = run_lawkit_command("pareto", &[&test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -682,7 +682,7 @@ mod integration_analyze_tests {
         }
         let test_data = large_data.join(" ");
 
-        let output = run_lawkit_command("analyze", &["", "--laws", "all", &test_data]);
+        let output = run_lawkit_command("analyze", &["--laws", "all", &test_data]);
 
         assert!(matches!(
             output.status.code(),
@@ -978,14 +978,14 @@ mod documentation_examples_tests {
         let temp_file = create_temp_file_with_content(&test_data);
 
         // Performance optimization for large files
-        let output = run_lawkit_command("benf", &["", temp_file.path().to_str().unwrap()]);
+        let output = run_lawkit_command("benf", &[temp_file.path().to_str().unwrap()]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
         ));
 
         // Analyze with optimization
-        let output = run_lawkit_command("analyze", &["", temp_file.path().to_str().unwrap()]);
+        let output = run_lawkit_command("analyze", &[temp_file.path().to_str().unwrap()]);
         assert!(matches!(
             output.status.code(),
             Some(0) | Some(1) | Some(10) | Some(11) | Some(12)
