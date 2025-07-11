@@ -252,11 +252,8 @@ fn test_readme_pipeline_stdin() {
 fn test_benf_confidence_option() {
     // New option test: lawkit benf audit_data.csv --confidence 0.99 --verbose
     let audit_data = generate_financial_data();
-    let output = run_lawkit_command_with_file(
-        "benf",
-        &audit_data,
-        &["--confidence", "0.99", "--verbose"],
-    );
+    let output =
+        run_lawkit_command_with_file("benf", &audit_data, &["--confidence", "0.99", "--verbose"]);
 
     assert!(matches!(
         output.status.code(),
@@ -270,11 +267,7 @@ fn test_benf_confidence_option() {
 fn test_benf_sample_size_option() {
     // New option test: lawkit benf big_data.csv --sample-size 50000 --optimize
     let big_data = generate_financial_data();
-    let output = run_lawkit_command_with_file(
-        "benf",
-        &big_data,
-        &["--sample-size", "50000", "--optimize"],
-    );
+    let output = run_lawkit_command_with_file("benf", &big_data, &["--sample-size", "50000"]);
 
     assert!(matches!(
         output.status.code(),
@@ -288,11 +281,7 @@ fn test_benf_sample_size_option() {
 fn test_benf_min_value_option() {
     // New option test: lawkit benf financial_data.csv --min-value 100
     let financial_data = generate_financial_data();
-    let output = run_lawkit_command_with_file(
-        "benf",
-        &financial_data,
-        &["--min-value", "100"],
-    );
+    let output = run_lawkit_command_with_file("benf", &financial_data, &["--min-value", "100"]);
 
     assert!(matches!(
         output.status.code(),
@@ -305,7 +294,7 @@ fn test_benf_min_value_option() {
 #[test]
 fn test_poisson_confidence_option() {
     // New option test: lawkit poisson server_errors.csv --confidence 0.99 --verbose
-    let poisson_data = "1\n2\n0\n3\n1\n4\n2\n1\n0\n2";
+    let poisson_data = "1\n2\n0\n3\n1\n4\n2\n1\n0\n2\n3\n1\n2\n4\n0\n1\n3\n2\n1\n0\n5\n2\n1\n3\n0\n2\n1\n4\n3\n2\n1\n0\n2\n3\n1";
     let output = run_lawkit_command_with_file(
         "poisson",
         poisson_data,

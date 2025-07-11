@@ -119,15 +119,14 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         let expected = result.expected_distribution[i];
         let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
-        
+
         // Create bar with filled and background portions
         let filled_bar = "█".repeat(bar_length);
         let background_bar = "░".repeat(BAR_WIDTH - bar_length);
-        let full_bar = format!("{}{}", filled_bar, background_bar);
+        let full_bar = format!("{filled_bar}{background_bar}");
 
         output.push_str(&format!(
-            "{:1}: {} {:>5.1}% (expected: {:>5.1}%)\n",
-            digit, full_bar, observed, expected
+            "{digit:1}: {full_bar} {observed:>5.1}% (expected: {expected:>5.1}%)\n"
         ));
     }
 

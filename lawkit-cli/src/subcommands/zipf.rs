@@ -1,87 +1,161 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
+use crate::common_options::get_optimized_reader;
 use clap::ArgMatches;
 use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
-        input::parse_text_input,
+        input::{parse_input_auto, parse_text_input},
+        memory::{streaming_zipf_analysis, MemoryConfig},
         risk::RiskLevel,
+        streaming_io::OptimizedFileReader,
     },
     error::{BenfError, Result},
-    laws::zipf::{analyze_numeric_zipf, analyze_text_zipf, ZipfResult},
+    laws::zipf::{
+        analyze_numeric_zipf, analyze_text_zipf, analyze_text_zipf_from_frequencies, ZipfResult,
+    },
 };
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
-    // 自動最適化設定をセットアップ
-    let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
     let is_text_mode = matches.get_flag("text");
 
-    // 自動最適化された入力読み込み
-    let input_data = if let Some(input) = matches.get_one::<String>("input") {
-        if input == "-" {
-            get_optimized_reader(None)
+    // Determine input source based on arguments
+    if let Some(input) = matches.get_one::<String>("input") {
+        // Use auto-detection for file vs string input
+        if is_text_mode {
+            // Text mode: read file or use as text directly
+            let buffer = if input == "-" {
+                match get_optimized_reader(None) {
+                    Ok(data) => data,
+                    Err(e) => {
+                        eprintln!("Error reading input: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                match get_optimized_reader(Some(input)) {
+                    Ok(data) => data,
+                    Err(e) => {
+                        eprintln!("Error reading input: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            };
+
+            match analyze_text_zipf(&buffer, input) {
+                Ok(result) => {
+                    output_results(matches, &result);
+                    std::process::exit(result.risk_level.exit_code());
+                }
+                Err(e) => {
+                    eprintln!("Analysis error: {e}");
+                    std::process::exit(1);
+                }
+            }
         } else {
-            get_optimized_reader(Some(input))
-        }
-    } else {
-        get_optimized_reader(None)
-    };
+            // Numeric mode
+            match parse_input_auto(input) {
+                Ok(numbers) => {
+                    if numbers.is_empty() {
+                        eprintln!("Error: No valid numbers found in input");
+                        std::process::exit(1);
+                    }
 
-    let buffer = match input_data {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error reading input: {e}");
-            std::process::exit(1);
-        }
-    };
+                    let result =
+                        match analyze_numbers_with_options(matches, input.to_string(), &numbers) {
+                            Ok(result) => result,
+                            Err(e) => {
+                                eprintln!("Analysis error: {e}");
+                                std::process::exit(1);
+                            }
+                        };
 
-    if buffer.trim().is_empty() {
-        eprintln!("Error: No input provided. Use --help for usage information.");
-        std::process::exit(2);
-    }
-
-    let dataset_name = matches
-        .get_one::<String>("input")
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| "stdin".to_string());
-
-    if is_text_mode {
-        // Text analysis mode
-        match analyze_text_zipf(&buffer, &dataset_name) {
-            Ok(result) => {
-                output_results(matches, &result);
-                std::process::exit(result.risk_level.exit_code());
-            }
-            Err(e) => {
-                eprintln!("Analysis error: {e}");
-                std::process::exit(1);
+                    output_results(matches, &result);
+                    std::process::exit(result.risk_level.exit_code());
+                }
+                Err(e) => {
+                    eprintln!("Error processing input '{input}': {e}");
+                    std::process::exit(1);
+                }
             }
         }
     } else {
-        // Numeric analysis mode
-        let numbers = match parse_text_input(&buffer) {
-            Ok(numbers) => numbers,
-            Err(e) => {
-                eprintln!("Analysis error: {e}");
+        // Read from stdin - use automatic optimization based on data characteristics
+        if is_text_mode {
+            // Text mode with streaming
+            let mut reader = OptimizedFileReader::from_stdin();
+            let memory_config = MemoryConfig::default();
+
+            // Process text line by line and extract words
+            let mut words = Vec::new();
+            match reader.read_lines_streaming(|line: String| {
+                // Extract words from line
+                let line_words: Vec<String> =
+                    line.split_whitespace().map(|s| s.to_string()).collect();
+                words.extend(line_words);
+                Ok(None::<()>)
+            }) {
+                Ok(_) => {}
+                Err(e) => {
+                    eprintln!("Error reading stream: {e}");
+                    std::process::exit(1);
+                }
+            }
+
+            // Use streaming analysis
+            let chunk_result = match streaming_zipf_analysis(words.into_iter(), &memory_config) {
+                Ok(result) => result,
+                Err(e) => {
+                    eprintln!("Streaming analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            // Convert IncrementalZipf to ZipfResult
+            let frequencies = chunk_result.result.get_sorted_frequencies();
+            let result = match analyze_text_zipf_from_frequencies(&frequencies, "stdin") {
+                Ok(result) => result,
+                Err(e) => {
+                    eprintln!("Analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            output_results(matches, &result);
+            std::process::exit(result.risk_level.exit_code());
+        } else {
+            // Numeric mode
+            let buffer = match get_optimized_reader(None) {
+                Ok(data) => data,
+                Err(e) => {
+                    eprintln!("Error reading input: {e}");
+                    std::process::exit(1);
+                }
+            };
+            let numbers = match parse_text_input(&buffer) {
+                Ok(numbers) => numbers,
+                Err(e) => {
+                    eprintln!("Analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            if numbers.is_empty() {
+                eprintln!("Error: No valid numbers found in input");
                 std::process::exit(1);
             }
-        };
 
-        if numbers.is_empty() {
-            eprintln!("Error: No valid numbers found in input");
-            std::process::exit(1);
+            let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &numbers)
+            {
+                Ok(result) => result,
+                Err(e) => {
+                    eprintln!("Analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
+
+            output_results(matches, &result);
+            std::process::exit(result.risk_level.exit_code());
         }
-
-        let result = match analyze_numbers_with_options(matches, dataset_name, &numbers) {
-            Ok(result) => result,
-            Err(e) => {
-                eprintln!("Analysis error: {e}");
-                std::process::exit(1);
-            }
-        };
-
-        output_results(matches, &result);
-        std::process::exit(result.risk_level.exit_code())
     }
 }
 
@@ -328,45 +402,45 @@ fn analyze_numbers_with_options(
 fn format_rank_frequency_chart(result: &ZipfResult) -> String {
     let mut output = String::new();
     const CHART_WIDTH: usize = 50;
-    
+
     if result.rank_frequency_pairs.is_empty() {
         return "No data available for chart".to_string();
     }
-    
+
     // 最大頻度を取得（正規化用）
-    let max_frequency = result.rank_frequency_pairs
+    let max_frequency = result
+        .rank_frequency_pairs
         .iter()
         .map(|(_, freq)| *freq)
         .fold(0.0, f64::max);
-    
+
     if max_frequency == 0.0 {
         return "All frequencies are zero".to_string();
     }
-    
+
     // ランク-頻度ペアを表示（上位10項目）
     for (rank, frequency) in result.rank_frequency_pairs.iter().take(10) {
         let normalized_freq = frequency / max_frequency;
         let bar_length = (normalized_freq * CHART_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(CHART_WIDTH);
-        
+
         let filled_bar = "█".repeat(bar_length);
         let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-        let full_bar = format!("{}{}", filled_bar, background_bar);
-        
+        let full_bar = format!("{filled_bar}{background_bar}");
+
         // パーセンテージ計算
         let percentage = (frequency / result.total_observations as f64) * 100.0;
-        
+
         output.push_str(&format!(
-            "#{:2}: {} {:>6.2}% (freq: {:.0})\n",
-            rank, full_bar, percentage, frequency
+            "#{rank:2}: {full_bar} {percentage:>6.2}% (freq: {frequency:.0})\n"
         ));
     }
-    
+
     // Zipf法則の適合度情報
     output.push_str(&format!(
         "\nZipf Exponent: {:.3} (ideal: 1.0), Correlation: {:.3}",
         result.zipf_exponent, result.correlation_coefficient
     ));
-    
+
     output
 }

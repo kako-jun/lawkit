@@ -99,10 +99,10 @@ impl BenfordResult {
             &digit_distribution,
             &expected_distribution,
         );
-        
+
         // Use standard p-value calculation (confidence level adjustment in interpretation)
         let p_value = crate::common::statistics::calculate_p_value(chi_square, 8);
-        
+
         let mean_absolute_deviation =
             crate::common::statistics::calculate_mad(&digit_distribution, &expected_distribution);
 
@@ -111,7 +111,7 @@ impl BenfordResult {
         let risk_level = if p_value < adjusted_alpha / 4.0 {
             RiskLevel::Critical
         } else if p_value < adjusted_alpha / 2.0 {
-            RiskLevel::High  
+            RiskLevel::High
         } else if p_value < adjusted_alpha {
             RiskLevel::Medium
         } else {

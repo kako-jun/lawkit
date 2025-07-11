@@ -5,9 +5,9 @@ use lawkit_core::{
     common::{
         filtering::{apply_number_filter, NumberFilter},
         input::{parse_input_auto, parse_text_input},
-        streaming_io::OptimizedFileReader,
+        memory::{streaming_pareto_analysis, MemoryConfig},
         risk::RiskLevel,
-        memory::{MemoryConfig, streaming_pareto_analysis},
+        streaming_io::OptimizedFileReader,
     },
     error::{BenfError, Result},
     laws::pareto::{analyze_pareto_distribution, ParetoResult},
@@ -16,9 +16,12 @@ use lawkit_core::{
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // Determine input source based on arguments
     if std::env::var("LAWKIT_DEBUG").is_ok() {
-        eprintln!("Debug: input argument = {:?}", matches.get_one::<String>("input"));
+        eprintln!(
+            "Debug: input argument = {:?}",
+            matches.get_one::<String>("input")
+        );
     }
-    
+
     if let Some(input) = matches.get_one::<String>("input") {
         // Use auto-detection for file vs string input
         match parse_input_auto(input) {
@@ -57,25 +60,25 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         let mut reader = OptimizedFileReader::from_stdin();
 
         if std::env::var("LAWKIT_DEBUG").is_ok() {
-            eprintln!("Debug: Using automatic optimization (streaming + incremental + memory efficiency)");
+            eprintln!(
+                "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
+            );
         }
 
         // ストリーミング処理でインクリメンタル分析を実行
-        let numbers = match reader
-            .read_lines_streaming(|line: String| {
-                if std::env::var("LAWKIT_DEBUG").is_ok() {
-                    eprintln!("Debug: Processing line: '{}'", line);
-                }
-                parse_text_input(&line).map(Some).or(Ok(None))
-            })
-        {
+        let numbers = match reader.read_lines_streaming(|line: String| {
+            if std::env::var("LAWKIT_DEBUG").is_ok() {
+                eprintln!("Debug: Processing line: '{line}'");
+            }
+            parse_text_input(&line).map(Some).or(Ok(None))
+        }) {
             Ok(nested_numbers) => {
                 let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
                 if std::env::var("LAWKIT_DEBUG").is_ok() {
                     eprintln!("Debug: Collected {} numbers from stream", flattened.len());
                 }
                 flattened
-            },
+            }
             Err(e) => {
                 eprintln!("Analysis error: {e}");
                 std::process::exit(1);
@@ -89,15 +92,18 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
         // メモリ設定を作成
         let memory_config = MemoryConfig::default();
-        
+
         // インクリメンタルストリーミング分析を実行
         let chunk_result = match streaming_pareto_analysis(numbers.into_iter(), &memory_config) {
             Ok(result) => {
                 if std::env::var("LAWKIT_DEBUG").is_ok() {
-                    eprintln!("Debug: Streaming analysis successful - {} items processed", result.total_items);
+                    eprintln!(
+                        "Debug: Streaming analysis successful - {} items processed",
+                        result.total_items
+                    );
                 }
                 result
-            },
+            }
             Err(e) => {
                 eprintln!("Streaming analysis error: {e}");
                 std::process::exit(1);
@@ -105,8 +111,10 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         };
 
         if std::env::var("LAWKIT_DEBUG").is_ok() {
-            eprintln!("Debug: Processed {} numbers in {} chunks", 
-                     chunk_result.total_items, chunk_result.chunks_processed);
+            eprintln!(
+                "Debug: Processed {} numbers in {} chunks",
+                chunk_result.total_items, chunk_result.chunks_processed
+            );
             eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
         }
 
@@ -115,13 +123,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         let sorted_values = incremental_pareto.get_sorted_values().to_vec();
 
         // パレート分析を実行
-        let result = match analyze_numbers_with_options(matches, "stdin".to_string(), &sorted_values) {
-            Ok(result) => result,
-            Err(e) => {
-                eprintln!("Analysis error: {e}");
-                std::process::exit(1);
-            }
-        };
+        let result =
+            match analyze_numbers_with_options(matches, "stdin".to_string(), &sorted_values) {
+                Ok(result) => result,
+                Err(e) => {
+                    eprintln!("Analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
 
         // 結果出力
         output_results(matches, &result);
@@ -413,45 +422,47 @@ fn format_lorenz_curve(result: &ParetoResult) -> String {
     let mut output = String::new();
     const CHART_WIDTH: usize = 50;
     const CHART_HEIGHT: usize = 10;
-    
+
     // ローレンツ曲線の主要ポイントを取得（グラフ用に簡略化）
     let curve_points = &result.cumulative_distribution;
     let total_points = curve_points.len();
-    
+
     // 10点のサンプルポイントを選択
     let sample_indices: Vec<usize> = (0..CHART_HEIGHT)
         .map(|i| ((i + 1) * total_points) / (CHART_HEIGHT + 1))
         .collect();
-    
-    for (_chart_line, &sample_idx) in sample_indices.iter().enumerate() {
+
+    for &sample_idx in sample_indices.iter() {
         let sample_idx = sample_idx.min(total_points - 1);
         let (population_pct, wealth_pct) = curve_points[sample_idx];
-        
+
         // X軸：人口パーセンタイル（0-100%）
         // Y軸：富のパーセンタイル（0-100%）
         let bar_length = (wealth_pct * CHART_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(CHART_WIDTH);
-        
+
         let filled_bar = "█".repeat(bar_length);
         let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-        let full_bar = format!("{}{}", filled_bar, background_bar);
-        
+        let full_bar = format!("{filled_bar}{background_bar}");
+
         // パーセンタイルごとに表示
         let pop_percent = population_pct * 100.0;
         let wealth_percent = wealth_pct * 100.0;
-        
+
         output.push_str(&format!(
-            "{:3.0}%: {} {:>5.1}% cumulative\n",
-            pop_percent, full_bar, wealth_percent
+            "{pop_percent:3.0}%: {full_bar} {wealth_percent:>5.1}% cumulative\n"
         ));
     }
-    
+
     // 80/20ラインの表示
-    output.push_str(&format!("\n80/20 Rule: Top 20% owns {:.1}% of total wealth", result.top_20_percent_share));
+    output.push_str(&format!(
+        "\n80/20 Rule: Top 20% owns {:.1}% of total wealth",
+        result.top_20_percent_share
+    ));
     output.push_str(&format!(
         " (Ideal: 80.0%, Ratio: {:.2})",
         result.pareto_ratio
     ));
-    
+
     output
 }
