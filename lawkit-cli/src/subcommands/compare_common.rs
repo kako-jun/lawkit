@@ -1,5 +1,5 @@
 use crate::colors;
-use crate::common_options::{get_optimized_reader, setup_optimization_config};
+use crate::common_options::{get_optimized_reader, setup_automatic_optimization_config};
 use chrono;
 use clap::ArgMatches;
 use lawkit_core::common::output::OutputConfig;
@@ -8,16 +8,16 @@ use lawkit_core::laws::integration::AnalysisPurpose;
 use std::io::Write;
 
 pub fn get_numbers_from_input(matches: &ArgMatches) -> Result<Vec<f64>> {
-    let (use_optimize, _parallel_config, _memory_config) = setup_optimization_config(matches);
+    let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
 
     let buffer = if let Some(input) = matches.get_one::<String>("input") {
         if input == "-" {
-            get_optimized_reader(None, use_optimize)
+            get_optimized_reader(None)
         } else {
-            get_optimized_reader(Some(input), use_optimize)
+            get_optimized_reader(Some(input))
         }
     } else {
-        get_optimized_reader(None, use_optimize)
+        get_optimized_reader(None)
     };
 
     let data = buffer.map_err(|e| lawkit_core::error::BenfError::IoError(e.to_string()))?;

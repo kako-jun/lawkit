@@ -368,11 +368,12 @@ where
         }
     }
 
-    // 処理済み件数を記録
-    let total_processed = processor.processed_count();
+    // 処理済み件数を記録（finish()前にカウントを取得）
+    let mut total_processed = processor.processed_count();
 
     // 残りのデータを処理
     if let Some(remaining) = processor.finish() {
+        total_processed += remaining.len(); // 残りのデータ数を追加
         let mut chunk_benford = IncrementalBenford::new();
         chunk_benford.add_batch(&remaining);
         benford.merge(&chunk_benford);

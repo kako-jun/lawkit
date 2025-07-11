@@ -150,17 +150,19 @@ lawkit pareto resource_usage.csv --business-analysis --format json
 
 最適化された処理とインクリメンタルアルゴリズムを使用して、利用可能なRAMより大きなデータセットを処理します。
 
-### 最適化処理モード
+### 自動最適化
+
+lawkitはデータ特性に基づいてメモリと処理の最適化を自動適用します。
 
 ```bash
-# 大きなファイルの基本最適化処理
-lawkit benf massive_dataset.csv --optimize
+# 大きなファイルの自動最適化（フラグ不要）
+lawkit benf massive_dataset.csv
 
-# メモリ管理付き最適化処理
-lawkit benf huge_file.csv --optimize
+# メモリ管理は透明
+lawkit benf huge_file.csv
 
-# メモリ制限付き最適化処理
-lawkit benf data.csv --optimize
+# 最適化は自動適用
+lawkit benf data.csv
 ```
 
 ## 統計法則との統合
@@ -231,24 +233,24 @@ lawkit benf data.csv
 
 **中サイズデータセット (1万 - 100万レコード):**
 ```bash
-lawkit benf data.csv --optimize --min-count 100
+lawkit benf data.csv --min-count 100
 ```
 
 **大きなデータセット (100万+ レコード):**
 ```bash
-lawkit benf data.csv --optimize --quiet --format json
+lawkit benf data.csv --quiet --format json
 ```
 
 ### ユースケース最適化
 
 **リアルタイム分析:**
 ```bash
-lawkit benf data.csv --optimize --quiet --threshold high
+lawkit benf data.csv --quiet --threshold high
 ```
 
 **バッチ処理:**
 ```bash
-lawkit analyze datasets/*.csv --optimize --quiet --format json
+lawkit analyze datasets/*.csv --quiet --format json
 ```
 
 **インタラクティブ分析:**

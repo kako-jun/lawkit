@@ -150,17 +150,19 @@ lawkit pareto resource_usage.csv --business-analysis --format json
 
 Handle datasets larger than available RAM using optimized processing and incremental algorithms.
 
-### Optimized Processing Mode
+### Automatic Optimization
+
+lawkit automatically applies memory and processing optimizations based on data characteristics.
 
 ```bash
-# Basic optimized processing for large files
-lawkit benf massive_dataset.csv --optimize
+# Automatic optimization for large files (no flags needed)
+lawkit benf massive_dataset.csv
 
-# Optimized processing with memory management
-lawkit benf huge_file.csv --optimize
+# Memory management is transparent
+lawkit benf huge_file.csv
 
-# Memory-limited optimized processing
-lawkit benf data.csv --optimize
+# Optimizations applied automatically
+lawkit benf data.csv
 ```
 
 ### Incremental Statistics
@@ -249,24 +251,24 @@ lawkit benf data.csv
 
 **Medium Datasets (10K - 1M records):**
 ```bash
-lawkit benf data.csv --optimize --min-count 100
+lawkit benf data.csv --min-count 100
 ```
 
 **Large Datasets (1M+ records):**
 ```bash
-lawkit benf data.csv --optimize --quiet --format json
+lawkit benf data.csv --quiet --format json
 ```
 
 ### Use Case Optimization
 
 **Real-time Analysis:**
 ```bash
-lawkit benf data.csv --optimize --quiet --threshold high
+lawkit benf data.csv --quiet --threshold high
 ```
 
 **Batch Processing:**
 ```bash
-lawkit analyze datasets/*.csv --optimize --quiet --format json
+lawkit analyze datasets/*.csv --quiet --format json
 ```
 
 **Interactive Analysis:**
