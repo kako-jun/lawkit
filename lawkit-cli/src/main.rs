@@ -5,7 +5,7 @@ mod colors;
 mod common_options;
 mod subcommands;
 
-const VERSION: &str = "2.1.0";
+const VERSION: &str = "2.2.0";
 
 fn main() {
     let matches = command!()
