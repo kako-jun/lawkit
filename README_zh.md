@@ -20,49 +20,59 @@
 专为现代自动化设计，提供JSON、CSV和其他结构化输出，与AI工具和自动化工作流完美配合。非常适合欺诈检测、数据质量检查和商业智能。
 
 ```bash
-# 单法则分析 - 本福德定律
+# 带可视化图表的单法则分析 - 本福德定律欺诈检测
 $ lawkit benf financial_data.csv
 Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 2500
+Risk Level: Low [LOW]
+
+First Digit Distribution:
+1: ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  30.1% (expected: 30.1%)
+2: ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  17.6% (expected: 17.6%)
+3: █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  12.5% (expected: 12.5%)
+4: ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   9.7% (expected:  9.7%)
+5: ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   7.9% (expected:  7.9%)
+6: ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   6.7% (expected:  6.7%)
+7: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.8% (expected:  5.8%)
+8: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.1% (expected:  5.1%)
+9: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   4.6% (expected:  4.6%)
+
+统计测试:
+Chi-square: 1.34 (p-value: 0.995)
+Mean Absolute Deviation: 0.8%
+
+# 带洛伦兹曲线可视化的帕累托分析
+$ lawkit pareto sales_data.csv
+Pareto Principle (80/20 Rule) Analysis Results
+
+Dataset: sales_data.csv
+Numbers analyzed: 1000
 [LOW] Dataset analysis
 
-# 生成帕累托分布数据
-$ lawkit generate pareto --samples 100 | head -5
-5.48
-1.03
-1.04
-1.42
-1.61
+Lorenz Curve (Cumulative Distribution):
+ 10%: █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.2% cumulative
+ 20%: ████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░  20.1% cumulative
+ 30%: ██████████████████████████████░░░░░░░░░░░░░░░░  35.4% cumulative
+ 40%: ████████████████████████████████████████░░░░░░  48.9% cumulative
+ 50%: ██████████████████████████████████████████████  61.7% cumulative
 
-# 全面的多法则比较
+80/20 Rule: Top 20% owns 79.2% of total wealth (Ideal: 80.0%, Ratio: 0.99)
+
+# 多法则集成分析
 $ lawkit analyze --laws all data.csv
 Statistical Laws Integration Analysis
 
 Dataset: data.csv
-Numbers analyzed: 1000
-Laws executed: 5 (benford, pareto, zipf, normal, poisson)
+Numbers Analyzed: 1000
+Laws Executed: 5 (benf, pareto, zipf, normal, poisson)
 
 Integration Metrics:
   Overall Quality Score: 0.743
   Consistency Score: 0.823
   Conflicts Detected: 2
   Recommendation Confidence: 0.892
-
-Law Results:
-  Benford Law: 0.652
-  Pareto Principle: 0.845
-  Zipf Law: 0.423
-  Normal Distribution: 0.912
-  Poisson Distribution: 0.634
-
-Conflicts:
-  [CONFLICT] Benford Law score 0.652 significantly deviates from expected 0.500 - deviation 30.4%
-     Likely Cause: Different distribution assumptions
-     Suggestion: Focus on Zipf analysis for frequency data
-
-Risk Assessment: [MEDIUM]
 
 # 一致性检查的数据验证
 $ lawkit validate --laws benf,pareto,normal transactions.csv --consistency-check
@@ -130,6 +140,7 @@ Recommendation: 自动决策前需要手动数据审查
 ## ✨ 主要功能
 
 - **🎯 多法则分析**: 本福德、帕累托、齐夫、正态、泊松分布的智能集成
+- **📊 可视化图表**: 数字分布、洛伦兹曲线、概率图、直方图的ASCII条形图
 - **🌍 国际支持**: 5语言数字解析（英日中印阿）和丰富输出格式
 - **📈 高级分析**: 时间序列分析、异常值检测（LOF·隔离森林·DBSCAN）、元链
 - **⚡ 高性能**: Rust驱动并行处理优化大型数据集
@@ -307,18 +318,148 @@ lawkit-download-binary  # 下载CLI二进制文件 (pip install后可用)
 
 ## 基本用法
 
-```bash
-# 各种输入格式的单法则分析
-lawkit benf financial_data.csv
-lawkit pareto sales_report.json
-lawkit zipf word_frequencies.txt
-lawkit normal measurements.xlsx
-lawkit poisson server_logs.tsv
+### 带可视化图表的单法则分析
 
-# 不同输出格式的多法则比较
-lawkit analyze --laws all transactions.csv
-lawkit validate --laws all inventory.json --format yaml
-lawkit diagnose --laws benf,zipf document.txt --format json
+```bash
+# 本福德定律 - 带数字分布图表的欺诈检测
+$ lawkit benf financial_data.csv
+First Digit Distribution:
+1: ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  20.0% (expected:  30.1%)
+2: █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  11.4% (expected:  17.6%)
+3: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   5.7% (expected:  12.5%)
+4: ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  14.3% (expected:   9.7%)
+5: ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  17.1% (expected:   7.9%)
+6: █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   2.9% (expected:   6.7%)
+7: ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  14.3% (expected:   5.8%)
+8: █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  11.4% (expected:   5.1%)
+9: █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   2.9% (expected:   4.6%)
+
+# 帕累托分析 - 80/20法则与洛伦兹曲线可视化
+$ lawkit pareto sales_data.csv
+Lorenz Curve (Cumulative Distribution):
+  7%: █████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  26.0% cumulative
+ 13%: ███████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░  46.9% cumulative
+ 27%: ████████████████████████████████████░░░░░░░░░░░░░░  72.9% cumulative
+ 33%: ████████████████████████████████████████░░░░░░░░░░  80.7% cumulative
+ 47%: █████████████████████████████████████████████░░░░░  89.8% cumulative
+
+80/20 Rule: Top 20% owns 62.5% of total wealth (Ideal: 80.0%, Ratio: 0.78)
+
+# 正态分布 - 带直方图的质量控制
+$ lawkit normal measurements.csv
+Distribution Histogram:
+ 71.36- 76.99: █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   2.7%
+ 76.99- 82.61: ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  11.5%
+ 82.61- 88.24: █████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  34.0%
+ 88.24- 93.87: ███████████████████████████████████░░░░░░░░░░░░░░░  69.8%
+ 93.87- 99.50: ██████████████████████████████████████████████████ 100.0%
+
+Distribution: μ=99.50, σ=9.38, Range: [71.36, 127.64]
+
+# 泊松分布 - 带概率图表的稀有事件
+$ lawkit poisson event_counts.csv
+Probability Distribution:
+P(X= 0): █████████████████████████████░░░░░░░░░░░░░░░░░░░░░  0.180
+P(X= 1): ██████████████████████████████████████████████████  0.309
+P(X= 2): ███████████████████████████████████████████░░░░░░░  0.265
+P(X= 3): ████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░  0.151
+P(X= 4): ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.065
+
+Key Probabilities: P(X=0)=0.180, P(X=1)=0.309, P(X≥2)=0.511
+```
+
+### 三阶段分析工作流
+
+我们建议使用**analyze** → **validate** → **diagnose**方法进行彻底的数据分析：
+
+```bash
+# 阶段1：基本多法则分析
+$ lawkit analyze test_data.txt
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford Law: 0.944
+  Pareto Principle: -0.868
+  Normal Distribution: 0.125
+  Zipf Law: 0.813
+
+Conflicts:
+  [CONFLICT] Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+     Likely Cause: Benford Law may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for Benford Law
+
+# 阶段2：带一致性检查的数据验证
+$ lawkit validate --laws benf,pareto,normal test_data.txt --consistency-check
+Data Validation and Consistency Check
+
+Dataset: test_data.txt
+Threshold: 0.500
+Consistency Score: 0.484
+
+[WARNING] Consistency below threshold
+Recommendation: Review data quality and collection methods
+
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford Law: 0.944
+  Zipf Law: 0.813
+  Pareto Principle: -0.868
+
+# 阶段3：详细冲突分析和建议
+$ lawkit diagnose --laws all test_data.txt --report detailed
+Statistical Laws Integration Analysis
+
+Dataset: test_data.txt
+Numbers Analyzed: 500
+Laws Executed: 4 (benf, pareto, zipf, normal)
+
+Integration Metrics:
+  Overall Quality Score: 0.239
+  Consistency Score: 0.484
+  Conflicts Detected: 10
+  Recommendation Confidence: 0.100
+
+Law Results:
+  Benford Law: 0.944
+  Pareto Principle: -0.868
+  Normal Distribution: 0.125
+  Zipf Law: 0.813
+
+Conflicts:
+  [CONFLICT] Benford Law score 0.944 significantly deviates from expected 0.254 - deviation 272.2%
+     Likely Cause: Benford Law may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for Benford Law
+  [CONFLICT] Law 'normal' score (0.125) significantly deviates from expected (0.254) - deviation: 50.8%
+     Likely Cause: Law 'normal' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'normal'
+  [CONFLICT] Law 'pareto' score (-0.868) significantly deviates from expected (0.254) - deviation: 442.1%
+     Likely Cause: Law 'pareto' may not be compatible with the data pattern
+     Suggestion: Please review application conditions and data quality for law 'pareto'
+```
+
+### 高级用法
+```bash
 
 # 生成测试数据
 lawkit generate pareto --samples 1000 > test_data.txt
@@ -330,11 +471,11 @@ lawkit normal monthly_sales.csv --enable-timeseries --timeseries-window 12
 
 # 高级过滤和分析
 lawkit analyze --laws all --filter ">=1000" financial_data.xlsx
-lawkit benf --column "amount" sales_data.csv --format xml
+lawkit benf sales_data.csv --format xml
 
 # 管道使用
 cat raw_numbers.txt | lawkit benf -
-lawkit generate zipf --size 10000 | lawkit analyze --laws all -
+lawkit generate zipf --samples 10000 | lawkit analyze --laws all -
 
 # 使用diffx进行时间序列分析的元链
 lawkit benf sales_2023.csv > analysis_2023.txt

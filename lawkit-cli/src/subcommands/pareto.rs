@@ -113,6 +113,10 @@ fn print_text_output(
         RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
     }
 
+    println!();
+    println!("Lorenz Curve (Cumulative Distribution):");
+    println!("{}", format_lorenz_curve(result));
+
     if verbose {
         println!();
         println!("Pareto Metrics:");
@@ -343,4 +347,51 @@ fn analyze_numbers_with_options(
     }
 
     Ok(result)
+}
+
+fn format_lorenz_curve(result: &ParetoResult) -> String {
+    let mut output = String::new();
+    const CHART_WIDTH: usize = 50;
+    const CHART_HEIGHT: usize = 10;
+    
+    // ローレンツ曲線の主要ポイントを取得（グラフ用に簡略化）
+    let curve_points = &result.cumulative_distribution;
+    let total_points = curve_points.len();
+    
+    // 10点のサンプルポイントを選択
+    let sample_indices: Vec<usize> = (0..CHART_HEIGHT)
+        .map(|i| ((i + 1) * total_points) / (CHART_HEIGHT + 1))
+        .collect();
+    
+    for (_chart_line, &sample_idx) in sample_indices.iter().enumerate() {
+        let sample_idx = sample_idx.min(total_points - 1);
+        let (population_pct, wealth_pct) = curve_points[sample_idx];
+        
+        // X軸：人口パーセンタイル（0-100%）
+        // Y軸：富のパーセンタイル（0-100%）
+        let bar_length = (wealth_pct * CHART_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(CHART_WIDTH);
+        
+        let filled_bar = "█".repeat(bar_length);
+        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
+        let full_bar = format!("{}{}", filled_bar, background_bar);
+        
+        // パーセンタイルごとに表示
+        let pop_percent = population_pct * 100.0;
+        let wealth_percent = wealth_pct * 100.0;
+        
+        output.push_str(&format!(
+            "{:3.0}%: {} {:>5.1}% cumulative\n",
+            pop_percent, full_bar, wealth_percent
+        ));
+    }
+    
+    // 80/20ラインの表示
+    output.push_str(&format!("\n80/20 Rule: Top 20% owns {:.1}% of total wealth", result.top_20_percent_share));
+    output.push_str(&format!(
+        " (Ideal: 80.0%, Ratio: {:.2})",
+        result.pareto_ratio
+    ));
+    
+    output
 }
