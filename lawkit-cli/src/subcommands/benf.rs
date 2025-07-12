@@ -97,7 +97,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
             let original_len = numbers.len();
             let filtered: Vec<f64> = numbers.into_iter().filter(|&x| x >= min_val).collect();
-            
+
             if matches.get_flag("verbose") {
                 eprintln!(
                     "Debug: Min-value filter applied: {} → {} numbers (>= {})",
@@ -120,21 +120,22 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         let memory_config = MemoryConfig::default();
 
         // インクリメンタルストリーミング分析を実行
-        let chunk_result = match streaming_benford_analysis(filtered_numbers.into_iter(), &memory_config) {
-            Ok(result) => {
-                if matches.get_flag("verbose") {
-                    eprintln!(
-                        "Debug: Streaming analysis successful - {} items processed",
-                        result.total_items
-                    );
+        let chunk_result =
+            match streaming_benford_analysis(filtered_numbers.into_iter(), &memory_config) {
+                Ok(result) => {
+                    if matches.get_flag("verbose") {
+                        eprintln!(
+                            "Debug: Streaming analysis successful - {} items processed",
+                            result.total_items
+                        );
+                    }
+                    result
                 }
-                result
-            }
-            Err(e) => {
-                eprintln!("Streaming analysis error: {e}");
-                std::process::exit(1);
-            }
-        };
+                Err(e) => {
+                    eprintln!("Streaming analysis error: {e}");
+                    std::process::exit(1);
+                }
+            };
 
         if chunk_result.total_items == 0 {
             if matches.get_flag("verbose") {

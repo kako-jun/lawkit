@@ -26,7 +26,6 @@ class LawkitOptions:
     verbose: bool = False
     filter: Optional[str] = None
     min_count: Optional[int] = None
-    optimize: bool = False
     
     # Integration-specific options
     laws: Optional[str] = None  # "benf,pareto,zipf,normal,poisson"
@@ -45,8 +44,15 @@ class LawkitOptions:
     business_analysis: bool = False
     concentration: Optional[float] = None
     
+    # Zipf-specific options
+    text: bool = False  # Enable text analysis mode
+    words: Optional[int] = None  # Maximum number of words to analyze in text mode
+    
     # Benford-specific options
     threshold_level: Optional[str] = None  # "low", "medium", "high", "critical", "auto"
+    confidence: Optional[float] = None  # Statistical confidence level (0.01-0.99)
+    sample_size: Optional[int] = None  # Maximum sample size for large datasets
+    min_value: Optional[float] = None  # Minimum value to include in analysis
     
     # Generate-specific options
     samples: Optional[int] = None
@@ -223,6 +229,15 @@ def analyze_benford(
     if options.threshold_level:
         args.extend(["--threshold", options.threshold_level])
     
+    if options.confidence is not None:
+        args.extend(["--confidence", str(options.confidence)])
+    
+    if options.sample_size is not None:
+        args.extend(["--sample-size", str(options.sample_size)])
+    
+    if options.min_value is not None:
+        args.extend(["--min-value", str(options.min_value)])
+    
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
@@ -325,6 +340,13 @@ def analyze_zipf(
     # Add common options
     _add_common_options(args, options)
     
+    # Add Zipf-specific options
+    if options.text:
+        args.append("--text")
+    
+    if options.words is not None:
+        args.extend(["--words", str(options.words)])
+    
     stdout, stderr = _execute_lawkit(args)
     
     # If output format is JSON, parse the result
@@ -421,6 +443,10 @@ def analyze_poisson(
     
     # Add common options
     _add_common_options(args, options)
+    
+    # Add Poisson-specific options
+    if options.confidence is not None:
+        args.extend(["--confidence", str(options.confidence)])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -695,9 +721,6 @@ def _add_common_options(args: List[str], options: LawkitOptions) -> None:
     
     if options.min_count is not None:
         args.extend(["--min-count", str(options.min_count)])
-    
-    if options.optimize:
-        args.append("--optimize")
     
     # Integration-specific options
     if options.laws:

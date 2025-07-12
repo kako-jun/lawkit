@@ -19,7 +19,7 @@ const { tmpdir } = require('os');
 /**
  * Options for lawkit operations
  * @typedef {Object} LawkitOptions
- * @property {OutputFormat} [output='text'] - Output format
+ * @property {OutputFormat} [output='text'] - Output format (maps to --format option)
  * @property {number} [minCount] - Minimum count threshold
  * @property {number} [confidence] - Confidence level
  * @property {number} [sampleSize] - Sample size for optimization
@@ -205,7 +205,7 @@ async function executeAnalysis(command, data, options = {}) {
     
     // Add output format option
     if (options.output) {
-      args.push('--output', options.output);
+      args.push('--format', options.output);
     }
     
     // Add min-count option
