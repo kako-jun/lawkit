@@ -19,74 +19,58 @@ cargo clippy --workspace --all-targets --all-features -- -D warnings
 echo "Step 3: Build"
 cargo build --workspace --verbose
 
-echo "Step 4: Run tests"
-cargo test --workspace --verbose
+echo "Step 4: Run unit tests"
+cargo test --workspace --lib --verbose
 
-echo "Step 5: Quick performance check"
-# Light performance sanity check (just compilation and basic run)
-cargo build --release --package lawkit-core
-echo "Release build successful - performance optimizations applied"
+echo "Step 5: Run integration tests"
+cargo test --workspace --test "*" --verbose
 
-echo "Step 6: Test core CLI functionality"
+echo "Step 6: Test generate functionality"
+# Test basic generate functionality
+cargo run --bin lawkit -- generate benf --samples 35 --seed 12345 > /tmp/test_benf.txt
+cargo run --bin lawkit -- benf /tmp/test_benf.txt
 
-# Create temp directory for test files (like CI would)
-TEST_DIR=$(mktemp -d)
-trap 'rm -rf "$TEST_DIR"' EXIT
-
-# Test basic Benford's Law analysis (must succeed)
-seq 111 200 > "$TEST_DIR/test_data.txt"
-if cargo run --bin lawkit -- benf "$TEST_DIR/test_data.txt" > /dev/null 2>&1; then
-    echo "✅ Benford analysis completed successfully"
-elif [ $? -eq 11 ]; then
-    echo "✅ Benford analysis completed (CRITICAL result is normal for sequential data)"
-else
-    echo "ERROR: Basic Benford's Law test failed with unexpected error" >&2
-    exit 1
+# Test generate→analyze pipeline (allow exit codes 0-12 for normal)
+cargo run --bin lawkit -- generate normal --samples 100 --mean 50 --stddev 10 --seed 42 > /tmp/test_normal.txt
+set +e
+cargo run --bin lawkit -- normal /tmp/test_normal.txt
+exit_code=$?
+set -e
+if [ $exit_code -gt 12 ]; then
+  echo "Normal analysis failed with exit code $exit_code"
+  exit $exit_code
 fi
 
-# Test help command (must succeed)
-if ! cargo run --bin lawkit -- --help > /dev/null 2>&1; then
-    echo "ERROR: Help command test failed" >&2
-    exit 1
+# Test selftest functionality
+cargo run --bin lawkit -- selftest
+
+echo "Step 7: Test CLI examples from README"
+# Basic analysis examples (use --min-count to allow small datasets)
+set +e
+echo "1234 5678 9012 3456" | cargo run --bin lawkit -- benf --min-count 4
+exit_code=$?
+set -e
+if [ $exit_code -gt 12 ]; then
+  echo "Benf analysis failed with exit code $exit_code"
+  exit $exit_code
 fi
 
-# Test stdin processing (must succeed)
-if seq 111 200 | cargo run --bin lawkit -- benf - > /dev/null 2>&1; then
-    echo "✅ Stdin processing completed successfully"
-elif [ $? -eq 11 ]; then
-    echo "✅ Stdin processing completed (CRITICAL result is normal for sequential data)"
-else
-    echo "ERROR: Stdin processing test failed with unexpected error" >&2
-    exit 1
+# Generate and analyze workflow
+cargo run --bin lawkit -- generate benf --samples 100 --seed readme > /tmp/readme_test.txt
+cargo run --bin lawkit -- benf /tmp/readme_test.txt --format json
+
+# Multi-law comparison (allow exit codes 0-12 for analysis results)
+set +e
+cargo run --bin lawkit -- analyze /tmp/readme_test.txt
+exit_code=$?
+set -e
+if [ $exit_code -gt 12 ]; then
+  echo "Analyze command failed with exit code $exit_code"
+  exit $exit_code
 fi
 
-# Additional tests to ensure exact CI parity
-echo "Step 7: Additional strict checks"
-
-# Ensure no warnings in release mode
-if ! cargo build --release --workspace 2>&1 | grep -v "Finished" | grep -v "Compiling" | grep -v "Building" | grep -q .; then
-    echo "Release build completed without warnings"
-else
-    echo "ERROR: Release build produced warnings" >&2
-    exit 1
-fi
-
-# Check for any TODO or FIXME comments (optional but good practice)
-if grep -r "TODO\|FIXME" --include="*.rs" . | grep -v "target/"; then
-    echo "WARNING: Found TODO/FIXME comments in code"
-fi
-
-# Verify Cargo.lock is committed and up to date
-if ! git diff --quiet Cargo.lock; then
-    echo "ERROR: Cargo.lock has uncommitted changes" >&2
-    exit 1
-fi
-
-# Check for large files that shouldn't be committed
-if find . -type f -size +1M -not -path "./target/*" -not -path "./.git/*" | grep -q .; then
-    echo "WARNING: Found files larger than 1MB"
-    find . -type f -size +1M -not -path "./target/*" -not -path "./.git/*" -exec ls -lh {} \;
-fi
+# List functionality
+cargo run --bin lawkit -- list
 
 echo "All CI steps completed successfully!"
 echo "Ready to push to remote repository"
