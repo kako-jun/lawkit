@@ -19,6 +19,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let is_text_mode = matches.get_flag("text");
 
     // Determine input source based on arguments
+    if matches.get_flag("verbose") {
+        eprintln!(
+            "Debug: input argument = {:?}",
+            matches.get_one::<String>("input")
+        );
+        eprintln!("Debug: text mode = {is_text_mode}");
+    }
+
     if let Some(input) = matches.get_one::<String>("input") {
         // Use auto-detection for file vs string input
         if is_text_mode {
@@ -80,6 +88,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     } else {
         // Read from stdin - use automatic optimization based on data characteristics
+        if matches.get_flag("verbose") {
+            eprintln!("Debug: Reading from stdin, using automatic optimization");
+            eprintln!(
+                "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
+            );
+        }
+
         if is_text_mode {
             // Text mode with streaming
             let mut reader = OptimizedFileReader::from_stdin();
@@ -101,14 +116,38 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 }
             }
 
+            if matches.get_flag("verbose") {
+                eprintln!("Debug: Collected {} words from stream", words.len());
+            }
+
             // Use streaming analysis
             let chunk_result = match streaming_zipf_analysis(words.into_iter(), &memory_config) {
-                Ok(result) => result,
+                Ok(result) => {
+                    if matches.get_flag("verbose") {
+                        eprintln!(
+                            "Debug: Streaming analysis successful - {} items processed",
+                            result.total_items
+                        );
+                    }
+                    result
+                }
                 Err(e) => {
                     eprintln!("Streaming analysis error: {e}");
                     std::process::exit(1);
                 }
             };
+
+            if matches.get_flag("verbose") {
+                eprintln!(
+                    "Debug: Processed {} items in {} chunks",
+                    chunk_result.total_items, chunk_result.chunks_processed
+                );
+                eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+                eprintln!(
+                    "Debug: Processing time: {} ms",
+                    chunk_result.processing_time_ms
+                );
+            }
 
             // Convert IncrementalZipf to ZipfResult
             let frequencies = chunk_result.result.get_sorted_frequencies();
@@ -132,7 +171,12 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 }
             };
             let numbers = match parse_text_input(&buffer) {
-                Ok(numbers) => numbers,
+                Ok(numbers) => {
+                    if matches.get_flag("verbose") {
+                        eprintln!("Debug: Collected {} numbers from input", numbers.len());
+                    }
+                    numbers
+                }
                 Err(e) => {
                     eprintln!("Analysis error: {e}");
                     std::process::exit(1);
