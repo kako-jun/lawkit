@@ -116,6 +116,10 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 chunk_result.total_items, chunk_result.chunks_processed
             );
             eprintln!("Debug: Memory used: {:.2} MB", chunk_result.memory_used_mb);
+            eprintln!(
+                "Debug: Processing time: {} ms",
+                chunk_result.processing_time_ms
+            );
         }
 
         // IncrementalParetoから通常のパレート結果に変換
