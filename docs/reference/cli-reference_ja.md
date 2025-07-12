@@ -41,7 +41,7 @@ lawkit benf [OPTIONS] [INPUT]
 #### オプション
 - `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
 - `--quiet, -q` - 最小限の出力（数値のみ）
-- `--verbose, -v` - 詳細統計
+- `--verbose, -v` - 詳細なデバッグ出力と分析洞察を有効化
 - `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
 - `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
 - `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
@@ -49,6 +49,42 @@ lawkit benf [OPTIONS] [INPUT]
 - `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
 - `--sample-size <NUMBER>` - 大規模データセットの最大サンプルサイズ（性能向上）
 - `--min-value <VALUE>` - 分析に含める最小値（ノイズとなる小さな値をフィルタ）
+
+#### 詳細出力
+`--verbose`フラグは包括的なデバッグと分析情報を提供します：
+
+**デバッグ情報:**
+- 入力引数の検出と検証
+- データ処理戦略（自動最適化、ストリーミング）
+- フィルタ適用の前後統計
+- データ収集と解析の詳細
+
+**パフォーマンス指標:**
+- 処理時間（ミリ秒）
+- メモリ使用量（MB）
+- 大規模データセットの処理チャンク数
+- 処理されたアイテム数
+
+**分析洞察:**
+- 統計計算ステップ
+- 信頼区間の詳細
+- アルゴリズム選択の理由
+- データ品質評価
+
+詳細出力例:
+```bash
+$ echo "123 456 789" | lawkit benf --verbose
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Using automatic optimization (streaming + incremental + memory efficiency)
+Debug: Collected 3 numbers from stream
+Debug: Streaming analysis successful - 3 items processed
+Debug: Processed 3 numbers in 1 chunks
+Debug: Memory used: 0.00 MB
+Debug: Processing time: 1 ms
+
+# 標準分析出力が続きます...
+```
 
 #### 例
 ```bash
@@ -111,6 +147,32 @@ lawkit pareto revenue.csv --percentiles 70,80,90,95
 lawkit zipf [OPTIONS] [INPUT]
 ```
 
+#### 詳細出力
+`--verbose`フラグは包括的なデバッグと分析情報を提供します：
+
+**デバッグ情報:**
+- 入力引数の検出と検証
+- テキストモードvs数値モードの判定
+- データ処理戦略（ストリーミング分析）
+- データ収集と解析の詳細
+
+**パフォーマンス指標:**
+- 処理時間（ミリ秒）
+- メモリ使用量（MB）
+- 処理チャンク数
+- 処理されたアイテム数
+
+詳細出力例:
+```bash
+$ echo "1 2 3 4 5" | lawkit zipf --verbose
+Debug: input argument = None
+Debug: text mode = false
+Debug: Reading from stdin, using automatic optimization
+Debug: Collected 5 numbers from input
+
+# 標準分析出力が続きます...
+```
+
 #### 例
 ```bash
 # 基本ジップ分析
@@ -129,6 +191,32 @@ lawkit zipf data.csv --format json
 
 ```bash
 lawkit normal [OPTIONS] [INPUT]
+```
+
+#### 詳細出力
+`--verbose`フラグは包括的なデバッグと分析情報を提供します：
+
+**デバッグ情報:**
+- 入力引数の検出と検証
+- データ処理戦略（自動最適化、ストリーミング）
+- データ収集と解析の詳細
+- ストリーミング分析メトリクス
+
+**パフォーマンス指標:**
+- 処理時間（ミリ秒）
+- メモリ使用量（MB）
+- 大規模データセットの処理チャンク数
+- 処理されたアイテム数
+
+詳細出力例:
+```bash
+$ echo "50 51 49 52 48" | lawkit normal --verbose
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Collected 5 numbers from stream
+Debug: Memory used: 0.00 MB
+
+# 標準分析出力が続きます...
 ```
 
 #### 例
@@ -154,7 +242,7 @@ lawkit poisson [OPTIONS] [INPUT]
 #### オプション
 - `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
 - `--quiet, -q` - 最小限の出力（数値のみ）
-- `--verbose, -v` - 詳細統計
+- `--verbose, -v` - 詳細なデバッグ出力と分析洞察を有効化
 - `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
 - `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
 - `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
