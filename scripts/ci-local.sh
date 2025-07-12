@@ -34,9 +34,13 @@ TEST_DIR=$(mktemp -d)
 trap 'rm -rf "$TEST_DIR"' EXIT
 
 # Test basic Benford's Law analysis (must succeed)
-echo -e "123\n456\n789\n101\n202" > "$TEST_DIR/test_data.txt"
-if ! cargo run --bin lawkit -- benf "$TEST_DIR/test_data.txt" > /dev/null 2>&1; then
-    echo "ERROR: Basic Benford's Law test failed" >&2
+seq 111 200 > "$TEST_DIR/test_data.txt"
+if cargo run --bin lawkit -- benf "$TEST_DIR/test_data.txt" > /dev/null 2>&1; then
+    echo "✅ Benford analysis completed successfully"
+elif [ $? -eq 11 ]; then
+    echo "✅ Benford analysis completed (CRITICAL result is normal for sequential data)"
+else
+    echo "ERROR: Basic Benford's Law test failed with unexpected error" >&2
     exit 1
 fi
 
@@ -47,8 +51,12 @@ if ! cargo run --bin lawkit -- --help > /dev/null 2>&1; then
 fi
 
 # Test stdin processing (must succeed)
-if ! echo -e "111\n222\n333" | cargo run --bin lawkit -- benf - > /dev/null 2>&1; then
-    echo "ERROR: Stdin processing test failed" >&2
+if seq 111 200 | cargo run --bin lawkit -- benf - > /dev/null 2>&1; then
+    echo "✅ Stdin processing completed successfully"
+elif [ $? -eq 11 ]; then
+    echo "✅ Stdin processing completed (CRITICAL result is normal for sequential data)"
+else
+    echo "ERROR: Stdin processing test failed with unexpected error" >&2
     exit 1
 fi
 
