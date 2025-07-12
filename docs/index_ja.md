@@ -43,9 +43,6 @@ lawkit analyze data.csv --laws benf,pareto,normal
 - [統合機能](guides/integrations_ja.md)
 - [パフォーマンス](guides/performance_ja.md)
 
-### プロジェクト
-- [変更履歴](../CHANGELOG.md)
-- [ロードマップ](project/roadmap_ja.md)
 
 ### その他
 - [FAQ](user-guide/faq_ja.md)

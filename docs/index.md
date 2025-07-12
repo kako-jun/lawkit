@@ -44,9 +44,6 @@ lawkit analyze data.csv --laws benf,pareto,normal
 - [Performance Guide](guides/performance.md)
 - [Advanced Analysis](guides/advanced-analysis.md)
 
-### Project
-- [Changelog](../CHANGELOG.md)
-- [Roadmap](project/roadmap.md)
 
 ### Other
 - [FAQ](user-guide/faq.md)
