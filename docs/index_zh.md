@@ -44,9 +44,6 @@ lawkit analyze data.csv --laws benf,pareto,normal
 - [性能优化](guides/performance_zh.md)
 - [高级分析](guides/advanced-analysis_zh.md)
 
-### 项目信息
-- [更新日志](../CHANGELOG.md)
-- [路线图](project/roadmap_zh.md)
 
 ### 其他
 - [常见问题](user-guide/faq_zh.md)
