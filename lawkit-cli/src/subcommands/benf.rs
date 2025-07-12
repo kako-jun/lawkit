@@ -15,7 +15,7 @@ use std::str::FromStr;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // Determine input source based on arguments
-    if std::env::var("LAWKIT_DEBUG").is_ok() {
+    if matches.get_flag("verbose") {
         eprintln!(
             "Debug: input argument = {:?}",
             matches.get_one::<String>("input")
@@ -52,14 +52,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     } else {
         // Read from stdin - use automatic optimization based on data characteristics
-        if std::env::var("LAWKIT_DEBUG").is_ok() {
+        if matches.get_flag("verbose") {
             eprintln!("Debug: Reading from stdin, using automatic optimization");
         }
 
         // 自動最適化処理：データ特性に基づいてストリーミング処理を自動選択
         let mut reader = OptimizedFileReader::from_stdin();
 
-        if std::env::var("LAWKIT_DEBUG").is_ok() {
+        if matches.get_flag("verbose") {
             eprintln!(
                 "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
             );
@@ -67,14 +67,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
         // ストリーミング処理でインクリメンタル分析を実行
         let numbers = match reader.read_lines_streaming(|line| {
-            if std::env::var("LAWKIT_DEBUG").is_ok() {
+            if matches.get_flag("verbose") {
                 eprintln!("Debug: Processing line: '{line}'");
             }
             parse_text_input(&line).map(Some).or(Ok(None))
         }) {
             Ok(nested_numbers) => {
                 let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
-                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                if matches.get_flag("verbose") {
                     eprintln!("Debug: Collected {} numbers from stream", flattened.len());
                 }
                 flattened
@@ -91,7 +91,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         // インクリメンタルストリーミング分析を実行
         let chunk_result = match streaming_benford_analysis(numbers.into_iter(), &memory_config) {
             Ok(result) => {
-                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                if matches.get_flag("verbose") {
                     eprintln!(
                         "Debug: Streaming analysis successful - {} items processed",
                         result.total_items
@@ -106,7 +106,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         };
 
         if chunk_result.total_items == 0 {
-            if std::env::var("LAWKIT_DEBUG").is_ok() {
+            if matches.get_flag("verbose") {
                 eprintln!(
                     "Debug: Total items in chunk_result: {}",
                     chunk_result.total_items
@@ -121,7 +121,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             convert_incremental_to_result(&chunk_result.result, "stdin".to_string(), matches);
 
         // デバッグ情報を出力
-        if std::env::var("LAWKIT_DEBUG").is_ok() {
+        if matches.get_flag("verbose") {
             eprintln!(
                 "Debug: Processed {} numbers in {} chunks",
                 chunk_result.total_items, chunk_result.chunks_processed

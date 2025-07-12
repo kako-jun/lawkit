@@ -122,7 +122,8 @@ fn test_memory_efficiency_large_dataset() {
 fn run_lawkit_command_with_debug(subcommand: &str, args: &[&str]) -> std::process::Output {
     let mut command = Command::new("cargo");
     command.args(["run", "--bin", "lawkit", "--", subcommand]);
-    command.env("LAWKIT_DEBUG", "1"); // Enable debug output
+    // Enable verbose output for debugging
+    command.args(["--verbose"]); // Enable debug output
 
     // Handle test data similar to integration tests
     let mut test_data = String::new();
