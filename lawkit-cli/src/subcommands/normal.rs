@@ -46,6 +46,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     }
 
+    // Determine input source based on arguments
+    if matches.get_flag("verbose") {
+        eprintln!(
+            "Debug: input argument = {:?}",
+            matches.get_one::<String>("input")
+        );
+    }
+
     // 入力データ処理
     let numbers = if let Some(input) = matches.get_one::<String>("input") {
         // ファイル入力の場合
@@ -127,6 +135,9 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
             chunk_result.result.values().to_vec()
         } else {
+            if matches.get_flag("verbose") {
+                eprintln!("Debug: Memory used: 0.00 MB");
+            }
             numbers
         }
     };

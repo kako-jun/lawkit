@@ -41,7 +41,7 @@ lawkit benf [OPTIONS] [INPUT]
 #### Options
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
-- `--verbose, -v` - Detailed statistics
+- `--verbose, -v` - Enable verbose debugging output with detailed analysis insights
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
 - `--optimize` - Enable memory and processing optimizations for large datasets
@@ -49,6 +49,42 @@ lawkit benf [OPTIONS] [INPUT]
 - `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)
 - `--sample-size <NUMBER>` - Maximum sample size for large datasets (improves performance)
 - `--min-value <VALUE>` - Minimum value to include in analysis (filters small values that add noise)
+
+#### Verbose Output
+The `--verbose` flag provides comprehensive debugging and analysis information:
+
+**Debug Information:**
+- Input argument detection and validation
+- Data processing strategy (automatic optimization, streaming)
+- Filter application with before/after statistics
+- Data collection and parsing details
+
+**Performance Metrics:**
+- Processing time in milliseconds
+- Memory usage in MB
+- Number of chunks processed for large datasets
+- Items processed counts
+
+**Analysis Insights:**
+- Statistical computation steps
+- Confidence interval details
+- Algorithm selection reasoning
+- Data quality assessment
+
+Example verbose output:
+```bash
+$ echo "123 456 789" | lawkit benf --verbose
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Using automatic optimization (streaming + incremental + memory efficiency)
+Debug: Collected 3 numbers from stream
+Debug: Streaming analysis successful - 3 items processed
+Debug: Processed 3 numbers in 1 chunks
+Debug: Memory used: 0.00 MB
+Debug: Processing time: 1 ms
+
+# Standard analysis output follows...
+```
 
 #### Examples
 ```bash
@@ -154,7 +190,7 @@ lawkit poisson [OPTIONS] [INPUT]
 #### Options
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
-- `--verbose, -v` - Detailed statistics
+- `--verbose, -v` - Enable verbose debugging output with detailed analysis insights
 - `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
 - `--optimize` - Enable memory and processing optimizations for large datasets
 - `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)

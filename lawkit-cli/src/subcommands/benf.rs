@@ -85,11 +85,42 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             }
         };
 
+        // Apply minimum value filter for streaming analysis
+        let filtered_numbers = if let Some(min_value_str) = matches.get_one::<String>("min-value") {
+            let min_val = min_value_str
+                .parse::<f64>()
+                .map_err(|_| {
+                    eprintln!("Error: Invalid minimum value");
+                    std::process::exit(2);
+                })
+                .unwrap();
+
+            let original_len = numbers.len();
+            let filtered: Vec<f64> = numbers.into_iter().filter(|&x| x >= min_val).collect();
+            
+            if matches.get_flag("verbose") {
+                eprintln!(
+                    "Debug: Min-value filter applied: {} → {} numbers (>= {})",
+                    original_len,
+                    filtered.len(),
+                    min_val
+                );
+                eprintln!(
+                    "Debug: Filter removed {} values ({:.1}%)",
+                    original_len - filtered.len(),
+                    100.0 * (original_len - filtered.len()) as f64 / original_len as f64
+                );
+            }
+            filtered
+        } else {
+            numbers
+        };
+
         // メモリ設定を作成
         let memory_config = MemoryConfig::default();
 
         // インクリメンタルストリーミング分析を実行
-        let chunk_result = match streaming_benford_analysis(numbers.into_iter(), &memory_config) {
+        let chunk_result = match streaming_benford_analysis(filtered_numbers.into_iter(), &memory_config) {
             Ok(result) => {
                 if matches.get_flag("verbose") {
                     eprintln!(
