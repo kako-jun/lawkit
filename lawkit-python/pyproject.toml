@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lawkit-python"
-version = "2.2.0"
+version = "2.3.0"
 description = "Python wrapper for lawkit - Statistical law analysis toolkit for fraud detection and data quality assessment"
 readme = "README.md"
 license = "MIT"
