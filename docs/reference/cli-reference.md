@@ -39,16 +39,17 @@ lawkit benf [OPTIONS] [INPUT]
 ```
 
 #### Options
-- `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
+- `--format <FORMAT>, -f` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Enable verbose debugging output with detailed analysis insights
 - `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
-- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
-- `--optimize` - Enable memory and processing optimizations for large datasets
-- `--threshold <LEVEL>` - Anomaly detection threshold: low, medium, high, critical (default: auto)
+- `--min-count <NUMBER>, -c` - Minimum number of data points required for analysis (default: 10)
+- `--threshold <LEVEL>, -t` - Anomaly detection threshold: low, medium, high, critical (default: auto)
 - `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)
 - `--sample-size <NUMBER>` - Maximum sample size for large datasets (improves performance)
 - `--min-value <VALUE>` - Minimum value to include in analysis (filters small values that add noise)
+
+**Note**: The `--optimize` option has been deprecated. Optimization is now applied automatically.
 
 #### Verbose Output
 The `--verbose` flag provides comprehensive debugging and analysis information:
@@ -104,7 +105,7 @@ lawkit benf accounts.csv --filter ">=1000" --threshold high
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
 # Performance optimization for large datasets
-lawkit benf big_data.csv --sample-size 50000 --optimize
+lawkit benf big_data.csv --sample-size 50000
 
 # Filter out small values that add noise to analysis
 lawkit benf financial_data.csv --min-value 100
@@ -118,8 +119,15 @@ Analyze concentration and apply the 80/20 rule.
 lawkit pareto [OPTIONS] [INPUT]
 ```
 
+#### Common Options
+- `--format <FORMAT>, -f` - Output format: text, json, csv, yaml, toml, xml (default: text)
+- `--quiet, -q` - Minimal output
+- `--verbose, -v` - Detailed output
+- `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - Minimum number of data points required for analysis (default: 10)
+
 #### Specific Options
-- `--concentration <THRESHOLD>` - Concentration threshold (0.0-1.0) (default: 0.8)
+- `--concentration <THRESHOLD>, -C` - Concentration threshold (0.0-1.0) (default: 0.8)
 - `--gini-coefficient` - Calculate Gini coefficient for inequality measurement
 - `--percentiles <PERCENTILES>` - Custom percentiles to calculate (e.g., 70,80,90)
 - `--business-analysis` - Enable business analysis insights
@@ -141,16 +149,33 @@ lawkit pareto revenue.csv --percentiles 70,80,90,95
 
 ### `lawkit zipf` - Zipf Law Analysis
 
-Analyze frequency distributions and ranking patterns.
+Analyze frequency distributions and ranking patterns. Supports both numeric and text data analysis.
 
 ```bash
 lawkit zipf [OPTIONS] [INPUT]
 ```
 
+#### Common Options
+- `--format <FORMAT>, -f` - Output format: text, json, csv, yaml, toml, xml (default: text)
+- `--quiet, -q` - Minimal output
+- `--verbose, -v` - Detailed output
+- `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - Minimum number of data points required for analysis (default: 10)
+
+#### Specific Options
+- `--text, -T` - Enable text analysis mode
+- `--words <NUMBER>, -w` - Maximum number of words to analyze in text mode (default: 1000)
+
 #### Examples
 ```bash
-# Basic zipf analysis
+# Basic zipf analysis (numeric data)
 lawkit zipf frequency_data.csv
+
+# Text analysis mode
+lawkit zipf text_document.txt --text
+
+# Text analysis with word limit
+lawkit zipf large_text.txt --text --words 500
 
 # Verbose output
 lawkit zipf rankings.csv --verbose
@@ -161,16 +186,44 @@ lawkit zipf data.csv --format json
 
 ### `lawkit normal` - Normal Distribution Analysis
 
-Test for normality and detect outliers.
+Test for normality and detect outliers. Provides advanced statistical analysis capabilities.
 
 ```bash
 lawkit normal [OPTIONS] [INPUT]
 ```
 
+#### Common Options
+- `--format <FORMAT>, -f` - Output format: text, json, csv, yaml, toml, xml (default: text)
+- `--quiet, -q` - Minimal output
+- `--verbose, -v` - Detailed output
+- `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - Minimum number of data points required for analysis (default: 10)
+
+#### Analysis Options
+- `--test <METHOD>, -T` - Normality test method: shapiro, anderson, ks, all (default: all)
+- `--outliers, -O` - Enable outlier detection
+- `--outlier-method <METHOD>` - Outlier detection method: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (default: zscore)
+- `--quality-control, -Q` - Enable quality control analysis
+- `--spec-limits <LOWER,UPPER>` - Specification limits for quality control (e.g., 9.5,10.5)
+- `--enable-timeseries` - Enable time series analysis
+- `--timeseries-window <SIZE>` - Time series analysis window size (default: 10)
+
 #### Examples
 ```bash
 # Basic normality testing
 lawkit normal data.csv
+
+# Specific test method
+lawkit normal data.csv --test shapiro
+
+# Outlier detection
+lawkit normal data.csv --outliers --outlier-method lof
+
+# Quality control analysis
+lawkit normal production_data.csv --quality-control --spec-limits 9.5,10.5
+
+# Time series analysis
+lawkit normal timeseries_data.csv --enable-timeseries --timeseries-window 20
 
 # Detailed output
 lawkit normal measurements.csv --verbose
@@ -187,18 +240,35 @@ Analyze event occurrences and rare events.
 lawkit poisson [OPTIONS] [INPUT]
 ```
 
-#### Options
-- `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml (default: text)
+#### Common Options
+- `--format <FORMAT>, -f` - Output format: text, json, csv, yaml, toml, xml (default: text)
 - `--quiet, -q` - Minimal output (numbers only)
 - `--verbose, -v` - Enable verbose debugging output with detailed analysis insights
-- `--min-count <NUMBER>` - Minimum number of data points required for analysis (default: 10)
-- `--optimize` - Enable memory and processing optimizations for large datasets
+- `--filter <RANGE>` - Filter numbers by range (e.g., >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - Minimum number of data points required for analysis (default: 10)
 - `--confidence <LEVEL>` - Statistical confidence level for tests (0.01-0.99, default: 0.95)
+
+#### Analysis Options
+- `--test <METHOD>, -T` - Goodness-of-fit test method: chi_square, ks, variance, all (default: all)
+- `--predict, -p` - Enable probability prediction
+- `--max-events <NUMBER>` - Maximum number of events for analysis (default: 20)
+- `--rare-events, -R` - Focus on rare event analysis
+
+**Note**: The `--optimize` option has been deprecated. Optimization is now applied automatically.
 
 #### Examples
 ```bash
 # Basic Poisson analysis
 lawkit poisson events.csv
+
+# Specific test method
+lawkit poisson data.csv --test chi_square
+
+# Probability prediction mode
+lawkit poisson server_logs.csv --predict --max-events 50
+
+# Rare event analysis
+lawkit poisson rare_events.csv --rare-events
 
 # Detailed output
 lawkit poisson incidents.csv --verbose
@@ -314,7 +384,8 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
-- `--optimize` - Enable memory and processing optimizations for large datasets
+
+**Note**: Optimization is automatically applied, so the `--optimize` option is no longer needed.
 
 ### Data Processing
 - `--filter <RANGE>` - Number filtering (>=100, <1000, 50-500)

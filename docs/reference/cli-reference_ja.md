@@ -39,16 +39,17 @@ lawkit benf [OPTIONS] [INPUT]
 ```
 
 #### オプション
-- `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--format <FORMAT>, -f` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
 - `--quiet, -q` - 最小限の出力（数値のみ）
 - `--verbose, -v` - 詳細なデバッグ出力と分析洞察を有効化
 - `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
-- `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
-- `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
-- `--threshold <LEVEL>` - 異常検出閾値: low, medium, high, critical (デフォルト: auto)
+- `--min-count <NUMBER>, -c` - 分析に必要な最小データポイント数 (デフォルト: 10)
+- `--threshold <LEVEL>, -t` - 異常検出閾値: low, medium, high, critical (デフォルト: auto)
 - `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
 - `--sample-size <NUMBER>` - 大規模データセットの最大サンプルサイズ（性能向上）
 - `--min-value <VALUE>` - 分析に含める最小値（ノイズとなる小さな値をフィルタ）
+
+**注意**: `--optimize`オプションは廃止されました。最適化は自動的に適用されます。
 
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
@@ -104,7 +105,7 @@ lawkit benf accounts.csv --filter ">=1000" --threshold high
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
 # 大規模データセットのパフォーマンス最適化
-lawkit benf big_data.csv --sample-size 50000 --optimize
+lawkit benf big_data.csv --sample-size 50000
 
 # 分析にノイズを加える小さな値をフィルタ
 lawkit benf financial_data.csv --min-value 100
@@ -118,8 +119,15 @@ lawkit benf financial_data.csv --min-value 100
 lawkit pareto [OPTIONS] [INPUT]
 ```
 
+#### 共通オプション
+- `--format <FORMAT>, -f` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--quiet, -q` - 最小限の出力
+- `--verbose, -v` - 詳細出力
+- `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - 分析に必要な最小データポイント数 (デフォルト: 10)
+
 #### 固有オプション
-- `--concentration <THRESHOLD>` - 集中度閾値 (0.0-1.0) (デフォルト: 0.8)
+- `--concentration <THRESHOLD>, -C` - 集中度閾値 (0.0-1.0) (デフォルト: 0.8)
 - `--gini-coefficient` - 不平等測定のためのジニ係数を計算
 - `--percentiles <PERCENTILES>` - 計算するカスタムパーセンタイル (例: 70,80,90)
 - `--business-analysis` - ビジネス分析洞察を有効化
@@ -141,11 +149,22 @@ lawkit pareto revenue.csv --percentiles 70,80,90,95
 
 ### `lawkit zipf` - ジップ法則分析
 
-頻度分布とランキングパターンを分析。
+頻度分布とランキングパターンを分析。数値データとテキストデータの両方に対応。
 
 ```bash
 lawkit zipf [OPTIONS] [INPUT]
 ```
+
+#### 共通オプション
+- `--format <FORMAT>, -f` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--quiet, -q` - 最小限の出力
+- `--verbose, -v` - 詳細出力
+- `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - 分析に必要な最小データポイント数 (デフォルト: 10)
+
+#### 固有オプション
+- `--text, -T` - テキスト分析モードを有効化
+- `--words <NUMBER>, -w` - テキストモードで分析する最大単語数 (デフォルト: 1000)
 
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
@@ -175,8 +194,14 @@ Debug: Collected 5 numbers from input
 
 #### 例
 ```bash
-# 基本ジップ分析
+# 基本ジップ分析（数値データ）
 lawkit zipf frequency_data.csv
+
+# テキスト分析モード
+lawkit zipf text_document.txt --text
+
+# 単語数制限付きテキスト分析
+lawkit zipf large_text.txt --text --words 500
 
 # 詳細出力
 lawkit zipf rankings.csv --verbose
@@ -187,11 +212,27 @@ lawkit zipf data.csv --format json
 
 ### `lawkit normal` - 正規分布分析
 
-正規性をテストし、外れ値を検出。
+正規性をテストし、外れ値を検出。高度な統計分析機能を提供。
 
 ```bash
 lawkit normal [OPTIONS] [INPUT]
 ```
+
+#### 共通オプション
+- `--format <FORMAT>, -f` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+- `--quiet, -q` - 最小限の出力
+- `--verbose, -v` - 詳細出力
+- `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - 分析に必要な最小データポイント数 (デフォルト: 10)
+
+#### 分析オプション
+- `--test <METHOD>, -T` - 正規性検定方法: shapiro, anderson, ks, all (デフォルト: all)
+- `--outliers, -O` - 外れ値検出を有効化
+- `--outlier-method <METHOD>` - 外れ値検出方法: zscore, modified_zscore, iqr, lof, isolation, dbscan, ensemble (デフォルト: zscore)
+- `--quality-control, -Q` - 品質管理分析を有効化
+- `--spec-limits <LOWER,UPPER>` - 品質管理用規格限界 (例: 9.5,10.5)
+- `--enable-timeseries` - 時系列分析を有効化
+- `--timeseries-window <SIZE>` - 時系列分析ウィンドウサイズ (デフォルト: 10)
 
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
@@ -224,6 +265,18 @@ Debug: Memory used: 0.00 MB
 # 基本正規性テスト
 lawkit normal data.csv
 
+# 特定の検定方法
+lawkit normal data.csv --test shapiro
+
+# 外れ値検出
+lawkit normal data.csv --outliers --outlier-method lof
+
+# 品質管理分析
+lawkit normal production_data.csv --quality-control --spec-limits 9.5,10.5
+
+# 時系列分析
+lawkit normal timeseries_data.csv --enable-timeseries --timeseries-window 20
+
 # 詳細出力
 lawkit normal measurements.csv --verbose
 
@@ -239,13 +292,21 @@ lawkit normal quality_data.csv --format json
 lawkit poisson [OPTIONS] [INPUT]
 ```
 
-#### オプション
-- `--format <FORMAT>` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
+#### 共通オプション
+- `--format <FORMAT>, -f` - 出力形式: text, json, csv, yaml, toml, xml (デフォルト: text)
 - `--quiet, -q` - 最小限の出力（数値のみ）
 - `--verbose, -v` - 詳細なデバッグ出力と分析洞察を有効化
-- `--min-count <NUMBER>` - 分析に必要な最小データポイント数 (デフォルト: 10)
-- `--optimize` - 大規模データセットのメモリと処理の最適化を有効化
+- `--filter <RANGE>` - 数値を範囲でフィルタ (例: >=100, <1000, 50-500)
+- `--min-count <NUMBER>, -c` - 分析に必要な最小データポイント数 (デフォルト: 10)
 - `--confidence <LEVEL>` - 統計的検定の信頼度レベル (0.01-0.99, デフォルト: 0.95)
+
+#### 分析オプション
+- `--test <METHOD>, -T` - 適合度検定方法: chi_square, ks, variance, all (デフォルト: all)
+- `--predict, -p` - 確率予測を有効化
+- `--max-events <NUMBER>` - 分析対象の最大イベント数 (デフォルト: 20)
+- `--rare-events, -R` - 稀な事象分析に特化
+
+**注意**: `--optimize`オプションは廃止されました。最適化は自動的に適用されます。
 
 #### 例
 ```bash

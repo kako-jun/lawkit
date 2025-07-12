@@ -44,7 +44,6 @@ lawkit benf [OPTIONS] [INPUT]
 - `--verbose, -v` - 启用详细调试输出和分析洞察
 - `--filter <RANGE>` - 按范围过滤数字 (例: >=100, <1000, 50-500)
 - `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
-- `--optimize` - 为大数据集启用内存和处理优化
 - `--threshold <LEVEL>` - 异常检测阈值: low, medium, high, critical (默认: auto)
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
 - `--sample-size <NUMBER>` - 大数据集的最大样本大小（提高性能）
@@ -104,7 +103,7 @@ lawkit benf accounts.csv --filter ">=1000" --threshold high
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
 # 大数据集的性能优化
-lawkit benf big_data.csv --sample-size 50000 --optimize
+lawkit benf big_data.csv --sample-size 50000
 
 # 过滤给分析增加噪音的小值
 lawkit benf financial_data.csv --min-value 100
@@ -244,7 +243,6 @@ lawkit poisson [OPTIONS] [INPUT]
 - `--quiet, -q` - 最小输出（仅数字）
 - `--verbose, -v` - 启用详细调试输出和分析洞察
 - `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
-- `--optimize` - 为大数据集启用内存和处理优化
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
 
 #### 示例
@@ -366,7 +364,6 @@ lawkit analyze dataset.csv --verbose --format json
 - `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - 最小输出
 - `--verbose, -v` - 详细输出
-- `--optimize` - 为大数据集启用内存和处理优化
 
 ### 数据处理
 - `--filter <RANGE>` - 数字过滤 (>=100, <1000, 50-500)
