@@ -50,7 +50,6 @@ lawkit benf [OPTIONS] [INPUT]
 - `--min-value <VALUE>` - 分析に含める最小値（ノイズとなる小さな値をフィルタ）
 
 **注意**: `--optimize`オプションは廃止されました。最適化は自動的に適用されます。
-
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
 
@@ -165,7 +164,6 @@ lawkit zipf [OPTIONS] [INPUT]
 #### 固有オプション
 - `--text, -T` - テキスト分析モードを有効化
 - `--words <NUMBER>, -w` - テキストモードで分析する最大単語数 (デフォルト: 1000)
-
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
 
@@ -233,7 +231,6 @@ lawkit normal [OPTIONS] [INPUT]
 - `--spec-limits <LOWER,UPPER>` - 品質管理用規格限界 (例: 9.5,10.5)
 - `--enable-timeseries` - 時系列分析を有効化
 - `--timeseries-window <SIZE>` - 時系列分析ウィンドウサイズ (デフォルト: 10)
-
 #### 詳細出力
 `--verbose`フラグは包括的なデバッグと分析情報を提供します：
 

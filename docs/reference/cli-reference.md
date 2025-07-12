@@ -50,7 +50,6 @@ lawkit benf [OPTIONS] [INPUT]
 - `--min-value <VALUE>` - Minimum value to include in analysis (filters small values that add noise)
 
 **Note**: The `--optimize` option has been deprecated. Optimization is now applied automatically.
-
 #### Verbose Output
 The `--verbose` flag provides comprehensive debugging and analysis information:
 
