@@ -5,7 +5,8 @@ const path = require('path');
 const https = require('https');
 const { execSync } = require('child_process');
 
-const LAWKIT_VERSION = '2.1.0';
+const packageJson = require('../package.json');
+const LAWKIT_VERSION = packageJson.version;
 const BINARY_DIR = path.join(__dirname, '..', 'bin');
 
 function getPlatform() {

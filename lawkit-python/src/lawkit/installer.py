@@ -12,7 +12,22 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-LAWKIT_VERSION = "2.1.0"
+# Get version from package metadata
+try:
+    from importlib.metadata import version
+    LAWKIT_VERSION = version("lawkit-python")
+except ImportError:
+    # Fallback for older Python versions
+    try:
+        import pkg_resources
+        LAWKIT_VERSION = pkg_resources.get_distribution("lawkit-python").version
+    except:
+        # Final fallback - read from __init__.py
+        try:
+            from . import __version__
+            LAWKIT_VERSION = __version__
+        except:
+            LAWKIT_VERSION = "2.3.0"  # Hardcoded fallback
 
 
 def get_platform_info():
