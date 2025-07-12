@@ -60,7 +60,8 @@
       "Bash(./scripts/ci-local.sh:*)",
       "Bash(for file in docs/guides/advanced-analysis_ja.md docs/user-guide/getting-started_ja.md docs/user-guide/configuration_ja.md)",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(./scripts/check-versions.sh:*)"
     ],
     "deny": []
   },
