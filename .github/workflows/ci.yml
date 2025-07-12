@@ -82,11 +82,11 @@ jobs:
         
         # Multi-law comparison (allow exit codes 0-12 for analysis results)
         set +e
-        cargo run --bin lawkit -- compare /tmp/readme_test.txt
+        cargo run --bin lawkit -- analyze /tmp/readme_test.txt
         exit_code=$?
         set -e
         if [ $exit_code -gt 12 ]; then
-          echo "Compare command failed with exit code $exit_code"
+          echo "Analyze command failed with exit code $exit_code"
           exit $exit_code
         fi
         
