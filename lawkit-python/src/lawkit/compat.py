@@ -120,8 +120,7 @@ def run_benford_analysis(file_path: str, **kwargs) -> LawkitProcess:
     if kwargs.get("verbose", False):
         args.append("--verbose")
     
-    if kwargs.get("optimize", False):
-        args.append("--optimize")
+    # optimize flag removed - auto-optimization is always enabled
     
     return run_lawkit(args)
 
