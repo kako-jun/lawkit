@@ -41,7 +41,7 @@ lawkit benf [OPTIONS] [INPUT]
 #### 选项
 - `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml (默认: text)
 - `--quiet, -q` - 最小输出（仅数字）
-- `--verbose, -v` - 详细统计
+- `--verbose, -v` - 启用详细调试输出和分析洞察
 - `--filter <RANGE>` - 按范围过滤数字 (例: >=100, <1000, 50-500)
 - `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
 - `--optimize` - 为大数据集启用内存和处理优化
@@ -49,6 +49,42 @@ lawkit benf [OPTIONS] [INPUT]
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)
 - `--sample-size <NUMBER>` - 大数据集的最大样本大小（提高性能）
 - `--min-value <VALUE>` - 分析中包含的最小值（过滤增加噪音的小值）
+
+#### 详细输出
+`--verbose`标志提供全面的调试和分析信息：
+
+**调试信息:**
+- 输入参数检测和验证
+- 数据处理策略（自动优化、流处理）
+- 过滤器应用的前后统计
+- 数据收集和解析详情
+
+**性能指标:**
+- 处理时间（毫秒）
+- 内存使用量（MB）
+- 大数据集的处理块数
+- 已处理项目数
+
+**分析洞察:**
+- 统计计算步骤
+- 置信区间详情
+- 算法选择原因
+- 数据质量评估
+
+详细输出示例:
+```bash
+$ echo "123 456 789" | lawkit benf --verbose
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Using automatic optimization (streaming + incremental + memory efficiency)
+Debug: Collected 3 numbers from stream
+Debug: Streaming analysis successful - 3 items processed
+Debug: Processed 3 numbers in 1 chunks
+Debug: Memory used: 0.00 MB
+Debug: Processing time: 1 ms
+
+# 标准分析输出如下...
+```
 
 #### 示例
 ```bash
@@ -111,6 +147,32 @@ lawkit pareto revenue.csv --percentiles 70,80,90,95
 lawkit zipf [OPTIONS] [INPUT]
 ```
 
+#### 详细输出
+`--verbose`标志提供全面的调试和分析信息：
+
+**调试信息:**
+- 输入参数检测和验证
+- 文本模式vs数值模式判定
+- 数据处理策略（流处理分析）
+- 数据收集和解析详情
+
+**性能指标:**
+- 处理时间（毫秒）
+- 内存使用量（MB）
+- 处理块数
+- 已处理项目数
+
+详细输出示例:
+```bash
+$ echo "1 2 3 4 5" | lawkit zipf --verbose
+Debug: input argument = None
+Debug: text mode = false
+Debug: Reading from stdin, using automatic optimization
+Debug: Collected 5 numbers from input
+
+# 标准分析输出如下...
+```
+
 #### 示例
 ```bash
 # 基本齐普夫分析
@@ -129,6 +191,32 @@ lawkit zipf data.csv --format json
 
 ```bash
 lawkit normal [OPTIONS] [INPUT]
+```
+
+#### 详细输出
+`--verbose`标志提供全面的调试和分析信息：
+
+**调试信息:**
+- 输入参数检测和验证
+- 数据处理策略（自动优化、流处理）
+- 数据收集和解析详情
+- 流处理分析指标
+
+**性能指标:**
+- 处理时间（毫秒）
+- 内存使用量（MB）
+- 大数据集的处理块数
+- 已处理项目数
+
+详细输出示例:
+```bash
+$ echo "50 51 49 52 48" | lawkit normal --verbose
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Collected 5 numbers from stream
+Debug: Memory used: 0.00 MB
+
+# 标准分析输出如下...
 ```
 
 #### 示例
@@ -154,7 +242,7 @@ lawkit poisson [OPTIONS] [INPUT]
 #### 选项
 - `--format <FORMAT>` - 输出格式: text, json, csv, yaml, toml, xml (默认: text)
 - `--quiet, -q` - 最小输出（仅数字）
-- `--verbose, -v` - 详细统计
+- `--verbose, -v` - 启用详细调试输出和分析洞察
 - `--min-count <NUMBER>` - 分析所需的最小数据点数 (默认: 10)
 - `--optimize` - 为大数据集启用内存和处理优化
 - `--confidence <LEVEL>` - 统计检验的置信水平 (0.01-0.99, 默认: 0.95)

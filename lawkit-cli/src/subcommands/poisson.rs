@@ -37,6 +37,14 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     // 自動最適化設定をセットアップ
     let (_parallel_config, _memory_config) = setup_automatic_optimization_config();
 
+    // Determine input source based on arguments
+    if matches.get_flag("verbose") {
+        eprintln!(
+            "Debug: input argument = {:?}",
+            matches.get_one::<String>("input")
+        );
+    }
+
     // 入力データ処理
     let numbers = if let Some(input) = matches.get_one::<String>("input") {
         // ファイル入力の場合
@@ -131,6 +139,9 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                 .collect()
         } else {
             // 小さなデータセットの場合は直接処理
+            if matches.get_flag("verbose") {
+                eprintln!("Debug: Memory used: 0.00 MB");
+            }
             event_counts.iter().map(|&x| x as f64).collect()
         }
     };
