@@ -30,8 +30,6 @@ from .lawkit import (
     LawType,
 )
 
-# For backward compatibility and convenience
-from .compat import run_lawkit
 
 __version__ = "2.2.0"
 __all__ = [
@@ -61,6 +59,4 @@ __all__ = [
     "OutputFormat", 
     "LawType",
     
-    # Backward compatibility
-    "run_lawkit",
 ]
