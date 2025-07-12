@@ -362,12 +362,26 @@ fn analyze_numbers_with_options(
         working_numbers.retain(|&x| x >= min_val);
 
         if working_numbers.len() != original_len {
-            eprintln!(
-                "最小値フィルタ適用: {}個の数値が{}個に絞り込まれました (>= {})",
-                original_len,
-                working_numbers.len(),
-                min_val
-            );
+            if matches.get_flag("verbose") {
+                eprintln!(
+                    "Debug: Min-value filter applied: {} → {} numbers (>= {})",
+                    original_len,
+                    working_numbers.len(),
+                    min_val
+                );
+                eprintln!(
+                    "Debug: Filter removed {} values ({:.1}%)",
+                    original_len - working_numbers.len(),
+                    100.0 * (original_len - working_numbers.len()) as f64 / original_len as f64
+                );
+            } else {
+                eprintln!(
+                    "最小値フィルタ適用: {}個の数値が{}個に絞り込まれました (>= {})",
+                    original_len,
+                    working_numbers.len(),
+                    min_val
+                );
+            }
         }
     }
 
