@@ -11,7 +11,8 @@ mod automatic_optimization_tests {
         let mut command = Command::new("cargo");
         command.args(["run", "--bin", "lawkit", "--", subcommand]);
         command.args(args);
-        command.env("LAWKIT_DEBUG", "1");
+        // Enable verbose output for debugging
+        command.args(["--verbose"]);
         command.env("LANG", "en_US.UTF-8");
 
         if let Some(data) = input_data {

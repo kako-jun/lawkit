@@ -55,13 +55,13 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     } else {
         // stdin入力の場合：ストリーミング処理を使用
-        if std::env::var("LAWKIT_DEBUG").is_ok() {
+        if matches.get_flag("verbose") {
             eprintln!("Debug: Reading from stdin, using automatic optimization");
         }
 
         let mut reader = OptimizedFileReader::from_stdin();
 
-        if std::env::var("LAWKIT_DEBUG").is_ok() {
+        if matches.get_flag("verbose") {
             eprintln!(
                 "Debug: Using automatic optimization (streaming + incremental + memory efficiency)"
             );
@@ -72,7 +72,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         {
             Ok(nested_numbers) => {
                 let flattened: Vec<f64> = nested_numbers.into_iter().flatten().collect();
-                if std::env::var("LAWKIT_DEBUG").is_ok() {
+                if matches.get_flag("verbose") {
                     eprintln!("Debug: Collected {} numbers from stream", flattened.len());
                 }
                 flattened
@@ -100,7 +100,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             let chunk_result =
                 match streaming_poisson_analysis(event_counts.into_iter(), &memory_config) {
                     Ok(result) => {
-                        if std::env::var("LAWKIT_DEBUG").is_ok() {
+                        if matches.get_flag("verbose") {
                             eprintln!(
                                 "Debug: Streaming analysis successful - {} items processed",
                                 result.total_items
@@ -114,7 +114,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
                     }
                 };
 
-            if std::env::var("LAWKIT_DEBUG").is_ok() {
+            if matches.get_flag("verbose") {
                 eprintln!(
                     "Debug: Processed {} numbers in {} chunks",
                     chunk_result.total_items, chunk_result.chunks_processed
