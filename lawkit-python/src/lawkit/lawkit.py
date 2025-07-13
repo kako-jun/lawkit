@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import os
 import platform
+import sys
 from pathlib import Path
 from typing import Union, List, Dict, Any, Optional, Literal
 from dataclasses import dataclass
@@ -152,14 +153,48 @@ class LawkitError(Exception):
 
 
 def _get_lawkit_binary_path() -> str:
-    """Get the path to the lawkit binary"""
-    # Check if local binary exists (installed via postinstall)
-    package_dir = Path(__file__).parent.parent.parent
-    binary_name = "lawkit.exe" if platform.system() == "Windows" else "lawkit"
-    local_binary_path = package_dir / "bin" / binary_name
+    """Get the path to the lawkit binary (embedded in wheel)"""
+    import sysconfig
     
-    if local_binary_path.exists():
-        return str(local_binary_path)
+    binary_name = "lawkit.exe" if platform.system() == "Windows" else "lawkit"
+    
+    # Check if binary exists in the package installation
+    if hasattr(sys, "_MEIPASS"):  # PyInstaller
+        binary_path = Path(sys._MEIPASS) / binary_name
+        if binary_path.exists():
+            return str(binary_path)
+    
+    # Try sysconfig scripts path (most reliable for pip installs)
+    try:
+        scripts_path = Path(sysconfig.get_path("scripts")) / binary_name
+        if scripts_path.exists():
+            return str(scripts_path)
+    except (KeyError, TypeError):
+        pass
+    
+    # Try user scheme detection for user installs
+    try:
+        if sys.version_info >= (3, 10):
+            user_scheme = sysconfig.get_preferred_scheme("user")
+        else:
+            user_scheme = "posix_user" if os.name == "posix" else "nt_user"
+        
+        user_scripts = Path(sysconfig.get_path("scripts", scheme=user_scheme)) / binary_name
+        if user_scripts.exists():
+            return str(user_scripts)
+    except (KeyError, TypeError):
+        pass
+    
+    # Try package relative paths
+    package_dir = Path(__file__).parent.parent.parent
+    for relative_path in [
+        package_dir / "bin" / binary_name,
+        package_dir / ".." / "bin" / binary_name,
+        package_dir / ".." / ".." / "bin" / binary_name,
+        Path(__file__).parent / binary_name,
+    ]:
+        if relative_path.exists():
+            return str(relative_path)
     
     # Fall back to system PATH
     return "lawkit"

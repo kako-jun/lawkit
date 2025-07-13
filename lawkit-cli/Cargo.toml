@@ -14,6 +14,10 @@ categories.workspace = true
 exclude.workspace = true
 rust-version.workspace = true
 
+[lib]
+name = "lawkit_python"
+crate-type = ["cdylib", "rlib"]
+
 [[bin]]
 name = "lawkit"
 path = "src/main.rs"
@@ -33,6 +37,11 @@ serde_json = { workspace = true }
 owo-colors = "4.1"
 is-terminal = "0.4"
 chrono = { version = "0.4", features = ["serde"] }
+pyo3 = { version = "0.22", features = ["extension-module"], optional = true }
+
+[features]
+default = []
+python = ["pyo3"]
 
 [dev-dependencies]
 tempfile = { workspace = true }

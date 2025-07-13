@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
 
 [project]
 name = "lawkit-python"
@@ -65,18 +65,12 @@ dev = [
     "ruff"
 ]
 
-[project.scripts]
-lawkit-download-binary = "lawkit.installer:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/lawkit"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/scripts",
-    "/README.md"
-]
+[tool.maturin]
+# This package includes a binary (lawkit CLI) in the wheel
+python-source = "src/lawkit"
+bindings = "bin"
+# Find Python interpreters automatically
+find-interpreter = true
 
 [tool.ruff]
 line-length = 88
