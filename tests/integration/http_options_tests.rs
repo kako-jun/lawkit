@@ -26,12 +26,12 @@ async fn test_http_options_parsing() {
         .arg(Arg::new("user-agent")
             .long("user-agent")
             .value_name("STRING")
-            .default_value("benf-cli/0.1.0"));
+            .default_value("benf-cli/dynamic"));
     
     // Test default values
     let matches = app.clone().try_get_matches_from(vec!["benf-test"]).unwrap();
     assert_eq!(matches.get_one::<String>("timeout").unwrap(), "30");
-    assert_eq!(matches.get_one::<String>("user-agent").unwrap(), "benf-cli/0.1.0");
+    assert_eq!(matches.get_one::<String>("user-agent").unwrap(), "benf-cli/dynamic");
     assert!(!matches.get_flag("insecure"));
     assert!(matches.get_one::<String>("proxy").is_none());
     
@@ -100,8 +100,8 @@ fn test_user_agent_formats() {
     // Test various User-Agent string formats
     
     let valid_user_agents = vec![
-        "benf-cli/0.1.0",
-        "Mozilla/5.0 (compatible; benf-cli/0.1.0)",
+        "benf-cli/dynamic",
+        "Mozilla/5.0 (compatible; benf-cli/dynamic)",
         "custom-tool/1.0",
         "benf (fraud detection tool)",
     ];

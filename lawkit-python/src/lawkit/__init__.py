@@ -31,7 +31,18 @@ from .lawkit import (
 )
 
 
-__version__ = "2.3.0"
+# Version is now managed dynamically from pyproject.toml
+# This prevents hardcoded version mismatches during releases
+try:
+    from importlib.metadata import version
+    __version__ = version("lawkit-python")
+except ImportError:
+    # Fallback for Python < 3.8
+    try:
+        import pkg_resources
+        __version__ = pkg_resources.get_distribution("lawkit-python").version
+    except Exception:
+        __version__ = "unknown"
 __all__ = [
     # Main analysis functions
     "analyze_benford",
