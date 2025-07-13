@@ -47,7 +47,9 @@ keywords = [
     "anomaly-detection"
 ]
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+    "maturin>=1.9.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/kako-jun/lawkit"
