@@ -12,7 +12,7 @@ const { writeFileSync, mkdtempSync, rmSync } = require('fs');
 const { tmpdir } = require('os');
 
 /**
- * @typedef {'benf'|'pareto'|'zipf'|'normal'|'poisson'|'analyze'|'validate'|'diagnose'|'generate'} Command
+ * @typedef {'benf'|'pareto'|'zipf'|'normal'|'poisson'|'analyze'|'validate'|'diagnose'|'generate'|'list'} Command
  * @typedef {'text'|'json'|'csv'|'yaml'|'toml'|'xml'} OutputFormat
  */
 
@@ -52,20 +52,56 @@ class LawkitError extends Error {
 }
 
 /**
+ * Determine the platform-specific binary name and directory
+ * @returns {Object} Platform info with subdir and binaryName
+ */
+function getPlatformInfo() {
+  const platform = process.platform;
+  const arch = process.arch;
+  
+  if (platform === 'win32') {
+    return { subdir: 'win32-x64', binaryName: 'lawkit.exe' };
+  } else if (platform === 'darwin') {
+    if (arch === 'arm64') {
+      return { subdir: 'darwin-arm64', binaryName: 'lawkit' };
+    } else {
+      return { subdir: 'darwin-x64', binaryName: 'lawkit' };
+    }
+  } else if (platform === 'linux') {
+    return { subdir: 'linux-x64', binaryName: 'lawkit' };
+  } else {
+    throw new Error(`Unsupported platform: ${platform}-${arch}`);
+  }
+}
+
+/**
  * Get the path to the lawkit binary
  * @returns {string} Path to lawkit binary
  */
 function getLawkitBinaryPath() {
-  // Check if local binary exists (installed via postinstall)
-  const binaryName = process.platform === 'win32' ? 'lawkit.exe' : 'lawkit';
-  const localBinaryPath = path.join(__dirname, 'bin', binaryName);
-  
-  if (fs.existsSync(localBinaryPath)) {
-    return localBinaryPath;
+  try {
+    // Get platform-specific binary path
+    const platformInfo = getPlatformInfo();
+    const platformBinaryPath = path.join(__dirname, 'bin', platformInfo.subdir, platformInfo.binaryName);
+    
+    if (fs.existsSync(platformBinaryPath)) {
+      return platformBinaryPath;
+    }
+    
+    // Check if old-style flat binary exists (for backwards compatibility)
+    const binaryName = process.platform === 'win32' ? 'lawkit.exe' : 'lawkit';
+    const legacyBinaryPath = path.join(__dirname, 'bin', binaryName);
+    
+    if (fs.existsSync(legacyBinaryPath)) {
+      return legacyBinaryPath;
+    }
+    
+    // Fall back to system PATH
+    return 'lawkit';
+  } catch (error) {
+    // If platform detection fails, fall back to system PATH
+    return 'lawkit';
   }
-  
-  // Fall back to system PATH
-  return 'lawkit';
 }
 
 /**
@@ -287,12 +323,121 @@ async function isLawkitAvailable() {
   }
 }
 
+/**
+ * Perform comprehensive analysis using multiple statistical laws
+ * 
+ * @param {string|number[]} data - Data file path or array of numbers
+ * @param {LawkitOptions} [options={}] - Analysis options
+ * @returns {Promise<string|AnalysisResult>} Analysis result
+ */
+async function analyze(data, options = {}) {
+  return executeAnalysis('analyze', data, options);
+}
+
+/**
+ * Validate data quality using statistical tests
+ * 
+ * @param {string|number[]} data - Data file path or array of numbers
+ * @param {LawkitOptions} [options={}] - Analysis options
+ * @returns {Promise<string|AnalysisResult>} Validation result
+ */
+async function validate(data, options = {}) {
+  return executeAnalysis('validate', data, options);
+}
+
+/**
+ * Diagnose data anomalies and provide recommendations
+ * 
+ * @param {string|number[]} data - Data file path or array of numbers
+ * @param {LawkitOptions} [options={}] - Analysis options
+ * @returns {Promise<string|AnalysisResult>} Diagnostic result
+ */
+async function diagnose(data, options = {}) {
+  return executeAnalysis('diagnose', data, options);
+}
+
+/**
+ * Generate sample data for testing statistical laws
+ * 
+ * @param {string} law - Statistical law to generate data for ('benf', 'pareto', 'zipf', 'normal', 'poisson')
+ * @param {Object} [options={}] - Generation options
+ * @param {number} [options.count=1000] - Number of samples to generate
+ * @param {string} [options.outputFile] - Output file path
+ * @returns {Promise<string>} Generated data or file path
+ */
+async function generate(law, options = {}) {
+  const args = ['generate', law];
+  
+  // Add generation options
+  if (options.count !== undefined) {
+    args.push('--count', options.count.toString());
+  }
+  
+  if (options.outputFile) {
+    args.push('--output-file', options.outputFile);
+  }
+  
+  // Add other common options
+  if (options.output) {
+    args.push('--format', options.output);
+  }
+  
+  if (options.quiet) {
+    args.push('--quiet');
+  }
+  
+  const { stdout, stderr } = await executeLawkit(args);
+  
+  // If output format is JSON, parse the result
+  if (options.output === 'json') {
+    try {
+      return JSON.parse(stdout);
+    } catch (e) {
+      throw new LawkitError(`Failed to parse JSON output: ${e.message}`, -1, '');
+    }
+  }
+  
+  return stdout;
+}
+
+/**
+ * List available statistical laws and commands
+ * 
+ * @param {Object} [options={}] - List options
+ * @returns {Promise<string>} List of available commands
+ */
+async function list(options = {}) {
+  const args = ['list'];
+  
+  if (options.output) {
+    args.push('--format', options.output);
+  }
+  
+  const { stdout, stderr } = await executeLawkit(args);
+  
+  // If output format is JSON, parse the result
+  if (options.output === 'json') {
+    try {
+      return JSON.parse(stdout);
+    } catch (e) {
+      throw new LawkitError(`Failed to parse JSON output: ${e.message}`, -1, '');
+    }
+  }
+  
+  return stdout;
+}
+
 module.exports = {
   benford,
   pareto,
   zipf,
   normal,
   poisson,
+  analyze,
+  validate,
+  diagnose,
+  generate,
+  list,
   isLawkitAvailable,
   LawkitError
 };

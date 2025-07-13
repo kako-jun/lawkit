@@ -1,4 +1,4 @@
-use lawkit::common::input::parser::{extract_numbers, filter_benford_valid_numbers};
+use lawkit_core::common::input::parser::{extract_numbers, filter_benford_valid_numbers};
 
 #[cfg(test)]
 mod number_extraction_tests {

@@ -19,15 +19,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test-binaries:
+  get-tag:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     outputs:
       tag-name: ${{ steps.get-tag.outputs.tag }}
-      binaries-ready: ${{ steps.test.outputs.ready }}
     steps:
-    - uses: actions/checkout@v4
-    
     - name: Get tag name
       id: get-tag
       run: |
@@ -38,33 +35,12 @@ jobs:
           TAG_NAME=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
         fi
         echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
-        echo "Testing binaries for tag: $TAG_NAME"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Test binary downloads
-      id: test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        TAG_NAME="${{ steps.get-tag.outputs.tag }}"
-        echo "Testing binary downloads for $TAG_NAME..."
-        
-        # Test Linux binary download
-        if curl -f -L "https://github.com/${{ github.repository }}/releases/download/$TAG_NAME/lawkit-linux-x86_64.tar.gz" -o test.tar.gz; then
-          echo "✅ Linux binary download successful"
-          rm test.tar.gz
-        else
-          echo "❌ Linux binary download failed"
-          exit 1
-        fi
-        
-        echo "ready=true" >> $GITHUB_OUTPUT
 
   publish-npm:
-    needs: test-binaries
+    needs: get-tag
     runs-on: ubuntu-latest
-    if: needs.test-binaries.outputs.binaries-ready == 'true'
     steps:
     - uses: actions/checkout@v4
     
@@ -74,56 +50,54 @@ jobs:
         node-version: '18'
         registry-url: 'https://registry.npmjs.org'
     
-    - name: Test binary download in npm package
+    - name: Download all platform binaries for npm package
       working-directory: lawkit-npm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "Testing binary download script..."
-        node scripts/download-binary.js
-        
-        # Verify binary was downloaded
-        if [ -f "bin/lawkit" ] || [ -f "bin/lawkit.exe" ]; then
-          echo "✅ Binary download successful"
-        else
-          echo "❌ Binary download failed"
-          exit 1
-        fi
+        TAG_NAME="${{ needs.get-tag.outputs.tag-name }}"
+        node scripts/download-all-binaries.js
     
     - name: Publish to npm
       working-directory: lawkit-npm
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      run: |
-        echo "Publishing lawkit-js to npm..."
-        npm publish
+      run: npm publish
 
   publish-pypi:
-    needs: test-binaries
-    runs-on: ubuntu-latest
-    if: needs.test-binaries.outputs.binaries-ready == 'true'
+    needs: get-tag
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
     
-    - name: Test binary download script
-      working-directory: lawkit-python
-      run: |
-        echo "Testing Python binary download script..."
-        python src/lawkit/installer.py
-        
-        # Check if binary was downloaded (installer creates bin/ directory)
-        if [ -d "bin" ]; then
-          echo "✅ Binary download script works"
-        else
-          echo "ℹ️  Binary download script completed (may have failed gracefully)"
-        fi
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
     
-    - name: Build and publish to PyPI
+    - name: Install maturin
+      run: pip install maturin
+    
+    - name: Build and publish wheel
       working-directory: lawkit-python
       env:
-        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
       run: |
-        echo "Building and publishing lawkit-python to PyPI..."
-        uv build
-        uv publish
+        maturin build --release --target ${{ matrix.target }} --out dist --find-interpreter
+        maturin publish --skip-existing

@@ -8,12 +8,31 @@
     "lawkit": "./index.js"
   },
   "scripts": {
-    "postinstall": "node scripts/download-binary.js",
     "test": "node test.js",
     "examples": "node examples.js",
     "verify": "node index.js --help",
     "prepublish": "npm run verify"
   },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "index.js",
+    "lib.js",
+    "bin/",
+    "README.md",
+    "examples.js",
+    "test.js"
+  ],
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
   "author": "kako-jun",
   "license": "MIT",
   "homepage": "https://github.com/kako-jun/lawkit",
@@ -28,26 +47,5 @@
   "funding": {
     "type": "github",
     "url": "https://github.com/sponsors/kako-jun"
-  },
-  "engines": {
-    "node": ">=12.0.0"
-  },
-  "files": [
-    "index.js",
-    "lib.js",
-    "scripts/download-binary.js",
-    "bin/",
-    "README.md",
-    "examples.js",
-    "test.js"
-  ],
-  "os": [
-    "linux",
-    "darwin",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ]
+  }
 }

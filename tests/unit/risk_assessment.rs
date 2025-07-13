@@ -1,5 +1,5 @@
-use lawkit::laws::benford::result::BenfordResult;
-use lawkit::common::risk::{RiskLevel, determine_risk_level, assess_data_quality, calculate_confidence_score};
+use lawkit_core::laws::benford::result::BenfordResult;
+use lawkit_core::common::risk::{RiskLevel, determine_risk_level, assess_data_quality, calculate_confidence_score};
 
 #[cfg(test)]
 mod risk_level_tests {

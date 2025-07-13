@@ -10,6 +10,21 @@ npm install lawkit-js
 
 Automatically downloads the appropriate `lawkit` binary for your system from GitHub Releases.
 
+### Supported Platforms
+
+- **Linux**: x86_64
+- **macOS**: x86_64 and Apple Silicon (ARM64)
+- **Windows**: x86_64
+
+Binaries are automatically downloaded and stored in platform-specific directories:
+```
+bin/
+├── linux-x64/lawkit
+├── darwin-x64/lawkit  
+├── darwin-arm64/lawkit
+└── win32-x64/lawkit.exe
+```
+
 ## Quick Start
 
 ### CLI Usage
@@ -28,62 +43,153 @@ lawkit validate data.csv --consistency-check
 
 # Conflict diagnosis
 lawkit diagnose data.csv --report detailed
+
+# Generate test data
+lawkit generate benf --count 1000 --output-file test-data.csv
 ```
 
-### Programmatic Usage
-```javascript
-const { runLawkit } = require('lawkit-js');
+### JavaScript API
 
-async function analyzeFraud() {
-  // Benford analysis for fraud detection
-  const benf = await runLawkit(['benf', 'data.csv', '--format', 'json']);
-  
-  // Multi-law analysis for comprehensive insights
-  const analysis = await runLawkit(['analyze', 'data.csv', '--format', 'json', '--laws', 'benf,pareto']);
-  
-  // Data validation for consistency check
-  const validation = await runLawkit(['validate', 'data.csv', '--format', 'json']);
-  
-  if (benf.code === 0) {
-    const result = JSON.parse(benf.stdout);
-    if (result.risk_level === 'High') {
-      console.log('⚠️  Potential fraud detected!');
-    }
+```javascript
+const { benford, pareto, zipf, normal, poisson, analyze, validate, diagnose, generate, list } = require('lawkit-js');
+
+// Analyze array data
+const numbers = [1, 10, 100, 1000, 2000];
+const result = await benford(numbers, { output: 'json' });
+console.log('Risk level:', result.risk_level);
+
+// Analyze file data
+const fileResult = await benford('data.csv', { 
+  output: 'json',
+  confidence: 0.99 
+});
+
+// Generate sample data
+const sampleData = await generate('benf', { 
+  count: 1000,
+  outputFile: 'sample.csv' 
+});
+
+// Multi-law analysis
+const analysisResult = await analyze('data.csv', {
+  output: 'json',
+  crossValidation: true
+});
+
+// Data validation
+const validationResult = await validate('data.csv', {
+  consistencyCheck: true,
+  report: true
+});
+
+// List available laws
+const availableLaws = await list({ output: 'json' });
+```
+
+## API Reference
+
+### Analysis Functions
+
+#### `benford(data, options)`
+Analyze data using Benford's Law for fraud detection.
+
+#### `pareto(data, options)`
+Analyze data using the Pareto Principle for business insights.
+
+#### `zipf(data, options)`
+Analyze data using Zipf's Law for text and frequency analysis.
+
+#### `normal(data, options)`
+Analyze data using Normal Distribution for quality control.
+
+#### `poisson(data, options)`
+Analyze data using Poisson Distribution for event analysis.
+
+#### `analyze(data, options)`
+Perform comprehensive multi-law analysis.
+
+#### `validate(data, options)`
+Validate data quality using statistical tests.
+
+#### `diagnose(data, options)`
+Diagnose data anomalies and provide recommendations.
+
+### Utility Functions
+
+#### `generate(law, options)`
+Generate sample data for testing statistical laws.
+
+#### `list(options)`
+List available statistical laws and commands.
+
+#### `isLawkitAvailable()`
+Check if the lawkit binary is available.
+
+### Options
+
+All analysis functions accept these common options:
+
+```typescript
+interface LawkitOptions {
+  output?: 'text' | 'json' | 'csv' | 'yaml' | 'toml' | 'xml';
+  minCount?: number;
+  confidence?: number;
+  sampleSize?: number;
+  minValue?: number;
+  quiet?: boolean;
+  verbose?: boolean;
+  outputFile?: string;
+  businessAnalysis?: boolean;
+  giniCoefficient?: boolean;
+  percentiles?: string;
+  crossValidation?: boolean;
+  consistencyCheck?: boolean;
+  confidenceLevel?: number;
+  report?: boolean;
+}
+```
+
+## Error Handling
+
+```javascript
+const { benford, LawkitError } = require('lawkit-js');
+
+try {
+  const result = await benford('data.csv', { output: 'json' });
+  console.log(result);
+} catch (error) {
+  if (error instanceof LawkitError) {
+    console.error('lawkit error:', error.message);
+    console.error('Exit code:', error.exitCode);
+    console.error('stderr:', error.stderr);
+  } else {
+    console.error('Unexpected error:', error);
   }
 }
 ```
 
-## Supported Laws
+## Features
 
-- **Benford Law**: Fraud detection in financial data
-- **Pareto Analysis**: 80/20 rule and business optimization
-- **Zipf Law**: Text analysis and frequency patterns
-- **Normal Distribution**: Quality control and outlier detection
-- **Poisson Distribution**: Event prediction and risk assessment
-- **Multi-Law Analysis**: Comprehensive statistical integration
-- **Data Validation**: Consistency checking and quality assessment
-- **Conflict Diagnosis**: Detailed anomaly detection and reporting
+- **Universal Binary Support**: Automatic platform detection and binary download
+- **Comprehensive API**: Full JavaScript API with TypeScript definitions
+- **Statistical Laws**: Benford, Pareto, Zipf, Normal, Poisson distributions
+- **Advanced Analysis**: Multi-law comparison, validation, diagnostics
+- **Data Generation**: Create test datasets for validation
+- **Multiple Output Formats**: JSON, CSV, YAML, TOML, XML support
+- **Business Intelligence**: Built-in business analysis features
+- **Cross-platform**: Linux, macOS (Intel & ARM), Windows support
 
-## Platforms
+## Requirements
 
-- **Linux**: x86_64, aarch64
-- **macOS**: Intel, Apple Silicon  
-- **Windows**: x86_64
-
-## Input Formats
-
-CSV, JSON, YAML, TOML, XML, Excel (.xlsx), Text, PDF
-
-## International Support
-
-Supports number formats in English, Japanese, Chinese, Hindi, and Arabic.
-
-## Links
-
-- **GitHub**: https://github.com/kako-jun/lawkit
-- **Documentation**: https://github.com/kako-jun/lawkit/tree/main/docs
-- **PyPI Package**: https://pypi.org/project/lawkit-python/
+- Node.js 12.0.0 or higher
+- Internet connection for initial binary download
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/kako-jun/lawkit/blob/main/LICENSE)
+MIT
+
+## Links
+
+- [GitHub Repository](https://github.com/kako-jun/lawkit)
+- [Documentation](https://github.com/kako-jun/lawkit/tree/main/docs)
+- [Issues](https://github.com/kako-jun/lawkit/issues)
