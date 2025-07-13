@@ -250,8 +250,7 @@ println!("カイ二乗値: {}", result.chi_square);
 npm install lawkit-js
 
 # Python統合
-pip install lawkit-python
-lawkit-download-binary  # CLIバイナリをダウンロード (pip installの後に使用可能)
+pip install lawkit-python  # CLIバイナリが自動的に含まれます
 ```
 
 ## 基本的な使用方法

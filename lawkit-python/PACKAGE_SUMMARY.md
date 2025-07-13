@@ -6,13 +6,13 @@ A complete Python package wrapper for the lawkit CLI tool, providing statistical
 ## Package Structure Created
 
 ### Core Files
-✅ **pyproject.toml** - Modern Python packaging configuration
-- Package metadata: lawkit-python v2.1.0
+✅ **pyproject.toml** - Maturin-based packaging configuration
+- Package metadata: lawkit-python v2.3.0
 - MIT license, author: kako-jun
 - Keywords: statistics, fraud-detection, audit, compliance
 - Python 3.8+ compatibility
 - Development dependencies: pytest, black, mypy, ruff
-- Entry point: `lawkit-download-binary`
+- Embedded binary: CLI tool included in wheel
 
 ✅ **README.md** - Comprehensive documentation (4,000+ words)
 - Installation instructions
@@ -40,12 +40,11 @@ A complete Python package wrapper for the lawkit CLI tool, providing statistical
 - Type hints and comprehensive docstrings
 - Error handling and platform detection
 
-✅ **installer.py** - Binary download system
-- Multi-platform support (Windows, macOS, Linux)
-- Architecture detection (x86_64, ARM64)
-- GitHub Releases integration
-- Archive extraction (ZIP, TAR.GZ)
-- Binary verification and permissions
+✅ **Rust Source Files** - Complete CLI implementation
+- Multi-platform binary compilation via maturin
+- All lawkit CLI commands embedded in wheel
+- Automatic binary path detection
+- No separate download required
 
 ✅ **compat.py** - Backward compatibility layer
 - Legacy API support
@@ -59,10 +58,10 @@ A complete Python package wrapper for the lawkit CLI tool, providing statistical
 - Object creation testing
 - Error handling validation
 
-✅ **verify_package.py** - Structure verification
-- File existence checks
-- Configuration validation
-- Import testing
+✅ **__main__.py** - Module entry point
+- `python -m lawkit` support
+- Direct CLI command forwarding
+- Seamless binary execution
 
 ## Key Features Implemented
 
@@ -148,9 +147,11 @@ cd lawkit/lawkit-python
 pip install -e .[dev]
 ```
 
-### Manual Binary Installation
+### Module Usage
 ```bash
-lawkit-download-binary
+# Use as Python module
+python -m lawkit benf data.csv
+python -m lawkit analyze --laws all data.csv
 ```
 
 ## Quality Assurance
@@ -177,9 +178,9 @@ lawkit-download-binary
 ## Integration with lawkit Ecosystem
 
 ### Version Synchronization
-- Package version: 2.1.0
-- CLI tool version: 2.1.0
-- Feature parity maintained
+- Package version: 2.3.0
+- CLI tool version: 2.3.0
+- Feature parity maintained via embedded binary
 
 ### Consistency
 - Same command-line options

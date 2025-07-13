@@ -64,6 +64,24 @@ print(f"80/20 concentration: {pareto_result.concentration_80_20}")
 
 ## Usage Examples
 
+### Command Line Interface (CLI) via Python Module
+
+```bash
+# Install and use immediately - binary included automatically
+pip install lawkit-python
+
+# Use lawkit CLI directly through Python module
+python -m lawkit benf financial_data.csv
+python -m lawkit pareto sales_data.csv --gini-coefficient
+python -m lawkit analyze --laws all dataset.csv
+python -m lawkit validate dataset.csv --consistency-check
+python -m lawkit diagnose dataset.csv --report detailed
+
+# Generate sample data for testing
+python -m lawkit generate benf --samples 1000 --output-file test_data.csv
+python -m lawkit generate pareto --samples 500 --concentration 0.8
+```
+
 ### Modern API (Recommended)
 
 ```python

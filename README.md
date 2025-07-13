@@ -250,8 +250,7 @@ println!("Chi-square: {}", result.chi_square);
 npm install lawkit-js
 
 # Python integration  
-pip install lawkit-python
-lawkit-download-binary  # Download CLI binary (available after pip install)
+pip install lawkit-python  # CLI binary automatically included
 ```
 
 ## Basic Usage
