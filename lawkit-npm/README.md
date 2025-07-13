@@ -8,15 +8,15 @@ Node.js wrapper for the `lawkit` CLI tool - comprehensive statistical law analys
 npm install lawkit-js
 ```
 
-Automatically downloads the appropriate `lawkit` binary for your system from GitHub Releases.
+Includes all platform binaries (universal bundle) - no download required.
 
 ### Supported Platforms
 
 - **Linux**: x86_64
-- **macOS**: x86_64 and Apple Silicon (ARM64)
+- **macOS**: x86_64 and Apple Silicon (ARM64)  
 - **Windows**: x86_64
 
-Binaries are automatically downloaded and stored in platform-specific directories:
+All binaries are pre-bundled in the package for immediate use:
 ```
 bin/
 ├── linux-x64/lawkit

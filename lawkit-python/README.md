@@ -8,7 +8,7 @@ Python wrapper for the `lawkit` CLI tool - Statistical law analysis toolkit for 
 pip install lawkit-python
 ```
 
-This will automatically download the appropriate `lawkit` binary for your system from GitHub Releases.
+This includes the `lawkit` binary embedded in the wheel - no download required.
 
 ## Quick Start
 
@@ -279,7 +279,7 @@ pareto_result = run_pareto_analysis("sales.csv", gini_coefficient=True)
 pip install lawkit-python
 ```
 
-The package will automatically download the appropriate binary for your platform.
+The binary is pre-embedded in the wheel for your platform.
 
 ### Manual Binary Installation
 
