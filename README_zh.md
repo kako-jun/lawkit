@@ -312,8 +312,7 @@ println!("卡方值: {}", result.chi_square);
 npm install lawkit-js
 
 # Python集成
-pip install lawkit-python
-lawkit-download-binary  # 下载CLI二进制文件 (pip install后可用)
+pip install lawkit-python  # CLI二进制文件自动包含
 ```
 
 ## 基本用法
