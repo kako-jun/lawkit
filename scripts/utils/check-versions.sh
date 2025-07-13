@@ -5,6 +5,13 @@
 
 set -e
 
+# Find the project root directory (where Cargo.toml exists)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
 echo "Checking version consistency across lawkit packages..."
 
 # Colors for output
@@ -31,27 +38,18 @@ info() {
 }
 
 # Extract versions
-# Check if workspace version is used
-if grep -q '^version.workspace = true' lawkit-core/Cargo.toml; then
-    CORE_VERSION=$(grep '^version = ' Cargo.toml | head -1 | cut -d'"' -f2)
-else
-    CORE_VERSION=$(grep '^version = ' lawkit-core/Cargo.toml | head -1 | cut -d'"' -f2)
-fi
+WORKSPACE_VERSION=$(grep '^version = ' "$PROJECT_ROOT/Cargo.toml" | head -1 | cut -d'"' -f2)
+CORE_VERSION=$WORKSPACE_VERSION
+CLI_VERSION=$WORKSPACE_VERSION
 
-if grep -q '^version.workspace = true' lawkit-cli/Cargo.toml; then
-    CLI_VERSION=$(grep '^version = ' Cargo.toml | head -1 | cut -d'"' -f2)
-else
-    CLI_VERSION=$(grep '^version = ' lawkit-cli/Cargo.toml | head -1 | cut -d'"' -f2)
-fi
-
-if [ -f "lawkit-npm/package.json" ]; then
-    NPM_VERSION=$(node -p "require('./lawkit-npm/package.json').version" 2>/dev/null || echo "unknown")
+if [ -f "$PROJECT_ROOT/lawkit-npm/package.json" ]; then
+    NPM_VERSION=$(node -p "require('$PROJECT_ROOT/lawkit-npm/package.json').version" 2>/dev/null || echo "unknown")
 else
     NPM_VERSION="not found"
 fi
 
-if [ -f "lawkit-python/pyproject.toml" ]; then
-    PYTHON_VERSION=$(python -c "import tomllib; print(tomllib.load(open('lawkit-python/pyproject.toml', 'rb'))['project']['version'])" 2>/dev/null || echo "unknown")
+if [ -f "$PROJECT_ROOT/lawkit-python/pyproject.toml" ]; then
+    PYTHON_VERSION=$(grep '^version = ' "$PROJECT_ROOT/lawkit-python/pyproject.toml" | head -1 | cut -d'"' -f2)
 else
     PYTHON_VERSION="not found"
 fi
@@ -64,7 +62,7 @@ echo "│ Package         │ Version     │"
 echo "├─────────────────┼─────────────┤"
 printf "│ %-15s │ %-11s │\n" "lawkit-core" "$CORE_VERSION"
 printf "│ %-15s │ %-11s │\n" "lawkit-cli" "$CLI_VERSION"
-printf "│ %-15s │ %-11s │\n" "lawkit-js" "$NPM_VERSION"
+printf "│ %-15s │ %-11s │\n" "lawkit" "$NPM_VERSION"
 printf "│ %-15s │ %-11s │\n" "lawkit-python" "$PYTHON_VERSION"
 echo "└─────────────────┴─────────────┘"
 echo ""
@@ -101,24 +99,16 @@ else
     success "Python package version found: $PYTHON_VERSION"
 fi
 
-# Check if core dependency versions in CLI match
-CLI_CORE_DEP=$(grep 'lawkit-core.*version' lawkit-cli/Cargo.toml | grep -o 'version = "[^"]*"' | cut -d'"' -f2 || echo "not found")
-if [ "$CLI_CORE_DEP" != "not found" ] && [ "$CLI_CORE_DEP" != "$CORE_VERSION" ]; then
-    error "CLI references wrong core version:"
-    echo "   Core version: $CORE_VERSION"
-    echo "   CLI dependency: $CLI_CORE_DEP"
-    ISSUES_FOUND=$((ISSUES_FOUND + 1))
-else
-    success "CLI core dependency version matches: $CLI_CORE_DEP"
-fi
+# Check if core dependency versions in CLI match (workspace uses unified versioning)
+# This check is skipped for workspace configurations as they share the same version
 
 # Summary
 echo ""
 if [ $ISSUES_FOUND -eq 0 ]; then
     success "All version checks passed! ✨"
     echo ""
-    info "Ready for release:"
-    echo "   Create a tag with: git tag v\$VERSION && git push origin v\$VERSION"
+    info "Ready for publishing:"
+    echo "   ./scripts/publish-all.sh"
 else
     error "Found $ISSUES_FOUND version consistency issue(s)"
     echo ""

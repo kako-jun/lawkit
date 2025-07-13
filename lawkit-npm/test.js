@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const { runLawkit } = require('./index.js');
+const { benford, pareto, zipf, normal, poisson, analyze, validate, diagnose, generate, list, isLawkitAvailable } = require('./lib.js');
 
 async function testLawkit() {
   console.log('🧪 Testing lawkit-js package...\n');
@@ -73,6 +74,30 @@ async function testLawkit() {
       console.log('❌ Generate command failed');
       console.log('Error:', generateResult.stderr);
     }
+    
+    // Test 5: Test lib.js API
+    console.log('\nTest 5: Testing lib.js API');
+    
+    // Test isLawkitAvailable
+    const isAvailable = await isLawkitAvailable();
+    if (isAvailable) {
+      console.log('✅ lawkit binary is available');
+    } else {
+      console.log('❌ lawkit binary is not available');
+    }
+    
+    // Test Benford analysis with array data
+    console.log('\nTest 6: Benford analysis with array data');
+    const testData = [1, 10, 100, 1000, 2000, 3000];
+    const benfResult = await benford(testData, { output: 'json' });
+    console.log('✅ Benford analysis successful');
+    console.log('Benford result risk level:', benfResult.risk_level);
+    
+    // Test list function
+    console.log('\nTest 7: List available laws');
+    const lawsList = await list();
+    console.log('✅ List function successful');
+    console.log('Available laws:', lawsList.substring(0, 100) + '...');
     
     console.log('\n🎉 All tests completed!');
     

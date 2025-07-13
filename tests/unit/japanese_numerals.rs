@@ -1,4 +1,4 @@
-use lawkit::laws::benford::japanese::{convert_japanese_numerals, extract_numbers_from_japanese_text};
+use lawkit_core::laws::benford::japanese::{convert_japanese_numerals, extract_numbers_from_japanese_text};
 use crate::test_common::{FULLWIDTH_DIGITS, KANJI_NUMERALS, KANJI_WITH_POSITIONS, MIXED_JAPANESE};
 
 #[cfg(test)]

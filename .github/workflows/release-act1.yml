@@ -60,7 +60,6 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         cd target/${{ matrix.target }}/release
-        strip lawkit || true
         tar -czf ${{ matrix.name }}.tar.gz lawkit
         mv ${{ matrix.name }}.tar.gz ../../../
 

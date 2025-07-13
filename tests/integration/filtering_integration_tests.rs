@@ -1,6 +1,6 @@
-use lawkit::common::filtering::{apply_number_filter, NumberFilter, RiskThreshold};
-use lawkit::error::BenfError;
-use lawkit::laws::benford::BenfordResult;
+use lawkit_core::common::filtering::{apply_number_filter, NumberFilter, RiskThreshold};
+use lawkit_core::error::BenfError;
+use lawkit_core::laws::benford::BenfordResult;
 use std::str::FromStr;
 
 #[test]

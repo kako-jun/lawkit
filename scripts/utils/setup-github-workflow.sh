@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Setting up Simplified GitHub Workflow for lawkit project"
+echo "🚀 Setting up GitHub Workflow automation for lawkit project"
 echo "========================================================="
 
 # Check if gh CLI is installed
@@ -11,17 +11,6 @@ if ! command -v gh &> /dev/null; then
     exit 1
 fi
 
-# Check if jq is installed
-if ! command -v jq &> /dev/null; then
-    echo "❌ jq is not installed. Please install it first:"
-    echo "   Ubuntu/Debian: sudo apt install jq"
-    echo "   macOS: brew install jq"
-    echo "   Or skip this step and create labels manually via GitHub web interface"
-    echo ""
-    echo "Continuing without label creation..."
-    SKIP_LABELS=true
-fi
-
 # Check if we're in a git repository
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
     echo "❌ Not in a git repository"
@@ -29,33 +18,7 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
 fi
 
 echo ""
-echo "📋 Step 1: Creating GitHub Labels"
-echo "--------------------------------"
-# Create labels from labels.json
-if [ -f ".github/labels.json" ] && [ "$SKIP_LABELS" != "true" ]; then
-    echo "Creating labels from .github/labels.json..."
-    
-    # Create new labels using jq
-    jq -c '.[]' .github/labels.json | while read label; do
-        name=$(echo "$label" | jq -r '.name')
-        color=$(echo "$label" | jq -r '.color')
-        description=$(echo "$label" | jq -r '.description')
-        
-        echo "  Creating label: $name"
-        gh label create "$name" --color "$color" --description "$description" 2>/dev/null || \
-        gh label edit "$name" --color "$color" --description "$description"
-    done
-    echo "✅ Labels created successfully"
-elif [ "$SKIP_LABELS" = "true" ]; then
-    echo "⚠️  Skipping label creation (jq not available)"
-    echo "   You can create labels manually via GitHub web interface"
-    echo "   Or install jq and run this script again"
-else
-    echo "❌ .github/labels.json not found"
-fi
-
-echo ""
-echo "🔧 Step 2: Configuring Repository Settings" 
+echo "🔧 Step 1: Configuring Repository Settings" 
 echo "------------------------------------------"
 echo "Setting up auto-merge, branch deletion, and merge options..."
 REPO_FULL_NAME=$(gh repo view --json nameWithOwner -q .nameWithOwner)
@@ -75,9 +38,8 @@ else
     echo "❌ Failed to configure repository settings"
 fi
 
-
 echo ""
-echo "🎯 Step 3: Workflow Summary"
+echo "🎯 Step 2: Workflow Summary"
 echo "---------------------------"
 echo "GitHub Workflow is now configured with the following features:"
 echo ""

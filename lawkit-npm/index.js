@@ -4,71 +4,50 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Determine the platform-specific binary name
-let binaryName = 'lawkit';
-if (process.platform === 'win32') {
-  binaryName = 'lawkit.exe';
+// Determine the platform-specific binary name and directory
+function getPlatformInfo() {
+  const platform = process.platform;
+  const arch = process.arch;
+  
+  if (platform === 'win32') {
+    return { subdir: 'win32-x64', binaryName: 'lawkit.exe' };
+  } else if (platform === 'darwin') {
+    if (arch === 'arm64') {
+      return { subdir: 'darwin-arm64', binaryName: 'lawkit' };
+    } else {
+      return { subdir: 'darwin-x64', binaryName: 'lawkit' };
+    }
+  } else if (platform === 'linux') {
+    return { subdir: 'linux-x64', binaryName: 'lawkit' };
+  } else {
+    throw new Error(`Unsupported platform: ${platform}-${arch}`);
+  }
 }
 
-// Construct the path to the binary
-// The binary is downloaded and placed in the 'bin' directory
-const binaryPath = path.join(__dirname, 'bin', binaryName);
+// Get platform-specific binary path
+const platformInfo = getPlatformInfo();
+const binaryPath = path.join(__dirname, 'bin', platformInfo.subdir, platformInfo.binaryName);
 
 // Check if the binary exists
 if (!fs.existsSync(binaryPath)) {
   console.error(`Error: Binary not found at ${binaryPath}`);
-  console.error('Please ensure lawkit is properly installed or built for your platform.');
-  console.error('Try running: npm install --force');
+  console.error(`Platform: ${process.platform}-${process.arch}`);
+  console.error('Expected platform-specific binary not found.');
+  console.error('This might indicate a packaging issue. Please report this at:');
+  console.error('https://github.com/kako-jun/lawkit/issues');
   process.exit(1);
 }
 
-// Function to run lawkit programmatically (for use as a library)
-function runLawkit(args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(binaryPath, args, {
-      stdio: 'pipe',
-    });
+// Spawn the lawkit process with arguments
+const child = spawn(binaryPath, process.argv.slice(2), {
+  stdio: 'inherit',
+});
 
-    let stdout = '';
-    let stderr = '';
+child.on('close', (code) => {
+  process.exit(code);
+});
 
-    child.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
-
-    child.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-
-    child.on('close', (code) => {
-      resolve({
-        code: code,
-        stdout: stdout,
-        stderr: stderr
-      });
-    });
-
-    child.on('error', (err) => {
-      reject(err);
-    });
-  });
-}
-
-// If called directly (not as a library), spawn the process
-if (require.main === module) {
-  const child = spawn(binaryPath, process.argv.slice(2), {
-    stdio: 'inherit',
-  });
-
-  child.on('close', (code) => {
-    process.exit(code);
-  });
-
-  child.on('error', (err) => {
-    console.error(`Failed to start lawkit: ${err.message}`);
-    process.exit(1);
-  });
-}
-
-// Export the function for programmatic use
-module.exports = { runLawkit };
+child.on('error', (err) => {
+  console.error(`Failed to start lawkit: ${err.message}`);
+  process.exit(1);
+});
