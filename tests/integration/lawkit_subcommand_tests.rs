@@ -765,9 +765,9 @@ mod integration_diagnose_tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         assert!(
-            stdout.contains("Conflict Analysis")
-                || stdout.contains("Resolution Strategies")
-                || stdout.contains("Threshold")
+            stdout.contains("Conflicts:")
+                || stdout.contains("Integration Metrics")
+                || stdout.contains("Statistical Laws Integration Analysis")
         );
     }
 }
