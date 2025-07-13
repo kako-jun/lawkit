@@ -345,12 +345,12 @@ pub fn add_generate_poisson_options(cmd: Command) -> Command {
 }
 
 /// サブコマンド固有のオプション：統合分析
-pub fn add_compare_options(cmd: Command) -> Command {
+pub fn add_integration_options(cmd: Command) -> Command {
     cmd.arg(
         Arg::new("laws")
             .long("laws")
-            .short('l') // compare専用で-lを使用
-            .help("Laws to compare (benf,pareto,zipf,normal,poisson)")
+            .short('l') // 統合分析専用で-lを使用
+            .help("Laws to analyze (benf,pareto,zipf,normal,poisson)")
             .value_name("LAWS"),
     )
     .arg(
@@ -365,7 +365,7 @@ pub fn add_compare_options(cmd: Command) -> Command {
         Arg::new("threshold")
             .long("threshold")
             .short('t')
-            .help("Conflict detection threshold (0.0-1.0)")
+            .help("Analysis threshold for anomaly detection (0.0-1.0)")
             .value_name("THRESHOLD")
             .value_parser(clap::value_parser!(f64))
             .default_value("0.5"),
@@ -380,9 +380,9 @@ pub fn add_compare_options(cmd: Command) -> Command {
     .arg(
         Arg::new("report")
             .long("report")
-            .help("Integration report type")
+            .help("Analysis report type")
             .value_name("TYPE")
-            .value_parser(["summary", "detailed", "conflicting"])
+            .value_parser(["summary", "detailed", "anomalies"])
             .default_value("summary"),
     )
     .arg(

@@ -20,13 +20,65 @@ const { tmpdir } = require('os');
  * Options for lawkit operations
  * @typedef {Object} LawkitOptions
  * @property {OutputFormat} [output='text'] - Output format (maps to --format option)
- * @property {number} [minCount] - Minimum count threshold
- * @property {number} [confidence] - Confidence level
- * @property {number} [sampleSize] - Sample size for optimization
- * @property {number} [minValue] - Minimum value threshold
  * @property {boolean} [quiet=false] - Suppress output
  * @property {boolean} [verbose=false] - Verbose output
+ * @property {string} [filter] - Filter numbers by range
+ * @property {number} [minCount] - Minimum count threshold
+ * 
+ * // Integration options
+ * @property {string} [laws] - Laws to analyze (comma-separated)
+ * @property {string} [focus] - Analysis focus area
+ * @property {number} [threshold] - Analysis threshold for anomaly detection
+ * @property {boolean} [recommend=false] - Enable recommendation mode
+ * @property {string} [report] - Analysis report type
+ * @property {boolean} [consistencyCheck=false] - Enable consistency check
+ * @property {boolean} [crossValidation=false] - Enable cross-validation
+ * @property {number} [confidenceLevel] - Confidence level
+ * @property {string} [purpose] - Analysis purpose
+ * 
+ * // Benford-specific options
+ * @property {string} [thresholdLevel] - Anomaly detection threshold level
+ * @property {number} [confidence] - Statistical confidence level
+ * @property {number} [sampleSize] - Maximum sample size for large datasets
+ * @property {number} [minValue] - Minimum value to include in analysis
+ * 
+ * // Pareto-specific options
+ * @property {number} [concentration] - Concentration threshold
+ * @property {boolean} [giniCoefficient=false] - Calculate Gini coefficient
+ * @property {string} [percentiles] - Custom percentiles to calculate
+ * @property {boolean} [businessAnalysis=false] - Enable business analysis
+ * 
+ * // Zipf-specific options
+ * @property {boolean} [text=false] - Enable text analysis mode
+ * @property {number} [words] - Maximum number of words to analyze
+ * @property {number} [vocabularySize] - Vocabulary size for text generation
+ * @property {number} [exponent] - Zipf exponent
+ * 
+ * // Normal distribution options
+ * @property {string} [test] - Normality test method
+ * @property {boolean} [outliers=false] - Enable outlier detection
+ * @property {string} [outlierMethod] - Outlier detection method
+ * @property {boolean} [qualityControl=false] - Enable quality control analysis
+ * @property {string} [specLimits] - Specification limits for quality control
+ * @property {boolean} [enableTimeseries=false] - Enable time series analysis
+ * @property {number} [timeseriesWindow] - Time series analysis window size
+ * @property {number} [mean] - Mean of normal distribution
+ * @property {number} [stddev] - Standard deviation of normal distribution
+ * 
+ * // Poisson distribution options
+ * @property {boolean} [predict=false] - Enable probability prediction
+ * @property {number} [maxEvents] - Maximum number of events for analysis
+ * @property {boolean} [rareEvents=false] - Focus on rare event analysis
+ * @property {number} [lambda] - Lambda parameter for Poisson distribution
+ * @property {boolean} [timeSeries=false] - Generate time-series event data
+ * 
+ * // Generation options
+ * @property {number} [samples] - Number of samples to generate
+ * @property {number} [seed] - Random seed for reproducible generation
  * @property {string} [outputFile] - Output file path
+ * @property {number} [fraudRate] - Fraud injection rate for testing
+ * @property {string} [range] - Number range for generation
+ * @property {number} [scale] - Scale parameter for distributions
  */
 
 /**
@@ -239,45 +291,67 @@ async function executeAnalysis(command, data, options = {}) {
   try {
     const args = [command];
     
-    // Add output format option
-    if (options.output) {
-      args.push('--format', options.output);
-    }
+    // Common options
+    if (options.output) args.push('--format', options.output);
+    if (options.quiet) args.push('--quiet');
+    if (options.verbose) args.push('--verbose');
+    if (options.filter) args.push('--filter', options.filter);
+    if (options.minCount !== undefined) args.push('--min-count', options.minCount.toString());
     
-    // Add min-count option
-    if (options.minCount !== undefined) {
-      args.push('--min-count', options.minCount.toString());
-    }
+    // Integration options
+    if (options.laws) args.push('--laws', options.laws);
+    if (options.focus) args.push('--focus', options.focus);
+    if (options.threshold !== undefined) args.push('--threshold', options.threshold.toString());
+    if (options.recommend) args.push('--recommend');
+    if (options.report) args.push('--report', options.report);
+    if (options.consistencyCheck) args.push('--consistency-check');
+    if (options.crossValidation) args.push('--cross-validation');
+    if (options.confidenceLevel !== undefined) args.push('--confidence-level', options.confidenceLevel.toString());
+    if (options.purpose) args.push('--purpose', options.purpose);
     
-    // Add confidence option
-    if (options.confidence !== undefined) {
-      args.push('--confidence', options.confidence.toString());
-    }
+    // Benford-specific options
+    if (options.thresholdLevel) args.push('--threshold', options.thresholdLevel);
+    if (options.confidence !== undefined) args.push('--confidence', options.confidence.toString());
+    if (options.sampleSize !== undefined) args.push('--sample-size', options.sampleSize.toString());
+    if (options.minValue !== undefined) args.push('--min-value', options.minValue.toString());
     
-    // Add sample-size option
-    if (options.sampleSize !== undefined) {
-      args.push('--sample-size', options.sampleSize.toString());
-    }
+    // Pareto-specific options
+    if (options.concentration !== undefined) args.push('--concentration', options.concentration.toString());
+    if (options.giniCoefficient) args.push('--gini-coefficient');
+    if (options.percentiles) args.push('--percentiles', options.percentiles);
+    if (options.businessAnalysis) args.push('--business-analysis');
     
-    // Add min-value option
-    if (options.minValue !== undefined) {
-      args.push('--min-value', options.minValue.toString());
-    }
+    // Zipf-specific options
+    if (options.text) args.push('--text');
+    if (options.words !== undefined) args.push('--words', options.words.toString());
+    if (options.vocabularySize !== undefined) args.push('--vocabulary-size', options.vocabularySize.toString());
+    if (options.exponent !== undefined) args.push('--exponent', options.exponent.toString());
     
-    // Add quiet option
-    if (options.quiet) {
-      args.push('--quiet');
-    }
+    // Normal distribution options
+    if (options.test) args.push('--test', options.test);
+    if (options.outliers) args.push('--outliers');
+    if (options.outlierMethod) args.push('--outlier-method', options.outlierMethod);
+    if (options.qualityControl) args.push('--quality-control');
+    if (options.specLimits) args.push('--spec-limits', options.specLimits);
+    if (options.enableTimeseries) args.push('--enable-timeseries');
+    if (options.timeseriesWindow !== undefined) args.push('--timeseries-window', options.timeseriesWindow.toString());
+    if (options.mean !== undefined) args.push('--mean', options.mean.toString());
+    if (options.stddev !== undefined) args.push('--stddev', options.stddev.toString());
     
-    // Add verbose option
-    if (options.verbose) {
-      args.push('--verbose');
-    }
+    // Poisson distribution options
+    if (options.predict) args.push('--predict');
+    if (options.maxEvents !== undefined) args.push('--max-events', options.maxEvents.toString());
+    if (options.rareEvents) args.push('--rare-events');
+    if (options.lambda !== undefined) args.push('--lambda', options.lambda.toString());
+    if (options.timeSeries) args.push('--time-series');
     
-    // Add output file option
-    if (options.outputFile) {
-      args.push('--output-file', options.outputFile);
-    }
+    // Generation options
+    if (options.samples !== undefined) args.push('--samples', options.samples.toString());
+    if (options.seed !== undefined) args.push('--seed', options.seed.toString());
+    if (options.outputFile) args.push('--output-file', options.outputFile);
+    if (options.fraudRate !== undefined) args.push('--fraud-rate', options.fraudRate.toString());
+    if (options.range) args.push('--range', options.range);
+    if (options.scale !== undefined) args.push('--scale', options.scale.toString());
     
     // Add input file
     args.push(inputPath);
