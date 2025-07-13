@@ -1,5 +1,5 @@
 use crate::common_options;
-use crate::subcommands::compare_common::{
+use crate::subcommands::integration_common::{
     get_dataset_name, get_numbers_from_input, output_integration_result, parse_analysis_purpose,
 };
 use clap::{ArgMatches, Command};
@@ -11,7 +11,7 @@ use lawkit_core::laws::integration::{
 use std::io::Write;
 
 pub fn command() -> Command {
-    common_options::add_compare_options(common_options::add_common_options(
+    common_options::add_integration_options(common_options::add_common_options(
         common_options::add_input_arg(Command::new("diagnose").about("矛盾検出と詳細分析レポート")),
     ))
 }

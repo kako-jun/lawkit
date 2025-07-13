@@ -349,7 +349,7 @@ if [ -f "$LAWKIT" ]; then
         print_fail "Multi-law analyze failed"
     fi
 else
-    print_fail "lawkit executable not found for compare test"
+    print_fail "lawkit executable not found for integration test"
 fi
 
 # Test 19: Pareto analysis functionality

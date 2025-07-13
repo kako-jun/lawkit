@@ -195,7 +195,7 @@ All implementations are validated against:
 ### Command Line Interface
 
 - **Subcommand Structure**: `lawkit <law> [options] <input>`
-- **Available Commands**: benf, pareto, zipf, normal, poisson, compare, generate, list, selftest
+- **Available Commands**: benf, pareto, zipf, normal, poisson, analyze, validate, diagnose, generate, list, selftest
 - **Configuration Management**: CLI arguments and runtime options
 - **Error Handling**: Comprehensive error reporting and recovery
 - **International Number Support**: Automatic recognition of 5 language number formats
@@ -209,7 +209,7 @@ All implementations are validated against:
 
 ### Future Extensions (Planned)
 
-- **Command Split**: analyze, validate, diagnose commands (replacing compare)
+- **Integrated Analysis**: analyze, validate, diagnose commands for comprehensive data assessment
 - **RESTful API**: HTTP API for web integration
 - **GraphQL Support**: Flexible query interface  
 - **WebSocket Streaming**: Real-time analysis updates

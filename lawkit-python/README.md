@@ -394,7 +394,6 @@ print(f"Power law exponent: {result.exponent:.3f}")
 - `analyze_laws(input_data, options)` - Multi-law analysis
 - `validate_laws(input_data, options)` - Data validation and consistency check
 - `diagnose_laws(input_data, options)` - Conflict diagnosis and detailed reporting
-- `compare_laws(input_data, options)` - Alias for analyze_laws (backward compatibility)
 - `generate_data(law_type, samples, **kwargs)` - Generate sample data
 - `analyze_string(content, law_type, options)` - Analyze string data directly
 

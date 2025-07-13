@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🐛 Bug Fixes
 - Resolve all Clippy warnings and CI compilation issues
 - Fix CLI regression issues and achieve 100% test coverage (179 tests)
-- Resolve compare subcommand exit code handling
+- Resolve integration subcommand exit code handling
 - Update test assertions for lawkit 2.1.0 compatibility
 
 ### 📚 Documentation

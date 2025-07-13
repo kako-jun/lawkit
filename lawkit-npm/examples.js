@@ -116,15 +116,15 @@ async function main() {
     ['generate', 'benf', '--samples', '20', '--seed', '42']
   );
   
-  // Example 6: Comparative Analysis
-  const compareFile = path.join(__dirname, 'temp-compare.csv');
-  fs.writeFileSync(compareFile, financialData.join('\n'));
+  // Example 6: Integration Analysis
+  const analyzeFile = path.join(__dirname, 'temp-analyze.csv');
+  fs.writeFileSync(analyzeFile, financialData.join('\n'));
   
   await runExample(
-    'Comparative Analysis - Multi-Law Validation',
-    'Comparing multiple statistical laws to find the best fit',
-    ['compare', compareFile, '--format', 'json'],
-    compareFile
+    'Integration Analysis - Multi-Law Validation',
+    'Analyzing data using multiple statistical laws to find the best fit',
+    ['analyze', analyzeFile, '--format', 'json'],
+    analyzeFile
   );
   
   // Example 7: Normal Distribution

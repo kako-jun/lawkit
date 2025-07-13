@@ -1,6 +1,6 @@
 pub mod analyze;
 pub mod benf;
-pub mod compare_common;
+pub mod integration_common;
 pub mod diagnose;
 pub mod normal;
 pub mod pareto;

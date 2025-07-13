@@ -345,7 +345,7 @@ pub fn add_generate_poisson_options(cmd: Command) -> Command {
 }
 
 /// サブコマンド固有のオプション：統合分析
-pub fn add_compare_options(cmd: Command) -> Command {
+pub fn add_integration_options(cmd: Command) -> Command {
     cmd.arg(
         Arg::new("laws")
             .long("laws")

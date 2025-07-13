@@ -22,32 +22,23 @@ LawType = Literal["benf", "pareto", "zipf", "normal", "poisson"]
 @dataclass
 class LawkitOptions:
     """Options for lawkit operations"""
+    # Common options
     format: Optional[Format] = None
     quiet: bool = False
     verbose: bool = False
     filter: Optional[str] = None
     min_count: Optional[int] = None
     
-    # Integration-specific options
+    # Integration options
     laws: Optional[str] = None  # "benf,pareto,zipf,normal,poisson"
     focus: Optional[str] = None  # "quality", "concentration", "distribution", "anomaly"
-    threshold: Optional[float] = None  # Conflict detection threshold
+    threshold: Optional[float] = None  # Analysis threshold for anomaly detection
     recommend: bool = False
-    report: Optional[str] = None  # "summary", "detailed", "conflicting"
+    report: Optional[str] = None  # "summary", "detailed", "anomalies"
     consistency_check: bool = False
     cross_validation: bool = False
     confidence_level: Optional[float] = None
     purpose: Optional[str] = None  # "quality", "fraud", "concentration", "anomaly", "distribution", "general"
-    
-    # Law-specific options
-    gini_coefficient: bool = False
-    percentiles: Optional[str] = None
-    business_analysis: bool = False
-    concentration: Optional[float] = None
-    
-    # Zipf-specific options
-    text: bool = False  # Enable text analysis mode
-    words: Optional[int] = None  # Maximum number of words to analyze in text mode
     
     # Benford-specific options
     threshold_level: Optional[str] = None  # "low", "medium", "high", "critical", "auto"
@@ -55,23 +46,43 @@ class LawkitOptions:
     sample_size: Optional[int] = None  # Maximum sample size for large datasets
     min_value: Optional[float] = None  # Minimum value to include in analysis
     
-    # Generate-specific options
+    # Pareto-specific options
+    concentration: Optional[float] = None
+    gini_coefficient: bool = False
+    percentiles: Optional[str] = None
+    business_analysis: bool = False
+    
+    # Zipf-specific options
+    text: bool = False  # Enable text analysis mode
+    words: Optional[int] = None  # Maximum number of words to analyze in text mode
+    vocabulary_size: Optional[int] = None  # Vocabulary size for text generation
+    exponent: Optional[float] = None  # Zipf exponent
+    
+    # Normal distribution options
+    test: Optional[str] = None  # Normality test method
+    outliers: bool = False  # Enable outlier detection
+    outlier_method: Optional[str] = None  # Outlier detection method
+    quality_control: bool = False  # Enable quality control analysis
+    spec_limits: Optional[str] = None  # Specification limits for quality control
+    enable_timeseries: bool = False  # Enable time series analysis
+    timeseries_window: Optional[int] = None  # Time series analysis window size
+    mean: Optional[float] = None  # Mean of normal distribution
+    stddev: Optional[float] = None  # Standard deviation of normal distribution
+    
+    # Poisson distribution options
+    predict: bool = False  # Enable probability prediction
+    max_events: Optional[int] = None  # Maximum number of events for analysis
+    rare_events: bool = False  # Focus on rare event analysis
+    lambda_: Optional[float] = None  # Lambda parameter for Poisson distribution (lambda is a keyword)
+    time_series: bool = False  # Generate time-series event data
+    
+    # Generation options
     samples: Optional[int] = None
     seed: Optional[int] = None
     output_file: Optional[str] = None
     fraud_rate: Optional[float] = None
     range: Optional[str] = None  # "1,100000"
     scale: Optional[float] = None
-    
-    # Statistical options
-    test_type: Optional[str] = None
-    alpha: Optional[float] = None
-    
-    # Advanced options
-    outlier_detection: bool = False
-    time_series: bool = False
-    parallel: bool = False
-    memory_efficient: bool = False
 
 
 class LawkitResult:
@@ -257,21 +268,8 @@ def analyze_benford(
     
     args = ["benf", input_data]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add Benford-specific options
-    if options.threshold_level:
-        args.extend(["--threshold", options.threshold_level])
-    
-    if options.confidence is not None:
-        args.extend(["--confidence", str(options.confidence)])
-    
-    if options.sample_size is not None:
-        args.extend(["--sample-size", str(options.sample_size)])
-    
-    if options.min_value is not None:
-        args.extend(["--min-value", str(options.min_value)])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -315,21 +313,8 @@ def analyze_pareto(
     
     args = ["pareto", input_data]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add Pareto-specific options
-    if options.concentration is not None:
-        args.extend(["--concentration", str(options.concentration)])
-    
-    if options.gini_coefficient:
-        args.append("--gini-coefficient")
-    
-    if options.percentiles:
-        args.extend(["--percentiles", options.percentiles])
-    
-    if options.business_analysis:
-        args.append("--business-analysis")
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -372,15 +357,8 @@ def analyze_zipf(
     
     args = ["zipf", input_data]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add Zipf-specific options
-    if options.text:
-        args.append("--text")
-    
-    if options.words is not None:
-        args.extend(["--words", str(options.words)])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -425,15 +403,8 @@ def analyze_normal(
     
     args = ["normal", input_data]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add Normal-specific options
-    if options.outlier_detection:
-        args.append("--outlier-detection")
-    
-    if options.test_type:
-        args.extend(["--test-type", options.test_type])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -476,12 +447,8 @@ def analyze_poisson(
     
     args = ["poisson", input_data]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add Poisson-specific options
-    if options.confidence is not None:
-        args.extend(["--confidence", str(options.confidence)])
     
     stdout, stderr = _execute_lawkit(args)
     
@@ -662,25 +629,8 @@ def generate_data(
     
     args = ["generate", law_type]
     
-    # Add common options
+    # Add all options
     _add_common_options(args, options)
-    
-    # Add generate-specific options
-    if options.samples is not None:
-        args.extend(["--samples", str(options.samples)])
-    
-    if options.seed is not None:
-        args.extend(["--seed", str(options.seed)])
-    
-    if options.output_file:
-        args.extend(["--output-file", options.output_file])
-    
-    if options.fraud_rate is not None:
-        args.extend(["--fraud-rate", str(options.fraud_rate)])
-    
-    # Note: --range option not available in current CLI
-    
-    # Note: --scale option may not be available for all law types
     
     # Add law-specific parameters (backward compatibility)
     for key, value in kwargs.items():
@@ -741,62 +691,114 @@ def analyze_string(
 
 
 def _add_common_options(args: List[str], options: LawkitOptions) -> None:
-    """Add common options to command arguments"""
+    """Add all options to command arguments"""
+    # Common options
     if options.format:
         args.extend(["--format", options.format])
-    
     if options.quiet:
         args.append("--quiet")
-    
     if options.verbose:
         args.append("--verbose")
-    
     if options.filter:
         args.extend(["--filter", options.filter])
-    
     if options.min_count is not None:
         args.extend(["--min-count", str(options.min_count)])
     
-    # Integration-specific options
+    # Integration options
     if options.laws:
         args.extend(["--laws", options.laws])
-    
     if options.focus:
         args.extend(["--focus", options.focus])
-    
     if options.threshold is not None:
         args.extend(["--threshold", str(options.threshold)])
-    
     if options.recommend:
         args.append("--recommend")
-    
     if options.report:
         args.extend(["--report", options.report])
-    
     if options.consistency_check:
         args.append("--consistency-check")
-    
     if options.cross_validation:
         args.append("--cross-validation")
-    
     if options.confidence_level is not None:
         args.extend(["--confidence-level", str(options.confidence_level)])
-    
     if options.purpose:
         args.extend(["--purpose", options.purpose])
     
-    # Advanced options
-    if options.alpha is not None:
-        args.extend(["--alpha", str(options.alpha)])
+    # Benford-specific options
+    if options.threshold_level:
+        args.extend(["--threshold", options.threshold_level])
+    if options.confidence is not None:
+        args.extend(["--confidence", str(options.confidence)])
+    if options.sample_size is not None:
+        args.extend(["--sample-size", str(options.sample_size)])
+    if options.min_value is not None:
+        args.extend(["--min-value", str(options.min_value)])
     
+    # Pareto-specific options
+    if options.concentration is not None:
+        args.extend(["--concentration", str(options.concentration)])
+    if options.gini_coefficient:
+        args.append("--gini-coefficient")
+    if options.percentiles:
+        args.extend(["--percentiles", options.percentiles])
+    if options.business_analysis:
+        args.append("--business-analysis")
+    
+    # Zipf-specific options
+    if options.text:
+        args.append("--text")
+    if options.words is not None:
+        args.extend(["--words", str(options.words)])
+    if options.vocabulary_size is not None:
+        args.extend(["--vocabulary-size", str(options.vocabulary_size)])
+    if options.exponent is not None:
+        args.extend(["--exponent", str(options.exponent)])
+    
+    # Normal distribution options
+    if options.test:
+        args.extend(["--test", options.test])
+    if options.outliers:
+        args.append("--outliers")
+    if options.outlier_method:
+        args.extend(["--outlier-method", options.outlier_method])
+    if options.quality_control:
+        args.append("--quality-control")
+    if options.spec_limits:
+        args.extend(["--spec-limits", options.spec_limits])
+    if options.enable_timeseries:
+        args.append("--enable-timeseries")
+    if options.timeseries_window is not None:
+        args.extend(["--timeseries-window", str(options.timeseries_window)])
+    if options.mean is not None:
+        args.extend(["--mean", str(options.mean)])
+    if options.stddev is not None:
+        args.extend(["--stddev", str(options.stddev)])
+    
+    # Poisson distribution options
+    if options.predict:
+        args.append("--predict")
+    if options.max_events is not None:
+        args.extend(["--max-events", str(options.max_events)])
+    if options.rare_events:
+        args.append("--rare-events")
+    if options.lambda_ is not None:
+        args.extend(["--lambda", str(options.lambda_)])
     if options.time_series:
         args.append("--time-series")
     
-    if options.parallel:
-        args.append("--parallel")
-    
-    if options.memory_efficient:
-        args.append("--memory-efficient")
+    # Generation options
+    if options.samples is not None:
+        args.extend(["--samples", str(options.samples)])
+    if options.seed is not None:
+        args.extend(["--seed", str(options.seed)])
+    if options.output_file:
+        args.extend(["--output-file", options.output_file])
+    if options.fraud_rate is not None:
+        args.extend(["--fraud-rate", str(options.fraud_rate)])
+    if options.range:
+        args.extend(["--range", options.range])
+    if options.scale is not None:
+        args.extend(["--scale", str(options.scale)])
 
 
 def is_lawkit_available() -> bool:

@@ -195,7 +195,7 @@ lawkitは小規模サンプル（100+データポイント）から企業規模�
 ### コマンドラインインターフェース
 
 - **サブコマンド構造**: `lawkit <法則> [オプション] <入力>`
-- **利用可能コマンド**: benf, pareto, zipf, normal, poisson, compare, generate, list, selftest
+- **利用可能コマンド**: benf, pareto, zipf, normal, poisson, analyze, validate, diagnose, generate, list, selftest
 - **設定管理**: CLI引数と実行時オプション
 - **エラーハンドリング**: 包括的エラー報告と回復
 - **国際数字サポート**: 5言語数字フォーマット自動認識
@@ -209,7 +209,7 @@ lawkitは小規模サンプル（100+データポイント）から企業規模�
 
 ### 将来拡張（予定）
 
-- **コマンド分割**: analyze, validate, diagnose コマンド（compare置換）
+- **統合分析**: analyze, validate, diagnose コマンドによる包括的データ評価
 - **RESTful API**: ウェブ統合用HTTP API
 - **GraphQLサポート**: 柔軟なクエリインターフェース
 - **WebSocketストリーミング**: リアルタイム分析更新

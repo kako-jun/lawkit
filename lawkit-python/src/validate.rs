@@ -1,6 +1,6 @@
 use crate::colors;
 use crate::common_options;
-use crate::subcommands::compare_common::{
+use crate::subcommands::integration_common::{
     get_dataset_name, get_numbers_from_input, output_integration_result,
 };
 use clap::{ArgMatches, Command};
@@ -10,7 +10,7 @@ use lawkit_core::laws::integration::{analyze_all_laws, cross_validate_laws};
 use std::io::Write;
 
 pub fn command() -> Command {
-    common_options::add_compare_options(common_options::add_common_options(
+    common_options::add_integration_options(common_options::add_common_options(
         common_options::add_input_arg(Command::new("validate").about("データ検証と一貫性チェック")),
     ))
 }
