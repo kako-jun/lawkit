@@ -755,7 +755,7 @@ mod integration_diagnose_tests {
         let test_data = generate_test_data();
         let output = run_lawkit_command(
             "diagnose",
-            &["--report", "conflicting", "--threshold", "0.7", &test_data],
+            &["--report", "anomalies", "--threshold", "0.7", &test_data],
         );
 
         assert!(matches!(
