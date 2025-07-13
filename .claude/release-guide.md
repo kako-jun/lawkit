@@ -239,13 +239,18 @@ git push --delete origin v<failed-version>
    git log v<前の実質バージョン>..v<現在バージョン> --oneline
    ```
 
-4. **リリースノート自動生成**
+4. **リリースノートとCHANGELOG同時更新**
    ```bash
    # 詳細なリリースノートで上書き
    gh release edit v<version> --notes "$(cat <<'EOF'
    [詳細な本文]
    EOF
    )"
+   
+   # 同時にCHANGELOG.mdも更新
+   # - 新機能・改善・バグ修正を整理
+   # - 破壊的変更があれば明記
+   # - リンクやマイグレーション情報を追加
    ```
 
 #### **リリースノート必須要素**
