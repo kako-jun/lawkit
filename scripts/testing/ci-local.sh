@@ -30,6 +30,12 @@ cargo build --workspace --verbose
 echo "Step 4: Run tests"
 cargo test --workspace --verbose
 
+echo "Step 4.1: Test Python package compilation"
+cd "$PROJECT_ROOT/lawkit-python"
+cargo check --workspace --verbose
+cargo build --workspace --verbose  
+cd "$PROJECT_ROOT"
+
 echo "Step 5: Quick performance check"
 # Light performance sanity check (just compilation and basic run)
 cargo build --release --package lawkit-core
