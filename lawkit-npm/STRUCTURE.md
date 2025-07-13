@@ -7,13 +7,16 @@ This document outlines the complete structure of the lawkit-js NPM package.
 ```
 lawkit-npm/
 ├── package.json                 # NPM package configuration
-├── index.js                     # Main wrapper script & CLI entry point
+├── index.js                     # Main CLI entry point
+├── lib.js                       # Programmatic API wrapper  
 ├── README.md                    # Package documentation
-├── .gitignore                   # Git ignore rules
-├── .npmignore                   # NPM ignore rules
 ├── scripts/
-│   └── download-binary.js       # Automatic binary download script
-├── bin/                         # Binary directory (populated at install)
+│   └── download-all-binaries.js # Build-time binary bundling script
+├── bin/                         # Pre-bundled binaries (universal)
+│   ├── linux-x64/lawkit         # Linux x86_64 binary
+│   ├── darwin-x64/lawkit        # macOS Intel binary
+│   ├── darwin-arm64/lawkit      # macOS Apple Silicon binary
+│   └── win32-x64/lawkit.exe     # Windows x86_64 binary
 ├── test.js                      # Package test script
 ├── examples.js                  # Usage examples
 ├── verify-package.js            # Package verification script
@@ -31,7 +34,7 @@ lawkit-npm/
 
 ### Scripts
 
-- **`scripts/download-binary.js`** - Downloads appropriate binary for the user's platform
+- **`scripts/download-all-binaries.js`** - Build-time script to bundle all platform binaries
 - **`test.js`** - Test script that verifies basic functionality
 - **`examples.js`** - Comprehensive examples demonstrating all features
 - **`verify-package.js`** - Verification script for package structure
@@ -48,11 +51,11 @@ lawkit-npm/
 
 ## 🚀 Key Features
 
-### 1. Automatic Binary Download
-- Detects user's platform (Linux, macOS, Windows)
-- Downloads appropriate binary from GitHub releases
-- Handles architecture detection (x86_64, aarch64)
-- Graceful fallback with helpful error messages
+### 1. Universal Binary Bundle
+- Pre-includes all platform binaries (Linux, macOS, Windows)
+- Runtime platform detection and binary selection
+- No download required - immediate execution
+- Smaller overall package size than individual downloads
 
 ### 2. Dual Usage Pattern
 - **CLI Tool**: Can be used directly as `lawkit` command
