@@ -468,15 +468,31 @@ fn format_rank_frequency_chart(result: &ZipfResult) -> String {
         let bar_length = (normalized_freq * CHART_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(CHART_WIDTH);
 
-        let filled_bar = "█".repeat(bar_length);
-        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-        let full_bar = format!("{filled_bar}{background_bar}");
+        // Calculate expected value based on ideal Zipf law (1/rank)
+        let expected_freq = max_frequency / *rank as f64;
+        let expected_normalized = expected_freq / max_frequency;
+        let expected_line_pos = (expected_normalized * CHART_WIDTH as f64).round() as usize;
+        let expected_line_pos = expected_line_pos.min(CHART_WIDTH - 1);
+
+        // Create bar with filled portion, expected value line, and background
+        let mut bar_chars = Vec::new();
+        for pos in 0..CHART_WIDTH {
+            if pos == expected_line_pos {
+                bar_chars.push('┃'); // Expected value line (ideal Zipf)
+            } else if pos < bar_length {
+                bar_chars.push('█'); // Filled portion
+            } else {
+                bar_chars.push('░'); // Background portion
+            }
+        }
+        let full_bar: String = bar_chars.iter().collect();
 
         // パーセンテージ計算
         let percentage = (frequency / result.total_observations as f64) * 100.0;
+        let expected_percentage = (expected_freq / result.total_observations as f64) * 100.0;
 
         output.push_str(&format!(
-            "#{rank:2}: {full_bar} {percentage:>6.2}% (freq: {frequency:.0})\n"
+            "#{rank:2}: {full_bar} {percentage:>6.2}% (expected: {expected_percentage:.2}%)\n"
         ));
     }
 
