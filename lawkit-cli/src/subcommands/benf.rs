@@ -482,7 +482,7 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         let expected = result.expected_distribution[i];
         let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
-        
+
         // Calculate expected value line position
         let expected_line_pos = ((expected / 100.0) * BAR_WIDTH as f64).round() as usize;
         let expected_line_pos = expected_line_pos.min(BAR_WIDTH - 1); // Ensure it's within bounds
