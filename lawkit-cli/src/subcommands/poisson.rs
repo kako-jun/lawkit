@@ -719,9 +719,22 @@ fn format_poisson_probability_chart(result: &PoissonResult) -> String {
             let bar_length = (normalized_prob * CHART_WIDTH as f64).round() as usize;
             let bar_length = bar_length.min(CHART_WIDTH);
 
-            let filled_bar = "█".repeat(bar_length);
-            let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-            let full_bar = format!("{filled_bar}{background_bar}");
+            // Calculate expected line position based on theoretical probability
+            let expected_line_pos = (normalized_prob * CHART_WIDTH as f64).round() as usize;
+            let expected_line_pos = expected_line_pos.min(CHART_WIDTH - 1);
+
+            // Create bar with filled portion, expected value line, and background
+            let mut bar_chars = Vec::new();
+            for pos in 0..CHART_WIDTH {
+                if pos == expected_line_pos {
+                    bar_chars.push('┃'); // Expected value line (theoretical probability)
+                } else if pos < bar_length {
+                    bar_chars.push('█'); // Filled portion
+                } else {
+                    bar_chars.push('░'); // Background portion
+                }
+            }
+            let full_bar: String = bar_chars.iter().collect();
 
             output.push_str(&format!("P(X={k:2}): {full_bar} {prob:>6.3}\n"));
         }

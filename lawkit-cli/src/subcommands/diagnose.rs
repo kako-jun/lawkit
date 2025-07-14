@@ -12,7 +12,7 @@ use std::io::Write;
 
 pub fn command() -> Command {
     common_options::add_integration_options(common_options::add_common_options(
-        common_options::add_input_arg(Command::new("diagnose").about("矛盾検出と詳細分析レポート")),
+        common_options::add_input_arg(Command::new("diagnose").about("Conflict detection and detailed analysis report")),
     ))
 }
 
