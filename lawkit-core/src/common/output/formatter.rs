@@ -122,23 +122,18 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         
         // Calculate expected value line position
         let expected_line_pos = ((expected / 100.0) * BAR_WIDTH as f64).round() as usize;
-        let expected_line_pos = expected_line_pos.min(BAR_WIDTH);
+        let expected_line_pos = expected_line_pos.min(BAR_WIDTH - 1); // Ensure it's within bounds
+
 
         // Create bar with filled portion, expected value line, and background
         let mut bar_chars = Vec::new();
         for pos in 0..BAR_WIDTH {
-            if pos < bar_length {
-                if pos == expected_line_pos {
-                    bar_chars.push('┃'); // Expected value line
-                } else {
-                    bar_chars.push('█'); // Filled portion
-                }
+            if pos == expected_line_pos {
+                bar_chars.push('┃'); // Expected value line (always visible)
+            } else if pos < bar_length {
+                bar_chars.push('█'); // Filled portion
             } else {
-                if pos == expected_line_pos {
-                    bar_chars.push('┃'); // Expected value line in background
-                } else {
-                    bar_chars.push('░'); // Background portion
-                }
+                bar_chars.push('░'); // Background portion
             }
         }
         let full_bar: String = bar_chars.iter().collect();
