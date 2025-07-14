@@ -11,7 +11,9 @@ use std::io::Write;
 
 pub fn command() -> Command {
     common_options::add_integration_options(common_options::add_common_options(
-        common_options::add_input_arg(Command::new("validate").about("Data validation and consistency check")),
+        common_options::add_input_arg(
+            Command::new("validate").about("Data validation and consistency check"),
+        ),
     ))
 }
 
