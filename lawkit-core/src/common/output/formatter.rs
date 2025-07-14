@@ -119,11 +119,29 @@ fn format_distribution_bars(result: &BenfordResult) -> String {
         let expected = result.expected_distribution[i];
         let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
+        
+        // Calculate expected value line position
+        let expected_line_pos = ((expected / 100.0) * BAR_WIDTH as f64).round() as usize;
+        let expected_line_pos = expected_line_pos.min(BAR_WIDTH);
 
-        // Create bar with filled and background portions
-        let filled_bar = "█".repeat(bar_length);
-        let background_bar = "░".repeat(BAR_WIDTH - bar_length);
-        let full_bar = format!("{filled_bar}{background_bar}");
+        // Create bar with filled portion, expected value line, and background
+        let mut bar_chars = Vec::new();
+        for pos in 0..BAR_WIDTH {
+            if pos < bar_length {
+                if pos == expected_line_pos {
+                    bar_chars.push('┃'); // Expected value line
+                } else {
+                    bar_chars.push('█'); // Filled portion
+                }
+            } else {
+                if pos == expected_line_pos {
+                    bar_chars.push('┃'); // Expected value line in background
+                } else {
+                    bar_chars.push('░'); // Background portion
+                }
+            }
+        }
+        let full_bar: String = bar_chars.iter().collect();
 
         output.push_str(&format!(
             "{digit:1}: {full_bar} {observed:>5.1}% (expected: {expected:>5.1}%)\n"
