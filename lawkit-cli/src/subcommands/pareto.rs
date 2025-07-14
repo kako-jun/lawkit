@@ -445,16 +445,36 @@ fn format_lorenz_curve(result: &ParetoResult) -> String {
         let bar_length = (wealth_pct * CHART_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(CHART_WIDTH);
 
-        let filled_bar = "█".repeat(bar_length);
-        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-        let full_bar = format!("{filled_bar}{background_bar}");
-
         // パーセンタイルごとに表示
         let pop_percent = population_pct * 100.0;
         let wealth_percent = wealth_pct * 100.0;
 
+        // Calculate expected value line position for 80/20 rule
+        let expected_line_pos = (0.80 * CHART_WIDTH as f64).round() as usize;
+        let expected_line_pos = expected_line_pos.min(CHART_WIDTH - 1);
+
+        // Create bar with filled portion, expected value line, and background
+        let mut bar_chars = Vec::new();
+        for pos in 0..CHART_WIDTH {
+            if pos == expected_line_pos && (pop_percent - 20.0).abs() < 5.0 {
+                bar_chars.push('┃'); // Expected value line (80% position) near 20% point
+            } else if pos < bar_length {
+                bar_chars.push('█'); // Filled portion
+            } else {
+                bar_chars.push('░'); // Background portion
+            }
+        }
+        let full_bar: String = bar_chars.iter().collect();
+
+        // Add special notation for 80/20 point
+        let suffix = if (pop_percent - 20.0).abs() < 5.0 {
+            " (80/20 point)"
+        } else {
+            ""
+        };
+
         output.push_str(&format!(
-            "{pop_percent:3.0}%: {full_bar} {wealth_percent:>5.1}% cumulative\n"
+            "{pop_percent:3.0}%: {full_bar} {wealth_percent:>5.1}% cumulative{suffix}\n"
         ));
     }
 

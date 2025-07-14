@@ -919,9 +919,23 @@ fn format_normal_histogram(result: &NormalResult) -> String {
         let bar_length = (normalized_density * CHART_WIDTH as f64).round() as usize;
         let bar_length = bar_length.min(CHART_WIDTH);
 
-        let filled_bar = "█".repeat(bar_length);
-        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
-        let full_bar = format!("{filled_bar}{background_bar}");
+        // Calculate theoretical expected density for this bin
+        let theoretical_density = density / max_density; // This is already the normalized theoretical density
+        let expected_line_pos = (theoretical_density * CHART_WIDTH as f64).round() as usize;
+        let expected_line_pos = expected_line_pos.min(CHART_WIDTH - 1);
+
+        // Create bar with filled portion, expected value line, and background
+        let mut bar_chars = Vec::new();
+        for pos in 0..CHART_WIDTH {
+            if pos == expected_line_pos {
+                bar_chars.push('┃'); // Expected value line (theoretical density)
+            } else if pos < bar_length {
+                bar_chars.push('█'); // Filled portion
+            } else {
+                bar_chars.push('░'); // Background portion
+            }
+        }
+        let full_bar: String = bar_chars.iter().collect();
 
         output.push_str(&format!(
             "{:6.2}-{:6.2}: {} {:>5.1}%\n",
