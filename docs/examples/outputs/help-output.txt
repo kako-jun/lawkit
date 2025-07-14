@@ -1,0 +1,29 @@
+# lawkit Demo Output: help-output
+# Description: Complete help message showing all available commands and options
+# Command: lawkit --help
+# Generated: Mon Jul 14 03:30:00 PM JST 2025
+# Version: 2.4.1
+
+## Command Output:
+
+Statistical law analysis toolkit
+
+Usage: lawkit [COMMAND]
+
+Commands:
+  benf      Benford's law analysis
+  pareto    Pareto principle (80/20 rule) analysis
+  zipf      Zipf's law analysis
+  normal    Normal distribution analysis
+  poisson   Poisson distribution analysis
+  analyze   Multi-law statistical analysis
+  validate  Data validation and consistency check
+  diagnose  Conflict detection and detailed analysis report
+  generate  Generate sample data following statistical laws
+  list      List available statistical laws
+  selftest  Run self-test for all laws using generated data
+  help      Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version

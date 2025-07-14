@@ -12,7 +12,7 @@ use lawkit_core::laws::integration::{
 pub fn command() -> Command {
     common_options::add_integration_options(common_options::add_common_options(
         common_options::add_input_arg(
-            Command::new("analyze").about("複数の統計法則による基本分析"),
+            Command::new("analyze").about("Multi-law statistical analysis"),
         ),
     ))
 }
