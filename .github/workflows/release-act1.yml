@@ -77,8 +77,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         cd target/${{ matrix.target }}/release
-        7z a ${{ env.ARCHIVE_NAME }}.zip ${{ env.PROJECT_NAME }}.exe
-        mv ${{ env.ARCHIVE_NAME }}.zip ../../../
+        7z a "${{ env.ARCHIVE_NAME }}.zip" "${{ env.PROJECT_NAME }}.exe"
+        mv "${{ env.ARCHIVE_NAME }}.zip" ../../../
 
     - name: Upload artifacts (Unix)
       if: matrix.os != 'windows-latest'
@@ -93,7 +93,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARCHIVE_NAME }}
-        path: ${{ env.ARCHIVE_NAME }}.zip
+        path: "${{ env.ARCHIVE_NAME }}.zip"
         retention-days: 5
 
   create-release:
