@@ -62,6 +62,7 @@ coverage/
 *.tar.gz
 *.zip
 release/
+!scripts/release/
 
 # Environment files
 .env
