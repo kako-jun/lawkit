@@ -76,9 +76,32 @@ jobs:
     - name: Create archive (Windows)
       if: matrix.os == 'windows-latest'
       run: |
+        Write-Host "Debug: ARCHIVE_NAME = $env:ARCHIVE_NAME"
+        Write-Host "Debug: PROJECT_NAME = $env:PROJECT_NAME"
+        Write-Host "Debug: Current directory = $(Get-Location)"
+        Write-Host "Debug: Target directory contents:"
+        Get-ChildItem target/${{ matrix.target }}/release -ErrorAction SilentlyContinue
+        
         cd target/${{ matrix.target }}/release
-        7z a "$env:ARCHIVE_NAME.zip" "$env:PROJECT_NAME.exe"
-        mv "$env:ARCHIVE_NAME.zip" ../../../
+        Write-Host "Debug: Now in directory = $(Get-Location)"
+        Write-Host "Debug: Directory contents:"
+        Get-ChildItem . -ErrorAction SilentlyContinue
+        
+        if (Test-Path "$env:PROJECT_NAME.exe") {
+          Write-Host "Debug: Found $env:PROJECT_NAME.exe"
+          7z a "$env:ARCHIVE_NAME.zip" "$env:PROJECT_NAME.exe"
+          if (Test-Path "$env:ARCHIVE_NAME.zip") {
+            Write-Host "Debug: ZIP created successfully: $env:ARCHIVE_NAME.zip"
+            mv "$env:ARCHIVE_NAME.zip" ../../../
+            Write-Host "Debug: ZIP moved to root"
+          } else {
+            Write-Error "ERROR: ZIP creation failed"
+            exit 1
+          }
+        } else {
+          Write-Error "ERROR: $env:PROJECT_NAME.exe not found"
+          exit 1
+        }
 
     - name: Verify archive exists (Unix)
       if: matrix.os != 'windows-latest'
