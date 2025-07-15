@@ -40,8 +40,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set project name
+    - name: Set project name (Unix)
+      if: matrix.os != 'windows-latest'
       run: echo "ARCHIVE_NAME=${{ env.PROJECT_NAME }}-${{ matrix.platform }}" >> $GITHUB_ENV
+    
+    - name: Set project name (Windows)
+      if: matrix.os == 'windows-latest'
+      run: echo "ARCHIVE_NAME=${{ env.PROJECT_NAME }}-${{ matrix.platform }}" >> $env:GITHUB_ENV
     
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
