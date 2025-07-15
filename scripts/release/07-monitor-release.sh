@@ -55,13 +55,10 @@ get_workflow_runs() {
     local workflow_name="$1"
     local tag="$2"
     
-    # Get runs triggered by this tag push (within last 2 hours to avoid old results)
-    gh run list --workflow="$workflow_name" --json status,conclusion,event,headSha,createdAt,url --limit 10 | \
-    jq -r --arg tag "$tag" --argjson since_time "$(date -d '2 hours ago' +%s)" '
-        map(select(
-            .event == "push" and 
-            (.createdAt | fromdateiso8601) > $since_time
-        )) | 
+    # Get the most recent run for this tag
+    gh run list --workflow="$workflow_name" --json status,conclusion,event,headBranch,createdAt,url --limit 20 | \
+    jq -r --arg tag "$tag" '
+        map(select(.event == "push" and (.headBranch == $tag or .headBranch == "refs/tags/" + $tag))) | 
         sort_by(.createdAt) | 
         reverse | 
         .[0] // empty
@@ -221,7 +218,7 @@ main() {
     local elapsed=0
     
     while [ $elapsed -lt $max_wait ]; do
-        local act1_result=$(check_act1 "$VERSION")
+        check_act1 "$VERSION"
         local act1_code=$?
         
         if [ $act1_code -eq 0 ]; then
@@ -253,7 +250,7 @@ main() {
     
     elapsed=0
     while [ $elapsed -lt $max_wait ]; do
-        local act2_result=$(check_act2 "$VERSION")
+        check_act2 "$VERSION"
         local act2_code=$?
         
         if [ $act2_code -eq 0 ]; then
