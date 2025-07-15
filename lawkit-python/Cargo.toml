@@ -3,7 +3,7 @@
 
 [package]
 name = "lawkit-python"
-version = "2.5.5"
+version = "2.5.6"
 edition = "2021"
 authors = ["kako-jun"]
 license = "MIT"
@@ -17,7 +17,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Reference to the actual lawkit dependencies
-lawkit-core = { version = "2.5.5", path = "../lawkit-core" }
+lawkit-core = { version = "2.5.6", path = "../lawkit-core" }
 clap = { version = "4.0", features = ["derive", "cargo"] }
 serde_json = "1.0"
 owo-colors = "4.1"
