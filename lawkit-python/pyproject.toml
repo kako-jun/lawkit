@@ -69,10 +69,12 @@ dev = [
 
 [tool.maturin]
 # This package includes a binary (lawkit CLI) in the wheel
-python-source = "src/lawkit"
+python-source = "src"
 bindings = "bin"
 # Find Python interpreters automatically
 find-interpreter = true
+# Skip auditwheel repair to avoid library issues in development
+skip-auditwheel = true
 
 [tool.ruff]
 line-length = 88
