@@ -9,14 +9,14 @@ lawkitは単一法則の限界を超え、Benford法則・Pareto原理・Zipf法
 ## 🚨 重要な開発ルール
 
 ### Claude対応時の必須ルール
-- **CI事前テスト**: `./scripts/testing/ci-local.sh` で全工程確認後プッシュ
+- **CI事前テスト**: リリース前に`.claude/release-guide.md`の手順でテスト実行
 - **ドキュメント-テスト同期**: 全ドキュメント例がテストで検証済み、変更時は同期必須
 - **バージョン統一**: Cargo.toml/pyproject.toml/package.json の完全同期
 
 ### プッシュ前の必須チェック
 - `cargo test` 全通過
 - `cargo clippy` 警告0個
-- `./scripts/testing/ci-local.sh` 成功
+- リリース手順のステップ4-5成功
 - ドキュメント例と実装の一致確認
 
 ### コンテキスト効率化ルール
