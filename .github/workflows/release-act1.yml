@@ -95,8 +95,26 @@ jobs:
           
           if (Test-Path "$env:ARCHIVE_NAME.zip") {
             Write-Host "Debug: ZIP created successfully: $env:ARCHIVE_NAME.zip"
-            Move-Item "$env:ARCHIVE_NAME.zip" "../../../$env:ARCHIVE_NAME.zip" -Force
-            Write-Host "Debug: ZIP moved to root"
+            Write-Host "Debug: ZIP size: $((Get-Item "$env:ARCHIVE_NAME.zip").Length) bytes"
+            
+            # Move to root directory
+            $destinationPath = "../../../$env:ARCHIVE_NAME.zip"
+            Write-Host "Debug: Moving ZIP to: $destinationPath"
+            Move-Item "$env:ARCHIVE_NAME.zip" $destinationPath -Force
+            
+            # Verify move was successful
+            cd ../../..
+            Write-Host "Debug: Now in root directory: $(Get-Location)"
+            Write-Host "Debug: Checking if file exists: $env:ARCHIVE_NAME.zip"
+            if (Test-Path "$env:ARCHIVE_NAME.zip") {
+              Write-Host "Debug: ZIP successfully moved to root"
+              Write-Host "Debug: Final ZIP size: $((Get-Item "$env:ARCHIVE_NAME.zip").Length) bytes"
+            } else {
+              Write-Error "ERROR: ZIP move failed - file not found in root"
+              Write-Host "Debug: Available files in root:"
+              Get-ChildItem . | ForEach-Object { Write-Host "  $($_.Name)" }
+              exit 1
+            }
           } else {
             Write-Error "ERROR: ZIP creation failed"
             exit 1
@@ -106,24 +124,6 @@ jobs:
           exit 1
         }
 
-    - name: Verify archive exists (Unix)
-      if: matrix.os != 'windows-latest'
-      run: |
-        if [ ! -f "${{ env.ARCHIVE_NAME }}.tar.gz" ]; then
-          echo "ERROR: Archive file ${{ env.ARCHIVE_NAME }}.tar.gz not found!"
-          exit 1
-        fi
-        echo "Archive file verified: ${{ env.ARCHIVE_NAME }}.tar.gz"
-        
-    - name: Verify archive exists (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        if (-not (Test-Path "$env:ARCHIVE_NAME.zip")) {
-          Write-Error "ERROR: Archive file $env:ARCHIVE_NAME.zip not found!"
-          exit 1
-        }
-        Write-Host "Archive file verified: $env:ARCHIVE_NAME.zip"
-        
     - name: Upload artifacts (Unix)
       if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v4
@@ -131,6 +131,7 @@ jobs:
         name: ${{ env.ARCHIVE_NAME }}
         path: ${{ env.ARCHIVE_NAME }}.tar.gz
         retention-days: 5
+        if-no-files-found: error
         
     - name: Upload artifacts (Windows)
       if: matrix.os == 'windows-latest'
@@ -139,6 +140,7 @@ jobs:
         name: ${{ env.ARCHIVE_NAME }}
         path: ${{ env.ARCHIVE_NAME }}.zip
         retention-days: 5
+        if-no-files-found: error
 
   create-release:
     needs: build-and-upload
