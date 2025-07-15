@@ -474,18 +474,18 @@ fn determine_risk_level(mad: f64, p_value: f64) -> RiskLevel {
 
 fn format_distribution_bars(result: &BenfordResult) -> String {
     let mut output = String::new();
-    const BAR_WIDTH: usize = 40;
+    const CHART_WIDTH: usize = 50;
 
     for i in 0..9 {
         let digit = i + 1;
         let observed = result.digit_distribution[i];
         let expected = result.expected_distribution[i];
-        let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
-        let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
+        let bar_length = ((observed / 100.0) * CHART_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(CHART_WIDTH); // Ensure we don't exceed max width
 
         // Create bar with filled and background portions
         let filled_bar = "█".repeat(bar_length);
-        let background_bar = "░".repeat(BAR_WIDTH - bar_length);
+        let background_bar = "░".repeat(CHART_WIDTH - bar_length);
         let full_bar = format!("{filled_bar}{background_bar}");
 
         output.push_str(&format!(
