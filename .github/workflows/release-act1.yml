@@ -97,22 +97,34 @@ jobs:
             Write-Host "Debug: ZIP created successfully: $env:ARCHIVE_NAME.zip"
             Write-Host "Debug: ZIP size: $((Get-Item "$env:ARCHIVE_NAME.zip").Length) bytes"
             
-            # Move to root directory
-            $destinationPath = "../../../$env:ARCHIVE_NAME.zip"
+            # Move to root directory using absolute paths
+            $rootPath = (Get-Location).Path -replace '\\target\\[^\\]+\\release$', ''
+            $destinationPath = Join-Path $rootPath "$env:ARCHIVE_NAME.zip"
+            Write-Host "Debug: Root path: $rootPath"
             Write-Host "Debug: Moving ZIP to: $destinationPath"
-            Move-Item "$env:ARCHIVE_NAME.zip" $destinationPath -Force
+            
+            try {
+              Move-Item "$env:ARCHIVE_NAME.zip" $destinationPath -Force -ErrorAction Stop
+              Write-Host "Debug: Move-Item succeeded"
+            } catch {
+              Write-Error "ERROR: Move-Item failed with error: $($_.Exception.Message)"
+              Write-Host "Debug: Error details: $($_.Exception.GetType().FullName)"
+              Write-Host "Debug: Source file exists: $(Test-Path "$env:ARCHIVE_NAME.zip")"
+              Write-Host "Debug: Destination directory exists: $(Test-Path (Split-Path $destinationPath))"
+              Write-Host "Debug: Source file info:"
+              Get-Item "$env:ARCHIVE_NAME.zip" -ErrorAction SilentlyContinue | Format-List
+              exit 1
+            }
             
             # Verify move was successful
-            cd ../../..
-            Write-Host "Debug: Now in root directory: $(Get-Location)"
-            Write-Host "Debug: Checking if file exists: $env:ARCHIVE_NAME.zip"
-            if (Test-Path "$env:ARCHIVE_NAME.zip") {
+            Write-Host "Debug: Checking if file exists at: $destinationPath"
+            if (Test-Path $destinationPath) {
               Write-Host "Debug: ZIP successfully moved to root"
-              Write-Host "Debug: Final ZIP size: $((Get-Item "$env:ARCHIVE_NAME.zip").Length) bytes"
+              Write-Host "Debug: Final ZIP size: $((Get-Item $destinationPath).Length) bytes"
             } else {
               Write-Error "ERROR: ZIP move failed - file not found in root"
               Write-Host "Debug: Available files in root:"
-              Get-ChildItem . | ForEach-Object { Write-Host "  $($_.Name)" }
+              Get-ChildItem $rootPath | ForEach-Object { Write-Host "  $($_.Name)" }
               exit 1
             }
           } else {
