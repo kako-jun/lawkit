@@ -74,7 +74,7 @@ bindings = "bin"
 # Find Python interpreters automatically
 find-interpreter = true
 # Use manylinux for PyPI compatibility
-compatibility = "manylinux2014"
+compatibility = "linux"
 
 [tool.ruff]
 line-length = 88
