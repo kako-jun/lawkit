@@ -81,65 +81,9 @@ jobs:
     - name: Create archive (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        Write-Host "Debug: ARCHIVE_NAME = $env:ARCHIVE_NAME"
-        Write-Host "Debug: PROJECT_NAME = $env:PROJECT_NAME"
-        Write-Host "Debug: Current directory = $(Get-Location)"
-        Write-Host "Debug: Target directory contents:"
-        Get-ChildItem target/${{ matrix.target }}/release -ErrorAction SilentlyContinue
-        
         cd target/${{ matrix.target }}/release
-        Write-Host "Debug: Now in directory = $(Get-Location)"
-        Write-Host "Debug: Directory contents:"
-        Get-ChildItem . -ErrorAction SilentlyContinue
-        
-        if (Test-Path "$env:PROJECT_NAME.exe") {
-          Write-Host "Debug: Found $env:PROJECT_NAME.exe"
-          
-          # Use PowerShell's Compress-Archive instead of 7z
-          Compress-Archive -Path "$env:PROJECT_NAME.exe" -DestinationPath "$env:ARCHIVE_NAME.zip" -Force
-          
-          if (Test-Path "$env:ARCHIVE_NAME.zip") {
-            Write-Host "Debug: ZIP created successfully: $env:ARCHIVE_NAME.zip"
-            Write-Host "Debug: ZIP size: $((Get-Item "$env:ARCHIVE_NAME.zip").Length) bytes"
-            
-            # Move to root directory using absolute paths
-            $rootPath = (Get-Location).Path -replace '\\target\\[^\\]+\\release$', ''
-            $destinationPath = Join-Path $rootPath "$env:ARCHIVE_NAME.zip"
-            Write-Host "Debug: Root path: $rootPath"
-            Write-Host "Debug: Moving ZIP to: $destinationPath"
-            
-            try {
-              Move-Item "$env:ARCHIVE_NAME.zip" $destinationPath -Force -ErrorAction Stop
-              Write-Host "Debug: Move-Item succeeded"
-            } catch {
-              Write-Error "ERROR: Move-Item failed with error: $($_.Exception.Message)"
-              Write-Host "Debug: Error details: $($_.Exception.GetType().FullName)"
-              Write-Host "Debug: Source file exists: $(Test-Path "$env:ARCHIVE_NAME.zip")"
-              Write-Host "Debug: Destination directory exists: $(Test-Path (Split-Path $destinationPath))"
-              Write-Host "Debug: Source file info:"
-              Get-Item "$env:ARCHIVE_NAME.zip" -ErrorAction SilentlyContinue | Format-List
-              exit 1
-            }
-            
-            # Verify move was successful
-            Write-Host "Debug: Checking if file exists at: $destinationPath"
-            if (Test-Path $destinationPath) {
-              Write-Host "Debug: ZIP successfully moved to root"
-              Write-Host "Debug: Final ZIP size: $((Get-Item $destinationPath).Length) bytes"
-            } else {
-              Write-Error "ERROR: ZIP move failed - file not found in root"
-              Write-Host "Debug: Available files in root:"
-              Get-ChildItem $rootPath | ForEach-Object { Write-Host "  $($_.Name)" }
-              exit 1
-            }
-          } else {
-            Write-Error "ERROR: ZIP creation failed"
-            exit 1
-          }
-        } else {
-          Write-Error "ERROR: $env:PROJECT_NAME.exe not found"
-          exit 1
-        }
+        7z a ${{ env.ARCHIVE_NAME }}.zip ${{ env.PROJECT_NAME }}.exe
+        mv ${{ env.ARCHIVE_NAME }}.zip ../../../
 
     - name: Upload artifacts (Unix)
       if: matrix.os != 'windows-latest'
