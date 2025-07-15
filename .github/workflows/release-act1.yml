@@ -80,6 +80,24 @@ jobs:
         7z a "$env:ARCHIVE_NAME.zip" "$env:PROJECT_NAME.exe"
         mv "$env:ARCHIVE_NAME.zip" ../../../
 
+    - name: Verify archive exists (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        if [ ! -f "${{ env.ARCHIVE_NAME }}.tar.gz" ]; then
+          echo "ERROR: Archive file ${{ env.ARCHIVE_NAME }}.tar.gz not found!"
+          exit 1
+        fi
+        echo "Archive file verified: ${{ env.ARCHIVE_NAME }}.tar.gz"
+        
+    - name: Verify archive exists (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        if (-not (Test-Path "$env:ARCHIVE_NAME.zip")) {
+          Write-Error "ERROR: Archive file $env:ARCHIVE_NAME.zip not found!"
+          exit 1
+        }
+        Write-Host "Archive file verified: $env:ARCHIVE_NAME.zip"
+        
     - name: Upload artifacts (Unix)
       if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v4
