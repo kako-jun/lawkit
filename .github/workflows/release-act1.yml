@@ -80,20 +80,11 @@ jobs:
         7z a "${{ env.ARCHIVE_NAME }}.zip" "${{ env.PROJECT_NAME }}.exe"
         mv "${{ env.ARCHIVE_NAME }}.zip" ../../../
 
-    - name: Upload artifacts (Unix)
-      if: matrix.os != 'windows-latest'
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARCHIVE_NAME }}
-        path: ${{ env.ARCHIVE_NAME }}.tar.gz
-        retention-days: 5
-        
-    - name: Upload artifacts (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.ARCHIVE_NAME }}
-        path: "${{ env.ARCHIVE_NAME }}.zip"
+        path: ${{ env.ARCHIVE_NAME }}.*
         retention-days: 5
 
   create-release:
