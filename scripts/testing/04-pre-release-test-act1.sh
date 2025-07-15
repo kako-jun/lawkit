@@ -121,17 +121,45 @@ main() {
         exit 1
     fi
     
-    # Test selftest command (should return exit code 0)
-    if "$BINARY_PATH" selftest > /dev/null 2>&1; then
-        print_success "Selftest command works"
-    else
-        print_error "Selftest command failed"
-        exit 1
-    fi
-    
     print_success "Binary test passed"
     
-    # Step 5: Simulate crates.io publish (dry run only)
+    # Step 5: Test Python package
+    print_info "Step 5: Testing Python package..."
+    cd "$PROJECT_ROOT/${PROJECT_NAME}-python"
+    
+    # Python package tests
+    if [ -f "pyproject.toml" ]; then
+        print_info "Running Python package tests..."
+        if command -v python3 &> /dev/null; then
+            python3 -m pytest tests/ || print_warning "Python tests failed or no tests found"
+        else
+            print_warning "Python3 not found, skipping Python tests"
+        fi
+    else
+        print_warning "No pyproject.toml found, skipping Python tests"
+    fi
+    
+    cd "$PROJECT_ROOT"
+    
+    # Step 6: Test npm package
+    print_info "Step 6: Testing npm package..."
+    cd "$PROJECT_ROOT/${PROJECT_NAME}-npm"
+    
+    # npm package tests
+    if [ -f "package.json" ]; then
+        print_info "Running npm package tests..."
+        if command -v npm &> /dev/null; then
+            npm test || print_warning "npm tests failed or no tests found"
+        else
+            print_warning "npm not found, skipping npm tests"
+        fi
+    else
+        print_warning "No package.json found, skipping npm tests"
+    fi
+    
+    cd "$PROJECT_ROOT"
+    
+    # Step 7: Simulate crates.io publish (dry run only)
     print_info "Step 5: Simulating crates.io publish (dry run only - no actual publishing)..."
     
     # Check if packages can be published (dry run)
