@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.4] - 2025-07-15
+
+### 🔧 GitHub Actions Reliability Fix
+
+#### 🐛 Bug Fixes
+- **Windows Build Reliability**: Corrected Windows PowerShell environment variable syntax in GitHub Actions
+- **Cross-Platform Compatibility**: Separate environment variable setup for Windows (`$env:GITHUB_ENV`) and Unix (`$GITHUB_ENV`)
+- **Artifact Upload Success**: Resolved Windows ZIP file naming issues that caused 404 errors during npm package publishing
+- **Version Consistency**: Fixed npm package version synchronization across all release components
+
+#### 🛠️ Technical Improvements
+- **Automated Validation**: Enhanced pre-release testing to catch version mismatches before publication
+- **Error Prevention**: Improved error handling in GitHub Actions workflows to prevent incomplete releases
+- **Release Process**: Standardized version update procedures to maintain consistency across all platforms
+
+#### 📦 Package Updates
+- **Rust**: lawkit-core@2.5.4, lawkit@2.5.4 on crates.io
+- **npm**: lawkit-js@2.5.4 with universal binary bundle
+- **PyPI**: lawkit-python@2.5.4 with maturin-built wheel
+
+#### 🎯 Impact
+This release ensures reliable automated releases across all platforms, maintaining the complete statistical analysis toolkit functionality established in v2.4.1. The primary issue was environment variable handling in GitHub Actions workflows that caused empty `ARCHIVE_NAME` variables, leading to malformed file paths and failed releases.
+
 ## [2.4.1] - 2025-07-13
 
 ### 🎯 Complete Platform Integration & Enhanced Reliability
