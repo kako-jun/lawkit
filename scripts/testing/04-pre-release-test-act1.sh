@@ -75,11 +75,11 @@ main() {
     
     # Build workspace
     print_info "Building workspace..."
-    cargo build --workspace --verbose
+    cargo build --workspace
     
     # Run tests
     print_info "Running tests..."
-    cargo test --workspace --verbose
+    cargo test --workspace
     
     # Quick performance check
     print_info "Quick performance check..."
