@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# 🧪 Test published lawkit packages across all ecosystems
+# 🧪 Test published packages across all ecosystems
 # Based on lawkit's comprehensive package testing approach
 
 set -e
+
+# Get project name from current directory
+PROJECT_NAME=$(basename "$(pwd)")
 
 # Colors for output
 RED='\033[0;31m'
@@ -32,7 +35,7 @@ log() {
     echo -e "${BLUE}[$(date +'%H:%M:%S')] $1${NC}"
 }
 
-echo "🧪 Testing Published lawkit Packages"
+echo "🧪 Testing Published ${PROJECT_NAME} Packages"
 echo "=================================="
 
 # Create temporary workspace
@@ -48,25 +51,19 @@ TEST_JSON2='{"debug": false, "version": "1.1", "name": "app"}'
 EXPECTED_DIFF_COUNT=2  # version change + debug change
 
 ###########################################
-# Test 1: npm package (lawkit)
+# Test 1: npm package (${PROJECT_NAME}-js)
 ###########################################
 
-log "Test 1: Testing npm package (lawkit)"
+log "Test 1: Testing npm package (${PROJECT_NAME}-js)"
 
 # Create fresh npm project
 mkdir npm-test && cd npm-test
 npm init -y >/dev/null 2>&1
 
-# Install lawkit
-log "Installing lawkit from npm..."
-if timeout 120 npm install lawkit >/dev/null 2>&1; then
-    success "lawkit installed successfully"
-else
-    warning "lawkit npm installation failed or timed out - package may not be published yet"
-    log "Skipping npm tests..."
-    cd "$TEMP_DIR"
-    rm -rf npm-test
-fi
+# Install ${PROJECT_NAME}-js
+log "Installing ${PROJECT_NAME}-js from npm..."
+npm install ${PROJECT_NAME}-js >/dev/null 2>&1
+success "${PROJECT_NAME}-js installed successfully"
 
 # Create test files
 echo "$TEST_JSON1" > test1.json
@@ -74,15 +71,15 @@ echo "$TEST_JSON2" > test2.json
 
 # Test CLI command via npm
 log "Testing CLI via npm (--help)..."
-npx lawkit --help >/dev/null 2>&1
+npx ${PROJECT_NAME} --help >/dev/null 2>&1
 success "CLI help command works"
 
 log "Testing CLI via npm (--version)..."
-NPM_VERSION=$(npx lawkit --version | head -1)
+NPM_VERSION=$(npx ${PROJECT_NAME} --version | head -1)
 success "CLI version: $NPM_VERSION"
 
 log "Testing basic diff functionality..."
-DIFF_OUTPUT=$(npx lawkit test1.json test2.json)
+DIFF_OUTPUT=$(npx ${PROJECT_NAME} test1.json test2.json)
 if echo "$DIFF_OUTPUT" | grep -q "version.*1.0.*1.1" && echo "$DIFF_OUTPUT" | grep -q "debug.*true.*false"; then
     success "Basic diff functionality works correctly"
 else
@@ -92,7 +89,7 @@ else
 fi
 
 log "Testing JSON output format..."
-JSON_OUTPUT=$(npx lawkit test1.json test2.json --output json)
+JSON_OUTPUT=$(npx ${PROJECT_NAME} test1.json test2.json --output json)
 if echo "$JSON_OUTPUT" | python3 -m json.tool >/dev/null 2>&1; then
     success "JSON output format is valid"
 else
@@ -114,7 +111,7 @@ version: "1.1"
 debug: false
 EOF
 
-YAML_DIFF=$(npx lawkit test1.yaml test2.yaml)
+YAML_DIFF=$(npx ${PROJECT_NAME} test1.yaml test2.yaml)
 if echo "$YAML_DIFF" | grep -q "version.*1.0.*1.1"; then
     success "YAML diff functionality works"
 else
@@ -124,43 +121,36 @@ else
 fi
 
 log "Testing stdin processing..."
-echo "$TEST_JSON1" | npx lawkit - test2.json >/dev/null 2>&1
+echo "$TEST_JSON1" | npx ${PROJECT_NAME} - test2.json >/dev/null 2>&1
 success "Stdin processing works"
 
 cd ..
 
 ###########################################
-# Test 2: Python package (lawkit-python)
+# Test 2: Python package (${PROJECT_NAME}-python)
 ###########################################
 
-log "Test 2: Testing Python package (lawkit-python)"
+log "Test 2: Testing Python package (${PROJECT_NAME}-python)"
 
 # Create virtual environment
 python3 -m venv python-test-env
 source python-test-env/bin/activate
 
-# Install lawkit-python
-log "Installing lawkit-python from PyPI..."
-if timeout 120 pip install lawkit-python >/dev/null 2>&1; then
-    success "lawkit-python installed successfully"
-else
-    warning "lawkit-python installation failed or timed out - package may not be published yet"
-    log "Skipping Python tests..."
-    deactivate 2>/dev/null || true
-    cd "$TEMP_DIR"
-    rm -rf python-test
-fi
+# Install ${PROJECT_NAME}-python
+log "Installing ${PROJECT_NAME}-python from PyPI..."
+pip install ${PROJECT_NAME}-python >/dev/null 2>&1
+success "${PROJECT_NAME}-python installed successfully"
 
 # Test binary download (manual step for Python)
 log "Testing binary download..."
 python3 -c "
-import lawkit
+import diffx
 try:
-    result = lawkit.is_lawkit_available()
+    result = diffx.is_diffx_available()
     if not result:
         print('Binary not available, attempting download...')
         import subprocess
-        subprocess.run(['lawkit-download-binary'], check=True, capture_output=True)
+        subprocess.run(['${PROJECT_NAME}-download-binary'], check=True, capture_output=True)
     print('OK: Binary availability check passed')
 except Exception as e:
     print(f'ERROR: Binary check failed: {e}')
@@ -171,7 +161,7 @@ success "Binary availability verified"
 # Test Python API
 log "Testing Python API..."
 python3 -c "
-import lawkit
+import diffx
 import json
 
 # Test data
@@ -180,10 +170,10 @@ data2 = {'name': 'app', 'version': '1.1', 'debug': False}
 
 try:
     # Test diff function
-    result = lawkit.diff_string(
+    result = diffx.diff_string(
         json.dumps(data1), 
         json.dumps(data2), 
-        lawkit.DiffOptions(format=lawkit.Format.JSON)
+        diffx.DiffOptions(format=diffx.Format.JSON)
     )
     
     if result.success and len(result.diffs) == 2:
@@ -193,12 +183,12 @@ try:
         exit(1)
         
     # Test different output formats
-    json_result = lawkit.diff_string(
+    json_result = diffx.diff_string(
         json.dumps(data1),
         json.dumps(data2),
-        lawkit.DiffOptions(
-            format=lawkit.Format.JSON,
-            output_format=lawkit.OutputFormat.JSON
+        diffx.DiffOptions(
+            format=diffx.Format.JSON,
+            output_format=diffx.OutputFormat.JSON
         )
     )
     
@@ -219,7 +209,7 @@ success "Python API functionality verified"
 # Test backward compatibility
 log "Testing backward compatibility API..."
 python3 -c "
-import lawkit
+import diffx
 import tempfile
 import os
 
@@ -233,8 +223,8 @@ with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f2:
     file2 = f2.name
 
 try:
-    # Test legacy run_lawkit function
-    result = lawkit.run_lawkit(file1, file2)
+    # Test legacy run_diffx function
+    result = diffx.run_diffx(file1, file2)
     if 'test' in result and 'old' in result and 'new' in result:
         print('OK: Backward compatibility API works')
     else:
@@ -309,7 +299,7 @@ cd npm-test
 cp ../config_old.json ../config_new.json .
 
 log "Processing with npm package..."
-NPM_RESULT=$(npx lawkit config_old.json config_new.json --output json)
+NPM_RESULT=$(npx ${PROJECT_NAME} config_old.json config_new.json --output json)
 echo "$NPM_RESULT" > npm_result.json
 
 # Process with Python package  
@@ -318,10 +308,10 @@ source python-test-env/bin/activate
 
 log "Processing with Python package..."
 python3 -c "
-import lawkit
+import diffx
 import json
 
-result = lawkit.diff('config_old.json', 'config_new.json', lawkit.DiffOptions(output_format=lawkit.OutputFormat.JSON))
+result = diffx.diff('config_old.json', 'config_new.json', diffx.DiffOptions(output_format=diffx.OutputFormat.JSON))
 if result.success:
     with open('python_result.json', 'w') as f:
         f.write(result.output)
@@ -414,7 +404,7 @@ EOF
 cd npm-test
 cp ../.github_workflows_old.yml ../.github_workflows_new.yml .
 
-CI_DIFF=$(npx lawkit .github_workflows_old.yml .github_workflows_new.yml)
+CI_DIFF=$(npx ${PROJECT_NAME} .github_workflows_old.yml .github_workflows_new.yml)
 if echo "$CI_DIFF" | grep -q "node-version" && echo "$CI_DIFF" | grep -q "develop"; then
     success "CI/CD configuration diff scenario works"
 else
@@ -431,8 +421,8 @@ echo ""
 echo "All Published Package Tests Passed!"
 echo "======================================"
 echo ""
-success "npm package (lawkit) - All functionality verified"
-success "Python package (lawkit-python) - All functionality verified"  
+success "npm package (${PROJECT_NAME}-js) - All functionality verified"
+success "Python package (${PROJECT_NAME}-python) - All functionality verified"  
 success "Cross-platform compatibility - Results identical"
 success "Real-world scenarios - Working correctly"
 echo ""

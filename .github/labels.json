@@ -82,7 +82,7 @@
   {
     "name": "area: core",
     "color": "1d76db",
-    "description": "Core library (lawkit-core)"
+    "description": "Core library"
   },
   {
     "name": "area: cli",
@@ -92,41 +92,16 @@
   {
     "name": "area: npm",
     "color": "1d76db",
-    "description": "NPM package (lawkit-js)"
+    "description": "NPM package"
   },
   {
     "name": "area: pypi",
     "color": "1d76db",
-    "description": "PyPI package (lawkit-python)"
+    "description": "PyPI package"
   },
   {
     "name": "area: docs",
     "color": "1d76db",
     "description": "Documentation"
-  },
-  {
-    "name": "law: benford",
-    "color": "bfe5bf",
-    "description": "Benford's Law analysis"
-  },
-  {
-    "name": "law: pareto",
-    "color": "bfe5bf",
-    "description": "Pareto Principle analysis"
-  },
-  {
-    "name": "law: zipf",
-    "color": "bfe5bf",
-    "description": "Zipf's Law analysis"
-  },
-  {
-    "name": "law: normal",
-    "color": "bfe5bf",
-    "description": "Normal Distribution analysis"
-  },
-  {
-    "name": "law: poisson",
-    "color": "bfe5bf",
-    "description": "Poisson Distribution analysis"
   }
 ]
