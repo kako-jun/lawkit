@@ -190,20 +190,24 @@ main() {
     # Step 6: Additional release-specific checks
     print_info "Step 6: Additional release-specific checks..."
     
-    # Check no uncommitted changes (excluding build artifacts)
-    # Note: Cargo.lock may be updated during testing and should be committed separately
-    if ! git diff-index --quiet HEAD -- ':!target/' ':!**/target/'; then
+    # Check no uncommitted changes (excluding build artifacts and dry-run artifacts)
+    # Note: Cargo.lock and dry-run artifacts may be updated during testing
+    if ! git diff-index --quiet HEAD -- ':!target/' ':!**/target/' ':!Cargo.lock'; then
         print_error "Working directory has uncommitted changes (excluding build artifacts):"
         git status --porcelain | grep -v "target/"
         print_error "Git diff (excluding target/):"
         git diff --name-only HEAD -- ':!target/' ':!**/target/'
-        # Check if only Cargo.lock changed
+        # Check if only Cargo.lock or dry-run artifacts changed
         CHANGED_FILES=$(git diff --name-only HEAD -- ':!target/' ':!**/target/')
-        if [ "$CHANGED_FILES" = "Cargo.lock" ]; then
-            print_warning "Only Cargo.lock has changes - this is expected during testing"
-            print_info "Committing Cargo.lock changes..."
-            git add Cargo.lock
-            git commit -m "chore: update Cargo.lock after testing"
+        if [ "$CHANGED_FILES" = "Cargo.lock" ] || [ -z "$CHANGED_FILES" ]; then
+            if [ "$CHANGED_FILES" = "Cargo.lock" ]; then
+                print_warning "Only Cargo.lock has changes - this is expected during testing"
+                print_info "Committing Cargo.lock changes..."
+                git add Cargo.lock
+                git commit -m "chore: update Cargo.lock after testing"
+            else
+                print_success "No significant changes detected"
+            fi
         else
             print_error "Non-Cargo.lock files have uncommitted changes - this is not allowed"
             exit 1
