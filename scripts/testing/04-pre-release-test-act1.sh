@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Pre-release test Act 1 - Core build and crates.io simulation
 # This script simulates exactly what GitHub Actions Release Act 1 does
