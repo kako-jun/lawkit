@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "lawkit-python"
-version = "2.4.2"
+version = "2.4.3"
 description = "Python wrapper for lawkit - Statistical law analysis toolkit for fraud detection and data quality assessment"
 readme = "README.md"
 license = "MIT"
