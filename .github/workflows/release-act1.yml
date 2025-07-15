@@ -89,10 +89,13 @@ jobs:
         
         if (Test-Path "$env:PROJECT_NAME.exe") {
           Write-Host "Debug: Found $env:PROJECT_NAME.exe"
-          7z a "$env:ARCHIVE_NAME.zip" "$env:PROJECT_NAME.exe"
+          
+          # Use PowerShell's Compress-Archive instead of 7z
+          Compress-Archive -Path "$env:PROJECT_NAME.exe" -DestinationPath "$env:ARCHIVE_NAME.zip" -Force
+          
           if (Test-Path "$env:ARCHIVE_NAME.zip") {
             Write-Host "Debug: ZIP created successfully: $env:ARCHIVE_NAME.zip"
-            mv "$env:ARCHIVE_NAME.zip" ../../../
+            Move-Item "$env:ARCHIVE_NAME.zip" "../../../$env:ARCHIVE_NAME.zip" -Force
             Write-Host "Debug: ZIP moved to root"
           } else {
             Write-Error "ERROR: ZIP creation failed"
