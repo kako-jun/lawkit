@@ -111,22 +111,22 @@ fn format_text(result: &BenfordResult) -> String {
 
 fn format_distribution_bars(result: &BenfordResult) -> String {
     let mut output = String::new();
-    const BAR_WIDTH: usize = 40;
+    const CHART_WIDTH: usize = 50;
 
     for i in 0..9 {
         let digit = i + 1;
         let observed = result.digit_distribution[i];
         let expected = result.expected_distribution[i];
-        let bar_length = ((observed / 100.0) * BAR_WIDTH as f64).round() as usize;
-        let bar_length = bar_length.min(BAR_WIDTH); // Ensure we don't exceed max width
+        let bar_length = ((observed / 100.0) * CHART_WIDTH as f64).round() as usize;
+        let bar_length = bar_length.min(CHART_WIDTH); // Ensure we don't exceed max width
 
         // Calculate expected value line position
-        let expected_line_pos = ((expected / 100.0) * BAR_WIDTH as f64).round() as usize;
-        let expected_line_pos = expected_line_pos.min(BAR_WIDTH - 1); // Ensure it's within bounds
+        let expected_line_pos = ((expected / 100.0) * CHART_WIDTH as f64).round() as usize;
+        let expected_line_pos = expected_line_pos.min(CHART_WIDTH - 1); // Ensure it's within bounds
 
         // Create bar with filled portion, expected value line, and background
         let mut bar_chars = Vec::new();
-        for pos in 0..BAR_WIDTH {
+        for pos in 0..CHART_WIDTH {
             if pos == expected_line_pos {
                 bar_chars.push('┃'); // Expected value line (always visible)
             } else if pos < bar_length {
