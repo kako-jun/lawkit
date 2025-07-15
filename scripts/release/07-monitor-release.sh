@@ -138,10 +138,21 @@ check_act2() {
     local status=$(echo "$run_info" | jq -r '.status // "unknown"')
     local conclusion=$(echo "$run_info" | jq -r '.conclusion // "null"')
     local url=$(echo "$run_info" | jq -r '.url // ""')
+    local run_id=$(echo "$run_info" | jq -r '.databaseId // ""')
     
     print_info "Act2 status: $status, conclusion: $conclusion"
     if [ -n "$url" ]; then
         print_info "Act2 URL: $url"
+    fi
+    
+    # Check for job failures even if workflow is still running
+    if [ "$status" = "in_progress" ] && [ -n "$run_id" ]; then
+        print_info "Checking individual job statuses..."
+        local failed_jobs=$(gh run view "$run_id" --json jobs --jq '.jobs[] | select(.conclusion == "failure") | .name' 2>/dev/null || echo "")
+        if [ -n "$failed_jobs" ]; then
+            print_error "Act2 has failed jobs: $failed_jobs"
+            return 2
+        fi
     fi
     
     case "$status" in
@@ -152,7 +163,7 @@ check_act2() {
                     return 0
                     ;;
                 "failure")
-                    print_error "Act2 failed"
+                    print_error "Act2 failed with conclusion: $conclusion"
                     return 2
                     ;;
                 "cancelled")
