@@ -226,14 +226,22 @@ check_tool_versions() {
         elif [ -f ".venv/bin/maturin" ]; then
             print_success "Maturin available in virtual environment"
         else
-            print_error "Maturin not found (required for Python package)"
-            print_info "Run: source .venv/bin/activate && uv pip install maturin"
-            ERRORS=$((ERRORS + 1))
+            print_info "Installing maturin automatically..."
+            if source .venv/bin/activate && uv pip install maturin; then
+                print_success "Maturin installed successfully"
+            else
+                print_error "Failed to install maturin"
+                ERRORS=$((ERRORS + 1))
+            fi
         fi
     else
-        print_warning "Python virtual environment not found"
-        print_info "Run: uv venv && source .venv/bin/activate && uv pip install maturin"
-        WARNINGS=$((WARNINGS + 1))
+        print_info "Creating Python virtual environment and installing maturin..."
+        if uv venv && source .venv/bin/activate && uv pip install maturin; then
+            print_success "Virtual environment and maturin installed successfully"
+        else
+            print_error "Failed to create virtual environment or install maturin"
+            ERRORS=$((ERRORS + 1))
+        fi
     fi
 }
 
