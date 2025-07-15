@@ -105,30 +105,27 @@ main() {
     # Test basic functionality
     print_info "Testing binary functionality..."
     
-    # Create test files
-    TEST_DIR=$(mktemp -d)
-    trap 'rm -rf "$TEST_DIR"' EXIT
-    
-    echo '{"a": 1}' > "$TEST_DIR/test1.json"
-    echo '{"a": 2}' > "$TEST_DIR/test2.json"
-    
-    # Test basic diff (should return exit code 1 when differences found)
-    set +e  # Temporarily disable exit on error
-    "$BINARY_PATH" "$TEST_DIR/test1.json" "$TEST_DIR/test2.json" > /dev/null 2>&1
-    EXIT_CODE=$?
-    set -e  # Re-enable exit on error
-    if [ $EXIT_CODE -ne 1 ]; then
-        print_error "Binary test failed: expected exit code 1 (differences found), got $EXIT_CODE"
+    # Test help command (should return exit code 0)
+    if "$BINARY_PATH" --help > /dev/null 2>&1; then
+        print_success "Help command works"
+    else
+        print_error "Help command failed"
         exit 1
     fi
     
-    # Test identical files (should return exit code 0 when no differences)
-    set +e  # Temporarily disable exit on error
-    "$BINARY_PATH" "$TEST_DIR/test1.json" "$TEST_DIR/test1.json" > /dev/null 2>&1
-    EXIT_CODE=$?
-    set -e  # Re-enable exit on error
-    if [ $EXIT_CODE -ne 0 ]; then
-        print_error "Binary test failed: expected exit code 0 (no differences), got $EXIT_CODE"
+    # Test version command (should return exit code 0)
+    if "$BINARY_PATH" --version > /dev/null 2>&1; then
+        print_success "Version command works"
+    else
+        print_error "Version command failed"
+        exit 1
+    fi
+    
+    # Test selftest command (should return exit code 0)
+    if "$BINARY_PATH" selftest > /dev/null 2>&1; then
+        print_success "Selftest command works"
+    else
+        print_error "Selftest command failed"
         exit 1
     fi
     

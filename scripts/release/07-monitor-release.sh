@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 # Release monitoring script - correctly handles Act1 -> Act2 workflow
 # Fixes issues with false positive errors and workflow dependency understanding
@@ -223,8 +223,10 @@ main() {
     local elapsed=0
     
     while [ $elapsed -lt $max_wait ]; do
+        set +e
         check_act1 "$VERSION"
         local act1_code=$?
+        set -e
         
         if [ $act1_code -eq 0 ]; then
             print_success "Act1 completed successfully!"
@@ -255,8 +257,10 @@ main() {
     
     elapsed=0
     while [ $elapsed -lt $max_wait ]; do
+        set +e
         check_act2 "$VERSION"
         local act2_code=$?
+        set -e
         
         if [ $act2_code -eq 0 ]; then
             print_success "Act2 completed successfully!"
