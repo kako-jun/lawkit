@@ -97,13 +97,19 @@ cd ..
 
 log "Test 2: Testing Python package (${PROJECT_NAME}-python)"
 
-# Create virtual environment
-python3 -m venv python-test-env
+# Create virtual environment with uv
+if ! command -v uv &> /dev/null; then
+    log "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    source ~/.cargo/env
+fi
+
+uv venv python-test-env
 source python-test-env/bin/activate
 
 # Install ${PROJECT_NAME}-python
 log "Installing ${PROJECT_NAME}-python from PyPI..."
-if pip install ${PROJECT_NAME}-python >/dev/null 2>&1; then
+if uv pip install ${PROJECT_NAME}-python >/dev/null 2>&1; then
     success "${PROJECT_NAME}-python installed successfully"
 else
     error "${PROJECT_NAME}-python installation failed"
@@ -117,8 +123,21 @@ if python3 -c "import ${PROJECT_NAME}_core; print('OK: Core module imported')" 2
 elif python3 -c "import ${PROJECT_NAME//-/_}; print('OK: Module imported')" 2>/dev/null; then
     success "Python module works"
 else
-    error "Python module import failed"
-    exit 1
+    # Try alternative module names
+    MODULE_VARIANTS=("${PROJECT_NAME//-/_}" "${PROJECT_NAME}_core" "${PROJECT_NAME//[^a-zA-Z0-9]/_}")
+    IMPORTED=false
+    for variant in "${MODULE_VARIANTS[@]}"; do
+        if python3 -c "import $variant; print('OK: Module $variant imported')" 2>/dev/null; then
+            success "Python module works ($variant)"
+            IMPORTED=true
+            break
+        fi
+    done
+    
+    if [ "$IMPORTED" = false ]; then
+        error "Python module import failed (tried: ${MODULE_VARIANTS[*]})"
+        exit 1
+    fi
 fi
 
 # Test CLI via Python package
@@ -133,6 +152,8 @@ fi
 log "Running Python package tests..."
 if python3 -m pytest >/dev/null 2>&1; then
     success "Python package tests passed"
+elif uv pip install pytest >/dev/null 2>&1 && python3 -m pytest >/dev/null 2>&1; then
+    success "Python package tests passed (with pytest installed)"
 else
     warning "Python package tests failed or not available"
 fi
