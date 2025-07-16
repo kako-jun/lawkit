@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    uses: kako-jun/.github/.github/workflows/rust-cli-kiln-ci.yml@main
+    with:
+      project-name: ${{ github.event.repository.name }}
+    secrets: inherit
