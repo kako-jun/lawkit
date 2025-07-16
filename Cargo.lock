@@ -1140,7 +1140,7 @@ dependencies = [
 
 [[package]]
 name = "lawkit"
-version = "2.5.14"
+version = "2.5.15"
 dependencies = [
  "chrono",
  "clap",
@@ -1155,7 +1155,7 @@ dependencies = [
 
 [[package]]
 name = "lawkit-core"
-version = "2.5.14"
+version = "2.5.15"
 dependencies = [
  "anyhow",
  "calamine",
