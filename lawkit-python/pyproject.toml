@@ -73,8 +73,7 @@ python-source = "src"
 bindings = "bin"
 # Find Python interpreters automatically
 find-interpreter = true
-# Use manylinux for PyPI compatibility
-compatibility = "manylinux2014"
+# Let maturin auto-detect the best manylinux compatibility
 
 [tool.ruff]
 line-length = 88
