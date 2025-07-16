@@ -40,7 +40,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
-    needs: get-tag
+    needs: [get-tag, publish-pypi]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
