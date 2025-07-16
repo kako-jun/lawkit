@@ -60,7 +60,7 @@
 
 ### Phase 2: ドキュメント移植  
 - [x] `.claude/tasks.md` 作成
-- [x] `.claude/release-guide.md` 作成
+- [x] `mnt/rust-cli-kiln/release-guide.md` 作成
 
 ### Phase 3: スクリプト移植
 - [x] ci-local.shテストスクリプト移植

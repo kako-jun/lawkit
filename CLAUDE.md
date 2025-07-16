@@ -9,7 +9,7 @@ lawkitは単一法則の限界を超え、Benford法則・Pareto原理・Zipf法
 ## 🚨 重要な開発ルール
 
 ### Claude対応時の必須ルール
-- **CI事前テスト**: リリース前に`.claude/release-guide.md`の手順でテスト実行
+- **CI事前テスト**: リリース前に`mnt/rust-cli-kiln/release-guide.md`の手順でテスト実行
 - **ドキュメント-テスト同期**: 全ドキュメント例がテストで検証済み、変更時は同期必須
 - **バージョン統一**: Cargo.toml/pyproject.toml/package.json の完全同期
 
@@ -23,7 +23,7 @@ lawkitは単一法則の限界を超え、Benford法則・Pareto原理・Zipf法
 **CLAUDE.mdは目次として使用し、詳細情報は以下の専用ファイルを参照:**
 
 - **📋 タスクリスト**: `.claude/tasks.md` を参照
-- **🚀 リリース手順**: `.claude/release-guide.md` を参照
+- **🚀 リリース手順**: `mnt/rust-cli-kiln/release-guide.md` を参照
 
 **重要**: 詳細が必要な時のみ該当ファイルを読むこと。CLAUDE.md自体は最小限に保つ。
 
