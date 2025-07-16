@@ -73,6 +73,7 @@ jobs:
   publish-pypi:
     needs: get-tag
     timeout-minutes: 10
+    continue-on-error: true
     strategy:
       matrix:
         include:
