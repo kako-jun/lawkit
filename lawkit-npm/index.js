@@ -18,7 +18,11 @@ function getPlatformInfo() {
       return { subdir: 'darwin-x64', binaryName: 'lawkit' };
     }
   } else if (platform === 'linux') {
-    return { subdir: 'linux-x64', binaryName: 'lawkit' };
+    if (arch === 'arm64') {
+      return { subdir: 'linux-arm64', binaryName: 'lawkit' };
+    } else {
+      return { subdir: 'linux-x64', binaryName: 'lawkit' };
+    }
   } else {
     throw new Error(`Unsupported platform: ${platform}-${arch}`);
   }

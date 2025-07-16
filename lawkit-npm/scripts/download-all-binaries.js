@@ -17,6 +17,12 @@ const PLATFORMS = [
     subdir: 'linux-x64'
   },
   { 
+    name: 'linux-arm64', 
+    file: 'lawkit-linux-aarch64.tar.gz',
+    binaryName: 'lawkit',
+    subdir: 'linux-arm64'
+  },
+  { 
     name: 'darwin-x64', 
     file: 'lawkit-macos-x86_64.tar.gz',
     binaryName: 'lawkit',
