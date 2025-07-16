@@ -407,7 +407,7 @@ check_package_structure() {
     done
     
     # Check Python package structure
-    if [ -d "$PROJECT_ROOT/${PROJECT_NAME}-python/src/${PROJECT_NAME}_python" ]; then
+    if [ -d "$PROJECT_ROOT/${PROJECT_NAME}-python/src/${PROJECT_NAME}" ]; then
         print_success "Python package structure is correct"
     else
         print_error "Python package structure is incorrect"
