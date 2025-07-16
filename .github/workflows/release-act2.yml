@@ -78,19 +78,14 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64
-            manylinux: auto
           - os: ubuntu-latest
             target: aarch64
-            manylinux: auto
           - os: windows-latest
             target: x86_64
-            manylinux: 'off'
           - os: macos-latest
             target: x86_64
-            manylinux: 'off'
           - os: macos-latest
             target: aarch64
-            manylinux: 'off'
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -106,7 +101,7 @@ jobs:
         target: ${{ matrix.target }}
         args: --release --out dist --find-interpreter
         sccache: 'true'
-        manylinux: ${{ matrix.manylinux }}
+        manylinux: auto
         working-directory: ${{ env.PROJECT_NAME }}-python
     
     - name: Upload wheels
