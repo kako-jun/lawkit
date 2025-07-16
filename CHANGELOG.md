@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.14] - 2025-07-16
+
+### 🎯 Major Improvements
+
+#### ✨ New Features
+- **Graph Enhancement**: Added expected value bars to statistical analysis graphs for better visual comparison with theoretical values
+- **Distribution Visualization**: Enhanced visual representation of statistical distributions with expected value indicators
+
+#### 🐛 Bug Fixes
+- **PyPI Publishing**: Completely resolved manylinux compatibility issues for Python wheel distribution
+- **Package Distribution**: Fixed all Python package publishing errors across multiple platforms (Linux x86_64/aarch64, Windows, macOS x86_64/aarch64)
+- **Module Structure**: Corrected Python module naming from `lawkit_python` to `lawkit` for consistency
+
+#### 🛠️ Technical Improvements
+- **GitHub Actions Optimization**: Implemented PyO3/maturin-action for automatic manylinux detection
+- **Release Process**: Optimized execution order (Python → npm) for more reliable releases
+- **Cross-Platform Support**: Ensured consistent wheel generation across all supported platforms
+- **Error Handling**: Improved release failure recovery and retry mechanisms
+
+#### 📦 Package Distribution
+- **Multi-Platform Support**: Successfully published to all package managers
+  - Rust (crates.io): ✅ Available
+  - Python (PyPI): ✅ Available with proper manylinux compatibility
+  - Node.js (npm): ✅ Available
+  - Binary releases: ✅ Available for all platforms
+
+### 🔄 Migration Notes
+
+This release consolidates multiple failed release attempts (v2.5.5-v2.5.13) into a stable version. Users upgrading from v2.5.4 will see:
+- Improved graph visualization with expected value bars
+- More reliable package installation across all platforms
+- Better error handling in statistical analysis tools
+
 ## [2.5.4] - 2025-07-15
 
 ### 🔧 GitHub Actions Reliability Fix
