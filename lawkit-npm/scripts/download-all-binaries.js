@@ -109,11 +109,11 @@ async function downloadPlatformBinary(platform) {
     fs.mkdirSync(platformDir, { recursive: true });
   }
   
-  // Check if binary already exists
+  // Always download fresh binaries for release builds
   const binaryPath = path.join(platformDir, platform.binaryName);
   if (fs.existsSync(binaryPath)) {
-    console.log(`Binary for ${platform.name} already exists, skipping download.`);
-    return;
+    console.log(`Removing existing ${platform.name} binary to download fresh version...`);
+    fs.unlinkSync(binaryPath);
   }
   
   try {
