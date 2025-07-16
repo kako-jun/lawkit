@@ -5,24 +5,30 @@
 ### 🛠️ utils/
 ユーティリティスクリプト
 
-- **`check-docs-consistency.sh`** - ドキュメント整合性チェック
-- **`create-rust-cli-kiln-symlink.sh`** - rust-cli-kilnシンボリックリンク作成
-- **`setup-github-workflow.sh`** - GitHubワークフロー設定
+- **`create-github-shared-symlink.sh`** - github-sharedシンボリックリンク作成
 
-## 🚀 リリース関連スクリプト
+## 🚀 共有スクリプト
 
-リリース関連のスクリプトは `mnt/rust-cli-kiln/release-guide.md` を参照してください。
+共有スクリプトは `github-shared/rust-cli-kiln/` を参照してください：
+
+```bash
+# CI事前テスト
+./github-shared/rust-cli-kiln/scripts/testing/quick-check.sh
+
+# ドキュメント整合性チェック  
+./github-shared/rust-cli-kiln/scripts/docs/check-docs-consistency.sh
+
+# GitHubワークフロー設定
+./github-shared/rust-cli-kiln/scripts/setup/setup-github-workflow.sh
+```
 
 ## 🎯 使用方法
 
 ### 日常開発
 ```bash
-# ドキュメント整合性チェック
-./scripts/utils/check-docs-consistency.sh
+# github-sharedシンボリックリンク作成
+./scripts/utils/create-github-shared-symlink.sh
 
-# rust-cli-kilnシンボリックリンク作成
-./scripts/utils/create-rust-cli-kiln-symlink.sh
-
-# GitHubワークフロー設定
-./scripts/utils/setup-github-workflow.sh
+# CI事前テスト（プッシュ前必須）
+./github-shared/rust-cli-kiln/scripts/testing/quick-check.sh
 ```
