@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "lawkit-python"
-version = "2.5.15"
+version = "2.5.16"
 description = "Python wrapper for lawkit - Statistical law analysis toolkit for fraud detection and data quality assessment"
 readme = "README.md"
 license = "MIT"
@@ -70,6 +70,7 @@ dev = [
 [tool.maturin]
 # This package includes a binary (lawkit CLI) in the wheel
 python-source = "src"
+module-name = "lawkit_python"
 bindings = "bin"
 # Find Python interpreters automatically
 find-interpreter = true
