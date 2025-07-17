@@ -162,3 +162,7 @@ npm-package/bin/benf*
 !npm-package/bin/benf
 
 github-shared
+
+# === Temporary test directories ===
+tmp/
+lawkit-js/
