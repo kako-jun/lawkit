@@ -49,5 +49,29 @@ pretty_assertions = { workspace = true }
 
 # Integration tests configuration
 [[test]]
-name = "integration"
-path = "../tests/lib.rs"
+name = "basic"
+path = "../tests/basic/mod.rs"
+
+[[test]]
+name = "cli"
+path = "../tests/cli/mod.rs"
+
+[[test]]
+name = "core"
+path = "../tests/core/mod.rs"
+
+[[test]]
+name = "docs_examples"
+path = "../tests/docs_examples/mod.rs"
+
+[[test]]
+name = "errors"
+path = "../tests/errors/mod.rs"
+
+[[test]]
+name = "features"
+path = "../tests/features/mod.rs"
+
+[[test]]
+name = "formats"
+path = "../tests/formats/mod.rs"
