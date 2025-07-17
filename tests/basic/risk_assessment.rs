@@ -48,7 +48,7 @@ mod risk_level_tests {
         // assert_eq!(determine_risk_level(0.1), RiskLevel::Medium);
         // assert_eq!(determine_risk_level(0.05), RiskLevel::High);
         // assert_eq!(determine_risk_level(0.01), RiskLevel::Critical);
-        
+
         // Test just above boundaries
         // assert_eq!(determine_risk_level(0.100001), RiskLevel::Low);
         // assert_eq!(determine_risk_level(0.050001), RiskLevel::Medium);
@@ -60,7 +60,7 @@ mod risk_level_tests {
         // Test that risk levels are consistently ordered
         let test_p_values = vec![0.0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.2, 0.5, 1.0];
         let mut _previous_risk_numeric = 0;
-        
+
         for _p_value in test_p_values {
             // let risk = determine_risk_level(p_value);
             // let risk_numeric = match risk {
@@ -69,7 +69,7 @@ mod risk_level_tests {
             //     RiskLevel::Medium => 1,
             //     RiskLevel::Low => 0,
             // };
-            
+
             // Risk should be monotonically decreasing as p-value increases
             // assert!(
             //     risk_numeric >= previous_risk_numeric,
@@ -135,7 +135,7 @@ mod data_quality_assessment_tests {
         // let quality = assess_data_quality(1, 0.001);
         // assert!(!quality.is_sufficient_sample_size);
         // assert!(quality.is_statistically_significant);
-        
+
         // Test with zero data
         // let quality = assess_data_quality(0, 0.001);
         // assert!(!quality.is_sufficient_sample_size);
@@ -152,11 +152,11 @@ mod confidence_score_tests {
         // Test high confidence scenario
         // let score = calculate_confidence_score(1000, 0.001, 0.5);
         // assert!(score > 0.9, "High confidence score expected, got {}", score);
-        
+
         // Test medium confidence scenario
         // let score = calculate_confidence_score(100, 0.05, 2.0);
         // assert!(score > 0.5 && score < 0.8, "Medium confidence score expected, got {}", score);
-        
+
         // Test low confidence scenario
         // let score = calculate_confidence_score(20, 0.2, 10.0);
         // assert!(score < 0.5, "Low confidence score expected, got {}", score);
@@ -168,12 +168,12 @@ mod confidence_score_tests {
         // let score_small = calculate_confidence_score(50, 0.01, 1.0);
         // let score_large = calculate_confidence_score(500, 0.01, 1.0);
         // assert!(score_large > score_small, "Larger sample should have higher confidence");
-        
+
         // Test that lower p-value increases confidence
         // let score_high_p = calculate_confidence_score(100, 0.1, 1.0);
         // let score_low_p = calculate_confidence_score(100, 0.001, 1.0);
         // assert!(score_low_p > score_high_p, "Lower p-value should have higher confidence");
-        
+
         // Test that lower MAD increases confidence
         // let score_high_mad = calculate_confidence_score(100, 0.01, 5.0);
         // let score_low_mad = calculate_confidence_score(100, 0.01, 0.5);
@@ -189,7 +189,7 @@ mod confidence_score_tests {
             (10000, 0.001, 0.1),
             (5, 0.5, 50.0),
         ];
-        
+
         for (_sample_size, _p_value, _mad) in test_cases {
             // let score = calculate_confidence_score(sample_size, p_value, mad);
             // assert!(
@@ -217,10 +217,10 @@ mod integrated_risk_assessment_tests {
         //     0.15, // Medium p-value
         //     RiskLevel::Low,
         // );
-        
+
         // assert_valid_benford_result(&result);
         // assert_risk_level_matches_p_value(&result);
-        
+
         // let quality = assess_data_quality(result.numbers_analyzed, result.p_value);
         // assert!(quality.is_sufficient_sample_size);
         // assert!(!quality.is_statistically_significant); // p > 0.05
@@ -237,10 +237,10 @@ mod integrated_risk_assessment_tests {
         //     0.001, // Very low p-value
         //     RiskLevel::Critical,
         // );
-        
+
         // assert_valid_benford_result(&result);
         // assert_risk_level_matches_p_value(&result);
-        
+
         // let quality = assess_data_quality(result.numbers_analyzed, result.p_value);
         // assert!(quality.is_sufficient_sample_size);
         // assert!(quality.is_statistically_significant); // p < 0.05
@@ -255,7 +255,7 @@ mod integrated_risk_assessment_tests {
             (0.050, lawkit_core::common::risk::RiskLevel::High),   // Exactly at boundary
             (0.010, lawkit_core::common::risk::RiskLevel::Critical), // Exactly at boundary
         ];
-        
+
         for (_p_value, _expected_risk) in borderline_cases {
             // let result = create_test_result(
             //     "borderline_test",
@@ -265,7 +265,7 @@ mod integrated_risk_assessment_tests {
             //     p_value,
             //     expected_risk.clone(),
             // );
-            
+
             // assert_valid_benford_result(&result);
             // assert_risk_level_matches_p_value(&result);
         }
@@ -281,13 +281,13 @@ mod risk_messaging_tests {
     fn test_risk_messages() {
         // let low_msg = get_risk_message(RiskLevel::Low);
         // assert!(low_msg.contains("normal") || low_msg.contains("compliant"));
-        
+
         // let medium_msg = get_risk_message(RiskLevel::Medium);
         // assert!(medium_msg.contains("slight") || medium_msg.contains("minor"));
-        
+
         // let high_msg = get_risk_message(RiskLevel::High);
         // assert!(high_msg.contains("significant") || high_msg.contains("deviation"));
-        
+
         // let critical_msg = get_risk_message(RiskLevel::Critical);
         // assert!(critical_msg.contains("critical") || critical_msg.contains("strong evidence"));
     }
@@ -296,13 +296,13 @@ mod risk_messaging_tests {
     fn test_risk_recommendations() {
         // let low_rec = get_risk_recommendations(RiskLevel::Low);
         // assert!(low_rec.contains("continue") || low_rec.contains("normal"));
-        
+
         // let medium_rec = get_risk_recommendations(RiskLevel::Medium);
         // assert!(medium_rec.contains("review") || medium_rec.contains("monitor"));
-        
+
         // let high_rec = get_risk_recommendations(RiskLevel::High);
         // assert!(high_rec.contains("investigate") || high_rec.contains("audit"));
-        
+
         // let critical_rec = get_risk_recommendations(RiskLevel::Critical);
         // assert!(critical_rec.contains("immediate") || critical_rec.contains("urgent"));
     }
@@ -323,10 +323,10 @@ mod real_world_scenarios_tests {
         //     0.001,
         //     RiskLevel::Critical,
         // );
-        
+
         // assert_valid_benford_result(&result);
         // assert_eq!(result.risk_level, RiskLevel::Critical);
-        
+
         // let quality = assess_data_quality(result.numbers_analyzed, result.p_value);
         // assert!(quality.is_statistically_significant);
         // assert!(quality.confidence_score > 0.8);
@@ -343,10 +343,10 @@ mod real_world_scenarios_tests {
         //     0.22,
         //     RiskLevel::Low,
         // );
-        
+
         // assert_valid_benford_result(&result);
         // assert_eq!(result.risk_level, RiskLevel::Low);
-        
+
         // let quality = assess_data_quality(result.numbers_analyzed, result.p_value);
         // assert!(quality.is_sufficient_sample_size);
         // assert!(!quality.is_statistically_significant); // No fraud detected
@@ -363,10 +363,10 @@ mod real_world_scenarios_tests {
         //     0.08,
         //     RiskLevel::Medium,
         // );
-        
+
         // assert_valid_benford_result(&result);
         // assert_eq!(result.risk_level, RiskLevel::Medium);
-        
+
         // let quality = assess_data_quality(result.numbers_analyzed, result.p_value);
         // assert!(quality.is_sufficient_sample_size); // Just barely sufficient
         // assert!(quality.confidence_score < 0.7); // Lower confidence due to small size

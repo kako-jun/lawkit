@@ -1,4 +1,4 @@
-use lawkit_core::laws::benford::japanese::{convert_japanese_numerals, extract_numbers_from_japanese_text};
+use lawkit_core::laws::benford::japanese::convert_japanese_numerals;
 
 #[cfg(test)]
 mod japanese_numeral_conversion_tests {
@@ -50,7 +50,7 @@ mod japanese_numeral_conversion_tests {
         assert_eq!(convert_japanese_numerals("二十"), "20");
         assert_eq!(convert_japanese_numerals("三十"), "30");
         assert_eq!(convert_japanese_numerals("九十"), "90");
-        
+
         // Tens with units
         assert_eq!(convert_japanese_numerals("二十一"), "21");
         assert_eq!(convert_japanese_numerals("三十五"), "35");
@@ -63,7 +63,7 @@ mod japanese_numeral_conversion_tests {
         assert_eq!(convert_japanese_numerals("一百"), "100");
         assert_eq!(convert_japanese_numerals("二百"), "200");
         assert_eq!(convert_japanese_numerals("九百"), "900");
-        
+
         // Hundreds with tens and units
         assert_eq!(convert_japanese_numerals("一百二十三"), "123");
         assert_eq!(convert_japanese_numerals("二百五十"), "250");
@@ -76,7 +76,7 @@ mod japanese_numeral_conversion_tests {
         assert_eq!(convert_japanese_numerals("一千"), "1000");
         assert_eq!(convert_japanese_numerals("二千"), "2000");
         assert_eq!(convert_japanese_numerals("九千"), "9000");
-        
+
         // Complex thousands
         assert_eq!(convert_japanese_numerals("一千二百三十四"), "1234");
         assert_eq!(convert_japanese_numerals("五千六百七十八"), "5678");
@@ -89,7 +89,7 @@ mod japanese_numeral_conversion_tests {
         assert_eq!(convert_japanese_numerals("一万"), "10000");
         assert_eq!(convert_japanese_numerals("五万"), "50000");
         assert_eq!(convert_japanese_numerals("九万"), "90000");
-        
+
         // Complex ten thousands
         assert_eq!(convert_japanese_numerals("一万二千三百四十五"), "12345");
         assert_eq!(convert_japanese_numerals("九万八千七百六十五"), "98765");
@@ -98,17 +98,14 @@ mod japanese_numeral_conversion_tests {
     #[test]
     fn test_mixed_japanese_and_context() {
         // Full-width in context
-        assert_eq!(
-            convert_japanese_numerals("売上１２３万円"),
-            "売上123万円"
-        );
-        
+        assert_eq!(convert_japanese_numerals("売上１２３万円"), "売上123万円");
+
         // Kanji in context
         assert_eq!(
             convert_japanese_numerals("利益一千二百万円"),
             "利益1200万円"
         );
-        
+
         // Mixed context
         assert_eq!(
             convert_japanese_numerals("売上１２３万円 経費四十五万円"),
@@ -120,18 +117,18 @@ mod japanese_numeral_conversion_tests {
     fn test_edge_cases() {
         // Empty string
         assert_eq!(convert_japanese_numerals(""), "");
-        
+
         // No Japanese numerals
-        assert_eq!(convert_japanese_numerals("Hello World 123"), "Hello World 123");
-        
+        assert_eq!(
+            convert_japanese_numerals("Hello World 123"),
+            "Hello World 123"
+        );
+
         // Only non-numeral Japanese text
         assert_eq!(convert_japanese_numerals("こんにちは"), "こんにちは");
-        
+
         // Mixed with regular numbers
-        assert_eq!(
-            convert_japanese_numerals("123 一二三 456"),
-            "123 123 456"
-        );
+        assert_eq!(convert_japanese_numerals("123 一二三 456"), "123 123 456");
     }
 
     #[test]
@@ -151,11 +148,11 @@ mod japanese_numeral_conversion_tests {
         // Test extracting numbers after Japanese conversion
         // let numbers = extract_numbers_from_japanese_text("一二三 四五六 七八九");
         // assert_eq!(numbers, vec![123.0, 456.0, 789.0]);
-        
+
         // let numbers = extract_numbers_from_japanese_text("売上１２３万円 経費４５万円");
         // Note: This should extract 123 and 45, ignoring the 万 (ten thousand) marker for now
         // assert_eq!(numbers, vec![123.0, 45.0]);
-        
+
         // let numbers = extract_numbers_from_japanese_text("一千二百三十四");
         // assert_eq!(numbers, vec![1234.0]);
     }
@@ -165,7 +162,7 @@ mod japanese_numeral_conversion_tests {
         // Test that non-numeral text is preserved
         let result = convert_japanese_numerals("価格は一千円です");
         assert_eq!(result, "価格は1000円です");
-        
+
         let result = convert_japanese_numerals("数量：１２個、価格：三千円");
         assert_eq!(result, "数量：12個、価格：3000円");
     }
@@ -182,7 +179,7 @@ mod japanese_numeral_conversion_tests {
     fn test_zero_handling() {
         // Test how zero is handled in different contexts
         assert_eq!(convert_japanese_numerals("０"), "0");
-        
+
         // Zero in kanji (rarely used, but should be handled)
         // Note: 零 is sometimes used for zero in formal contexts
         // For now, we'll focus on the more common cases
@@ -193,7 +190,7 @@ mod japanese_numeral_conversion_tests {
         // Test with a large string containing many Japanese numerals
         let large_text = "一千二百三十四 ".repeat(1000);
         // let result = convert_japanese_numerals(&large_text);
-        
+
         // Should convert all instances efficiently
         // assert!(result.contains("1234"));
         // assert!(!result.contains("一千"));

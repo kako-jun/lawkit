@@ -21,6 +21,7 @@ exclude = [
     "test_manual/",
     "test_threshold.csv",
     ".github/",
+    "target/",
     "international_numerals_research.md"
 ]
 rust-version = "1.75"

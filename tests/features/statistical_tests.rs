@@ -1,8 +1,8 @@
 //! Statistical analysis tests
 
-use std::process::Command;
 use std::fs;
 use std::io::Write;
+use std::process::Command;
 
 #[test]
 fn test_normal_distribution_analysis() {
@@ -10,9 +10,9 @@ fn test_normal_distribution_analysis() {
     let mut file = fs::File::create(temp_file).expect("Failed to create temp file");
     writeln!(file, "value").expect("Failed to write header");
     for i in 1..=100 {
-        writeln!(file, "{}", i).expect("Failed to write data");
+        writeln!(file, "{i}").expect("Failed to write data");
     }
-    
+
     let output = Command::new("cargo")
         .args(["run", "--", "normal", temp_file])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
@@ -21,11 +21,13 @@ fn test_normal_distribution_analysis() {
 
     // Cleanup
     let _ = fs::remove_file(temp_file);
-    
+
     if output.status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
         // Should contain statistical analysis
-        assert!(stdout.contains("mean") || stdout.contains("deviation") || stdout.contains("normal"));
+        assert!(
+            stdout.contains("mean") || stdout.contains("deviation") || stdout.contains("normal")
+        );
     }
 }
 
@@ -39,7 +41,7 @@ fn test_pareto_analysis() {
     writeln!(file, "300").expect("Failed to write data");
     writeln!(file, "400").expect("Failed to write data");
     writeln!(file, "500").expect("Failed to write data");
-    
+
     let output = Command::new("cargo")
         .args(["run", "--", "pareto", temp_file])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
@@ -48,7 +50,7 @@ fn test_pareto_analysis() {
 
     // Cleanup
     let _ = fs::remove_file(temp_file);
-    
+
     if output.status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
         // Should contain Pareto analysis
