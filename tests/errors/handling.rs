@@ -12,7 +12,9 @@ fn test_missing_file_error() {
 
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("No such file") || stderr.contains("not found") || stderr.contains("error"));
+    assert!(
+        stderr.contains("No such file") || stderr.contains("not found") || stderr.contains("error")
+    );
 }
 
 #[test]

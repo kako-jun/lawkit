@@ -1,12 +1,12 @@
 //! Output format tests for lawkit
 
-use std::process::Command;
 use std::fs;
+use std::process::Command;
 
 #[test]
 fn test_json_output() {
     let test_file = "tests/fixtures/sample_data.csv";
-    
+
     let output = Command::new("cargo")
         .args(["run", "--", "analyze", test_file, "--output", "json"])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
@@ -23,7 +23,7 @@ fn test_json_output() {
 #[test]
 fn test_yaml_output() {
     let test_file = "tests/fixtures/sample_data.csv";
-    
+
     if fs::metadata(test_file).is_ok() {
         let output = Command::new("cargo")
             .args(["run", "--", "analyze", test_file, "--output", "yaml"])

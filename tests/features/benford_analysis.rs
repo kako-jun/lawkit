@@ -1,8 +1,8 @@
 //! Benford's Law analysis tests
 
-use std::process::Command;
 use std::fs;
 use std::io::Write;
+use std::process::Command;
 
 #[test]
 fn test_benford_analysis_basic() {
@@ -14,7 +14,7 @@ fn test_benford_analysis_basic() {
     writeln!(file, "345.67").expect("Failed to write data");
     writeln!(file, "111.11").expect("Failed to write data");
     writeln!(file, "222.22").expect("Failed to write data");
-    
+
     let output = Command::new("cargo")
         .args(["run", "--", "benf", temp_file])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
@@ -23,7 +23,7 @@ fn test_benford_analysis_basic() {
 
     // Cleanup
     let _ = fs::remove_file(temp_file);
-    
+
     if output.status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
         // Should contain Benford analysis results
@@ -39,7 +39,7 @@ fn test_benford_different_formats() {
     writeln!(file, "1,234.56").expect("Failed to write data with comma");
     writeln!(file, "$2,345.67").expect("Failed to write data with currency");
     writeln!(file, "3456.78").expect("Failed to write simple decimal");
-    
+
     let output = Command::new("cargo")
         .args(["run", "--", "benf", temp_file])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
@@ -48,7 +48,7 @@ fn test_benford_different_formats() {
 
     // Cleanup
     let _ = fs::remove_file(temp_file);
-    
+
     // Should handle different number formats
     assert!(output.status.success() || !String::from_utf8_lossy(&output.stderr).contains("parse"));
 }
