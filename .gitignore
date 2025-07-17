@@ -166,3 +166,5 @@ github-shared
 # === Temporary test directories ===
 tmp/
 lawkit-js/
+temp-*/
+tmp-*/
