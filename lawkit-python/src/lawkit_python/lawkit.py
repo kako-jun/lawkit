@@ -207,8 +207,20 @@ def _get_lawkit_binary_path() -> str:
         if relative_path.exists():
             return str(relative_path)
     
-    # Fall back to system PATH
-    return "lawkit"
+    # Error if binary not found - no system PATH fallback allowed
+    checked_paths = [
+        Path(sys.prefix) / "Scripts" / binary_name,
+        Path(sys.prefix) / "bin" / binary_name,
+        package_dir / "bin" / binary_name,
+        package_dir / ".." / "bin" / binary_name,
+        package_dir / ".." / ".." / "bin" / binary_name,
+        Path(__file__).parent / binary_name,
+    ]
+    raise LawkitError(
+        f"lawkit binary not found. Checked paths: {checked_paths}. "
+        "This might indicate a packaging issue. Please report this at: https://github.com/kako-jun/lawkit/issues",
+        -1, ""
+    )
 
 
 def _execute_lawkit(args: List[str]) -> tuple[str, str]:
