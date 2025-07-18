@@ -131,29 +131,16 @@ function getPlatformInfo() {
  * @returns {string} Path to lawkit binary
  */
 function getLawkitBinaryPath() {
-  try {
-    // Get platform-specific binary path
-    const platformInfo = getPlatformInfo();
-    const platformBinaryPath = path.join(__dirname, 'bin', platformInfo.subdir, platformInfo.binaryName);
-    
-    if (fs.existsSync(platformBinaryPath)) {
-      return platformBinaryPath;
-    }
-    
-    // Check if old-style flat binary exists (for backwards compatibility)
-    const binaryName = process.platform === 'win32' ? 'lawkit.exe' : 'lawkit';
-    const legacyBinaryPath = path.join(__dirname, 'bin', binaryName);
-    
-    if (fs.existsSync(legacyBinaryPath)) {
-      return legacyBinaryPath;
-    }
-    
-    // Fall back to system PATH
-    return 'lawkit';
-  } catch (error) {
-    // If platform detection fails, fall back to system PATH
-    return 'lawkit';
+  // Get platform-specific binary path
+  const platformInfo = getPlatformInfo();
+  const platformBinaryPath = path.join(__dirname, 'bin', platformInfo.subdir, platformInfo.binaryName);
+  
+  if (fs.existsSync(platformBinaryPath)) {
+    return platformBinaryPath;
   }
+  
+  // Error if binary not found - no system PATH fallback allowed
+  throw new Error(`Binary not found at ${platformBinaryPath}. Platform: ${process.platform}-${process.arch}. This might indicate a packaging issue. Please report this at: https://github.com/kako-jun/lawkit/issues`);
 }
 
 /**
