@@ -332,9 +332,10 @@ fn output_results(matches: &clap::ArgMatches, result: &NormalResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
+    let no_color = matches.get_flag("no-color");
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose),
+        "text" => print_text_output(result, quiet, verbose, no_color),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
@@ -373,6 +374,7 @@ fn output_normality_test_result(matches: &clap::ArgMatches, result: &NormalityTe
         }
         _ => print_text_output(
             &NormalResult::new("test".to_string(), &[0.0; 10]).unwrap(),
+            false,
             false,
             false,
         ),
@@ -464,7 +466,7 @@ fn output_quality_control_result(matches: &clap::ArgMatches, result: &QualityCon
     }
 }
 
-fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
+fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool, no_color: bool) {
     if quiet {
         println!("mean: {:.3}", result.mean);
         println!("std_dev: {:.3}", result.std_dev);
@@ -531,39 +533,39 @@ fn print_text_output(result: &NormalResult, quiet: bool, verbose: bool) {
 
         println!();
         println!("Interpretation:");
-        print_normal_interpretation(result);
+        print_normal_interpretation(result, no_color);
     }
 }
 
-fn print_normal_interpretation(result: &NormalResult) {
+fn print_normal_interpretation(result: &NormalResult, no_color: bool) {
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
         RiskLevel::Low => {
             println!(
                 "{}",
-                colors::pass("[PASS] Data follows normal distribution well")
+                colors::pass("[PASS] Data follows normal distribution well", no_color)
             );
             println!("   Suitable for standard statistical analysis");
         }
         RiskLevel::Medium => {
             println!(
                 "{}",
-                colors::warn("[WARN] Data shows some deviation from normality")
+                colors::warn("[WARN] Data shows some deviation from normality", no_color)
             );
             println!("   Consider robust statistical methods");
         }
         RiskLevel::High => {
             println!(
                 "{}",
-                colors::fail("[FAIL] Data significantly deviates from normality")
+                colors::fail("[FAIL] Data significantly deviates from normality", no_color)
             );
             println!("   Non-parametric methods recommended");
         }
         RiskLevel::Critical => {
             println!(
                 "{}",
-                colors::critical("[CRITICAL] Data shows extreme deviation from normality")
+                colors::critical("[CRITICAL] Data shows extreme deviation from normality", no_color)
             );
             println!("   Requires special handling and investigation");
         }
@@ -574,12 +576,12 @@ fn print_normal_interpretation(result: &NormalResult) {
         if result.skewness > 0.0 {
             println!(
                 "   {}",
-                colors::info("INFO: Data is right-skewed (positive skewness)")
+                colors::info("INFO: Data is right-skewed (positive skewness)", no_color)
             );
         } else {
             println!(
                 "   {}",
-                colors::info("INFO: Data is left-skewed (negative skewness)")
+                colors::info("INFO: Data is left-skewed (negative skewness)", no_color)
             );
         }
     }
@@ -587,12 +589,12 @@ fn print_normal_interpretation(result: &NormalResult) {
     if result.kurtosis > 1.0 {
         println!(
             "   {}",
-            colors::info("INFO: Data has heavy tails (high kurtosis)")
+            colors::info("INFO: Data has heavy tails (high kurtosis)", no_color)
         );
     } else if result.kurtosis < -1.0 {
         println!(
             "   {}",
-            colors::info("INFO: Data has light tails (low kurtosis)")
+            colors::info("INFO: Data has light tails (low kurtosis)", no_color)
         );
     }
 
@@ -603,7 +605,7 @@ fn print_normal_interpretation(result: &NormalResult) {
             colors::alert(&format!(
                 "ALERT: Outliers detected: {}",
                 result.outliers_z_score.len()
-            ))
+            ), no_color)
         );
     }
 }

@@ -142,7 +142,7 @@ fn output_integration_text(
             writeln!(
                 writer,
                 "  {}",
-                colors::level_conflict(&conflict.description)
+                colors::level_conflict(&conflict.description, false)
             )?;
             writeln!(
                 writer,

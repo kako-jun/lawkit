@@ -237,9 +237,10 @@ fn output_results(matches: &clap::ArgMatches, result: &PoissonResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
+    let no_color = matches.get_flag("no-color");
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose),
+        "text" => print_text_output(result, quiet, verbose, no_color),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
@@ -403,7 +404,7 @@ fn output_rare_events_result(matches: &clap::ArgMatches, result: &RareEventAnaly
     }
 }
 
-fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool) {
+fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool, no_color: bool) {
     if quiet {
         println!("lambda: {:.3}", result.lambda);
         println!("variance_ratio: {:.3}", result.variance_ratio);
@@ -468,38 +469,38 @@ fn print_text_output(result: &PoissonResult, quiet: bool, verbose: bool) {
 
         println!();
         println!("Interpretation:");
-        print_poisson_interpretation(result);
+        print_poisson_interpretation(result, no_color);
     }
 }
 
-fn print_poisson_interpretation(result: &PoissonResult) {
+fn print_poisson_interpretation(result: &PoissonResult, no_color: bool) {
     use lawkit_core::laws::poisson::result::PoissonAssessment;
 
     match result.distribution_assessment {
         PoissonAssessment::Excellent => {
             println!(
                 "{}",
-                colors::level_pass("Excellent Poisson distribution fit")
+                colors::level_pass("Excellent Poisson distribution fit", no_color)
             );
             println!("   Data closely follows Poisson distribution");
         }
         PoissonAssessment::Good => {
-            println!("{}", colors::level_pass("Good Poisson distribution fit"));
+            println!("{}", colors::level_pass("Good Poisson distribution fit", no_color));
             println!("   Acceptable fit to Poisson distribution");
         }
         PoissonAssessment::Moderate => {
             println!(
                 "{}",
-                colors::level_warn("Moderate Poisson distribution fit")
+                colors::level_warn("Moderate Poisson distribution fit", no_color)
             );
             println!("   Some deviations from Poisson distribution");
         }
         PoissonAssessment::Poor => {
-            println!("{}", colors::level_fail("Poor Poisson distribution fit"));
+            println!("{}", colors::level_fail("Poor Poisson distribution fit", no_color));
             println!("   Significant deviations from Poisson distribution");
         }
         PoissonAssessment::NonPoisson => {
-            println!("{}", colors::level_critical("Non-Poisson distribution"));
+            println!("{}", colors::level_critical("Non-Poisson distribution", no_color));
             println!("   Data does not follow Poisson distribution");
         }
     }
