@@ -46,6 +46,7 @@ python = ["pyo3"]
 [dev-dependencies]
 tempfile = { workspace = true }
 pretty_assertions = { workspace = true }
+assert_cmd = { workspace = true }
 
 # Integration tests configuration
 [[test]]

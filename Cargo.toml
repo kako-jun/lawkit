@@ -45,6 +45,7 @@ tempfile = "3.0"
 mockito = "1.0"
 pretty_assertions = "1.0"
 criterion = { version = "0.5", features = ["html_reports"] }
+assert_cmd = "2.0"
 
 
 [profile.release]
