@@ -329,7 +329,8 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 }
 
 fn list_laws(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
-    let no_color = matches.get_flag("no-color");
+    let _no_color = matches.get_flag("no-color");
+    // Note: no-color flag has no effect on plain text list output
     println!("Available statistical laws:");
     println!("  benf    - Benford's law analysis");
     println!("  pareto  - Pareto principle (80/20 rule) analysis");
