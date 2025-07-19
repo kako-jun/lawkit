@@ -1,17 +1,11 @@
 use is_terminal::IsTerminal;
 use owo_colors::OwoColorize;
-use std::env;
 
-/// 色付けが有効かどうか判定 (diffx準拠)
-pub fn should_use_color() -> bool {
-    // NO_COLOR環境変数チェック (https://no-color.org/)
-    if env::var("NO_COLOR").is_ok() {
+/// 色付けが有効かどうか判定
+pub fn should_use_color(no_color_flag: bool) -> bool {
+    // --no-color フラグが指定されている場合は無色
+    if no_color_flag {
         return false;
-    }
-
-    // FORCE_COLOR環境変数チェック
-    if env::var("FORCE_COLOR").is_ok() {
-        return true;
     }
 
     // 標準出力がターミナルかチェック (パイプやリダイレクト検出)
@@ -19,8 +13,8 @@ pub fn should_use_color() -> bool {
 }
 
 /// PASSステータスの色付け
-pub fn pass(text: &str) -> String {
-    if should_use_color() {
+pub fn pass(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_green().bold())
     } else {
         text.to_string()
@@ -28,8 +22,8 @@ pub fn pass(text: &str) -> String {
 }
 
 /// WARNステータスの色付け
-pub fn warn(text: &str) -> String {
-    if should_use_color() {
+pub fn warn(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_yellow().bold())
     } else {
         text.to_string()
@@ -37,8 +31,8 @@ pub fn warn(text: &str) -> String {
 }
 
 /// FAILステータスの色付け
-pub fn fail(text: &str) -> String {
-    if should_use_color() {
+pub fn fail(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_red().bold())
     } else {
         text.to_string()
@@ -46,8 +40,8 @@ pub fn fail(text: &str) -> String {
 }
 
 /// CRITICALステータスの色付け
-pub fn critical(text: &str) -> String {
-    if should_use_color() {
+pub fn critical(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_magenta().bold())
     } else {
         text.to_string()
@@ -55,8 +49,8 @@ pub fn critical(text: &str) -> String {
 }
 
 /// INFOテキストの色付け
-pub fn info(text: &str) -> String {
-    if should_use_color() {
+pub fn info(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_cyan())
     } else {
         text.to_string()
@@ -64,8 +58,8 @@ pub fn info(text: &str) -> String {
 }
 
 /// ALERTテキストの色付け
-pub fn alert(text: &str) -> String {
-    if should_use_color() {
+pub fn alert(text: &str, no_color: bool) -> String {
+    if should_use_color(no_color) {
         format!("{}", text.bright_yellow())
     } else {
         text.to_string()
@@ -73,38 +67,38 @@ pub fn alert(text: &str) -> String {
 }
 
 /// 統一レベル表記システム
-pub fn level_critical(message: &str) -> String {
-    format!("[{}] {}", critical("CRITICAL"), message)
+pub fn level_critical(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", critical("CRITICAL", no_color), message)
 }
 
-pub fn level_high(message: &str) -> String {
-    format!("[{}] {}", fail("HIGH"), message)
+pub fn level_high(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", fail("HIGH", no_color), message)
 }
 
-pub fn level_medium(message: &str) -> String {
-    format!("[{}] {}", warn("MEDIUM"), message)
+pub fn level_medium(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", warn("MEDIUM", no_color), message)
 }
 
-pub fn level_low(message: &str) -> String {
-    format!("[{}] {}", pass("LOW"), message)
+pub fn level_low(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", pass("LOW", no_color), message)
 }
 
-pub fn level_warning(message: &str) -> String {
-    format!("[{}] {}", warn("WARNING"), message)
+pub fn level_warning(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", warn("WARNING", no_color), message)
 }
 
-pub fn level_pass(message: &str) -> String {
-    format!("[{}] {}", pass("PASS"), message)
+pub fn level_pass(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", pass("PASS", no_color), message)
 }
 
-pub fn level_conflict(message: &str) -> String {
-    format!("[{}] {}", fail("CONFLICT"), message)
+pub fn level_conflict(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", fail("CONFLICT", no_color), message)
 }
 
-pub fn level_fail(message: &str) -> String {
-    format!("[{}] {}", fail("FAIL"), message)
+pub fn level_fail(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", fail("FAIL", no_color), message)
 }
 
-pub fn level_warn(message: &str) -> String {
-    format!("[{}] {}", warn("WARN"), message)
+pub fn level_warn(message: &str, no_color: bool) -> String {
+    format!("[{}] {}", warn("WARN", no_color), message)
 }

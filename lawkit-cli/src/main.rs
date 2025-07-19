@@ -69,9 +69,9 @@ fn main() {
                     )),
                 )),
         )
-        .subcommand(Command::new("list").about("List available statistical laws"))
+        .subcommand(common_options::add_common_options(Command::new("list").about("List available statistical laws")))
         .subcommand(
-            Command::new("selftest").about("Run self-test for all laws using generated data"),
+            common_options::add_common_options(Command::new("selftest").about("Run self-test for all laws using generated data")),
         )
         .get_matches();
 
@@ -85,8 +85,8 @@ fn main() {
         Some(("validate", sub_matches)) => subcommands::validate::run(sub_matches),
         Some(("diagnose", sub_matches)) => subcommands::diagnose::run(sub_matches),
         Some(("generate", sub_matches)) => handle_generate_command(sub_matches),
-        Some(("list", _)) => list_laws(),
-        Some(("selftest", _)) => run_selftest(),
+        Some(("list", sub_matches)) => list_laws(sub_matches),
+        Some(("selftest", sub_matches)) => run_selftest(sub_matches),
         _ => {
             show_help();
             Ok(())
@@ -328,7 +328,8 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
     }
 }
 
-fn list_laws() -> Result<(), LawkitError> {
+fn list_laws(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
+    let no_color = matches.get_flag("no-color");
     println!("Available statistical laws:");
     println!("  benf    - Benford's law analysis");
     println!("  pareto  - Pareto principle (80/20 rule) analysis");
@@ -349,7 +350,8 @@ fn list_laws() -> Result<(), LawkitError> {
     Ok(())
 }
 
-fn run_selftest() -> Result<(), LawkitError> {
+fn run_selftest(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
+    let no_color = matches.get_flag("no-color");
     println!("Running lawkit self-test...");
     println!();
 
@@ -364,11 +366,11 @@ fn run_selftest() -> Result<(), LawkitError> {
         match law {
             &"benf" => {
                 // Mock success for demonstration
-                println!("{}", colors::level_pass(""));
+                println!("{}", colors::level_pass("", no_color));
                 passed += 1;
             }
             _ => {
-                println!("{}", colors::level_pass("(placeholder)"));
+                println!("{}", colors::level_pass("(placeholder)", no_color));
                 passed += 1;
             }
         }
@@ -380,13 +382,13 @@ fn run_selftest() -> Result<(), LawkitError> {
     if passed == total {
         println!(
             "{}",
-            colors::level_pass("All tests passed! lawkit is working correctly.")
+            colors::level_pass("All tests passed! lawkit is working correctly.", no_color)
         );
         Ok(())
     } else {
         println!(
             "{}",
-            colors::level_fail("Some tests failed. Please check the implementation.")
+            colors::level_fail("Some tests failed. Please check the implementation.", no_color)
         );
         std::process::exit(1);
     }
