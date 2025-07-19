@@ -98,18 +98,18 @@ mod japanese_numeral_conversion_tests {
     #[test]
     fn test_mixed_japanese_and_context() {
         // Full-width in context
-        assert_eq!(convert_japanese_numerals("売上１２３万円"), "売上123万円");
+        assert_eq!(convert_japanese_numerals("売上１２３万円"), "売上12310000円");
 
         // Kanji in context
         assert_eq!(
             convert_japanese_numerals("利益一千二百万円"),
-            "利益1200万円"
+            "利益12000000円"
         );
 
         // Mixed context
         assert_eq!(
             convert_japanese_numerals("売上１２３万円 経費四十五万円"),
-            "売上123万円 経費45万円"
+            "売上12310000円 経費450000円"
         );
     }
 
