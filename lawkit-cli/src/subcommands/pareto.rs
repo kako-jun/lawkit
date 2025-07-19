@@ -146,6 +146,7 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
+    let no_color = matches.get_flag("no-color");
 
     match format.as_str() {
         "text" => print_text_output(result, quiet, verbose, matches),
@@ -177,13 +178,14 @@ fn print_text_output(
 
     println!("Pareto Principle (80/20 Rule) Analysis Results");
     println!();
+    let no_color = matches.get_flag("no-color");
     println!("Dataset: {}", result.dataset_name);
     println!("Numbers analyzed: {}", result.numbers_analyzed);
     match result.risk_level {
-        RiskLevel::Critical => println!("{}", colors::level_critical("Dataset analysis")),
-        RiskLevel::High => println!("{}", colors::level_high("Dataset analysis")),
-        RiskLevel::Medium => println!("{}", colors::level_medium("Dataset analysis")),
-        RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
+        RiskLevel::Critical => println!("{}", colors::level_critical("Dataset analysis", no_color)),
+        RiskLevel::High => println!("{}", colors::level_high("Dataset analysis", no_color)),
+        RiskLevel::Medium => println!("{}", colors::level_medium("Dataset analysis", no_color)),
+        RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis", no_color)),
     }
 
     println!();
@@ -208,7 +210,7 @@ fn print_text_output(
 
         println!();
         println!("Interpretation:");
-        print_pareto_interpretation(result);
+        print_pareto_interpretation(result, no_color);
     }
 
     // --gini-coefficient オプションが指定されたときにGini係数を明示的に表示
@@ -245,35 +247,35 @@ fn print_text_output(
     }
 }
 
-fn print_pareto_interpretation(result: &ParetoResult) {
+fn print_pareto_interpretation(result: &ParetoResult, no_color: bool) {
     use lawkit_core::common::risk::RiskLevel;
 
     match result.risk_level {
         RiskLevel::Low => {
             println!(
                 "{}",
-                colors::level_pass("Ideal Pareto distribution detected")
+                colors::level_pass("Ideal Pareto distribution detected", no_color)
             );
             println!("   80/20 principle is maintained");
         }
         RiskLevel::Medium => {
             println!(
                 "{}",
-                colors::level_warn("Slight deviation from Pareto principle")
+                colors::level_warn("Slight deviation from Pareto principle", no_color)
             );
             println!("   Monitoring recommended");
         }
         RiskLevel::High => {
             println!(
                 "{}",
-                colors::level_fail("Significant deviation from Pareto principle")
+                colors::level_fail("Significant deviation from Pareto principle", no_color)
             );
             println!("   Rebalancing needed");
         }
         RiskLevel::Critical => {
             println!(
                 "{}",
-                colors::level_critical("Critical deviation from Pareto principle")
+                colors::level_critical("Critical deviation from Pareto principle", no_color)
             );
             println!("   Strategy review needed");
         }

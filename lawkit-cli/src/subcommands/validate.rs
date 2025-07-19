@@ -63,7 +63,7 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
 fn output_cross_validation_result(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::CrossValidationResult,
-    _config: &OutputConfig,
+    config: &OutputConfig,
 ) -> Result<()> {
     writeln!(writer, "Cross-Validation Analysis")?;
     writeln!(writer)?;
@@ -102,7 +102,7 @@ fn output_consistency_check_result(
         writeln!(
             writer,
             "{}",
-            colors::level_warning("Consistency below threshold")
+            colors::level_warning("Consistency below threshold", false)
         )?;
         writeln!(
             writer,
@@ -112,7 +112,7 @@ fn output_consistency_check_result(
         writeln!(
             writer,
             "{}",
-            colors::level_pass("Data consistency meets requirements")
+            colors::level_pass("Data consistency meets requirements", false)
         )?;
     }
 

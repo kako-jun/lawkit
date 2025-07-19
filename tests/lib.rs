@@ -1,9 +1,12 @@
 //! Lawkit test suite
-//! Unified 6-folder test structure
+//! Unified test structure across all test categories
 
 mod basic;
 mod cli;
 mod core;
+mod docs_examples;
 mod errors;
 mod features;
 mod formats;
+mod integration;
+mod unit;

@@ -175,9 +175,10 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     let format = matches.get_one::<String>("format").unwrap();
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
+    let no_color = matches.get_flag("no-color");
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose),
+        "text" => print_text_output(result, quiet, verbose, no_color),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
@@ -190,7 +191,7 @@ fn output_results(matches: &clap::ArgMatches, result: &BenfordResult) {
     }
 }
 
-fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool) {
+fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool, no_color: bool) {
     if quiet {
         for (i, &observed) in result.digit_distribution.iter().enumerate() {
             println!("{}: {:.1}%", i + 1, observed);
@@ -203,10 +204,10 @@ fn print_text_output(result: &BenfordResult, quiet: bool, verbose: bool) {
     println!("Dataset: {}", result.dataset_name);
     println!("Numbers analyzed: {}", result.numbers_analyzed);
     match result.risk_level {
-        RiskLevel::Critical => println!("{}", colors::level_critical("Dataset analysis")),
-        RiskLevel::High => println!("{}", colors::level_high("Dataset analysis")),
-        RiskLevel::Medium => println!("{}", colors::level_medium("Dataset analysis")),
-        RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis")),
+        RiskLevel::Critical => println!("{}", colors::level_critical("Dataset analysis", no_color)),
+        RiskLevel::High => println!("{}", colors::level_high("Dataset analysis", no_color)),
+        RiskLevel::Medium => println!("{}", colors::level_medium("Dataset analysis", no_color)),
+        RiskLevel::Low => println!("{}", colors::level_low("Dataset analysis", no_color)),
     }
 
     println!();
