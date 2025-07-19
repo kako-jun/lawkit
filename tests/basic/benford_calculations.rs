@@ -1,17 +1,8 @@
-// Import all necessary functions for comprehensive testing
-// use lawkit_core::laws::benford::result::BenfordResult;
-// use lawkit_core::common::risk::RiskLevel;
-// use crate::test_common::{BENFORD_COMPLIANT_DATA, FRAUDULENT_DATA};
-// use crate::test_common::assertions::{
-//     assert_valid_benford_result,
-//     assert_follows_benford_law,
-//     assert_deviates_from_benford_law,
-//     assert_slices_approx_eq
-// };
+// Benford's Law calculation tests
 
 #[cfg(test)]
 mod benford_distribution_tests {
-    // use super::*;
+    use lawkit_core::laws::benford::analysis;
 
     #[test]
     fn test_benford_expected_percentages_constant() {
@@ -155,187 +146,31 @@ mod benford_distribution_tests {
         );
     }
 
-    #[test]
-    fn test_benford_distribution_with_compliant_data() {
-        // let result = calculate_benford_distribution("test_data", BENFORD_COMPLIANT_DATA);
-
-        // assert_valid_benford_result(&result);
-        // assert_eq!(result.dataset_name, "test_data");
-        // assert_eq!(result.numbers_analyzed, BENFORD_COMPLIANT_DATA.len());
-
-        // // Should follow Benford's Law reasonably well
-        // assert_follows_benford_law(&result.digit_distribution, 5.0); // Allow 5% tolerance
-
-        // // Should have low risk level
-        // assert!(matches!(result.risk_level, RiskLevel::Low | RiskLevel::Medium));
-    }
-
-    #[test]
-    fn test_benford_distribution_with_fraudulent_data() {
-        // let result = calculate_benford_distribution("fraudulent_data", FRAUDULENT_DATA);
-
-        // assert_valid_benford_result(&result);
-
-        // // Should deviate significantly from Benford's Law
-        // assert_deviates_from_benford_law(&result.digit_distribution, 10.0); // Expect >10% deviation
-
-        // // Should have high risk level
-        // assert!(matches!(result.risk_level, RiskLevel::High | RiskLevel::Critical));
-
-        // // Chi-square should be high
-        // assert!(result.chi_square > 20.0, "Chi-square should be high for fraudulent data, got {}", result.chi_square);
-
-        // // P-value should be very low
-        // assert!(result.p_value < 0.01, "P-value should be very low for fraudulent data, got {}", result.p_value);
-    }
 }
 
-#[cfg(test)]
-mod risk_assessment_tests {
-    // use super::*;
-    // use benf::core::risk::determine_risk_level;
 
-    #[test]
-    fn test_risk_level_determination() {
-        // // Test Low risk (p > 0.1)
-        // assert_eq!(determine_risk_level(0.5), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.15), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.11), RiskLevel::Low);
 
-        // // Test Medium risk (0.05 < p <= 0.1)
-        // assert_eq!(determine_risk_level(0.1), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.075), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.051), RiskLevel::Medium);
-
-        // // Test High risk (0.01 < p <= 0.05)
-        // assert_eq!(determine_risk_level(0.05), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.03), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.011), RiskLevel::High);
-
-        // // Test Critical risk (p <= 0.01)
-        // assert_eq!(determine_risk_level(0.01), RiskLevel::Critical);
-        // assert_eq!(determine_risk_level(0.005), RiskLevel::Critical);
-        // assert_eq!(determine_risk_level(0.0), RiskLevel::Critical);
-    }
-
-    #[test]
-    fn test_risk_level_edge_cases() {
-        // // Test exact boundary values
-        // assert_eq!(determine_risk_level(0.1), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.05), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.01), RiskLevel::Critical);
-    }
-}
-
-#[cfg(test)]
-mod statistical_tests {
-    // use super::*;
-    // use benf::core::statistics::{calculate_mean_absolute_deviation, calculate_confidence_interval};
-
-    #[test]
-    fn test_mean_absolute_deviation() {
-        // let observed = [30.0, 18.0, 12.0, 10.0, 8.0, 7.0, 6.0, 5.0, 4.0];
-        // let expected = BENFORD_EXPECTED_PERCENTAGES.clone();
-
-        // let mad = calculate_mean_absolute_deviation(&observed, &expected);
-
-        // // MAD should be small for data close to Benford's Law
-        // assert!(mad < 1.0, "MAD should be small for near-Benford data, got {}", mad);
-    }
-
-    #[test]
-    fn test_confidence_interval() {
-        // let numbers = BENFORD_COMPLIANT_DATA;
-        // let confidence_level = 0.95;
-
-        // let intervals = calculate_confidence_interval(numbers, confidence_level);
-
-        // // Should have 9 intervals (one for each digit)
-        // assert_eq!(intervals.len(), 9);
-
-        // // Each interval should have lower < upper bound
-        // for (i, (lower, upper)) in intervals.iter().enumerate() {
-        //     assert!(lower < upper, "Interval {} should have lower < upper: {} < {}", i + 1, lower, upper);
-        //     assert!(*lower >= 0.0, "Lower bound should be non-negative for digit {}", i + 1);
-        //     assert!(*upper <= 100.0, "Upper bound should be <= 100% for digit {}", i + 1);
-        // }
-    }
-}
-
-#[cfg(test)]
-mod integration_benford_tests {
-    // use super::*;
-
-    #[test]
-    fn test_full_benford_analysis_pipeline() {
-        // Test the complete pipeline from numbers to result
-        let _test_numbers = vec![
-            123.0, 234.0, 345.0, 456.0, 567.0, 678.0, 789.0, 890.0, 901.0, 112.0, 113.0, 114.0,
-            115.0, 116.0, 117.0, 118.0, 119.0, 120.0,
-        ];
-
-        // let result = calculate_benford_distribution("integration_test", &test_numbers);
-
-        // assert_valid_benford_result(&result);
-        // assert_eq!(result.numbers_analyzed, test_numbers.len());
-
-        // Check that the distribution adds up to 100%
-        // let sum: f64 = result.digit_distribution.iter().sum();
-        // assert!((sum - 100.0).abs() < 0.1, "Distribution should sum to ~100%, got {}", sum);
-    }
-
-    #[test]
-    fn test_minimal_dataset() {
-        // Test with minimal number of data points
-        let _test_numbers = vec![123.0, 234.0, 345.0];
-
-        // let result = calculate_benford_distribution("minimal_test", &test_numbers);
-
-        // assert_valid_benford_result(&result);
-        // assert_eq!(result.numbers_analyzed, 3);
-
-        // Should handle small datasets gracefully
-        // assert!(result.chi_square >= 0.0);
-        // assert!(result.p_value >= 0.0 && result.p_value <= 1.0);
-    }
-
-    #[test]
-    // #[should_panic(expected = "Insufficient data")]
-    fn test_empty_dataset() {
-        // Test with empty dataset - should panic or return error
-        let _test_numbers: Vec<f64> = vec![];
-        // calculate_benford_distribution("empty_test", &test_numbers);
-    }
-
-    #[test]
-    // #[should_panic(expected = "Insufficient data")]
-    fn test_single_number_dataset() {
-        // Test with single number - insufficient for Benford's Law analysis
-        let _test_numbers = vec![123.0];
-        // calculate_benford_distribution("single_test", &test_numbers);
-    }
-}
 
 #[cfg(test)]
 mod performance_tests {
-    // use super::*;
     use std::time::Instant;
 
     #[test]
     fn test_large_dataset_performance() {
-        // Test with a large dataset to ensure reasonable performance
-        let _large_dataset: Vec<f64> = (1..100000)
-            .map(|i| i as f64 * 1.618) // Use golden ratio to get varied first digits
+        // 大きなデータセットでのパフォーマンステスト
+        let large_dataset: Vec<f64> = (1..100000)
+            .map(|i| i as f64 * 1.618) // 黄金比を使用して様々な先頭桁を生成
             .collect();
 
         let start = Instant::now();
-        // let result = calculate_benford_distribution("performance_test", &large_dataset);
-        let _duration = start.elapsed();
+        let distribution = lawkit_core::laws::benford::analysis::calculate_digit_distribution(&large_dataset);
+        let duration = start.elapsed();
 
-        // assert_valid_benford_result(&result);
-        // assert_eq!(result.numbers_analyzed, large_dataset.len());
+        // 分布の合計が100%に近いことを確認
+        let sum: f64 = distribution.iter().sum();
+        assert!((sum - 100.0).abs() < 0.1, "分布の合計は100%付近であるべき、実際: {}", sum);
 
-        // Should complete within reasonable time (adjust threshold as needed)
-        // assert!(duration.as_millis() < 1000, "Large dataset analysis took too long: {:?}", duration);
+        // 合理的な時間内で完了すること
+        assert!(duration.as_millis() < 1000, "大きなデータセット分析に時間がかかりすぎる: {:?}", duration);
     }
 }
