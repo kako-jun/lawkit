@@ -2,7 +2,7 @@ use lawkit_core::laws::benford::japanese::extract_numbers;
 
 #[cfg(test)]
 mod number_extraction_tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test_basic_number_extraction() {
@@ -103,7 +103,7 @@ mod number_extraction_tests {
 
 #[cfg(test)]
 mod benford_filtering_tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test_filter_benford_valid_numbers() {
@@ -251,7 +251,7 @@ mod japanese_number_extraction_tests {
 
 #[cfg(test)]
 mod performance_extraction_tests {
-    use super::*;
+    // use super::*;
     use std::time::Instant;
 
     #[test]

@@ -269,7 +269,7 @@ mod integration_benford_tests {
     #[test]
     fn test_full_benford_analysis_pipeline() {
         // Test the complete pipeline from numbers to result
-        let test_numbers = vec![
+        let _test_numbers = vec![
             123.0, 234.0, 345.0, 456.0, 567.0, 678.0, 789.0, 890.0, 901.0, 112.0, 113.0, 114.0,
             115.0, 116.0, 117.0, 118.0, 119.0, 120.0,
         ];
@@ -287,7 +287,7 @@ mod integration_benford_tests {
     #[test]
     fn test_minimal_dataset() {
         // Test with minimal number of data points
-        let test_numbers = vec![123.0, 234.0, 345.0];
+        let _test_numbers = vec![123.0, 234.0, 345.0];
 
         // let result = calculate_benford_distribution("minimal_test", &test_numbers);
 
@@ -303,7 +303,7 @@ mod integration_benford_tests {
     // #[should_panic(expected = "Insufficient data")]
     fn test_empty_dataset() {
         // Test with empty dataset - should panic or return error
-        let test_numbers: Vec<f64> = vec![];
+        let _test_numbers: Vec<f64> = vec![];
         // calculate_benford_distribution("empty_test", &test_numbers);
     }
 
@@ -311,7 +311,7 @@ mod integration_benford_tests {
     // #[should_panic(expected = "Insufficient data")]
     fn test_single_number_dataset() {
         // Test with single number - insufficient for Benford's Law analysis
-        let test_numbers = vec![123.0];
+        let _test_numbers = vec![123.0];
         // calculate_benford_distribution("single_test", &test_numbers);
     }
 }
@@ -324,13 +324,13 @@ mod performance_tests {
     #[test]
     fn test_large_dataset_performance() {
         // Test with a large dataset to ensure reasonable performance
-        let large_dataset: Vec<f64> = (1..100000)
+        let _large_dataset: Vec<f64> = (1..100000)
             .map(|i| i as f64 * 1.618) // Use golden ratio to get varied first digits
             .collect();
 
         let start = Instant::now();
         // let result = calculate_benford_distribution("performance_test", &large_dataset);
-        let duration = start.elapsed();
+        let _duration = start.elapsed();
 
         // assert_valid_benford_result(&result);
         // assert_eq!(result.numbers_analyzed, large_dataset.len());
