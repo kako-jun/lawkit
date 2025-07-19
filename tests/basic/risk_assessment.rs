@@ -1,82 +1,99 @@
-// use lawkit_core::laws::benford::result::BenfordResult;
-// use lawkit_core::common::risk::RiskLevel;
+use lawkit_core::common::risk::RiskLevel;
 
 #[cfg(test)]
 mod risk_level_tests {
-    // use super::*;
+    use super::*;
 
     #[test]
     fn test_risk_level_low() {
         // Test various p-values in the low risk range (p > 0.1)
-        // assert_eq!(determine_risk_level(1.0), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.5), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.2), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.15), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.101), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(1.0), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(0.5), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(0.2), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(0.15), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(0.101), RiskLevel::Low);
     }
 
     #[test]
     fn test_risk_level_medium() {
         // Test p-values in the medium risk range (0.05 < p <= 0.1)
-        // assert_eq!(determine_risk_level(0.1), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.08), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.06), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.051), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.1), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.08), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.06), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.051), RiskLevel::Medium);
     }
 
     #[test]
     fn test_risk_level_high() {
         // Test p-values in the high risk range (0.01 < p <= 0.05)
-        // assert_eq!(determine_risk_level(0.05), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.03), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.02), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.011), RiskLevel::High);
+        assert_eq!(RiskLevel::from_p_value(0.05), RiskLevel::High);
+        assert_eq!(RiskLevel::from_p_value(0.03), RiskLevel::High);
+        assert_eq!(RiskLevel::from_p_value(0.02), RiskLevel::High);
+        assert_eq!(RiskLevel::from_p_value(0.011), RiskLevel::High);
     }
 
     #[test]
     fn test_risk_level_critical() {
         // Test p-values in the critical risk range (p <= 0.01)
-        // assert_eq!(determine_risk_level(0.01), RiskLevel::Critical);
-        // assert_eq!(determine_risk_level(0.005), RiskLevel::Critical);
-        // assert_eq!(determine_risk_level(0.001), RiskLevel::Critical);
-        // assert_eq!(determine_risk_level(0.0), RiskLevel::Critical);
+        assert_eq!(RiskLevel::from_p_value(0.01), RiskLevel::Critical);
+        assert_eq!(RiskLevel::from_p_value(0.005), RiskLevel::Critical);
+        assert_eq!(RiskLevel::from_p_value(0.001), RiskLevel::Critical);
+        assert_eq!(RiskLevel::from_p_value(0.0), RiskLevel::Critical);
     }
 
     #[test]
     fn test_risk_level_boundary_values() {
         // Test exact boundary values
-        // assert_eq!(determine_risk_level(0.1), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.05), RiskLevel::High);
-        // assert_eq!(determine_risk_level(0.01), RiskLevel::Critical);
+        assert_eq!(RiskLevel::from_p_value(0.1), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.05), RiskLevel::High);
+        assert_eq!(RiskLevel::from_p_value(0.01), RiskLevel::Critical);
 
-        // Test just above boundaries
-        // assert_eq!(determine_risk_level(0.100001), RiskLevel::Low);
-        // assert_eq!(determine_risk_level(0.050001), RiskLevel::Medium);
-        // assert_eq!(determine_risk_level(0.010001), RiskLevel::High);
+        // Test just above boundaries  
+        assert_eq!(RiskLevel::from_p_value(0.100001), RiskLevel::Low);
+        assert_eq!(RiskLevel::from_p_value(0.050001), RiskLevel::Medium);
+        assert_eq!(RiskLevel::from_p_value(0.010001), RiskLevel::High);
+    }
+
+    #[test]
+    fn test_exit_code_mapping() {
+        // Test exit code mapping for risk levels
+        assert_eq!(RiskLevel::Low.exit_code(), 0);
+        assert_eq!(RiskLevel::Medium.exit_code(), 0);
+        assert_eq!(RiskLevel::High.exit_code(), 10);
+        assert_eq!(RiskLevel::Critical.exit_code(), 11);
+    }
+
+    #[test]
+    fn test_risk_level_display() {
+        // Test Display trait implementation
+        assert_eq!(format!("{}", RiskLevel::Low), "Low");
+        assert_eq!(format!("{}", RiskLevel::Medium), "Medium");
+        assert_eq!(format!("{}", RiskLevel::High), "High");
+        assert_eq!(format!("{}", RiskLevel::Critical), "Critical");
     }
 
     #[test]
     fn test_risk_level_consistency() {
         // Test that risk levels are consistently ordered
         let test_p_values = vec![0.0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.2, 0.5, 1.0];
-        let mut _previous_risk_numeric = 0;
+        let mut _previous_risk_numeric = 4; // Start higher than any valid risk level
 
-        for _p_value in test_p_values {
-            // let risk = determine_risk_level(p_value);
-            // let risk_numeric = match risk {
-            //     RiskLevel::Critical => 3,
-            //     RiskLevel::High => 2,
-            //     RiskLevel::Medium => 1,
-            //     RiskLevel::Low => 0,
-            // };
+        for p_value in test_p_values {
+            let risk = RiskLevel::from_p_value(p_value);
+            let risk_numeric = match risk {
+                RiskLevel::Critical => 3,
+                RiskLevel::High => 2,
+                RiskLevel::Medium => 1,
+                RiskLevel::Low => 0,
+            };
 
             // Risk should be monotonically decreasing as p-value increases
-            // assert!(
-            //     risk_numeric >= previous_risk_numeric,
-            //     "Risk level should not increase as p-value increases: p={}, risk={:?}",
-            //     p_value, risk
-            // );
-            // previous_risk_numeric = risk_numeric;
+            assert!(
+                risk_numeric <= _previous_risk_numeric,
+                "Risk level should not increase as p-value increases: p={}, risk={:?}",
+                p_value, risk
+            );
+            _previous_risk_numeric = risk_numeric;
         }
     }
 }

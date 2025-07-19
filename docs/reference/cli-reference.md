@@ -383,6 +383,7 @@ All commands support these common options:
 - `--format <FORMAT>` - Output format: text, json, csv, yaml, toml, xml
 - `--quiet, -q` - Minimal output
 - `--verbose, -v` - Detailed output
+- `--no-color` - Disable colored output
 
 **Note**: Optimization is automatically applied, so the `--optimize` option is no longer needed.
 

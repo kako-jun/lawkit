@@ -39,6 +39,12 @@ pub fn add_common_options(cmd: Command) -> Command {
             .help("Minimum number of data points required for analysis")
             .default_value("10"), // 統一されたデフォルト値
     )
+    .arg(
+        Arg::new("no-color")
+            .long("no-color")
+            .help("Disable colored output")
+            .action(clap::ArgAction::SetTrue),
+    )
 }
 
 /// input引数を追加（位置引数）
