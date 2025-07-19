@@ -5,7 +5,7 @@ use std::process::Command;
 #[test]
 fn test_lawkit_version() {
     let output = Command::new("cargo")
-        .args(["run", "--", "--version"])
+        .args(["run", "--bin", "lawkit", "--", "--version"])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .output()
         .expect("Failed to execute lawkit");
@@ -18,7 +18,7 @@ fn test_lawkit_version() {
 #[test]
 fn test_lawkit_help() {
     let output = Command::new("cargo")
-        .args(["run", "--", "--help"])
+        .args(["run", "--bin", "lawkit", "--", "--help"])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .output()
         .expect("Failed to execute lawkit");
@@ -33,7 +33,7 @@ fn test_lawkit_help() {
 #[test]
 fn test_lawkit_benf_help() {
     let output = Command::new("cargo")
-        .args(["run", "--", "benf", "--help"])
+        .args(["run", "--bin", "lawkit", "--", "benf", "--help"])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .output()
         .expect("Failed to execute lawkit benf");
