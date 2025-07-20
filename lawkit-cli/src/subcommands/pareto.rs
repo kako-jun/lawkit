@@ -149,7 +149,7 @@ fn output_results(matches: &clap::ArgMatches, result: &ParetoResult) {
     let no_color = matches.get_flag("no-color");
 
     match format.as_str() {
-        "text" => print_text_output(result, quiet, verbose, matches),
+        "text" => print_text_output(result, quiet, verbose, no_color, matches),
         "json" => print_json_output(result),
         "csv" => print_csv_output(result),
         "yaml" => print_yaml_output(result),
@@ -166,6 +166,7 @@ fn print_text_output(
     result: &ParetoResult,
     quiet: bool,
     verbose: bool,
+    _no_color: bool,
     matches: &clap::ArgMatches,
 ) {
     if quiet {
