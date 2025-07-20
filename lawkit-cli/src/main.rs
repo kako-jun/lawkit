@@ -329,25 +329,25 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 }
 
 fn list_laws(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
-    let _no_color = matches.get_flag("no-color");
-    // Note: no-color flag has no effect on plain text list output
-    println!("Available statistical laws:");
-    println!("  benf    - Benford's law analysis");
-    println!("  pareto  - Pareto principle (80/20 rule) analysis");
-    println!("  zipf    - Zipf's law analysis");
-    println!("  normal  - Normal distribution analysis");
-    println!("  poisson - Poisson distribution analysis");
+    let no_color = matches.get_flag("no-color");
+    
+    println!("{}", colors::info("Available statistical laws:", no_color));
+    println!("  {} - Benford's law analysis", colors::pass("benf", no_color));
+    println!("  {} - Pareto principle (80/20 rule) analysis", colors::pass("pareto", no_color));
+    println!("  {} - Zipf's law analysis", colors::pass("zipf", no_color));
+    println!("  {} - Normal distribution analysis", colors::pass("normal", no_color));
+    println!("  {} - Poisson distribution analysis", colors::pass("poisson", no_color));
     println!();
-    println!("Integration commands:");
-    println!("  analyze  - Multi-law basic analysis and recommendations");
-    println!("  validate - Data validation and consistency checks");
-    println!("  diagnose - Conflict detection and detailed diagnostics");
+    println!("{}", colors::info("Integration commands:", no_color));
+    println!("  {} - Multi-law basic analysis and recommendations", colors::pass("analyze", no_color));
+    println!("  {} - Data validation and consistency checks", colors::pass("validate", no_color));
+    println!("  {} - Conflict detection and detailed diagnostics", colors::pass("diagnose", no_color));
     println!();
-    println!("Generation commands:");
-    println!("  generate - Generate sample data following statistical laws");
+    println!("{}", colors::info("Generation commands:", no_color));
+    println!("  {} - Generate sample data following statistical laws", colors::pass("generate", no_color));
     println!();
-    println!("Testing commands:");
-    println!("  selftest - Run self-test for all laws using generated data");
+    println!("{}", colors::info("Testing commands:", no_color));
+    println!("  {} - Run self-test for all laws using generated data", colors::pass("selftest", no_color));
     Ok(())
 }
 
