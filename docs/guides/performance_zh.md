@@ -1,227 +1,227 @@
-# Performance Guide
+# 性能指南
 
-Optimize lawkit performance for different use cases and data sizes.
+针对不同用例和数据大小优化lawkit性能。
 
-## Performance Overview
+## 性能概述
 
-lawkit is designed to handle various data sizes efficiently:
+lawkit设计用于高效处理各种数据规模：
 
-- **Small datasets** (< 1,000 records): Instant analysis
-- **Medium datasets** (1,000 - 100,000 records): < 5 seconds
-- **Large datasets** (100,000 - 1M records): < 30 seconds
-- **Very large datasets** (> 1M records): Sampling recommended
+- **小型数据集**（< 1,000条记录）：即时分析
+- **中型数据集**（1,000 - 100,000条记录）：< 5秒
+- **大型数据集**（100,000 - 1M条记录）：< 30秒
+- **超大型数据集**（> 1M条记录）：建议采样
 
-## Optimization Strategies
+## 优化策略
 
-### 1. Basic Analysis Commands
+### 1. 基本分析命令
 
 ```bash
-# Benford's law analysis
+# 本福德定律分析
 lawkit benf data.csv
 
-# Pareto analysis
+# 帕累托分析
 lawkit pareto data.csv --threshold 0.8
 
-# Zipf's law analysis
+# 齐普夫定律分析
 lawkit zipf text.txt
 
-# Normal distribution analysis
+# 正态分布分析
 lawkit normal data.csv
 
-# Poisson distribution analysis
+# 泊松分布分析
 lawkit poisson data.csv
 
-# Integrated analysis
+# 集成分析
 lawkit analyze data.csv --laws benford,pareto,normal
 ```
 
-### 2. Output Format Optimization
+### 2. 输出格式优化
 
 ```bash
-# Minimize output for faster processing
+# 最小化输出以实现更快处理
 lawkit benf data.csv --quiet --format json
 
-# Detailed information when needed
+# 需要时的详细信息
 lawkit benf data.csv --verbose
 
-# Different output formats
+# 不同输出格式
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 ```
 
-### 3. Integrated Analysis Optimization
+### 3. 集成分析优化
 
 ```bash
-# Multi-law comparison analysis
+# 多定律比较分析
 lawkit analyze data.csv --laws benford,pareto
 
-# Focus on specific analysis
+# 专注于特定分析
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# Optimize for specific purpose
+# 针对特定目的优化
 lawkit analyze data.csv --laws all --purpose audit
 
-# Use recommendation system
+# 使用推荐系统
 lawkit analyze data.csv --laws all --recommend
 ```
 
-## File Format Optimization
+## 文件格式优化
 
-### CSV Performance
+### CSV性能
 
 ```bash
-# Best performance: properly formatted CSV
+# 最佳性能：格式正确的CSV
 lawkit benf optimized.csv
 
-# Quiet mode for fast processing
+# 快速处理的安静模式
 lawkit benf data.csv --quiet
 
-# Detailed analysis when needed
+# 需要时的详细分析
 lawkit benf data.csv --verbose
 ```
 
-## Benchmarking
+## 基准测试
 
-### Basic Benchmarking
+### 基本基准测试
 
 ```bash
-# Run with timing information
+# 运行并显示计时信息
 time lawkit benf data.csv
 
-# Compare different configurations
+# 比较不同配置
 time lawkit benf data.csv --quiet
 time lawkit benf data.csv --verbose
 time lawkit analyze data.csv --laws benford
 time lawkit analyze data.csv --laws benford,pareto
 ```
 
-### Custom Benchmarks
+### 自定义基准测试
 
 ```bash
 #!/bin/bash
 # benchmark_script.sh
 
-echo "Benchmarking lawkit performance..."
+echo "正在对lawkit性能进行基准测试..."
 
-# Test different laws
-echo "Benford's law test:"
+# 测试不同定律
+echo "本福德定律测试："
 time lawkit benf data.csv --quiet
 
-echo "Pareto analysis test:"
+echo "帕累托分析测试："
 time lawkit pareto data.csv --quiet
 
-echo "Integrated analysis test:"
+echo "集成分析测试："
 time lawkit analyze data.csv --laws benford,pareto --quiet
 
-echo "All laws analysis test:"
+echo "全定律分析测试："
 time lawkit analyze data.csv --laws all --quiet
 ```
 
-## CPU Optimization
+## CPU优化
 
-### Basic Optimization
+### 基本优化
 
 ```bash
-# Lightweight analysis
+# 轻量级分析
 lawkit benf data.csv --quiet
 
-# Detailed analysis
+# 详细分析
 lawkit benf data.csv --verbose
 
-# Efficient multi-law execution
+# 高效多定律执行
 lawkit analyze data.csv --laws benford,pareto --quiet
 ```
 
-## Output Optimization
+## 输出优化
 
-### Efficient Output Formats
+### 高效输出格式
 
 ```bash
-# Minimize output for faster processing
+# 最小化输出以实现更快处理
 lawkit benf data.csv --quiet --format json
 
-# Structured output
+# 结构化输出
 lawkit analyze data.csv --format json --quiet
 
-# Human-readable format
+# 人类可读格式
 lawkit benf data.csv --format yaml
 ```
 
-## Performance Monitoring
+## 性能监控
 
-### Basic Monitoring
+### 基本监控
 
 ```bash
-# Using system tools
+# 使用系统工具
 time lawkit benf data.csv
 /usr/bin/time -v lawkit benf data.csv
 
-# Detailed timing information
+# 详细计时信息
 time lawkit analyze data.csv --laws all --verbose
 ```
 
-## Performance Tuning Examples
+## 性能调优示例
 
-### Small Data (< 1K records)
+### 小型数据（< 1K记录）
 
 ```bash
-# Minimal overhead configuration
+# 最小开销配置
 lawkit benf small_data.csv --quiet
 ```
 
-### Medium Data (1K - 100K records)
+### 中型数据（1K - 100K记录）
 
 ```bash
-# Balanced configuration
+# 平衡配置
 lawkit analyze medium_data.csv --laws benford,pareto
 ```
 
-### Large Data (100K - 1M records)
+### 大型数据（100K - 1M记录）
 
 ```bash
-# Optimized for large datasets
+# 针对大型数据集优化
 lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-### Very Large Data (> 1M records)
+### 超大型数据（> 1M记录）
 
 ```bash
-# Maximum optimization
+# 最大优化
 lawkit benf huge_data.csv --quiet --format json
 ```
 
-## Troubleshooting Performance Issues
+## 性能问题排查
 
-### Common Issues
+### 常见问题
 
-1. **Slow file reading**
+1. **文件读取缓慢**
    ```bash
-   # Solution: Use quiet mode
+   # 解决方案：使用安静模式
    lawkit benf data.csv --quiet
    ```
 
-2. **Slow analysis**
+2. **分析缓慢**
    ```bash
-   # Solution: Use single law
+   # 解决方案：使用单一定律
    lawkit benf data.csv --quiet
    ```
 
-3. **Too much output**
+3. **输出过多**
    ```bash
-   # Solution: Use quiet mode
+   # 解决方案：使用安静模式
    lawkit analyze data.csv --laws benford --quiet
    ```
 
-### Diagnostic Commands
+### 诊断命令
 
 ```bash
-# Version information and help
+# 版本信息和帮助
 lawkit --version
 lawkit --help
 
-# Command-specific help
+# 特定命令帮助
 lawkit benf --help
 lawkit pareto --help
 lawkit zipf --help
@@ -232,16 +232,16 @@ lawkit generate --help
 lawkit list --help
 ```
 
-## Future Optimization Features
+## 未来优化功能
 
-The following features are planned for future versions:
+以下功能计划在未来版本中实现：
 
-- Parallel processing support
-- Memory limit settings
-- Sampling capabilities
-- Configuration file support
-- Advanced outlier detection
-- Time series analysis
-- Batch processing mode
+- 并行处理支持
+- 内存限制设置
+- 采样功能
+- 配置文件支持
+- 高级异常值检测
+- 时间序列分析
+- 批处理模式
 
-Use these basic optimization techniques to achieve the best performance with the current implementation.
+使用这些基本优化技术可以在当前实现中获得最佳性能。
