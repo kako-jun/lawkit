@@ -1,65 +1,65 @@
-# Configuration Guide
+# 配置指南
 
-## Overview
+## 概述
 
-`lawkit` is designed to work out-of-the-box with sensible defaults, but offers several configuration options for different use cases.
+`lawkit`设计为开箱即用，具有合理的默认设置，但为不同的用例提供了多种配置选项。
 
-## Command-Line Options
+## 命令行选项
 
-### Global Options
+### 全局选项
 
 ```bash
-# Output format
+# 输出格式
 lawkit benf data.csv --format json
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 
-# International number support (automatic recognition)
-echo "１２３４５６" | lawkit benf      # Japanese numbers
-echo "一千二百三十四" | lawkit benf    # Chinese numbers
+# 国际数字支持（自动识别）
+echo "１２３４５６" | lawkit benf      # 日文数字
+echo "一千二百三十四" | lawkit benf    # 中文数字
 
-# Verbosity
-lawkit benf data.csv --quiet     # Minimal output
-lawkit benf data.csv --verbose   # Detailed output
+# 详细程度
+lawkit benf data.csv --quiet     # 最小输出
+lawkit benf data.csv --verbose   # 详细输出
 ```
 
-### Analysis Options
+### 分析选项
 
 ```bash
-# Pareto analysis with threshold
+# 带阈值的帕累托分析
 lawkit pareto data.csv --threshold 0.8
 
-# Multi-law analysis
+# 多定律分析
 lawkit analyze data.csv --laws benford,pareto,normal
 
-# Analysis with focus
+# 聚焦分析
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# Purpose-specific analysis
+# 特定目的分析
 lawkit analyze data.csv --laws all --purpose audit
 
-# Recommendations
+# 推荐
 lawkit analyze data.csv --laws all --recommend
 ```
 
-## Output Formats
+## 输出格式
 
-### Supported Formats
+### 支持的格式
 
-| Format | Description | Best For |
+| 格式 | 描述 | 最适用 |
 |--------|-------------|----------|
-| `text` | Human-readable (default) | Terminal display |
-| `json` | Machine-readable | APIs, automation |
-| `csv` | Tabular data | Spreadsheets |
-| `yaml` | Structured config | Config files |
-| `toml` | Rust-friendly | Rust integration |
-| `xml` | Legacy systems | Enterprise |
+| `text` | 人类可读（默认） | 终端显示 |
+| `json` | 机器可读 | API、自动化 |
+| `csv` | 表格数据 | 电子表格 |
+| `yaml` | 结构化配置 | 配置文件 |
+| `toml` | Rust友好 | Rust集成 |
+| `xml` | 遗留系统 | 企业 |
 
-### Format Examples
+### 格式示例
 
-#### JSON Output
+#### JSON输出
 ```bash
 lawkit benf data.csv --format json
 ```
@@ -73,7 +73,7 @@ lawkit benf data.csv --format json
 }
 ```
 
-#### CSV Output
+#### CSV输出
 ```bash
 lawkit benf data.csv --format csv
 ```
@@ -82,127 +82,127 @@ dataset,numbers_analyzed,risk_level,mad,chi_square_p
 data.csv,1000,Low,2.3,0.85
 ```
 
-## Multi-Language Support
+## 多语言支持
 
-### Supported Languages
+### 支持的语言
 
-- **English** (`en`) - Default
-- **Japanese** (`ja`) - 日本語
-- **Chinese** (`zh`) - 中文
-- **Hindi** (`hi`) - हिन्दी
-- **Arabic** (`ar`) - العربية
+- **英语** (`en`) - 默认
+- **日语** (`ja`) - 日本語
+- **中文** (`zh`) - 中文
+- **印地语** (`hi`) - हिन्दी
+- **阿拉伯语** (`ar`) - العربية
 
-### International Number Support
+### 国际数字支持
 
-`lawkit` automatically recognizes various number formats:
+`lawkit`自动识别各种数字格式：
 
 ```bash
-# Japanese numbers
+# 日文数字
 echo "１２３４ ５６７８" | lawkit benf
 
-# Chinese financial numbers  
+# 中文金融数字
 echo "壹万贰千 三千四百" | lawkit benf
 
-# Mixed formats
+# 混合格式
 echo "123 ４５６ 七八九" | lawkit benf
 ```
 
-## Integration Analysis
+## 集成分析
 
-### Multi-Law Analysis Configuration
+### 多定律分析配置
 
 ```bash
-# Select specific laws
+# 选择特定定律
 lawkit analyze data.csv --laws benford,pareto,normal
 
-# Focus on specific analysis type
+# 专注于特定分析类型
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# Purpose-specific analysis
+# 特定目的分析
 lawkit analyze data.csv --laws all --purpose audit
 
-# Recommendation mode
+# 推荐模式
 lawkit analyze data.csv --laws all --recommend
 
-# Validation mode
+# 验证模式
 lawkit validate data.csv --laws all
 
-# Diagnosis mode
+# 诊断模式
 lawkit diagnose data.csv --laws all
 ```
 
-### Analysis Purposes
+### 分析目的
 
-| Purpose | Best Laws | Use Case |
+| 目的 | 最佳定律 | 用例 |
 |---------|-----------|----------|
-| `audit` | Benford + Normal | Data quality audit |
-| `fraud` | Benford + Poisson | Fraud detection |
-| `business` | Pareto + Zipf | Business analysis |
-| `research` | All laws | General analysis |
+| `audit` | 本福德 + 正态 | 数据质量审计 |
+| `fraud` | 本福德 + 泊松 | 欺诈检测 |
+| `business` | 帕累托 + 齐普夫 | 商业分析 |
+| `research` | 所有定律 | 一般分析 |
 
-## Batch Processing
+## 批量处理
 
 ```bash
-# Process multiple files
+# 处理多个文件
 for file in *.csv; do
   lawkit benf "$file" --format json > "results_${file%.csv}.json"
 done
 
-# Analyze with different laws
+# 使用不同定律进行分析
 lawkit analyze data1.csv --laws benford --format json
 lawkit analyze data2.csv --laws pareto --format json
 lawkit analyze data3.csv --laws normal --format json
 ```
 
-## Performance Tuning
+## 性能调优
 
-### Large Datasets
+### 大型数据集
 
 ```bash
-# Use quiet mode for better performance
+# 使用安静模式提高性能
 lawkit benf large_data.csv --quiet
 
-# Focus on specific analysis
+# 专注于特定分析
 lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-### Memory Management
+### 内存管理
 
-- Files > 1GB: Consider data preprocessing
-- Use `--quiet` for minimal memory usage
-- Stream processing with stdin input
+- 文件 > 1GB: 考虑数据预处理
+- 使用`--quiet`最小化内存使用
+- 使用stdin输入进行流处理
 
-## Troubleshooting
+## 故障排除
 
-### Common Issues
+### 常见问题
 
-1. **"Insufficient data"** - Provide more data or check file format
-2. **"No numbers found"** - Check data format and encoding
-3. **"Format error"** - Verify file format matches content
+1. **"数据不足"** - 提供更多数据或检查文件格式
+2. **"未找到数字"** - 检查数据格式和编码
+3. **"格式错误"** - 验证文件格式与内容匹配
 
-### Debug Mode
+### 调试模式
 
 ```bash
-# Enable verbose logging
+# 启用详细日志记录
 lawkit benf data.csv --verbose
 
-# Check data parsing
+# 检查数据解析
 lawkit benf data.csv --format json | jq '.numbers_analyzed'
 ```
 
-## Future Configuration Features
+## 未来的配置功能
 
-The following features are planned for future versions:
+以下功能计划在未来版本中实现：
 
-- Configuration file support (`lawkit.toml`)
-- Environment variable settings
-- Custom threshold configuration
-- Profile-based settings
-- Data filtering options
-- Advanced analysis options
+- 配置文件支持 (`lawkit.toml`)
+- 环境变量设置
+- 自定义阈值配置
+- 基于配置文件的设置
+- 数据过滤选项
+- 高级分析选项
 
-## Next Steps
+## 下一步
 
-- [Examples](examples.md) - Real-world configuration examples
-- [CLI Reference](../reference/cli-reference.md) - Complete command documentation
-- [Integration Guide](../guides/integrations.md) - CI/CD automation
+- [示例](examples.md) - 实际配置示例
+- [CLI参考](../reference/cli-reference.md) - 完整的命令文档
+- [集成指南](../guides/integrations.md) - CI/CD自动化

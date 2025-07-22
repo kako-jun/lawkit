@@ -1,65 +1,65 @@
-# Configuration Guide
+# 設定ガイド
 
-## Overview
+## 概要
 
-`lawkit` is designed to work out-of-the-box with sensible defaults, but offers several configuration options for different use cases.
+`lawkit`は適切なデフォルト設定ですぐに使えるように設計されていますが、さまざまなユースケースに対応するためにいくつかの設定オプションを提供しています。
 
-## Command-Line Options
+## コマンドラインオプション
 
-### Global Options
+### グローバルオプション
 
 ```bash
-# Output format
+# 出力形式
 lawkit benf data.csv --format json
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 
-# International number support (automatic recognition)
-echo "１２３４５６" | lawkit benf      # Japanese numbers
-echo "一千二百三十四" | lawkit benf    # Chinese numbers
+# 国際数字サポート（自動認識）
+echo "１２３４５６" | lawkit benf      # 日本語数字
+echo "一千二百三十四" | lawkit benf    # 中国語数字
 
-# Verbosity
-lawkit benf data.csv --quiet     # Minimal output
-lawkit benf data.csv --verbose   # Detailed output
+# 詳細度
+lawkit benf data.csv --quiet     # 最小出力
+lawkit benf data.csv --verbose   # 詳細出力
 ```
 
-### Analysis Options
+### 分析オプション
 
 ```bash
-# Pareto analysis with threshold
+# 闾値付きパレート分析
 lawkit pareto data.csv --threshold 0.8
 
-# Multi-law analysis
+# 複数法則分析
 lawkit analyze data.csv --laws benford,pareto,normal
 
-# Analysis with focus
+# 焦点を当てた分析
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# Purpose-specific analysis
+# 目的固有の分析
 lawkit analyze data.csv --laws all --purpose audit
 
-# Recommendations
+# 推奨事項
 lawkit analyze data.csv --laws all --recommend
 ```
 
-## Output Formats
+## 出力形式
 
-### Supported Formats
+### サポートされる形式
 
-| Format | Description | Best For |
+| 形式 | 説明 | 最適用途 |
 |--------|-------------|----------|
-| `text` | Human-readable (default) | Terminal display |
-| `json` | Machine-readable | APIs, automation |
-| `csv` | Tabular data | Spreadsheets |
-| `yaml` | Structured config | Config files |
-| `toml` | Rust-friendly | Rust integration |
-| `xml` | Legacy systems | Enterprise |
+| `text` | 人間が読める（デフォルト） | ターミナル表示 |
+| `json` | 機械読み取り可能 | API、自動化 |
+| `csv` | 表形式データ | スプレッドシート |
+| `yaml` | 構造化設定 | 設定ファイル |
+| `toml` | Rustフレンドリー | Rust統合 |
+| `xml` | レガシーシステム | エンタープライズ |
 
-### Format Examples
+### 形式例
 
-#### JSON Output
+#### JSON出力
 ```bash
 lawkit benf data.csv --format json
 ```
@@ -73,7 +73,7 @@ lawkit benf data.csv --format json
 }
 ```
 
-#### CSV Output
+#### CSV出力
 ```bash
 lawkit benf data.csv --format csv
 ```
@@ -82,127 +82,127 @@ dataset,numbers_analyzed,risk_level,mad,chi_square_p
 data.csv,1000,Low,2.3,0.85
 ```
 
-## Multi-Language Support
+## 多言語サポート
 
-### Supported Languages
+### サポート言語
 
-- **English** (`en`) - Default
-- **Japanese** (`ja`) - 日本語
-- **Chinese** (`zh`) - 中文
-- **Hindi** (`hi`) - हिन्दी
-- **Arabic** (`ar`) - العربية
+- **英語** (`en`) - デフォルト
+- **日本語** (`ja`) - 日本語
+- **中国語** (`zh`) - 中文
+- **ヒンディー語** (`hi`) - हिन्दी
+- **アラビア語** (`ar`) - العربية
 
-### International Number Support
+### 国際数字サポート
 
-`lawkit` automatically recognizes various number formats:
+`lawkit`はさまざまな数字形式を自動認識します：
 
 ```bash
-# Japanese numbers
+# 日本語数字
 echo "１２３４ ５６７８" | lawkit benf
 
-# Chinese financial numbers  
+# 中国語金融数字
 echo "壹万贰千 三千四百" | lawkit benf
 
-# Mixed formats
+# 混合形式
 echo "123 ４５６ 七八九" | lawkit benf
 ```
 
-## Integration Analysis
+## 統合分析
 
-### Multi-Law Analysis Configuration
+### 複数法則分析設定
 
 ```bash
-# Select specific laws
+# 特定の法則を選択
 lawkit analyze data.csv --laws benford,pareto,normal
 
-# Focus on specific analysis type
+# 特定の分析タイプに焦点を当てる
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# Purpose-specific analysis
+# 目的固有の分析
 lawkit analyze data.csv --laws all --purpose audit
 
-# Recommendation mode
+# 推奨モード
 lawkit analyze data.csv --laws all --recommend
 
-# Validation mode
+# 検証モード
 lawkit validate data.csv --laws all
 
-# Diagnosis mode
+# 診断モード
 lawkit diagnose data.csv --laws all
 ```
 
-### Analysis Purposes
+### 分析目的
 
-| Purpose | Best Laws | Use Case |
+| 目的 | 最適法則 | ユースケース |
 |---------|-----------|----------|
-| `audit` | Benford + Normal | Data quality audit |
-| `fraud` | Benford + Poisson | Fraud detection |
-| `business` | Pareto + Zipf | Business analysis |
-| `research` | All laws | General analysis |
+| `audit` | ベンフォード + 正規 | データ品質監査 |
+| `fraud` | ベンフォード + ポアソン | 不正検出 |
+| `business` | パレート + ジップ | ビジネス分析 |
+| `research` | 全法則 | 一般分析 |
 
-## Batch Processing
+## バッチ処理
 
 ```bash
-# Process multiple files
+# 複数ファイルを処理
 for file in *.csv; do
   lawkit benf "$file" --format json > "results_${file%.csv}.json"
 done
 
-# Analyze with different laws
+# 異なる法則で分析
 lawkit analyze data1.csv --laws benford --format json
 lawkit analyze data2.csv --laws pareto --format json
 lawkit analyze data3.csv --laws normal --format json
 ```
 
-## Performance Tuning
+## パフォーマンスチューニング
 
-### Large Datasets
+### 大規模データセット
 
 ```bash
-# Use quiet mode for better performance
+# パフォーマンス向上のために静音モードを使用
 lawkit benf large_data.csv --quiet
 
-# Focus on specific analysis
+# 特定の分析に焦点を当てる
 lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-### Memory Management
+### メモリ管理
 
-- Files > 1GB: Consider data preprocessing
-- Use `--quiet` for minimal memory usage
-- Stream processing with stdin input
+- 1GB以上のファイル: データ前処理を検討
+- 最小メモリ使用のために`--quiet`を使用
+- stdin入力でのストリーム処理
 
-## Troubleshooting
+## トラブルシューティング
 
-### Common Issues
+### よくある問題
 
-1. **"Insufficient data"** - Provide more data or check file format
-2. **"No numbers found"** - Check data format and encoding
-3. **"Format error"** - Verify file format matches content
+1. **"データ不足"** - より多くのデータを提供するかファイル形式を確認
+2. **"数値が見つからない"** - データ形式とエンコーディングを確認
+3. **"形式エラー"** - ファイル形式が内容と一致しているか確認
 
-### Debug Mode
+### デバッグモード
 
 ```bash
-# Enable verbose logging
+# 詳細ログを有効化
 lawkit benf data.csv --verbose
 
-# Check data parsing
+# データ解析を確認
 lawkit benf data.csv --format json | jq '.numbers_analyzed'
 ```
 
-## Future Configuration Features
+## 将来の設定機能
 
-The following features are planned for future versions:
+以下の機能が将来のバージョンで計画されています：
 
-- Configuration file support (`lawkit.toml`)
-- Environment variable settings
-- Custom threshold configuration
-- Profile-based settings
-- Data filtering options
-- Advanced analysis options
+- 設定ファイルサポート (`lawkit.toml`)
+- 環境変数設定
+- カスタム闾値設定
+- プロファイルベースの設定
+- データフィルタリングオプション
+- 高度な分析オプション
 
-## Next Steps
+## 次のステップ
 
-- [Examples](examples.md) - Real-world configuration examples
-- [CLI Reference](../reference/cli-reference.md) - Complete command documentation
-- [Integration Guide](../guides/integrations.md) - CI/CD automation
+- [例](examples.md) - 実世界の設定例
+- [CLIリファレンス](../reference/cli-reference.md) - 完全なコマンドドキュメント
+- [統合ガイド](../guides/integrations.md) - CI/CD自動化
