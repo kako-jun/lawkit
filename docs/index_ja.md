@@ -1,15 +1,15 @@
 # lawkit ドキュメント
 
-lawkitは複数の統計法則を用いてデータ品質・不正検知を行うCLIツールキットです。
+lawkitは、複数の統計法則を使用したデータ品質評価と不正検出のための包括的統計法則分析ツールキットです。
 
-## 主な機能
+## 主要機能
 
-- **ベンフォード法則**: 会計データ、選挙結果、自然データの不正検知
-- **パレート法則**: 80/20分析、売上分析、在庫管理
+- **ベンフォード法則**: 会計データ、選挙結果、自然データセットでの不正検出
+- **パレート分析**: 80/20の法則分析、販売分析、在庫管理
 - **ジップ法則**: テキスト分析、単語頻度分析
-- **正規分布**: 品質管理、異常値検出、工程能力評価
-- **ポアソン分布**: イベント発生予測、稀少事象分析
-- **統合分析**: 複数法則の比較、矛盾検出、推奨システム
+- **正規分布**: 品質管理、外れ値検出、プロセス能力評価
+- **ポアソン分布**: 事象発生予測、まれな事象分析
+- **統合分析**: 複数法則比較、矛盾検出、推奨システム
 
 ## クイックスタート
 
@@ -30,23 +30,24 @@ lawkit analyze data.csv --laws benf,pareto,normal
 ## ドキュメント
 
 ### ユーザーガイド
-- [インストール](user-guide/installation_ja.md)
-- [はじめに](user-guide/getting-started_ja.md)  
-- [設定](user-guide/configuration_ja.md)
-- [使用例](user-guide/examples_ja.md)
+- [インストール](user-guide/installation.md)
+- [はじめ方](user-guide/getting-started.md)
+- [設定](user-guide/configuration.md)
+- [例](user-guide/examples.md)
 
 ### リファレンス
-- [CLIリファレンス](reference/cli-reference_ja.md)
+- [CLIリファレンス](reference/cli-reference.md)
 
 ### ガイド
-- [アーキテクチャガイド](guides/architecture_ja.md) - システム設計とアーキテクチャ概要
-- [統合機能](guides/integrations_ja.md)
-- [パフォーマンス](guides/performance_ja.md)
+- [アーキテクチャガイド](guides/architecture.md) - システム設計とアーキテクチャの概要
+- [統合ガイド](guides/integrations.md)
+- [性能ガイド](guides/performance.md)
+- [高度な分析](guides/advanced-analysis.md)
 
 
 ### その他
-- [FAQ](user-guide/faq_ja.md)
+- [FAQ](user-guide/faq.md)
 
 ## サポート
 
-質問や問題がある場合は、[GitHub Issues](https://github.com/user/lawkit/issues)で報告してください。日本語でのサポートも提供しています。
+質問や問題については、[GitHub Issues](https://github.com/kako-jun/lawkit/issues)にて報告してください。複数言語でのサポートを提供しています。

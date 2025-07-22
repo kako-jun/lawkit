@@ -1,422 +1,412 @@
-# 常见问题 (FAQ)
+# Frequently Asked Questions
 
-本页面收集了使用lawkit时最常遇到的问题和解决方案。
+## General Questions
 
-## 安装和设置
+### What is lawkit?
 
-### Q: 如何安装lawkit？
+lawkit is a comprehensive statistical analysis toolkit that implements multiple statistical laws including Benford Law, Pareto Principle, Zipf Law, Normal Distribution, and Poisson Distribution. It's designed for fraud detection, data quality assessment, business analytics, and scientific research.
 
-**A:** 最简单的方法是使用Cargo：
+### What makes lawkit different from other statistical tools?
 
+- **Multi-law Integration**: Compare multiple statistical laws in a single analysis
+- **International Support**: Handles numbers in multiple languages and formats
+- **Built-in Risk Assessment**: Automatic anomaly detection and risk evaluation
+- **Comprehensive Input Support**: Reads from CSV, Excel, PDF, Word, JSON, and more
+- **Professional Output**: Multiple output formats including JSON, CSV, YAML, XML
+
+### Is lawkit free to use?
+
+Yes, lawkit is open-source software released under the MIT License. You can use it freely for both personal and commercial purposes.
+
+## Installation and Setup
+
+### How do I install lawkit?
+
+**Option 1: Download Binary**
+Download pre-built binaries from [GitHub Releases](https://github.com/kako-jun/lawkit/releases).
+
+**Option 2: Build from Source**
 ```bash
-cargo install lawkit
+git clone https://github.com/kako-jun/lawkit.git
+cd lawkit
+cargo build --release
 ```
 
-如果您没有安装Rust，请先访问[rustup.rs](https://rustup.rs/)安装Rust工具链。
-
-### Q: 安装时出现编译错误怎么办？
-
-**A:** 常见解决方案：
-
-1. 确保Rust版本是1.75或更高：
-   ```bash
-   rustc --version
-   rustup update
-   ```
-
-2. 清理缓存并重新安装：
-   ```bash
-   cargo clean
-   cargo install lawkit
-   ```
-
-3. 如果仍有问题，请从源码编译：
-   ```bash
-   git clone https://github.com/kako-jun/lawkit.git
-   cd lawkit
-   cargo build --release
-   ```
-
-### Q: Windows上如何安装？
-
-**A:** Windows用户有几个选项：
-
-1. 使用WSL（推荐）：
-   ```bash
-   wsl --install
-   # 在WSL中安装Rust和lawkit
-   ```
-
-2. 使用Windows原生Rust：
-   ```bash
-   # 从rustup.rs安装Rust
-   cargo install lawkit
-   ```
-
-3. 下载预编译二进制文件
-
-## 基本使用
-
-### Q: 如何分析我的第一个文件？
-
-**A:** 从简单的本福德定律分析开始：
-
-```bash
-# 分析CSV文件
-lawkit benf your_data.csv
-
-# 查看详细信息
-lawkit benf your_data.csv --verbose
-
-# 输出JSON格式
-lawkit benf your_data.csv --format json
+**Option 3: As a Library**
+Add to your `Cargo.toml`:
+```toml
+[dependencies]
+lawkit-core = "2.0"
 ```
 
-### Q: 支持哪些文件格式？
+### What are the system requirements?
 
-**A:** lawkit支持多种输入格式：
+- **Operating Systems**: Linux, macOS, Windows
+- **Memory**: Minimum 512MB RAM (more for large datasets)
+- **Disk Space**: 50MB for installation
+- **Dependencies**: None (statically linked binaries)
 
-- **Excel**: .xlsx, .xls
-- **CSV/TSV**: .csv, .tsv  
-- **文档**: .pdf, .docx, .txt
-- **结构化数据**: .json, .yaml, .xml
-- **压缩文档**: .zip中的Office文档
-- **标准输入**: 通过管道输入
+### Why am I getting "command not found" error?
 
-### Q: 如何处理中文数字？
-
-**A:** lawkit自动识别中文数字格式：
+Ensure the lawkit binary is in your system's PATH. After downloading:
 
 ```bash
-# 中文数字示例
-echo "一千二百三十四 五千六百七十八" | lawkit benf
+# Make executable (Unix/Linux/macOS)
+chmod +x lawkit
 
-# 全角数字
-echo "１２３４ ５６７８" | lawkit benf
+# Move to PATH (example)
+sudo mv lawkit /usr/local/bin/
 
-# 繁体中文数字
-echo "壹萬貳仟參佰肆拾伍" | lawkit benf
+# Or add to PATH in your shell profile
+export PATH="/path/to/lawkit:$PATH"
 ```
 
-## 数据分析
+## Usage Questions
 
-### Q: 什么时候使用哪种统计法则？
+### What file formats does lawkit support?
 
-**A:** 不同法则适用于不同场景：
+**Input Formats:**
+- Spreadsheets: CSV, TSV, Excel (.xlsx, .xls), OpenDocument (.ods)
+- Documents: PDF, Word (.docx), PowerPoint (.pptx), plain text
+- Data: JSON, YAML, TOML, XML
+- Web: HTML (table extraction)
 
-| 法则 | 适用场景 | 典型用例 |
-|------|----------|----------|
-| **本福德定律** | 自然发生的数据 | 财务欺诈检测、选举数据验证 |
-| **帕累托定律** | 集中度分析 | 销售分析、客户价值分析 |
-| **齐夫定律** | 排名/频率数据 | 数值分布分析、频率统计 |
-| **正态分布** | 质量控制 | 制造业QC、性能监控 |
-| **泊松分布** | 事件发生 | 故障预测、到达率分析 |
+**Output Formats:**
+- text, json, csv, yaml, toml, xml
 
-### Q: 如何解读分析结果？
+### How do I analyze data from a specific column in a CSV file?
 
-**A:** 重点关注以下指标：
-
-#### 本福德定律
-- **风险等级**: LOW(绿色) = 正常，HIGH(红色) = 可疑
-- **卡方值**: 越高越偏离期望
-- **p值**: <0.05 表示显著偏离
-- **MAD**: 平均绝对偏差，<4通常正常
-
-#### 帕累托分析
-- **集中度**: 80%左右正常，>90%高度集中
-- **基尼系数**: 0-1范围，越高越不平等
-- **建议**: 关注业务优化建议
-
-### Q: 数据量太少怎么办？
-
-**A:** 
+lawkit automatically extracts numerical data from all columns. For specific columns, pre-process your data:
 
 ```bash
-# 检查数据特征
+# Extract specific column using standard tools
+cut -d',' -f2 data.csv | lawkit benf
+
+# Or use awk for more complex extraction
+awk -F',' '{print $2}' data.csv | lawkit pareto
+```
+
+### How many data points do I need for reliable analysis?
+
+Minimum requirements vary by statistical law:
+- **Benford Law**: 5+ points (recommended: 100+)
+- **Pareto Analysis**: 5+ points (recommended: 20+)
+- **Zipf Law**: 5+ points (recommended: 50+)
+- **Normal Distribution**: 8+ points (recommended: 30+)
+- **Poisson Distribution**: 10+ points (recommended: 50+)
+
+### What does the risk assessment mean?
+
+lawkit categorizes results into risk levels:
+- **Low**: Data follows expected statistical patterns
+- **Medium**: Some deviation, worth investigating
+- **High**: Significant deviation, likely issues
+- **Critical**: Extreme deviation, immediate attention needed
+
+Customize thresholds with:
+```bash
+lawkit benf --threshold high data.csv
+```
+
+## Statistical Analysis Questions
+
+### When should I use Benford Law?
+
+Benford Law is ideal for:
+- **Financial fraud detection**: Transaction amounts, accounting data
+- **Data quality assessment**: Naturally occurring numerical data
+- **Scientific validation**: Experimental measurements
+- **Election auditing**: Vote counts and demographics
+
+**Not suitable for:**
+- Assigned numbers (phone numbers, IDs)
+- Constrained ranges (percentages, ratings)
+- Uniform distributions
+
+### What's the difference between Pareto analysis and Zipf's law?
+
+**Pareto Analysis (80/20 Rule):**
+- Focuses on business applications
+- Calculates Gini coefficient for inequality
+- Provides business insights and recommendations
+- Best for: sales analysis, customer segmentation, resource allocation
+
+**Zipf Law (Power-law Distribution):**
+- Focuses on frequency distributions
+- Analyzes rank-frequency relationships
+- Supports numerical data analysis
+- Best for: linguistic analysis, city populations, website traffic
+
+### How accurate is the normal distribution testing?
+
+lawkit implements normality testing with statistical validation. The analysis provides:
+- Statistical measures for normality assessment
+- Confidence intervals and significance testing
+- Outlier detection capabilities
+- Quality control metrics
+
+### What does Poisson distribution analysis tell me?
+
+Poisson analysis is useful for:
+- **Event counting**: Defects per unit, calls per hour
+- **Rare events**: Accidents, equipment failures
+- **Quality control**: Process monitoring
+- **Capacity planning**: Server load, customer arrivals
+
+The analysis provides:
+- Lambda parameter (average rate)
+- Statistical validation
+- Event probability assessment
+- Quality metrics
+
+## International and Language Support
+
+### How does international number support work?
+
+lawkit automatically recognizes various number formats:
+
+```bash
+# These are all recognized as 1234.56:
+echo "1,234.56" | lawkit benf    # English
+echo "１，２３４．５６" | lawkit benf  # Japanese numbers (auto-detected)
+echo "१,२३४.५६" | lawkit benf    # Hindi numbers (auto-detected)
+```
+
+### Can I analyze text in non-English languages?
+
+Yes! lawkit supports Unicode text analysis with automatic language detection for international number formats in input data.
+
+### What languages does lawkit support?
+
+lawkit provides English output unified across all analysis, with automatic recognition of international number formats:
+```bash
+# English output (unified)
+lawkit benf data.csv
+
+# International numbers automatically recognized
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
+echo "१२३४५६" | lawkit benf        # Hindi numbers
+echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
+```
+
+## Integration and Advanced Features
+
+### How does multi-law comparison work?
+
+The `analyze` command analyzes data with multiple statistical laws:
+
+```bash
+# Analyze with specific laws
+lawkit analyze --laws benf,pareto data.csv
+
+# Analyze with all applicable laws
 lawkit analyze --laws all data.csv
 
-# 使用适合小数据量的法则
-lawkit pareto small_data.csv  # 要求较低
+# Get recommendations
+lawkit analyze --laws all --recommend data.csv
 ```
 
-最小数据要求：
-- 本福德定律：推荐100+，最少5
-- 帕累托分析：推荐20+，最少5  
-- 正态分布：推荐30+，最少8
-- 泊松分布：推荐50+，最少10
+Features include:
+- **Contradiction Detection**: Identifies conflicting results
+- **Confidence Scoring**: Rates reliability of each analysis
+- **Recommendations**: Suggests most appropriate law
+- **Meta-Analysis**: Combines insights from multiple perspectives
 
-## 性能和优化
+### Can I use lawkit in my own software?
 
-### Q: 分析大文件时内存不足怎么办？
+Yes! Use the `lawkit-core` library:
 
-**A:** 使用优化处理：
+```rust
+use lawkit_core::laws::benford::BenfordResult;
 
-```bash
-# 使用静默模式
-lawkit benf --quiet large_file.csv
-
-# 使用合适的阈值
-lawkit benf --threshold medium large_file.csv
+fn analyze_data(numbers: &[f64]) {
+    let result = BenfordResult::analyze(numbers);
+    println!("Chi-square: {}", result.chi_square);
+}
 ```
 
-### Q: 如何加速分析？
+### How do I integrate lawkit with CI/CD pipelines?
 
-**A:** 几种优化方法：
+See our [Integration Guide](../guides/integrations.md) for examples with:
+- GitHub Actions
+- GitLab CI
+- Jenkins
+- Docker containers
 
+## Performance and Troubleshooting
+
+### lawkit is slow on large datasets. How can I improve performance?
+
+**Optimization strategies:**
 ```bash
-# 减少输出详细度
-lawkit benf --quiet data.csv
+# Use quiet mode for faster processing
+lawkit benf --quiet large_data.csv
 
-# 使用合适的阈值
-lawkit benf --threshold medium data.csv
+# Use appropriate thresholds
+lawkit benf --threshold medium large_data.csv
 
-# 批量处理
-find . -name "*.csv" | xargs -I {} lawkit benf {}
+# Choose efficient output formats
+lawkit benf --format json large_data.csv  # Faster than text
 ```
 
-### Q: 分析卡住或很慢怎么办？
+### I'm getting "insufficient data" errors. What should I do?
 
-**A:** 调试步骤：
-
-1. 检查文件大小和内容：
-   ```bash
-   wc -l your_file.csv
-   head -10 your_file.csv
-   ```
-
-2. 启用详细模式：
-   ```bash
-   lawkit benf your_file.csv --verbose
-   ```
-
-3. 尝试不同的分析方法：
-   ```bash
-   lawkit analyze --laws all your_file.csv
-   ```
-
-## 输出和格式
-
-### Q: 如何保存分析结果？
-
-**A:** 
+This error occurs when your dataset doesn't meet minimum requirements:
 
 ```bash
-# 保存为JSON
-lawkit benf data.csv --format json > results.json
+# Check your data size
+wc -l data.csv
 
-# 保存为CSV（便于Excel打开）
-lawkit benf data.csv --format csv > results.csv
-
-# 批量分析并保存
-find . -name "*.csv" -exec lawkit benf {} --format json \; > batch_results.json
+# Use appropriate law for your data size
+lawkit pareto small_data.csv  # Lower requirements than normal
 ```
 
-### Q: 如何自定义输出格式？
+### The analysis results seem incorrect. What could be wrong?
 
-**A:** 使用jq处理JSON输出：
+**Common issues:**
+1. **Wrong statistical law**: Not all data fits all laws
+2. **Data preprocessing needed**: Remove headers, filter outliers
+3. **Insufficient data**: Too few data points for reliable analysis
+4. **Wrong format**: Ensure numerical data is properly formatted
 
+**Debugging steps:**
 ```bash
-# 只提取风险等级
-lawkit benf data.csv --format json | jq -r '.risk_level'
+# Verbose output for more details
+lawkit benf --verbose data.csv
 
-# 提取关键统计数据
-lawkit benf data.csv --format json | jq '{dataset, risk_level, chi_square, p_value}'
+# Check data with different laws
+lawkit analyze --laws all data.csv
 
-# 创建摘要报告
-lawkit benf data.csv --format json | jq -r '"文件: \(.dataset), 风险: \(.risk_level), 卡方: \(.chi_square)"'
+# Validate data format
+head -10 data.csv
 ```
 
-## 错误和故障排除
+### Can I analyze data in real-time?
 
-### Q: "No numbers found in input" 错误
-
-**A:** 常见原因和解决方案：
-
-1. **数据格式问题**：
-   ```bash
-   # 检查文件内容
-   head -5 data.csv
-   # 尝试不同的分隔符或格式
-   ```
-
-2. **空文件或无效数据**：
-   ```bash
-   # 检查文件大小
-   ls -la data.csv
-   # 验证数据内容
-   ```
-
-### Q: "Permission denied" 错误
-
-**A:** 
+Yes, lawkit supports piped input:
 
 ```bash
-# 检查文件权限
-ls -la your_file.csv
+# Pipe data from other commands
+tail -f logfile.txt | grep "amount:" | lawkit benf
 
-# 修改权限
-chmod 644 your_file.csv
-
-# 或复制到有权限的目录
-cp your_file.csv ~/temp/
-lawkit benf ~/temp/your_file.csv
+# Process continuous data
+while true; do
+    get_latest_data | lawkit benf --quiet
+    sleep 60
+done
 ```
 
-### Q: 结果看起来不对怎么办？
+## Advanced Usage
 
-**A:** 验证步骤：
-
-1. **检查数据质量**：
-   ```bash
-   lawkit benf data.csv --verbose
-   ```
-
-2. **使用已知数据测试**：
-   ```bash
-   lawkit generate --samples 1000 | lawkit benf --verbose
-   ```
-
-3. **比较多种方法**：
-   ```bash
-   lawkit analyze --laws all --recommend data.csv
-   ```
-
-## 高级使用
-
-### Q: 如何生成测试数据？
-
-**A:** 
+### How do I generate test data?
 
 ```bash
-# 生成样本数据进行测试
+# Generate sample data for testing
 lawkit generate --samples 1000 | lawkit benf
 
-# 生成并保存到文件
+# Generate and save to file
 lawkit generate --samples 500 > test_data.csv
 ```
 
-### Q: 如何验证数据质量？
-
-**A:** 
+### How do I validate data quality?
 
 ```bash
-# 使用多种法则验证
+# Validate using multiple laws
 lawkit validate --laws all data.csv
 
-# 专注特定领域
+# Focus on specific area
 lawkit validate --laws benf,pareto --focus fraud-detection data.csv
 ```
 
-### Q: 如何诊断数据问题？
-
-**A:** 
+### How do I diagnose data problems?
 
 ```bash
-# 诊断数据问题
+# Diagnose data issues
 lawkit diagnose --laws all data.csv
 
-# 指定分析目的
+# Specify analysis purpose
 lawkit diagnose --laws all --purpose quality-assessment data.csv
 ```
 
-### Q: 如何集成到自动化流程中？
+## Error Messages
 
-**A:** 
+### "Failed to parse input data"
 
+This usually means:
+- Non-numerical data in input
+- Incorrect file format
+- Encoding issues
+
+**Solutions:**
 ```bash
-#!/bin/bash
-# 自动化监控脚本
+# Check file encoding
+file data.csv
 
-result=$(lawkit benf daily_data.csv --format json)
-risk=$(echo $result | jq -r '.risk_level')
+# Validate CSV format
+csvlint data.csv
 
-if [ "$risk" = "HIGH" ] || [ "$risk" = "CRITICAL" ]; then
-    echo "Alert: High risk detected!" | mail -s "Data Alert" admin@company.com
-    echo $result > alert_$(date +%Y%m%d).json
-fi
+# Extract only numerical columns
+cut -d',' -f2 data.csv | lawkit benf
 ```
 
-### Q: 如何与其他工具集成？
+### "No statistical law applicable"
 
-**A:** 
+This occurs when:
+- Dataset is too small
+- Data doesn't fit any implemented law
+- All laws failed their applicability tests
 
+**Solutions:**
 ```bash
-# 与Python集成
-python -c "
-import subprocess
-import json
-result = subprocess.run(['lawkit', 'benf', 'data.csv', '--format', 'json'], 
-                       capture_output=True, text=True)
-data = json.loads(result.stdout)
-print(f'Risk Level: {data[\"risk_level\"]}')
-"
+# Check data characteristics
+lawkit analyze --laws all --verbose data.csv
 
-# 与R集成
-Rscript -e "
-system('lawkit benf data.csv --format json > results.json')
-library(jsonlite)
-results <- fromJSON('results.json')
-print(paste('Risk:', results\$risk_level))
-"
+# Try with different thresholds
+lawkit benf --threshold low data.csv
 ```
 
-### Q: 如何创建自定义报告？
+### "Permission denied" or "Access denied"
 
-**A:** 使用模板和脚本：
-
+File permission issues:
 ```bash
-#!/bin/bash
-# 生成综合报告
+# Check file permissions
+ls -la data.csv
 
-echo "# 数据分析报告 - $(date)" > report.md
-echo "" >> report.md
+# Make file readable
+chmod 644 data.csv
 
-for file in *.csv; do
-    echo "## 分析文件: $file" >> report.md
-    lawkit benf "$file" --format json | jq -r '"- 风险等级: \(.risk_level)\n- 卡方值: \(.chi_square)\n- p值: \(.p_value)"' >> report.md
-    echo "" >> report.md
-done
-
-# 转换为PDF
-pandoc report.md -o report.pdf
+# Check if file exists
+test -f data.csv && echo "File exists" || echo "File not found"
 ```
 
-## 获取帮助
+## Getting Help
 
-### Q: 在哪里可以获得更多帮助？
+### Where can I get more help?
 
-**A:** 
+- **Documentation**: [docs/](index.md)
+- **Issues**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
+- **Self-test**: Run `lawkit selftest` to verify installation
 
-1. **内置帮助**：
-   ```bash
-   lawkit --help
-   lawkit benf --help
-   ```
+### How do I report a bug?
 
-2. **文档**：
-   - [入门指南](getting-started_zh.md)
-   - [配置指南](configuration_zh.md)
-   - [使用示例](examples_zh.md)
+1. Check existing issues on GitHub
+2. Provide minimal reproduction case
+3. Include system information and lawkit version
+4. Run `lawkit selftest --verbose` and include output
 
-3. **社区支持**：
-   - [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
-   - [讨论区](https://github.com/kako-jun/lawkit/discussions)
+### How do I request a new feature?
 
-4. **自检工具**：
-   ```bash
-   # 运行自检验证安装
-   lawkit selftest --verbose
-   ```
+1. Open a GitHub Discussion to discuss the idea
+2. Explain the use case and expected behavior
+3. Consider contributing the implementation
+4. Check our [Contributing Guide](../CONTRIBUTING.md)
 
-### Q: 如何贡献或提出功能请求？
+### Is there a community or forum?
 
-**A:** 
+- **GitHub Discussions**: General questions and ideas
+- **GitHub Issues**: Bug reports and feature requests
+- **Email**: Direct contact for sensitive issues
 
-1. **功能请求**：在GitHub Issues中创建功能请求
-2. **错误报告**：提供重现步骤和样本数据
-3. **代码贡献**：查看[贡献指南](../../CONTRIBUTING.md)
-4. **文档改进**：通过Pull Request提交改进建议
-
----
-
-如果您的问题没有在此列出，请在[GitHub Issues](https://github.com/kako-jun/lawkit/issues)中提问，我们会及时回复并将常见问题添加到此FAQ中。
+We welcome contributions and feedback from the community!

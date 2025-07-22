@@ -1,167 +1,167 @@
-# 使用示例
+# Examples
 
-基于实际使用案例的lawkit实用示例。
+Practical usage examples of lawkit based on real-world use cases.
 
-## 1. 财务审计中的欺诈检测
+## 1. Fraud Detection in Financial Auditing
 
-### 案例：费用报告验证
+### Case: Expense Report Verification
 
 ```bash
-# 费用数据的基本分析
+# Basic analysis of expense data
 lawkit benf expenses_2024.csv --format json
 
-# 详细分析（带详细输出）
+# Detailed analysis with verbose output
 lawkit benf expenses_2024.csv --verbose
 
-# 高置信度审计分析（99%置信水平）
+# High-confidence audit analysis (99% confidence level)
 lawkit benf expenses_2024.csv --confidence 0.99 --verbose
 
-# 过滤掉增加噪音的小额数值
+# Filter out small amounts that add noise
 lawkit benf expenses_2024.csv --min-value 50 --threshold high
 
-# 大数据集的性能优化
+# Performance optimization for large datasets
 lawkit benf expenses_2024.csv --sample-size 10000 --optimize
 
-# 使用多个法则进行综合分析
+# Comprehensive analysis with multiple laws
 lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
-**预期结果**：
-- 偏离本福特定律可能表明人为操纵
-- 正态分布分析识别异常值
-- 多法则分析提供全面洞察
+**Expected Results**: 
+- Deviations from Benford Law may indicate artificial manipulation
+- Normal Distribution analysis identifies outliers
+- Multiple law analysis provides comprehensive insights
 
-### 案例：销售数据可靠性验证
+### Case: Sales Data Reliability Verification
 
 ```bash
-# 月度销售分析
+# Monthly sales analysis
 lawkit benf monthly_sales.csv --verbose
 
-# 区域分析
+# Regional analysis
 lawkit benf sales_by_region.csv --verbose
 ```
 
-## 2. 业务分析
+## 2. Business Analysis
 
-### 案例：客户销售帕累托分析
+### Case: Customer Sales Pareto Analysis
 
 ```bash
-# 80/20分析
+# 80/20 analysis
 lawkit pareto customer_sales.csv --threshold 0.8
 
-# 90/10分析（更严格的顶级客户识别）
+# 90/10 analysis (stricter top customer identification)
 lawkit pareto customer_sales.csv --threshold 0.9
 
-# 导出可视化数据
+# Export visualization data
 lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
-**应用方式**：
-- 识别贡献80%收入的关键客户
-- 将销售努力集中在高价值细分市场
-- 优化客户服务资源分配
+**Applications**:
+- Identify key customers contributing 80% of revenue
+- Focus sales efforts on high-value segments
+- Optimize customer service resource allocation
 
-### 案例：库存管理分析
+### Case: Inventory Management Analysis
 
 ```bash
-# 库存周转率分析
+# Inventory turnover analysis
 lawkit pareto inventory_turnover.csv --verbose
 
-# 季节性模式检测
+# Seasonal pattern detection
 lawkit normal seasonal_demand.csv --verbose
 ```
 
-## 3. 文本分析和内容管理
+## 3. Text Analysis and Content Management
 
-### 案例：网站内容分析
+### Case: Website Content Analysis
 
 ```bash
-# 词频分析
+# Word frequency analysis
 lawkit zipf website_content.txt --verbose
 
-# 内容分布分析
+# Content distribution analysis
 lawkit zipf blog_posts.txt --verbose
 ```
 
-**使用案例**：
-- SEO关键词优化
-- 内容策略规划
-- 自然与人工内容检测
+**Use Cases**:
+- SEO keyword optimization
+- Content strategy planning
+- Natural vs. artificial content detection
 
-### 案例：社交媒体分析
+### Case: Social Media Analytics
 
 ```bash
-# 标签分布分析
+# Hashtag distribution analysis
 lawkit zipf hashtags.csv --verbose
 
-# 参与度模式分析
+# Engagement pattern analysis
 lawkit poisson post_engagements.csv --verbose
 ```
 
-## 4. 质量控制和制造
+## 4. Quality Control and Manufacturing
 
-### 案例：制造过程控制
+### Case: Manufacturing Process Control
 
 ```bash
-# 产品尺寸质量控制
+# Product dimension quality control
 lawkit normal product_dimensions.csv --verbose
 
-# 高置信度缺陷率分析
+# Defect rate analysis with high confidence
 lawkit poisson defect_rates.csv --confidence 0.99 --verbose
 ```
 
-**质量指标**：
-- 统计过程控制
-- 缺陷模式分析
-- 质量分布评估
+**Quality Metrics**:
+- Statistical process control
+- Defect pattern analysis
+- Quality distribution assessment
 
-### 案例：服务响应时间分析
+### Case: Service Response Time Analysis
 
 ```bash
-# 响应时间分布
+# Response time distribution
 lawkit normal response_times.csv --verbose
 
-# 指定置信水平的事件频率分析
+# Incident frequency analysis with confidence level
 lawkit poisson incidents.csv --confidence 0.95 --verbose
 ```
 
-## 5. 集成分析工作流
+## 5. Integrated Analysis Workflows
 
-### 案例：综合数据质量评估
+### Case: Comprehensive Data Quality Assessment
 
 ```bash
-# 数据质量的多法则比较
+# Multi-law comparison for data quality
 lawkit analyze financial_data.csv --laws benford,pareto,normal --purpose audit
 
-# 生成详细的质量报告
+# Generate detailed quality report
 lawkit analyze data.csv --laws all --format json > quality_report.json
 ```
 
-### 案例：自动异常检测管道
+### Case: Automated Anomaly Detection Pipeline
 
 ```bash
 #!/bin/bash
-# 每日数据质量管道
+# Daily data quality pipeline
 
-# 步骤1：基本质量检查
+# Step 1: Basic quality check
 lawkit benf daily_transactions.csv --verbose || exit 1
 
-# 步骤2：集中度分析
+# Step 2: Concentration analysis
 lawkit pareto daily_sales.csv --verbose
 
-# 步骤3：统计验证
+# Step 3: Statistical validation
 lawkit normal process_metrics.csv --verbose
 
-# 步骤4：综合报告
+# Step 4: Comprehensive report
 lawkit analyze daily_data.csv --laws benford,pareto,normal --format json > daily_report.json
 ```
 
-## 6. CI/CD集成示例
+## 6. CI/CD Integration Examples
 
-### GitHub Actions集成
+### GitHub Actions Integration
 
 ```yaml
-name: 数据质量检查
+name: Data Quality Check
 on: [push, pull_request]
 
 jobs:
@@ -169,21 +169,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: 安装lawkit
+      - name: Install lawkit
         run: cargo install lawkit
-      - name: 运行质量检查
+      - name: Run quality checks
         run: |
           lawkit benf data/transactions.csv --format json
           lawkit analyze data/sales.csv --laws benford,pareto --format json
 ```
 
-### Jenkins管道集成
+### Jenkins Pipeline Integration
 
 ```groovy
 pipeline {
     agent any
     stages {
-        stage('数据质量检查') {
+        stage('Data Quality Check') {
             steps {
                 sh 'lawkit benf ${WORKSPACE}/data/*.csv --verbose'
                 sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --format json > quality_report.json'
@@ -194,113 +194,113 @@ pipeline {
 }
 ```
 
-## 7. 性能优化示例
+## 7. Performance Optimization Examples
 
-### 大数据集处理
+### Large Dataset Processing
 
 ```bash
-# 大文件的优化处理
+# Optimized processing for large files
 lawkit benf large_dataset.csv --quiet
 
-# 多文件并行处理
+# Parallel processing for multiple files
 find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
 ```
 
-### 内存高效分析
+### Memory-Efficient Analysis
 
 ```bash
-# 高效处理大数据集
+# Process large datasets efficiently
 lawkit benf huge_data.csv --format json | jq '.risk_level'
 
-# 实时输出的流式分析
+# Streaming analysis with real-time output
 tail -f live_data.log | lawkit benf --quiet
 ```
 
-## 8. 数据生成和测试示例
+## 8. Data Generation and Testing Examples
 
-### 案例：测试和教育的数据生成
+### Case: Data Generation for Testing and Education
 
 ```bash
-# 生成本福特定律样本用于欺诈检测测试
+# Generate Benford Law samples for fraud detection testing
 lawkit generate benf --samples 10000 > benf_test_data.csv
 
-# 测试我们的检测能力
+# Test our detection capability
 lawkit benf benf_test_data.csv --format json
 
-# 生成不同类型的数据
+# Generate different types of data
 lawkit generate pareto --samples 5000 > pareto_data.csv
 lawkit generate zipf --samples 2000 > zipf_data.txt
 lawkit generate normal --samples 1000 > normal_data.csv
 lawkit generate poisson --samples 1000 > poisson_data.csv
 ```
 
-### 案例：统计教育和演示
+### Case: Statistical Education and Demonstration
 
 ```bash
-# 演示不同的统计法则
+# Demonstrate different statistical laws
 for law in benf pareto zipf normal poisson; do
-  echo "测试 $law 法则："
+  echo "Testing $law law:"
   lawkit generate $law --samples 1000 > test_data.csv
   lawkit $law test_data.csv --verbose
   echo "---"
 done
 
-# 展示验证能力
+# Show validation capabilities
 lawkit generate benf --samples 5000 > test_benf.csv
 lawkit validate test_benf.csv --laws benford
 ```
 
-### 案例：方法验证和交叉测试
+### Case: Method Validation and Cross-Testing
 
 ```bash
-# 生成并立即分析管道
+# Generate and immediately analyze pipeline
 lawkit generate poisson --samples 1000 > poisson_test.csv
 lawkit poisson poisson_test.csv --format json
 
-# 法则之间的交叉验证
+# Cross-validation between laws
 lawkit generate normal --samples 5000 > normal_data.csv
 lawkit analyze normal_data.csv --laws normal,benford,zipf
 
-# 综合测试
-lawkit list --help  # 显示可用命令
+# Comprehensive testing
+lawkit list --help  # Show available commands
 ```
 
-### 案例：持续集成测试
+### Case: Continuous Integration Testing
 
 ```bash
 #!/bin/bash
-# 使用生成数据的CI/CD测试脚本
+# CI/CD test script using generated data
 
-echo "运行统计准确性测试..."
+echo "Running statistical accuracy tests..."
 
-# 测试1：本福特定律准确性
+# Test 1: Benford Law accuracy
 lawkit generate benf --samples 10000 > benf_test.csv
 BENF_RESULT=$(lawkit benf benf_test.csv --format json | jq -r '.risk_level')
 if [ "$BENF_RESULT" != "Low" ]; then
-    echo "❌ 本福特测试失败：预期Low风险，实际得到 $BENF_RESULT"
+    echo "❌ Benford test failed: Expected Low risk, got $BENF_RESULT"
     exit 1
 fi
 
-# 测试2：正态分布检测
+# Test 2: Normal distribution detection
 lawkit generate normal --samples 1000 > normal_test.csv
 lawkit normal normal_test.csv --verbose
 
-# 测试3：泊松分析
+# Test 3: Poisson analysis
 lawkit generate poisson --samples 5000 > poisson_test.csv
 lawkit poisson poisson_test.csv --format json
 
-echo "✅ 所有统计准确性测试通过"
+echo "✅ All statistical accuracy tests passed"
 ```
 
-## 9. 命令参考示例
+## 9. Command Reference Examples
 
-### 可用命令
+### Available Commands
 
 ```bash
-# 列出所有可用命令
+# List all available commands
 lawkit --help
 
-# 单个命令帮助
+# Individual command help
 lawkit benf --help
 lawkit pareto --help
 lawkit zipf --help
@@ -313,28 +313,28 @@ lawkit generate --help
 lawkit list --help
 ```
 
-### 输出格式示例
+### Output Format Examples
 
 ```bash
-# 不同的输出格式
+# Different output formats
 lawkit benf data.csv --format json
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 
-# 详细程度控制
+# Verbosity control
 lawkit benf data.csv --quiet
 lawkit benf data.csv --verbose
 ```
 
-## 配置示例
+## Configuration Examples
 
-有关详细的设置说明和高级配置选项，请参阅[配置指南](configuration_zh.md)。
+See [Configuration Guide](configuration.md) for detailed setup instructions and advanced configuration options.
 
-## 下一步
+## Next Steps
 
-- [安装指南](installation_zh.md) - 设置和安装说明
-- [CLI参考](../reference/cli-reference_zh.md) - 完整的命令文档
-- [集成指南](../guides/integrations_zh.md) - CI/CD自动化
-- [性能指南](../guides/performance_zh.md) - 优化技术
+- [Installation Guide](installation.md) - Setup and installation instructions
+- [CLI Reference](../reference/cli-reference.md) - Complete command documentation
+- [Integration Guide](../guides/integrations.md) - CI/CD automation
+- [Performance Guide](../guides/performance.md) - Optimization techniques

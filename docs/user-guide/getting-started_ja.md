@@ -1,233 +1,233 @@
-# はじめに
+# Getting Started
 
-lawkitの基本的な使用方法を学んでください。このガイドでは、主要な機能を実際のサンプルデータを使用して説明します。
+Learn the basic usage of lawkit. This guide explains the main features using actual sample data.
 
-## 基本的な使用方法
+## Basic Usage
 
-### 1. ベンフォード法則分析
+### 1. Benford's Law Analysis
 
-会計データや自然データの不正検知に使用します：
+Used for fraud detection in accounting data and natural data:
 
 ```bash
-# 基本的な分析
+# Basic analysis
 lawkit benf data.csv
 
-# 詳細出力
+# Detailed output
 lawkit benf data.csv --verbose
 
-# JSON形式で出力
+# Output in JSON format
 lawkit benf data.csv --format json
 
-# 閾値を指定して分析
+# Analyze with specified threshold
 lawkit benf data.csv --threshold high
 
-# 監査レベル分析（信頼度99%）
+# Audit-level analysis (99% confidence)
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
-# 大きなデータセットの最適化
+# Optimization for large datasets
 lawkit benf large_data.csv --sample-size 10000 --optimize
 
-# 小さな値をフィルタリング（ノイズ除去）
+# Filter small values (noise removal)
 lawkit benf financial_data.csv --min-value 100
 ```
 
-### 2. パレート分析（80/20法則）
+### 2. Pareto Analysis (80/20 Rule)
 
-売上分析や在庫管理に使用します：
+Used for sales analysis and inventory management:
 
 ```bash
-# 基本的なパレート分析
+# Basic Pareto analysis
 lawkit pareto sales.csv
 
-# 閾値を指定（80/20ではなく90/10分析）
+# Specify threshold (90/10 analysis instead of 80/20)
 lawkit pareto sales.csv --concentration 0.9
 
-# Gini係数も計算
+# Also calculate Gini coefficient
 lawkit pareto sales.csv --gini-coefficient
 ```
 
-### 3. ジップ法則分析
+### 3. Zipf's Law Analysis
 
-テキストデータの単語頻度分析：
+Word frequency analysis for text data:
 
 ```bash
-# テキストファイルの分析
+# Analyze text files
 lawkit zipf document.txt
 
-# 日本語テキスト分析
+# Japanese text analysis
 lawkit zipf japanese_text.txt
 
-# 最小出現回数を指定
+# Specify minimum occurrence count
 lawkit zipf text.txt --min-count 5
 ```
 
-### 4. 正規分布分析
+### 4. Normal Distribution Analysis
 
-品質管理や異常値検出：
+Quality control and outlier detection:
 
 ```bash
-# 正規性検定
+# Normality testing
 lawkit normal measurements.csv
 
-# 詳細な正規性検定
+# Detailed normality testing
 lawkit normal quality_data.csv --verbose
 
-# 異常値も検出
+# Also detect outliers
 lawkit normal process_data.csv --outliers
 ```
 
-### 5. ポアソン分布分析
+### 5. Poisson Distribution Analysis
 
-イベント発生予測や稀少事象分析：
+Event occurrence prediction and rare event analysis:
 
 ```bash
-# 基本的なポアソン分析
+# Basic Poisson analysis
 lawkit poisson events.csv
 
-# 詳細なポアソン分析
+# Detailed Poisson analysis
 lawkit poisson events.csv --verbose
 
-# 高い信頼度での分析
+# High confidence analysis
 lawkit poisson critical_events.csv --confidence 0.99 --verbose
 ```
 
-### 6. 複数法則比較
+### 6. Multi-Law Comparison
 
-複数の統計法則を同時に適用して包括的な分析：
+Comprehensive analysis by applying multiple statistical laws simultaneously:
 
 ```bash
-# 複数法則の分析と推奨
+# Multi-law analysis and recommendations
 lawkit analyze data.csv --laws benf,pareto,normal
 
-# データの一貫性チェック
+# Data consistency check
 lawkit validate data.csv --laws all
 
-# 詳細な診断レポート
+# Detailed diagnostic report
 lawkit diagnose data.csv --focus conflict
 ```
 
-## サンプルデータでの実習
+## Hands-on Practice with Sample Data
 
-### 会計データの不正検知
+### Fraud Detection in Accounting Data
 
 ```bash
-# サンプル会計データを作成
-echo "取引ID,金額,日付
+# Create sample accounting data
+echo "TransactionID,Amount,Date
 1,1234,2024-01-01
 2,2345,2024-01-02
 3,3456,2024-01-03" > accounting.csv
 
-# ベンフォード法則で分析
+# Analyze with Benford's Law
 lawkit benf accounting.csv
 ```
 
-### 売上データのパレート分析
+### Pareto Analysis of Sales Data
 
 ```bash
-# サンプル売上データを作成
-echo "商品,売上
-A商品,80000
-B商品,12000
-C商品,5000
-D商品,2000
-E商品,1000" > sales.csv
+# Create sample sales data
+echo "Product,Sales
+Product A,80000
+Product B,12000
+Product C,5000
+Product D,2000
+Product E,1000" > sales.csv
 
-# パレート分析実行
+# Execute Pareto analysis
 lawkit pareto sales.csv --threshold 0.8
 ```
 
-## 出力形式
+## Output Formats
 
-lawkitは複数の出力形式に対応しています：
+lawkit supports multiple output formats:
 
 ```bash
-# テキスト形式（デフォルト）
+# Text format (default)
 lawkit benf data.csv
 
-# JSON形式
-lawkit benf data.csv --output json
+# JSON format
+lawkit benf data.csv --format json
 
-# CSV形式
-lawkit benf data.csv --output csv
+# CSV format
+lawkit benf data.csv --format csv
 
-# YAML形式
-lawkit benf data.csv --output yaml
+# YAML format
+lawkit benf data.csv --format yaml
 
-# XML形式
-lawkit benf data.csv --output xml
+# XML format
+lawkit benf data.csv --format xml
 ```
 
-## 多言語対応
+## Multi-language Support
 
-lawkitは以下の言語に対応しています：
+lawkit supports the following languages:
 
 ```bash
-# 英語出力（デフォルト統一）
+# English output (default unified)
 lawkit benf data.csv
 
-# 日本語数字は自動認識されます
+# Japanese numbers are automatically recognized
 echo "１２３４５６ ７８９０" | lawkit benf
 
-# 中国語数字も自動認識されます
+# Chinese numbers are also automatically recognized
 echo "一千二百三十四" | lawkit benf
 
-# 中国語繁体字（旧字体）金融数字も対応
+# Traditional Chinese (old style) financial numbers are also supported
 echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 
-# 日本語漢数字も自動認識
+# Japanese kanji numerals are automatically recognized
 echo "五万六千七百八十九" | lawkit benf
 ```
 
-## 高度な機能
+## Advanced Features
 
-### フィルタリング
+### Filtering
 
 ```bash
-# 特定の範囲のデータのみ分析
+# Analyze only data within specific range
 lawkit benf data.csv --filter ">=1000"
 
-# 閾値設定
+# Threshold setting
 lawkit pareto sales.csv --concentration 0.95
 ```
 
-### パフォーマンス調整
+### Performance Tuning
 
 ```bash
-# 大きなファイルの場合、サンプリング
+# For large files, use sampling
 lawkit benf large_data.csv --optimize
 
-# 並列処理のスレッド数指定
+# Specify number of threads for parallel processing
 lawkit analyze data.csv --recommend
 ```
 
-## よく使われるワークフロー
+## Common Workflows
 
-### 1. データ品質チェック
+### 1. Data Quality Check
 ```bash
-# 総合的なデータ品質評価
+# Comprehensive data quality assessment
 lawkit validate financial_data.csv --laws benf,normal
 ```
 
-### 2. 不正検知パイプライン
+### 2. Fraud Detection Pipeline
 ```bash
-# ベンフォード法則で初期スクリーニング
+# Initial screening with Benford's Law
 lawkit benf transactions.csv --format json > results.json
 
-# 異常値を詳細分析
+# Detailed analysis of anomalies
 lawkit normal suspicious_data.csv --verbose
 ```
 
-### 3. ビジネス分析
+### 3. Business Analysis
 ```bash
-# 売上のパレート分析
+# Pareto analysis of sales
 lawkit pareto monthly_sales.csv --gini-coefficient
 
-# 顧客分析
+# Customer analysis
 lawkit zipf customer_feedback.txt
 ```
 
-## 次のステップ
+## Next Steps
 
-- [使用例](examples_ja.md) - 実際のユースケース
-- [CLIリファレンス](../reference/cli-reference_ja.md) - 全コマンド詳細
-- [アーキテクチャ](../guides/architecture_ja.md) - システム設計
+- [Examples](examples.md) - Real-world use cases
+- [CLI Reference](../reference/cli-reference.md) - All command details
+- [Architecture](../guides/architecture.md) - System design

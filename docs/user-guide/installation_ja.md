@@ -1,145 +1,145 @@
-# インストールガイド
+# Installation Guide
 
-このガイドでは、lawkitをシステムにインストールする方法を説明します。
+This guide explains how to install lawkit on your system.
 
-## 必要な環境
+## System Requirements
 
-- **OS**: Windows、macOS、Linux
-- **Rust**: 1.70.0以上（Cargoからインストールする場合）
-- **メモリ**: 最低512MB（大きなファイル処理には2GB以上推奨）
+- **OS**: Windows, macOS, Linux
+- **Rust**: 1.70.0 or higher (when installing from Cargo)
+- **Memory**: Minimum 512MB (2GB+ recommended for large file processing)
 
-## インストール方法
+## Installation Methods
 
-### 1. Cargoからインストール（推奨）
+### 1. Install from Cargo (Recommended)
 
 ```bash
-# 最新版をインストール
+# Install latest version
 cargo install lawkit
 
-# 特定のバージョンをインストール
+# Install specific version
 cargo install lawkit --version 2.0.0
 ```
 
-### 2. ソースからビルド
+### 2. Build from Source
 
 ```bash
-# リポジトリをクローン
+# Clone repository
 git clone https://github.com/user/lawkit.git
 cd lawkit
 
-# ビルドとインストール
+# Build and install
 cargo build --release
 cargo install --path .
 ```
 
-### 3. バイナリダウンロード
+### 3. Binary Download
 
-[GitHub Releases](https://github.com/user/lawkit/releases)から、お使いのプラットフォーム用のバイナリをダウンロードしてください。
+Download the binary for your platform from [GitHub Releases](https://github.com/user/lawkit/releases).
 
 #### Windows
 ```powershell
-# PowerShellで実行
+# Run in PowerShell
 Invoke-WebRequest -Uri "https://github.com/user/lawkit/releases/latest/download/lawkit-windows.zip" -OutFile "lawkit.zip"
 Expand-Archive lawkit.zip
 ```
 
 #### macOS
 ```bash
-# Homebrewでインストール（予定）
+# Install with Homebrew (planned)
 brew install lawkit
 
-# または手動ダウンロード
+# Or manual download
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-macos.tar.gz | tar xz
 ```
 
 #### Linux
 ```bash
-# 手動ダウンロード
+# Manual download
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-linux.tar.gz | tar xz
 sudo mv lawkit /usr/local/bin/
 ```
 
-## インストール確認
+## Verify Installation
 
-インストールが成功したか確認します：
+Confirm that installation was successful:
 
 ```bash
-# バージョン確認
+# Check version
 lawkit --version
 
-# ヘルプ表示
+# Display help
 lawkit --help
 
-# 利用可能な統計法則を表示
+# Show available statistical laws
 lawkit list
 ```
 
-## 旧版benfからの移行
+## Migration from Legacy benf
 
-既存の`benf`ツールをお使いの場合：
+If you're using the existing `benf` tool:
 
 ```bash
-# 旧版の使用方法
+# Legacy usage
 benf data.csv
 
-# 新版での同等の使用方法
+# Equivalent new usage
 lawkit benf data.csv
 ```
 
-互換性は100%保持されているため、既存のスクリプトをそのまま使用できます。
+100% compatibility is maintained, so you can use existing scripts as-is.
 
-## アップデート
+## Updates
 
-### Cargoでインストールした場合
+### If installed via Cargo
 ```bash
 cargo install lawkit --force
 ```
 
-### バイナリでインストールした場合
-新しいバイナリをダウンロードして置き換えてください。
+### If installed via binary
+Download and replace with the new binary.
 
-## アンインストール
+## Uninstallation
 
-### Cargoでインストールした場合
+### If installed via Cargo
 ```bash
 cargo uninstall lawkit
 ```
 
-### 手動でインストールした場合
+### If installed manually
 ```bash
-# バイナリの場所を確認
+# Check binary location
 which lawkit
 
-# ファイルを削除
+# Remove file
 sudo rm /usr/local/bin/lawkit
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### コンパイルエラー
-Rustのバージョンが古い場合があります：
+### Compilation Errors
+May be due to outdated Rust version:
 ```bash
 rustup update stable
 ```
 
-### パス設定
-バイナリにパスが通っていない場合：
+### Path Configuration
+If binary is not in PATH:
 ```bash
-# ~/.bashrcまたは~/.zshrcに追加
+# Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### 権限エラー
-Linuxで権限エラーが発生する場合：
+### Permission Errors
+If permission errors occur on Linux:
 ```bash
 sudo chown $USER:$USER ~/.cargo/bin/lawkit
 chmod +x ~/.cargo/bin/lawkit
 ```
 
-## 次のステップ
+## Next Steps
 
-インストールが完了したら、[はじめに](getting-started_ja.md)で基本的な使用方法を学んでください。
+Once installation is complete, learn basic usage in [Getting Started](getting-started.md).
 
-- [はじめに](getting-started_ja.md) - 基本的な使用方法
-- [使用例](examples_ja.md) - 実際の使用例
-- [CLIリファレンス](../reference/cli-reference_ja.md) - コマンドの詳細
+- [Getting Started](getting-started.md) - Basic usage
+- [Examples](examples.md) - Real-world examples
+- [CLI Reference](../reference/cli-reference.md) - Command details

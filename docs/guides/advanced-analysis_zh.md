@@ -1,12 +1,12 @@
 # 高级分析指南
 
-本指南涵盖lawkit 2.1中可用的高级统计分析功能。
+本指南涵盖了lawkit 2.1中可用的高级统计分析功能。
 
 ## 目录
 
 - [多法则分析](#多法则分析)
-- [高级本福特分析](#高级本福特分析)
-- [包含商业洞察的帕累托分析](#包含商业洞察的帕累托分析)
+- [高级本福德分析](#高级本福德分析)
+- [带商业洞察的帕累托分析](#带商业洞察的帕累托分析)
 - [内存高效处理](#内存高效处理)
 - [与统计法则的集成](#与统计法则的集成)
 - [性能优化](#性能优化)
@@ -49,21 +49,21 @@ lawkit analyze dataset.csv --purpose distribution --report detailed
 # 数据验证和一致性检查
 lawkit validate financial_data.csv --consistency-check --verbose
 
-# 诊断不同法则之间的冲突
+# 诊断不同法则间的冲突
 lawkit diagnose complex_data.csv --cross-validation --confidence-level 0.99
 
 # 带详细报告的综合诊断
 lawkit diagnose data.csv --report conflicting --format json
 ```
 
-## 高级本福特分析
+## 高级本福德分析
 
-具有高级过滤和阈值选项的本福特定律分析。
+具有高级过滤和阈值选项的本福德法则分析。
 
-### 基本本福特分析
+### 基本本福德分析
 
 ```bash
-# 基本本福特分析
+# 基本本福德分析
 lawkit benf financial_data.csv
 
 # 带详细输出的详细分析
@@ -75,13 +75,13 @@ lawkit benf transactions.csv --filter ">=100" --verbose
 
 ### 阈值分析
 
-调整异常检测敏感度。
+调整异常检测敏感性。
 
 ```bash
 # 高敏感度异常检测
 lawkit benf data.csv --threshold high --verbose
 
-# 用于欺诈检测的关键级别分析
+# 用于欺诈检测的临界级别分析
 lawkit benf financial_data.csv --threshold critical --format json
 
 # 带范围过滤的自定义阈值
@@ -103,7 +103,7 @@ lawkit benf dataset.csv --filter "50-500" --min-count 100
 lawkit benf measurements.csv --filter ">=100" --threshold high
 ```
 
-## 包含商业洞察的帕累托分析
+## 带商业洞察的帕累托分析
 
 具有商业导向功能的帕累托原理分析。
 
@@ -113,7 +113,7 @@ lawkit benf measurements.csv --filter ">=100" --threshold high
 # 基本帕累托分析
 lawkit pareto sales_data.csv
 
-# 带自定义集中度阈值的分析
+# 带自定义集中阈值的分析
 lawkit pareto data.csv --concentration 0.7 --verbose
 
 # 带基尼系数的商业洞察
@@ -123,7 +123,7 @@ lawkit pareto revenue_data.csv --gini-coefficient --business-analysis
 ### 高级帕累托功能
 
 ```bash
-# 自定义百分位数分析
+# 自定义百分位分析
 lawkit pareto data.csv --percentiles "70,80,90,95" --format json
 
 # 综合商业分析
@@ -142,7 +142,7 @@ lawkit pareto customer_revenue.csv --business-analysis --percentiles "80,90,95,9
 # 产品性能分析
 lawkit pareto product_sales.csv --gini-coefficient --concentration 0.8 --verbose
 
-# 资源利用分析
+# 资源利用率分析
 lawkit pareto resource_usage.csv --business-analysis --format json
 ```
 
@@ -152,22 +152,23 @@ lawkit pareto resource_usage.csv --business-analysis --format json
 
 ### 自动优化
 
-lawkit 根据数据特性自动应用内存和处理优化。
+lawkit根据数据特征自动应用内存和处理优化。
 
 ```bash
-# 大文件的自动优化（无需标志）
+# 大文件自动优化（无需标志）
 lawkit benf massive_dataset.csv
 
-# 内存管理透明化
+# 内存管理透明
 lawkit benf huge_file.csv
 
-# 优化自动应用
+# 自动应用优化
 lawkit benf data.csv
 ```
 
+
 ## 与统计法则的集成
 
-结合多个统计法则进行综合分析。
+组合多个统计法则进行综合分析。
 
 ### 多法则分析
 
@@ -188,7 +189,7 @@ lawkit analyze transactions.csv --purpose fraud --laws benf,pareto --format json
 # 交叉验证分析
 lawkit validate data.csv --cross-validation --confidence-level 0.95
 
-# 法则之间的冲突检测
+# 法则间冲突检测
 lawkit diagnose complex_data.csv --report conflicting --threshold 0.3
 
 # 一致性检查
@@ -222,35 +223,35 @@ lawkit analyze market_data.csv \
 
 ## 性能优化
 
-根据您的具体用例优化分析性能。
+根据您的特定用例优化分析性能。
 
-### 数据集大小指导
+### 数据集大小指南
 
-**小数据集 (< 1万记录):**
+**小型数据集（< 10K记录）:**
 ```bash
 lawkit benf data.csv
 ```
 
-**中等数据集 (1万 - 100万记录):**
+**中型数据集（10K - 1M记录）:**
 ```bash
-lawkit benf data.csv  --min-count 100
+lawkit benf data.csv --min-count 100
 ```
 
-**大数据集 (100万+ 记录):**
+**大型数据集（1M+记录）:**
 ```bash
-lawkit benf data.csv  --quiet --format json
+lawkit benf data.csv --quiet --format json
 ```
 
 ### 用例优化
 
 **实时分析:**
 ```bash
-lawkit benf data.csv  --quiet --threshold high
+lawkit benf data.csv --quiet --threshold high
 ```
 
 **批处理:**
 ```bash
-lawkit analyze datasets/*.csv  --quiet --format json
+lawkit analyze datasets/*.csv --quiet --format json
 ```
 
 **交互式分析:**
@@ -279,26 +280,26 @@ lawkit benf financial_data.csv --verbose --threshold critical
 
 **生成测试数据:**
 ```bash
-# 生成本福特测试数据
+# 生成本福德测试数据
 lawkit generate benf --samples 10000 --output-file test_benf.csv
 
 # 生成帕累托测试数据
 lawkit generate pareto --samples 5000 --output-file test_pareto.csv
 
-# 使用特定参数生成
+# 用特定参数生成
 lawkit generate normal --samples 1000 --output-file test_normal.csv
 
-# 为测试生成欺诈注入数据
+# 为测试生成带欺诈注入的数据
 lawkit generate benf --samples 1000 --fraud-rate 0.1 --output-file fraud_test.csv
 ```
 
-**自测试:**
+**自我测试:**
 ```bash
-# 运行综合自测试
+# 运行综合自我测试
 lawkit selftest
 
 # 列出可用法则
 lawkit list
 ```
 
-使用这些优化技术执行针对您特定要求和约束优化的高效统计分析。
+使用这些优化技术执行针对您特定需求和约束定制的高效统计分析。

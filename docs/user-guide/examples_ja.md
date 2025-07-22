@@ -1,167 +1,167 @@
-# 使用例
+# Examples
 
-実世界のユースケースに基づいたlawkitの実践的な使用例。
+Practical usage examples of lawkit based on real-world use cases.
 
-## 1. 会計監査における不正検知
+## 1. Fraud Detection in Financial Auditing
 
-### ケース: 経費報告書の検証
+### Case: Expense Report Verification
 
 ```bash
-# 経費データの基本分析
+# Basic analysis of expense data
 lawkit benf expenses_2024.csv --format json
 
-# 詳細な分析（冗長出力）
+# Detailed analysis with verbose output
 lawkit benf expenses_2024.csv --verbose
 
-# 高信頼度の監査分析（99%信頼水準）
+# High-confidence audit analysis (99% confidence level)
 lawkit benf expenses_2024.csv --confidence 0.99 --verbose
 
-# ノイズとなる小さな金額をフィルタリング
+# Filter out small amounts that add noise
 lawkit benf expenses_2024.csv --min-value 50 --threshold high
 
-# 大規模データセットのパフォーマンス最適化
+# Performance optimization for large datasets
 lawkit benf expenses_2024.csv --sample-size 10000 --optimize
 
-# 複数法則による包括的分析
+# Comprehensive analysis with multiple laws
 lawkit analyze expenses_2024.csv --laws benford,normal
 ```
 
-**期待される結果**: 
-- ベンフォード法則からの逸脱は人為的操作の可能性を示唆
-- 正規分布分析により外れ値を特定
-- 複数法則分析により包括的な洞察を提供
+**Expected Results**: 
+- Deviations from Benford Law may indicate artificial manipulation
+- Normal Distribution analysis identifies outliers
+- Multiple law analysis provides comprehensive insights
 
-### ケース: 売上データの信頼性検証
+### Case: Sales Data Reliability Verification
 
 ```bash
-# 月次売上分析
+# Monthly sales analysis
 lawkit benf monthly_sales.csv --verbose
 
-# 地域別分析
+# Regional analysis
 lawkit benf sales_by_region.csv --verbose
 ```
 
-## 2. ビジネス分析
+## 2. Business Analysis
 
-### ケース: 顧客売上のパレート分析
+### Case: Customer Sales Pareto Analysis
 
 ```bash
-# 80/20分析
+# 80/20 analysis
 lawkit pareto customer_sales.csv --threshold 0.8
 
-# 90/10分析（より厳密な上位顧客の特定）
+# 90/10 analysis (stricter top customer identification)
 lawkit pareto customer_sales.csv --threshold 0.9
 
-# 可視化データのエクスポート
+# Export visualization data
 lawkit pareto customer_sales.csv --format csv > pareto_results.csv
 ```
 
-**活用方法**:
-- 売上の80%を占める重要顧客を特定
-- 高価値セグメントに営業活動を集中
-- 顧客サービスリソースの最適配分
+**Applications**:
+- Identify key customers contributing 80% of revenue
+- Focus sales efforts on high-value segments
+- Optimize customer service resource allocation
 
-### ケース: 在庫管理分析
+### Case: Inventory Management Analysis
 
 ```bash
-# 在庫回転率分析
+# Inventory turnover analysis
 lawkit pareto inventory_turnover.csv --verbose
 
-# 季節パターンの検出
+# Seasonal pattern detection
 lawkit normal seasonal_demand.csv --verbose
 ```
 
-## 3. テキスト分析とコンテンツ管理
+## 3. Text Analysis and Content Management
 
-### ケース: ウェブサイトコンテンツ分析
+### Case: Website Content Analysis
 
 ```bash
-# 単語頻度分析
+# Word frequency analysis
 lawkit zipf website_content.txt --verbose
 
-# コンテンツ分布分析
+# Content distribution analysis
 lawkit zipf blog_posts.txt --verbose
 ```
 
-**ユースケース**:
-- SEOキーワード最適化
-- コンテンツ戦略の計画
-- 自然なコンテンツと人工的なコンテンツの検出
+**Use Cases**:
+- SEO keyword optimization
+- Content strategy planning
+- Natural vs. artificial content detection
 
-### ケース: ソーシャルメディア分析
+### Case: Social Media Analytics
 
 ```bash
-# ハッシュタグ分布分析
+# Hashtag distribution analysis
 lawkit zipf hashtags.csv --verbose
 
-# エンゲージメントパターン分析
+# Engagement pattern analysis
 lawkit poisson post_engagements.csv --verbose
 ```
 
-## 4. 品質管理と製造
+## 4. Quality Control and Manufacturing
 
-### ケース: 製造プロセス管理
+### Case: Manufacturing Process Control
 
 ```bash
-# 製品寸法の品質管理
+# Product dimension quality control
 lawkit normal product_dimensions.csv --verbose
 
-# 高信頼度での不良率分析
+# Defect rate analysis with high confidence
 lawkit poisson defect_rates.csv --confidence 0.99 --verbose
 ```
 
-**品質メトリクス**:
-- 統計的プロセス管理
-- 不良パターン分析
-- 品質分布評価
+**Quality Metrics**:
+- Statistical process control
+- Defect pattern analysis
+- Quality distribution assessment
 
-### ケース: サービス応答時間分析
+### Case: Service Response Time Analysis
 
 ```bash
-# 応答時間分布
+# Response time distribution
 lawkit normal response_times.csv --verbose
 
-# 信頼水準を指定したインシデント頻度分析
+# Incident frequency analysis with confidence level
 lawkit poisson incidents.csv --confidence 0.95 --verbose
 ```
 
-## 5. 統合分析ワークフロー
+## 5. Integrated Analysis Workflows
 
-### ケース: 包括的データ品質評価
+### Case: Comprehensive Data Quality Assessment
 
 ```bash
-# データ品質のための多法則比較
+# Multi-law comparison for data quality
 lawkit analyze financial_data.csv --laws benford,pareto,normal --purpose audit
 
-# 詳細な品質レポートの生成
+# Generate detailed quality report
 lawkit analyze data.csv --laws all --format json > quality_report.json
 ```
 
-### ケース: 自動異常検出パイプライン
+### Case: Automated Anomaly Detection Pipeline
 
 ```bash
 #!/bin/bash
-# 日次データ品質パイプライン
+# Daily data quality pipeline
 
-# ステップ1: 基本的な品質チェック
+# Step 1: Basic quality check
 lawkit benf daily_transactions.csv --verbose || exit 1
 
-# ステップ2: 集中度分析
+# Step 2: Concentration analysis
 lawkit pareto daily_sales.csv --verbose
 
-# ステップ3: 統計的検証
+# Step 3: Statistical validation
 lawkit normal process_metrics.csv --verbose
 
-# ステップ4: 包括的レポート
+# Step 4: Comprehensive report
 lawkit analyze daily_data.csv --laws benford,pareto,normal --format json > daily_report.json
 ```
 
-## 6. CI/CD統合例
+## 6. CI/CD Integration Examples
 
-### GitHub Actions統合
+### GitHub Actions Integration
 
 ```yaml
-name: データ品質チェック
+name: Data Quality Check
 on: [push, pull_request]
 
 jobs:
@@ -169,21 +169,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: lawkitのインストール
+      - name: Install lawkit
         run: cargo install lawkit
-      - name: 品質チェックの実行
+      - name: Run quality checks
         run: |
           lawkit benf data/transactions.csv --format json
           lawkit analyze data/sales.csv --laws benford,pareto --format json
 ```
 
-### Jenkinsパイプライン統合
+### Jenkins Pipeline Integration
 
 ```groovy
 pipeline {
     agent any
     stages {
-        stage('データ品質チェック') {
+        stage('Data Quality Check') {
             steps {
                 sh 'lawkit benf ${WORKSPACE}/data/*.csv --verbose'
                 sh 'lawkit analyze ${WORKSPACE}/data/sales.csv --laws all --format json > quality_report.json'
@@ -194,113 +194,113 @@ pipeline {
 }
 ```
 
-## 7. パフォーマンス最適化例
+## 7. Performance Optimization Examples
 
-### 大規模データセット処理
+### Large Dataset Processing
 
 ```bash
-# 大規模ファイルの最適化処理
+# Optimized processing for large files
 lawkit benf large_dataset.csv --quiet
 
-# 複数ファイルの並列処理
+# Parallel processing for multiple files
 find data/ -name "*.csv" | xargs -P 4 -I {} lawkit benf {}
 ```
 
-### メモリ効率的な分析
+### Memory-Efficient Analysis
 
 ```bash
-# 大規模データセットの効率的処理
+# Process large datasets efficiently
 lawkit benf huge_data.csv --format json | jq '.risk_level'
 
-# リアルタイム出力によるストリーミング分析
+# Streaming analysis with real-time output
 tail -f live_data.log | lawkit benf --quiet
 ```
 
-## 8. データ生成とテスト例
+## 8. Data Generation and Testing Examples
 
-### ケース: テストと教育のためのデータ生成
+### Case: Data Generation for Testing and Education
 
 ```bash
-# 不正検知テスト用のベンフォード法則サンプル生成
+# Generate Benford Law samples for fraud detection testing
 lawkit generate benf --samples 10000 > benf_test_data.csv
 
-# 検出能力のテスト
+# Test our detection capability
 lawkit benf benf_test_data.csv --format json
 
-# 異なるタイプのデータ生成
+# Generate different types of data
 lawkit generate pareto --samples 5000 > pareto_data.csv
 lawkit generate zipf --samples 2000 > zipf_data.txt
 lawkit generate normal --samples 1000 > normal_data.csv
 lawkit generate poisson --samples 1000 > poisson_data.csv
 ```
 
-### ケース: 統計教育とデモンストレーション
+### Case: Statistical Education and Demonstration
 
 ```bash
-# 異なる統計法則のデモンストレーション
+# Demonstrate different statistical laws
 for law in benf pareto zipf normal poisson; do
-  echo "$law 法則のテスト:"
+  echo "Testing $law law:"
   lawkit generate $law --samples 1000 > test_data.csv
   lawkit $law test_data.csv --verbose
   echo "---"
 done
 
-# 検証能力の表示
+# Show validation capabilities
 lawkit generate benf --samples 5000 > test_benf.csv
 lawkit validate test_benf.csv --laws benford
 ```
 
-### ケース: メソッド検証とクロステスト
+### Case: Method Validation and Cross-Testing
 
 ```bash
-# 生成と即時分析のパイプライン
+# Generate and immediately analyze pipeline
 lawkit generate poisson --samples 1000 > poisson_test.csv
 lawkit poisson poisson_test.csv --format json
 
-# 法則間のクロス検証
+# Cross-validation between laws
 lawkit generate normal --samples 5000 > normal_data.csv
 lawkit analyze normal_data.csv --laws normal,benford,zipf
 
-# 包括的テスト
-lawkit list --help  # 利用可能なコマンドを表示
+# Comprehensive testing
+lawkit list --help  # Show available commands
 ```
 
-### ケース: 継続的インテグレーションテスト
+### Case: Continuous Integration Testing
 
 ```bash
 #!/bin/bash
-# 生成データを使用したCI/CDテストスクリプト
+# CI/CD test script using generated data
 
-echo "統計精度テストの実行..."
+echo "Running statistical accuracy tests..."
 
-# テスト1: ベンフォード法則の精度
+# Test 1: Benford Law accuracy
 lawkit generate benf --samples 10000 > benf_test.csv
 BENF_RESULT=$(lawkit benf benf_test.csv --format json | jq -r '.risk_level')
 if [ "$BENF_RESULT" != "Low" ]; then
-    echo "❌ ベンフォードテスト失敗: Lowリスクを期待、実際は $BENF_RESULT"
+    echo "❌ Benford test failed: Expected Low risk, got $BENF_RESULT"
     exit 1
 fi
 
-# テスト2: 正規分布検出
+# Test 2: Normal distribution detection
 lawkit generate normal --samples 1000 > normal_test.csv
 lawkit normal normal_test.csv --verbose
 
-# テスト3: ポアソン分析
+# Test 3: Poisson analysis
 lawkit generate poisson --samples 5000 > poisson_test.csv
 lawkit poisson poisson_test.csv --format json
 
-echo "✅ すべての統計精度テストに合格"
+echo "✅ All statistical accuracy tests passed"
 ```
 
-## 9. コマンドリファレンス例
+## 9. Command Reference Examples
 
-### 利用可能なコマンド
+### Available Commands
 
 ```bash
-# すべての利用可能なコマンドをリスト
+# List all available commands
 lawkit --help
 
-# 個別コマンドのヘルプ
+# Individual command help
 lawkit benf --help
 lawkit pareto --help
 lawkit zipf --help
@@ -313,28 +313,28 @@ lawkit generate --help
 lawkit list --help
 ```
 
-### 出力形式の例
+### Output Format Examples
 
 ```bash
-# 異なる出力形式
+# Different output formats
 lawkit benf data.csv --format json
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 
-# 冗長性の制御
+# Verbosity control
 lawkit benf data.csv --quiet
 lawkit benf data.csv --verbose
 ```
 
-## 設定例
+## Configuration Examples
 
-詳細なセットアップ手順と高度な設定オプションについては、[設定ガイド](configuration_ja.md)を参照してください。
+See [Configuration Guide](configuration.md) for detailed setup instructions and advanced configuration options.
 
-## 次のステップ
+## Next Steps
 
-- [インストールガイド](installation_ja.md) - セットアップとインストール手順
-- [CLIリファレンス](../reference/cli-reference_ja.md) - 完全なコマンドドキュメント
-- [統合ガイド](../guides/integrations_ja.md) - CI/CD自動化
-- [パフォーマンスガイド](../guides/performance_ja.md) - 最適化テクニック
+- [Installation Guide](installation.md) - Setup and installation instructions
+- [CLI Reference](../reference/cli-reference.md) - Complete command documentation
+- [Integration Guide](../guides/integrations.md) - CI/CD automation
+- [Performance Guide](../guides/performance.md) - Optimization techniques

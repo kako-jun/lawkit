@@ -1,225 +1,208 @@
-# 設定ガイド
+# Configuration Guide
 
-lawkitの基本的な使用方法とコマンドラインオプションについて説明します。
+## Overview
 
-## 基本的なオプション
+`lawkit` is designed to work out-of-the-box with sensible defaults, but offers several configuration options for different use cases.
 
-lawkitでは以下の基本オプションが利用できます：
+## Command-Line Options
+
+### Global Options
 
 ```bash
-# 出力形式の指定
-lawkit benf data.csv --output json
-lawkit benf data.csv --output csv
-lawkit benf data.csv --output yaml
+# Output format
+lawkit benf data.csv --format json
+lawkit benf data.csv --format yaml
+lawkit benf data.csv --format csv
+lawkit benf data.csv --format toml
+lawkit benf data.csv --format xml
 
-# 詳細出力
-lawkit benf data.csv --verbose
+# International number support (automatic recognition)
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
 
-# 最適化モード（大きなファイル用）
-lawkit benf data.csv --optimize
+# Verbosity
+lawkit benf data.csv --quiet     # Minimal output
+lawkit benf data.csv --verbose   # Detailed output
 ```
 
-## 多言語数字認識
-
-lawkitは以下の数字形式を自動認識します：
-
-| 言語 | 数字認識例 |
-|------|------------|
-| 英語 | 123,456.78 |
-| 日本語 | 123,456.78, １２３４５６, 五万六千 |
-| 中国語 | 123,456.78, 壹貳參肆伍, 一万二千 |
-| ヒンディー語 | 123,456.78, १२३४५६ |
-| アラビア語 | 123,456.78, ١٢٣٤٥٦ |
+### Analysis Options
 
 ```bash
-# 国際数字フォーマットは自動認識されます
-lawkit benf data.csv
+# Pareto analysis with threshold
+lawkit pareto data.csv --threshold 0.8
 
-# 出力は英語に統一されています
-lawkit benf japanese_numbers.csv --verbose
+# Multi-law analysis
+lawkit analyze data.csv --laws benford,pareto,normal
+
+# Analysis with focus
+lawkit analyze data.csv --laws benford --focus accuracy
+
+# Purpose-specific analysis
+lawkit analyze data.csv --laws all --purpose audit
+
+# Recommendations
+lawkit analyze data.csv --laws all --recommend
 ```
 
-## 入力データ形式
+## Output Formats
 
-lawkitは以下の入力形式に対応しています：
+### Supported Formats
 
+| Format | Description | Best For |
+|--------|-------------|----------|
+| `text` | Human-readable (default) | Terminal display |
+| `json` | Machine-readable | APIs, automation |
+| `csv` | Tabular data | Spreadsheets |
+| `yaml` | Structured config | Config files |
+| `toml` | Rust-friendly | Rust integration |
+| `xml` | Legacy systems | Enterprise |
+
+### Format Examples
+
+#### JSON Output
 ```bash
-# CSV ファイル
-lawkit benf data.csv
-
-# テキストファイル（ジップ法則用）
-lawkit zipf document.txt
-
-# 標準入力からのデータ
-echo "1234 5678 9012" | lawkit benf
-
-# 複数ファイルの処理
-lawkit benf file1.csv file2.csv
+lawkit benf data.csv --format json
+```
+```json
+{
+  "dataset": "data.csv",
+  "numbers_analyzed": 1000,
+  "risk_level": "Low",
+  "mean_absolute_deviation": 2.3,
+  "chi_square_p_value": 0.85
+}
 ```
 
-## 出力形式
-
-lawkitは複数の出力形式に対応しています：
-
+#### CSV Output
 ```bash
-# テキスト形式（デフォルト）
-lawkit benf data.csv
-
-# JSON形式
-lawkit benf data.csv --output json
-
-# CSV形式
-lawkit benf data.csv --output csv
-
-# YAML形式
-lawkit benf data.csv --output yaml
-
-# XML形式
-lawkit benf data.csv --output xml
-
-# TOML形式
-lawkit benf data.csv --output toml
+lawkit benf data.csv --format csv
+```
+```csv
+dataset,numbers_analyzed,risk_level,mad,chi_square_p
+data.csv,1000,Low,2.3,0.85
 ```
 
-## 統計法則別オプション
+## Multi-Language Support
 
-### ベンフォード法則
+### Supported Languages
+
+- **English** (`en`) - Default
+- **Japanese** (`ja`) - 日本語
+- **Chinese** (`zh`) - 中文
+- **Hindi** (`hi`) - हिन्दी
+- **Arabic** (`ar`) - العربية
+
+### International Number Support
+
+`lawkit` automatically recognizes various number formats:
 
 ```bash
-# 基本分析
-lawkit benf financial_data.csv
+# Japanese numbers
+echo "１２３４ ５６７８" | lawkit benf
 
-# 閾値指定
-lawkit benf data.csv --threshold high
+# Chinese financial numbers  
+echo "壹万贰千 三千四百" | lawkit benf
 
-# 詳細出力
-lawkit benf data.csv --verbose
+# Mixed formats
+echo "123 ４５６ 七八九" | lawkit benf
 ```
 
-### パレート法則
+## Integration Analysis
+
+### Multi-Law Analysis Configuration
 
 ```bash
-# 基本分析
-lawkit pareto sales_data.csv
+# Select specific laws
+lawkit analyze data.csv --laws benford,pareto,normal
 
-# 濃度指定（90/10分析）
-lawkit pareto data.csv --concentration 0.9
+# Focus on specific analysis type
+lawkit analyze data.csv --laws benford --focus accuracy
 
-# Gini係数計算
-lawkit pareto data.csv --gini-coefficient
+# Purpose-specific analysis
+lawkit analyze data.csv --laws all --purpose audit
 
-# パーセンタイル分析
-lawkit pareto data.csv --percentiles 80,90,95
-```
+# Recommendation mode
+lawkit analyze data.csv --laws all --recommend
 
-### ジップ法則
-
-```bash
-# 基本分析
-lawkit zipf document.txt
-
-# 最小出現回数指定
-lawkit zipf text.txt --min-count 5
-
-# 詳細出力
-lawkit zipf document.txt --verbose
-```
-
-## パフォーマンス最適化
-
-大きなファイルを処理する際のオプション：
-
-```bash
-# 最適化モード（サンプリング使用）
-lawkit benf large_file.csv --optimize
-
-# 詳細な進捗表示
-lawkit benf big_data.csv --verbose
-
-# 複数ファイルの並列処理
-lawkit benf file1.csv file2.csv file3.csv --optimize
-```
-
-## 高度な分析機能
-
-```bash
-# 複数法則での統合分析
-lawkit analyze data.csv --laws benf,pareto,normal
-
-# データ検証
+# Validation mode
 lawkit validate data.csv --laws all
 
-# 診断レポート
-lawkit diagnose data.csv --focus conflict
-
-# 異常値検出
-lawkit normal data.csv --outliers
-
-# 時系列分析
-lawkit normal timeseries.csv --time-series
+# Diagnosis mode
+lawkit diagnose data.csv --laws all
 ```
 
-## データ生成機能
+### Analysis Purposes
 
-lawkitでは検証用のサンプルデータを生成できます：
+| Purpose | Best Laws | Use Case |
+|---------|-----------|----------|
+| `audit` | Benford + Normal | Data quality audit |
+| `fraud` | Benford + Poisson | Fraud detection |
+| `business` | Pareto + Zipf | Business analysis |
+| `research` | All laws | General analysis |
+
+## Batch Processing
 
 ```bash
-# ベンフォード分布に従うデータ生成
-lawkit generate benf --size 1000
+# Process multiple files
+for file in *.csv; do
+  lawkit benf "$file" --format json > "results_${file%.csv}.json"
+done
 
-# パレート分布データ生成
-lawkit generate pareto --size 500 --alpha 1.5
-
-# 正規分布データ生成
-lawkit generate normal --size 1000 --mean 50 --std 10
-
-# ポアソン分布データ生成
-lawkit generate poisson --size 100 --lambda 3.5
-
-# ジップ分布データ生成
-lawkit generate zipf --size 1000 --alpha 1.0
+# Analyze with different laws
+lawkit analyze data1.csv --laws benford --format json
+lawkit analyze data2.csv --laws pareto --format json
+lawkit analyze data3.csv --laws normal --format json
 ```
 
-## 利用可能なコマンド一覧
+## Performance Tuning
+
+### Large Datasets
 
 ```bash
-# 全コマンドとオプションの表示
-lawkit --help
+# Use quiet mode for better performance
+lawkit benf large_data.csv --quiet
 
-# 特定のコマンドのヘルプ
-lawkit benf --help
-lawkit pareto --help
-lawkit zipf --help
-lawkit normal --help
-lawkit poisson --help
-
-# 利用可能な法則の一覧
-lawkit list
+# Focus on specific analysis
+lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-## トラブルシューティング
+### Memory Management
 
-### よくある問題と解決方法
+- Files > 1GB: Consider data preprocessing
+- Use `--quiet` for minimal memory usage
+- Stream processing with stdin input
 
-1. **ファイルが読み込めない場合**：
-   ```bash
-   # ファイルの存在確認
-   ls -la data.csv
-   
-   # 権限の確認
-   file data.csv
-   ```
+## Troubleshooting
 
-2. **メモリ不足の場合**：
-   ```bash
-   # 最適化モードを使用
-   lawkit benf large_file.csv --optimize
-   ```
+### Common Issues
 
-3. **予期しない結果の場合**：
-   ```bash
-   # 詳細出力で原因を確認
-   lawkit benf data.csv --verbose
-   ```
+1. **"Insufficient data"** - Provide more data or check file format
+2. **"No numbers found"** - Check data format and encoding
+3. **"Format error"** - Verify file format matches content
 
-**注意**: 実際に使用できる機能については、`lawkit --help` および各サブコマンドの `--help` を参照してください。
+### Debug Mode
+
+```bash
+# Enable verbose logging
+lawkit benf data.csv --verbose
+
+# Check data parsing
+lawkit benf data.csv --format json | jq '.numbers_analyzed'
+```
+
+## Future Configuration Features
+
+The following features are planned for future versions:
+
+- Configuration file support (`lawkit.toml`)
+- Environment variable settings
+- Custom threshold configuration
+- Profile-based settings
+- Data filtering options
+- Advanced analysis options
+
+## Next Steps
+
+- [Examples](examples.md) - Real-world configuration examples
+- [CLI Reference](../reference/cli-reference.md) - Complete command documentation
+- [Integration Guide](../guides/integrations.md) - CI/CD automation

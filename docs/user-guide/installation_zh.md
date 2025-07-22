@@ -1,145 +1,145 @@
-# 安装指南
+# Installation Guide
 
-本指南说明如何在您的系统上安装lawkit。
+This guide explains how to install lawkit on your system.
 
-## 系统要求
+## System Requirements
 
-- **操作系统**: Windows、macOS、Linux
-- **Rust**: 1.70.0或更高版本（从Cargo安装时）
-- **内存**: 最小512MB（处理大文件建议2GB+）
+- **OS**: Windows, macOS, Linux
+- **Rust**: 1.70.0 or higher (when installing from Cargo)
+- **Memory**: Minimum 512MB (2GB+ recommended for large file processing)
 
-## 安装方法
+## Installation Methods
 
-### 1. 从Cargo安装（推荐）
+### 1. Install from Cargo (Recommended)
 
 ```bash
-# 安装最新版本
+# Install latest version
 cargo install lawkit
 
-# 安装特定版本
+# Install specific version
 cargo install lawkit --version 2.0.0
 ```
 
-### 2. 从源码构建
+### 2. Build from Source
 
 ```bash
-# 克隆仓库
+# Clone repository
 git clone https://github.com/user/lawkit.git
 cd lawkit
 
-# 构建和安装
+# Build and install
 cargo build --release
 cargo install --path .
 ```
 
-### 3. 二进制下载
+### 3. Binary Download
 
-从[GitHub Releases](https://github.com/user/lawkit/releases)下载适合您平台的二进制文件。
+Download the binary for your platform from [GitHub Releases](https://github.com/user/lawkit/releases).
 
 #### Windows
 ```powershell
-# 在PowerShell中运行
+# Run in PowerShell
 Invoke-WebRequest -Uri "https://github.com/user/lawkit/releases/latest/download/lawkit-windows.zip" -OutFile "lawkit.zip"
 Expand-Archive lawkit.zip
 ```
 
 #### macOS
 ```bash
-# 使用Homebrew安装（计划中）
+# Install with Homebrew (planned)
 brew install lawkit
 
-# 或手动下载
+# Or manual download
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-macos.tar.gz | tar xz
 ```
 
 #### Linux
 ```bash
-# 手动下载
+# Manual download
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-linux.tar.gz | tar xz
 sudo mv lawkit /usr/local/bin/
 ```
 
-## 验证安装
+## Verify Installation
 
-确认安装成功：
+Confirm that installation was successful:
 
 ```bash
-# 检查版本
+# Check version
 lawkit --version
 
-# 显示帮助
+# Display help
 lawkit --help
 
-# 显示可用的统计法则
+# Show available statistical laws
 lawkit list
 ```
 
-## 从旧版benf迁移
+## Migration from Legacy benf
 
-如果您正在使用现有的`benf`工具：
+If you're using the existing `benf` tool:
 
 ```bash
-# 旧版用法
+# Legacy usage
 benf data.csv
 
-# 新版等效用法
+# Equivalent new usage
 lawkit benf data.csv
 ```
 
-保持100%兼容性，您可以原样使用现有脚本。
+100% compatibility is maintained, so you can use existing scripts as-is.
 
-## 更新
+## Updates
 
-### 如果通过Cargo安装
+### If installed via Cargo
 ```bash
 cargo install lawkit --force
 ```
 
-### 如果通过二进制安装
-下载并替换为新的二进制文件。
+### If installed via binary
+Download and replace with the new binary.
 
-## 卸载
+## Uninstallation
 
-### 如果通过Cargo安装
+### If installed via Cargo
 ```bash
 cargo uninstall lawkit
 ```
 
-### 如果手动安装
+### If installed manually
 ```bash
-# 检查二进制位置
+# Check binary location
 which lawkit
 
-# 删除文件
+# Remove file
 sudo rm /usr/local/bin/lawkit
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 编译错误
-可能是由于Rust版本过旧：
+### Compilation Errors
+May be due to outdated Rust version:
 ```bash
 rustup update stable
 ```
 
-### 路径配置
-如果二进制文件不在PATH中：
+### Path Configuration
+If binary is not in PATH:
 ```bash
-# 添加到~/.bashrc或~/.zshrc
+# Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### 权限错误
-如果在Linux上出现权限错误：
+### Permission Errors
+If permission errors occur on Linux:
 ```bash
 sudo chown $USER:$USER ~/.cargo/bin/lawkit
 chmod +x ~/.cargo/bin/lawkit
 ```
 
-## 下一步
+## Next Steps
 
-安装完成后，在[快速开始](getting-started_zh.md)中学习基本用法。
+Once installation is complete, learn basic usage in [Getting Started](getting-started.md).
 
-- [快速开始](getting-started_zh.md) - 基本用法
-- [使用示例](examples_zh.md) - 实际示例
-- [CLI参考](../reference/cli-reference_zh.md) - 命令详细信息
+- [Getting Started](getting-started.md) - Basic usage
+- [Examples](examples.md) - Real-world examples
+- [CLI Reference](../reference/cli-reference.md) - Command details

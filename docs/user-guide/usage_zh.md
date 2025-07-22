@@ -1,373 +1,467 @@
-# 使用指南
+# Usage Guide
 
-本指南涵盖了使用lawkit进行统计分析的所有方面。
+This guide covers all aspects of using lawkit for statistical analysis.
 
-## 目录
+## Table of Contents
 
-- [基本命令](#基本命令)
-- [统计法则](#统计法则)
-- [输入格式](#输入格式)
-- [输出格式](#输出格式)
-- [阈值](#阈值)
-- [多语言支持](#多语言支持)
-- [集成分析](#集成分析)
-- [高级功能](#高级功能)
+- [Basic Commands](#basic-commands)
+- [Statistical Laws](#statistical-laws)
+- [Input Formats](#input-formats)
+- [Output Formats](#output-formats)
+- [Thresholds](#thresholds)
+- [Multi-language Support](#multi-language-support)
+- [Integration Analysis](#integration-analysis)
+- [Advanced Features](#advanced-features)
 
-## 基本命令
+## Basic Commands
 
-### 命令结构
+### Command Structure
 
 ```bash
-lawkit <子命令> [选项] <输入>
+lawkit <SUBCOMMAND> [OPTIONS] <INPUT>
 ```
 
-### 可用子命令
+### Available Subcommands
 
-- `benf` - 本福德定律分析
-- `pareto` - 帕累托法则分析
-- `zipf` - 齐夫定律分析
-- `normal` - 正态分布分析
-- `poisson` - 泊松分布分析
-- `analyze` - 多法则集成分析和建议
-- `validate` - 使用统计法则验证数据质量
-- `diagnose` - 使用统计法则诊断数据问题
-- `generate` - 生成测试样本数据
-- `list` - 列出可用的统计法则
-- `selftest` - 运行自检以验证安装
+- `benf` - Benford's law analysis
+- `pareto` - Pareto principle analysis
+- `zipf` - Zipf's law analysis
+- `normal` - Normal distribution analysis
+- `poisson` - Poisson distribution analysis
+- `analyze` - Multi-law integration analysis and recommendations
+- `validate` - Validate data quality using statistical laws
+- `diagnose` - Diagnose data issues using statistical laws
+- `generate` - Generate sample data for testing
+- `list` - List available statistical laws
+- `selftest` - Run self-tests to verify installation
 
-### 常用选项
+### Common Options
 
-- `--format <格式>` - 输出格式 (text, json, csv, yaml, toml, xml)
-- `--quiet` - 最少输出
-- `--verbose` - 详细分析
-- `--threshold <级别>` - 设置分析阈值 (low, medium, high, critical, auto)
-- `--focus <焦点>` - 分析焦点区域 (用于analyze命令)
-- `--purpose <目的>` - 分析目的 (用于analyze命令)
-- `--recommend` - 显示建议 (用于analyze命令)
-- `--samples <数量>` - 生成的样本数量 (用于generate命令)
+- `--format <FORMAT>` - Output format (text, json, csv, yaml, toml, xml)
+- `--quiet` - Minimal output
+- `--verbose` - Detailed analysis
+- `--threshold <LEVEL>` - Set analysis threshold (low, medium, high, critical, auto)
+- `--focus <FOCUS>` - Analysis focus area (for analyze command)
+- `--purpose <PURPOSE>` - Analysis purpose (for analyze command)
+- `--recommend` - Show recommendations (for analyze command)
+- `--samples <NUMBER>` - Number of samples to generate (for generate command)
 
-## 统计法则
+## Statistical Laws
 
-### 1. 本福德定律 (Benford's Law)
+### Benford Law
 
-检测财务数据中的欺诈行为：
+Analyzes first-digit frequency distribution for fraud detection.
 
 ```bash
-# 基本分析
-lawkit benf financial_data.csv
+# Basic analysis
+lawkit benf data.csv
 
-# 高敏感度欺诈检测
-lawkit benf transactions.csv --threshold high
+# Detailed analysis with custom threshold
+lawkit benf --verbose --threshold critical data.csv
 
-# JSON格式输出
-lawkit benf data.csv --format json
+# JSON output format
+lawkit benf --format json data.csv
 ```
 
-### 2. 帕累托法则 (Pareto Principle)
+**Use Cases:**
+- Financial fraud detection
+- Data quality assessment
+- Accounting anomaly detection
+- Scientific data validation
 
-分析业务集中度：
+### Pareto Analysis
+
+Implements the 80/20 rule with Gini coefficient calculation.
 
 ```bash
-# 基本80/20分析
+# Basic Pareto analysis
 lawkit pareto sales_data.csv
 
-# 业务分析模式
-lawkit pareto revenue.csv --business-analysis
+# Verbose output with business insights
+lawkit pareto --verbose --format json revenue.csv
 
-# 详细输出
-lawkit pareto customers.csv --verbose
+# Custom threshold analysis
+lawkit pareto --threshold high customer_values.csv
 ```
 
-### 3. 齐夫定律 (Zipf's Law)
+**Use Cases:**
+- Business priority analysis
+- Resource allocation
+- Customer segmentation
+- Quality management
 
-文本和频率分析：
+### Zipf Law
+
+Analyzes power-law distributions and frequency patterns.
 
 ```bash
-# 文本文件分析
-lawkit zipf document.txt
+# Analyze numerical data
+lawkit zipf data.csv
 
-# 设置最小计数
-lawkit zipf text.txt --min-count 5
+# Detailed analysis with verbose output
+lawkit zipf --verbose city_populations.csv
 
-# 中文文本分析
-lawkit zipf chinese_text.txt
+# JSON output format
+lawkit zipf --format json data.csv
 ```
 
-### 4. 正态分布 (Normal Distribution)
+**Use Cases:**
+- Text analysis and linguistics
+- Population distribution
+- Website traffic analysis
+- Social media analytics
 
-质量控制和异常检测：
+### Normal Distribution
+
+Statistical analysis with normality testing and quality control.
 
 ```bash
-# 正态性测试
+# Basic normality testing
 lawkit normal measurements.csv
 
-# 详细的正态性测试
-lawkit normal quality_data.csv --verbose
+# Detailed analysis with verbose output
+lawkit normal --verbose data.csv
 
-# 高敏感度异常检测
-lawkit normal sensor_data.csv --threshold high
+# JSON output format
+lawkit normal --format json data.csv
+
+# Custom threshold analysis
+lawkit normal --threshold high production_data.csv
 ```
 
-### 5. 泊松分布 (Poisson Distribution)
+**Use Cases:**
+- Quality control
+- Process monitoring
+- Outlier detection
+- Statistical validation
 
-事件建模和预测：
+### Poisson Distribution
+
+Event occurrence analysis and rare event modeling.
 
 ```bash
-# 基本泊松分析
-lawkit poisson events.csv
+# Basic Poisson analysis
+lawkit poisson event_counts.csv
 
-# 时间序列分析
-lawkit poisson daily_counts.csv --time-series
+# Detailed analysis with verbose output
+lawkit poisson --verbose data.csv
 
-# 详细分析
-lawkit poisson incidents.csv --verbose
+# JSON output format
+lawkit poisson --format json incidents.csv
+
+# Custom threshold analysis
+lawkit poisson --threshold high defect_data.csv
 ```
 
-## 输入格式
+**Use Cases:**
+- Defect analysis
+- Call center modeling
+- Network traffic analysis
+- Epidemiological studies
 
-lawkit支持多种输入格式：
+## Input Formats
 
-### CSV文件
-```csv
-value
-123.45
-678.90
-234.56
-```
+lawkit automatically detects file formats and supports:
 
-### JSON文件
-```json
-{
-  "data": [123.45, 678.90, 234.56]
-}
-```
-
-### 文本文件
-```
-123.45
-678.90
-234.56
-```
-
-### 标准输入
+### Structured Data
 ```bash
-echo -e "123\\n456\\n789" | lawkit benf -
+# CSV files
+lawkit benf data.csv
+
+# Excel files
+lawkit pareto spreadsheet.xlsx
+
+# JSON data
+lawkit zipf data.json
+
+# YAML configuration
+lawkit normal config.yaml
 ```
 
-## 输出格式
-
-使用`--format`选项选择输出格式：
-
-### 文本格式（默认）
+### Document Formats
 ```bash
-lawkit benf data.csv --format text
+# Text files
+lawkit benf document.txt
+
+# Word documents
+lawkit benf report.docx
+
+# PowerPoint presentations
+lawkit pareto presentation.pptx
 ```
 
-### JSON格式
+### Direct Input
 ```bash
-lawkit benf data.csv --format json
+# Pipe data
+echo "123,456,789" | lawkit benf
+
+# Command line string
+lawkit pareto "100,200,300,400,500"
+
+# Standard input
+cat data.txt | lawkit zipf
 ```
 
-### CSV格式
-```bash
-lawkit benf data.csv --format csv
-```
+## Output Formats
 
-### YAML格式
-```bash
-lawkit benf data.csv --format yaml
-```
-
-## 阈值
-
-阈值控制分析敏感度：
-
-- `low` - 低敏感度（更少误报）
-- `medium` - 中等敏感度（平衡）
-- `high` - 高敏感度（更多警报）
-- `critical` - 最高敏感度
-- `auto` - 自动选择（默认）
-
-示例：
-```bash
-# 高敏感度欺诈检测
-lawkit benf transactions.csv --threshold high
-
-# 低敏感度初步筛选
-lawkit benf large_dataset.csv --threshold low
-```
-
-## 多语言支持
-
-lawkit能够解析多种语言的数字：
+### Text (Default)
+Human-readable output with formatted tables and summaries.
 
 ```bash
-# 英文数字
-echo "one hundred twenty-three" | lawkit benf -
-
-# 日文数字
-echo "百二十三" | lawkit benf -
-
-# 中文数字
-echo "一百二十三" | lawkit benf -
-
-# 印地语数字
-echo "एक सौ तेईस" | lawkit benf -
-
-# 阿拉伯语数字
-echo "مائة وثلاثة وعشرون" | lawkit benf -
+lawkit benf data.csv
+# Output: Formatted tables with analysis results
 ```
 
-## 集成分析
+### JSON
+Structured data for programmatic use.
 
-### 多法则分析
 ```bash
-# 分析所有法则
-lawkit analyze data.csv --laws all
-
-# 分析特定法则
-lawkit analyze data.csv --laws benf,pareto,normal
-
-# 获取建议
-lawkit analyze data.csv --recommend
+lawkit benf --format json data.csv
+# Output: {"first_digit_distribution": {...}, "chi_square": 12.34, ...}
 ```
 
-### 数据验证
-```bash
-# 验证数据一致性
-lawkit validate data.csv --laws all
+### CSV
+Tabular format for spreadsheet applications.
 
-# 针对特定目的验证
-lawkit validate financial_data.csv --purpose fraud
+```bash
+lawkit pareto --format csv data.csv
+# Output: Comma-separated values with headers
 ```
 
-### 问题诊断
+### Other Formats
 ```bash
-# 诊断数据问题
-lawkit diagnose data.csv --focus conflict
+# YAML format
+lawkit normal --format yaml data.csv
 
-# 详细诊断报告
-lawkit diagnose data.csv --focus all --verbose
+# TOML format (Rust-friendly)
+lawkit poisson --format toml data.csv
+
+# XML format (enterprise integration)
+lawkit analyze --laws benf,pareto --format xml data.csv
 ```
 
-## 高级功能
+## Thresholds
 
-### 生成测试数据
+### Threshold Customization
+
+Set custom analysis thresholds for anomaly detection:
+
 ```bash
-# 生成本福德定律样本数据
-lawkit generate benf --samples 1000
+# Predefined levels
+lawkit benf --threshold low data.csv      # More permissive
+lawkit benf --threshold medium data.csv   # Balanced
+lawkit benf --threshold high data.csv     # Strict
+lawkit benf --threshold critical data.csv # Very strict
 
-# 生成带欺诈的数据
-lawkit generate benf --samples 1000 --fraud-rate 0.1
-
-# 生成帕累托分布数据
-lawkit generate pareto --samples 1000 --concentration 0.8
+# Auto-detection (default)
+lawkit benf --threshold auto data.csv
 ```
 
-### 自检
+### Data Requirements
+
+Minimum data requirements vary by law:
+- **Benford**: 5 points (recommended: 100+)
+- **Pareto**: 5 points (recommended: 20+)
+- **Zipf**: 5 points (recommended: 50+)
+- **Normal**: 8 points (recommended: 30+)
+- **Poisson**: 10 points (recommended: 50+)
+
+## Multi-language Support
+
+### International Number Recognition
+
 ```bash
-# 运行完整的自检
+# English output (unified across all analysis)
+lawkit benf data.csv
+
+# International numbers are automatically recognized
+echo "１２３４５６" | lawkit benf      # Japanese numbers
+echo "一千二百三十四" | lawkit benf    # Chinese numbers
+echo "१२३४५६" | lawkit benf        # Hindi numbers
+echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
+```
+
+### International Numbers
+
+lawkit automatically recognizes international number formats:
+
+- **English**: `1,234.56`, `1234.56`
+- **Japanese**: `１，２３４．５６`, `1,234.56`, `一千二百三十四`
+- **Chinese**: `1,234.56`, `一千二百三十四`
+- **Hindi**: `१,२३४.५६`, `1,234.56`
+- **Arabic**: `١٬٢٣٤٫٥٦`, `1,234.56`
+
+## Integration Analysis
+
+### Integration Analysis
+
+Analyze with multiple statistical laws for comprehensive analysis:
+
+```bash
+# Analyze with two laws
+lawkit analyze --laws benf,pareto data.csv
+
+# Analyze with all applicable laws
+lawkit analyze --laws all data.csv
+
+# Verbose analysis with recommendations
+lawkit analyze --laws benf,pareto,normal --verbose --recommend data.csv
+
+# Focus on specific analysis area
+lawkit analyze --laws all --focus fraud-detection data.csv
+
+# Specify analysis purpose
+lawkit analyze --laws all --purpose quality-assessment data.csv
+
+# Output in JSON format
+lawkit analyze --laws all --format json data.csv
+```
+
+### Integration Features
+
+- **Contradiction Detection**: Identifies conflicting results between laws
+- **Confidence Scoring**: Rates the reliability of each analysis
+- **Recommendation System**: Suggests the most appropriate statistical law
+- **Meta-Analysis**: Combines insights from multiple perspectives
+
+### Multi-Law Decision Flow
+
+```mermaid
+flowchart TD
+    A[Input Data] --> B{Data Size Check}
+    B -->|< 30 points| C[Use Benford + Pareto]
+    B -->|30-100 points| D[Use Benford + Pareto + Normal]
+    B -->|> 100 points| E[Use All Laws]
+    
+    C --> F[Risk Assessment]
+    D --> F
+    E --> F
+    
+    F --> G{Contradiction Found?}
+    G -->|Yes| H[Flag Inconsistencies]
+    G -->|No| I[Generate Confidence Score]
+    
+    H --> J[Manual Review Required]
+    I --> K{High Confidence?}
+    K -->|Yes| L[Accept Results]
+    K -->|No| M[Additional Analysis Recommended]
+    
+```
+
+## Advanced Features
+
+### Data Generation
+
+```bash
+# Generate sample data for testing
+lawkit generate --samples 1000 | lawkit benf
+
+# Generate data and save to file
+lawkit generate --samples 500 > test_data.csv
+
+# Generate data for specific law
+lawkit generate --samples 100 | lawkit pareto
+```
+
+### Data Validation
+
+```bash
+# Validate data quality using multiple laws
+lawkit validate --laws all data.csv
+
+# Validate with specific focus
+lawkit validate --laws benf,pareto --focus fraud-detection data.csv
+
+# Validate with recommendations
+lawkit validate --laws all --recommend data.csv
+```
+
+### Data Diagnosis
+
+```bash
+# Diagnose data issues
+lawkit diagnose --laws all data.csv
+
+# Diagnose with specific purpose
+lawkit diagnose --laws all --purpose quality-assessment data.csv
+
+# Verbose diagnosis with details
+lawkit diagnose --laws all --verbose data.csv
+```
+
+### Self-Testing
+
+```bash
+# Run self-tests to verify installation
 lawkit selftest
 
-# 这将测试所有统计法则的实现
+# Run verbose self-tests
+lawkit selftest --verbose
 ```
 
-### 批量处理
-```bash
-# 使用shell循环处理多个文件
-for file in *.csv; do
-    lawkit benf "$file" --format json > "results/${file%.csv}_benf.json"
-done
-```
+## Examples by Use Case
 
-### 管道和过滤
-```bash
-# 与其他工具结合
-cat large_dataset.csv | head -1000 | lawkit benf -
-
-# 过滤和分析
-awk -F',' '{print $3}' data.csv | lawkit pareto -
-```
-
-## 实际示例
-
-### 财务审计
-```bash
-# 第1步：使用本福德定律进行初步筛选
-lawkit benf transactions.csv --threshold high
-
-# 第2步：检查集中度
-lawkit pareto transactions.csv --business-analysis
-
-# 第3步：综合分析
-lawkit analyze transactions.csv --purpose fraud --recommend
-```
-
-### 质量控制
-```bash
-# 第1步：检查正态性
-lawkit normal measurements.csv --verbose
-
-# 第2步：检测异常值
-lawkit normal measurements.csv --threshold critical
-
-# 第3步：验证数据质量
-lawkit validate measurements.csv --purpose quality
-```
-
-### 文本分析
-```bash
-# 第1步：词频分析
-lawkit zipf document.txt --min-count 10
-
-# 第2步：检查自然性
-lawkit zipf document.txt --verbose
-
-# 第3步：比较文档
-lawkit analyze doc1.txt --laws zipf --format json
-lawkit analyze doc2.txt --laws zipf --format json
-```
-
-## 故障排除
-
-### 常见问题
-
-1. **没有数据输出**
-   - 检查输入文件格式
-   - 使用`--verbose`查看详细信息
-
-2. **意外结果**
-   - 验证数据质量
-   - 调整阈值设置
-   - 使用`diagnose`命令查找问题
-
-3. **性能问题**
-   - 对大型数据集使用采样
-   - 考虑`--threshold low`以加快处理速度
-
-### 获取帮助
+### Financial Fraud Detection
 
 ```bash
-# 显示一般帮助
-lawkit --help
+# Benford's law on transaction amounts
+lawkit benf --threshold high transactions.csv
 
-# 显示特定命令的帮助
-lawkit benf --help
+# Pareto analysis of transaction volumes
+lawkit pareto --verbose --format json daily_volumes.csv
 
-# 列出所有可用命令
-lawkit list
+# Multi-law comparison with fraud detection focus
+lawkit analyze --laws benf,pareto --focus fraud-detection financial_data.csv
 ```
 
-## 最佳实践
+### Quality Control
 
-1. **从简单分析开始**：先使用单个法则，然后再进行多法则分析
-2. **了解您的数据**：不同的法则适用于不同类型的数据
-3. **使用适当的阈值**：从`auto`开始，根据需要调整
-4. **验证结果**：使用多个法则交叉检查发现
-5. **保存输出**：对进一步分析使用结构化格式（JSON、YAML）
+```bash
+# Normal distribution analysis for quality control
+lawkit normal --threshold high measurements.csv
 
-## 另请参阅
+# Validate data quality in manufacturing
+lawkit validate --laws normal,poisson --purpose quality-control production_data.csv
 
-- [安装指南](installation_zh.md) - 设置说明
-- [示例](examples_zh.md) - 更多实际用例
-- [CLI参考](../reference/cli-reference_zh.md) - 完整的命令文档
+# Poisson analysis for defect rates
+lawkit poisson --verbose defect_counts.csv
+```
+
+### Statistical Analysis
+
+```bash
+# Zipf's law on numerical distributions
+lawkit zipf --verbose data.csv
+
+# Multi-law analysis for comprehensive insights
+lawkit analyze --laws all --verbose data.csv
+```
+
+### Business Intelligence
+
+```bash
+# Customer value analysis (Pareto)
+lawkit pareto --verbose customer_revenue.csv
+
+# Event occurrence modeling (Poisson)
+lawkit poisson --verbose incident_reports.csv
+
+# Comprehensive business data analysis
+lawkit analyze --laws pareto,normal,poisson --purpose business-analysis --verbose business_metrics.csv
+```
+
+## Error Handling
+
+lawkit provides clear error messages for common issues:
+
+- **Insufficient data**: Warns when data doesn't meet minimum requirements
+- **Invalid formats**: Suggests correct input formats
+- **Missing files**: Provides helpful file path guidance
+- **Invalid parameters**: Explains correct parameter usage
+
+## Performance Tips
+
+- Use `--quiet` for faster processing of large datasets
+- Use appropriate thresholds with `--threshold` for your use case
+- Consider output format: JSON is faster for large results than formatted text
+- Use `lawkit list` to see all available statistical laws

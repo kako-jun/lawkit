@@ -1,227 +1,227 @@
-# パフォーマンスガイド
+# Performance Guide
 
-さまざまなユースケースとデータサイズに対してlawkitのパフォーマンスを最適化します。
+Optimize lawkit performance for different use cases and data sizes.
 
-## パフォーマンス概要
+## Performance Overview
 
-lawkitは様々なデータサイズを効率的に処理するよう設計されています：
+lawkit is designed to handle various data sizes efficiently:
 
-- **小規模データセット** (< 1,000レコード): 瞬時分析
-- **中規模データセット** (1,000 - 100,000レコード): < 5秒
-- **大規模データセット** (100,000 - 1Mレコード): < 30秒
-- **超大規模データセット** (> 1Mレコード): サンプリング推奨
+- **Small datasets** (< 1,000 records): Instant analysis
+- **Medium datasets** (1,000 - 100,000 records): < 5 seconds
+- **Large datasets** (100,000 - 1M records): < 30 seconds
+- **Very large datasets** (> 1M records): Sampling recommended
 
-## 最適化戦略
+## Optimization Strategies
 
-### 1. 基本的な分析コマンド
+### 1. Basic Analysis Commands
 
 ```bash
-# ベンフォード法則分析
+# Benford's law analysis
 lawkit benf data.csv
 
-# パレート法則分析
+# Pareto analysis
 lawkit pareto data.csv --threshold 0.8
 
-# ジップ法則分析
+# Zipf's law analysis
 lawkit zipf text.txt
 
-# 正規分布分析
+# Normal distribution analysis
 lawkit normal data.csv
 
-# ポアソン分布分析
+# Poisson distribution analysis
 lawkit poisson data.csv
 
-# 統合分析
+# Integrated analysis
 lawkit analyze data.csv --laws benford,pareto,normal
 ```
 
-### 2. 出力形式の最適化
+### 2. Output Format Optimization
 
 ```bash
-# 高速処理のために出力を最小化
+# Minimize output for faster processing
 lawkit benf data.csv --quiet --format json
 
-# 詳細な情報が必要な場合
+# Detailed information when needed
 lawkit benf data.csv --verbose
 
-# 異なる出力形式
+# Different output formats
 lawkit benf data.csv --format csv
 lawkit benf data.csv --format yaml
 lawkit benf data.csv --format toml
 lawkit benf data.csv --format xml
 ```
 
-### 3. 統合分析の最適化
+### 3. Integrated Analysis Optimization
 
 ```bash
-# 複数法則の比較分析
+# Multi-law comparison analysis
 lawkit analyze data.csv --laws benford,pareto
 
-# 特定の分析に焦点を当てる
+# Focus on specific analysis
 lawkit analyze data.csv --laws benford --focus accuracy
 
-# 特定の目的に最適化
+# Optimize for specific purpose
 lawkit analyze data.csv --laws all --purpose audit
 
-# 推奨システムを使用
+# Use recommendation system
 lawkit analyze data.csv --laws all --recommend
 ```
 
-## ファイル形式の最適化
+## File Format Optimization
 
-### CSVパフォーマンス
+### CSV Performance
 
 ```bash
-# 最高パフォーマンス: 適切にフォーマットされたCSV
+# Best performance: properly formatted CSV
 lawkit benf optimized.csv
 
-# 静寂モードで高速処理
+# Quiet mode for fast processing
 lawkit benf data.csv --quiet
 
-# 詳細な分析が必要な場合
+# Detailed analysis when needed
 lawkit benf data.csv --verbose
 ```
 
-## ベンチマーキング
+## Benchmarking
 
-### 基本的なベンチマーキング
+### Basic Benchmarking
 
 ```bash
-# タイミング情報付きで実行
+# Run with timing information
 time lawkit benf data.csv
 
-# 異なる設定の比較
+# Compare different configurations
 time lawkit benf data.csv --quiet
 time lawkit benf data.csv --verbose
 time lawkit analyze data.csv --laws benford
 time lawkit analyze data.csv --laws benford,pareto
 ```
 
-### カスタムベンチマーク
+### Custom Benchmarks
 
 ```bash
 #!/bin/bash
 # benchmark_script.sh
 
-echo "lawkitパフォーマンスベンチマーク..."
+echo "Benchmarking lawkit performance..."
 
-# 異なる法則のテスト
-echo "ベンフォード法則テスト:"
+# Test different laws
+echo "Benford's law test:"
 time lawkit benf data.csv --quiet
 
-echo "パレート法則テスト:"
+echo "Pareto analysis test:"
 time lawkit pareto data.csv --quiet
 
-echo "統合分析テスト:"
+echo "Integrated analysis test:"
 time lawkit analyze data.csv --laws benford,pareto --quiet
 
-echo "全法則分析テスト:"
+echo "All laws analysis test:"
 time lawkit analyze data.csv --laws all --quiet
 ```
 
-## CPU最適化
+## CPU Optimization
 
-### 基本的な最適化
+### Basic Optimization
 
 ```bash
-# 軽量な分析
+# Lightweight analysis
 lawkit benf data.csv --quiet
 
-# 詳細な分析
+# Detailed analysis
 lawkit benf data.csv --verbose
 
-# 複数法則の効率的な実行
+# Efficient multi-law execution
 lawkit analyze data.csv --laws benford,pareto --quiet
 ```
 
-## 出力最適化
+## Output Optimization
 
-### 効率的な出力形式
+### Efficient Output Formats
 
 ```bash
-# 高速処理のために出力を最小化
+# Minimize output for faster processing
 lawkit benf data.csv --quiet --format json
 
-# 構造化された出力
+# Structured output
 lawkit analyze data.csv --format json --quiet
 
-# 人間が読みやすい形式
+# Human-readable format
 lawkit benf data.csv --format yaml
 ```
 
-## パフォーマンス監視
+## Performance Monitoring
 
-### 基本的な監視
+### Basic Monitoring
 
 ```bash
-# システムツールを使用
+# Using system tools
 time lawkit benf data.csv
 /usr/bin/time -v lawkit benf data.csv
 
-# 詳細なタイミング情報
+# Detailed timing information
 time lawkit analyze data.csv --laws all --verbose
 ```
 
-## パフォーマンスチューニング例
+## Performance Tuning Examples
 
-### 小規模データ (< 1Kレコード)
+### Small Data (< 1K records)
 
 ```bash
-# 最小オーバーヘッド設定
+# Minimal overhead configuration
 lawkit benf small_data.csv --quiet
 ```
 
-### 中規模データ (1K - 100Kレコード)
+### Medium Data (1K - 100K records)
 
 ```bash
-# バランス設定
+# Balanced configuration
 lawkit analyze medium_data.csv --laws benford,pareto
 ```
 
-### 大規模データ (100K - 1Mレコード)
+### Large Data (100K - 1M records)
 
 ```bash
-# 大規模データセット用最適化
+# Optimized for large datasets
 lawkit analyze large_data.csv --laws benford --quiet
 ```
 
-### 超大規模データ (> 1Mレコード)
+### Very Large Data (> 1M records)
 
 ```bash
-# 最大最適化
+# Maximum optimization
 lawkit benf huge_data.csv --quiet --format json
 ```
 
-## パフォーマンス問題のトラブルシューティング
+## Troubleshooting Performance Issues
 
-### よくある問題
+### Common Issues
 
-1. **ファイル読み込みが遅い**
+1. **Slow file reading**
    ```bash
-   # 解決策: 静寂モードを使用
+   # Solution: Use quiet mode
    lawkit benf data.csv --quiet
    ```
 
-2. **分析が遅い**
+2. **Slow analysis**
    ```bash
-   # 解決策: 単一法則を使用
+   # Solution: Use single law
    lawkit benf data.csv --quiet
    ```
 
-3. **出力が多すぎる**
+3. **Too much output**
    ```bash
-   # 解決策: 静寂モードを使用
+   # Solution: Use quiet mode
    lawkit analyze data.csv --laws benford --quiet
    ```
 
-### 診断コマンド
+### Diagnostic Commands
 
 ```bash
-# バージョン情報とヘルプ
+# Version information and help
 lawkit --version
 lawkit --help
 
-# 各コマンドのヘルプ
+# Command-specific help
 lawkit benf --help
 lawkit pareto --help
 lawkit zipf --help
@@ -232,16 +232,16 @@ lawkit generate --help
 lawkit list --help
 ```
 
-## 将来の最適化機能
+## Future Optimization Features
 
-以下の機能は将来のバージョンで実装予定です：
+The following features are planned for future versions:
 
-- 並列処理サポート
-- メモリ制限設定
-- サンプリング機能
-- 設定ファイル対応
-- 高度な異常値検出
-- 時系列分析
-- バッチ処理モード
+- Parallel processing support
+- Memory limit settings
+- Sampling capabilities
+- Configuration file support
+- Advanced outlier detection
+- Time series analysis
+- Batch processing mode
 
-これらの基本的な最適化技術を使用して、現在の実装で最適なパフォーマンスを実現してください。
+Use these basic optimization techniques to achieve the best performance with the current implementation.
