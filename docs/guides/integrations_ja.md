@@ -1,13 +1,13 @@
-# Integrations
+# インテグレーション
 
-Learn how to integrate lawkit with other tools and workflows.
+lawkitを他のツールやワークフローと統合する方法を学びます。
 
-## CI/CD Integration
+## CI/CD インテグレーション
 
 ### GitHub Actions
 
 ```yaml
-name: Data Quality Check
+name: データ品質チェック
 
 on:
   push:
@@ -20,16 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install lawkit
+      - name: lawkitをインストール
         run: cargo install lawkit
         
-      - name: Quality Analysis
+      - name: 品質分析
         run: |
           for file in data/*.csv; do
             lawkit analyze "$file" --laws benford,normal --format json > "qa_$(basename "$file" .csv).json"
           done
           
-      - name: Upload Results
+      - name: 結果をアップロード
         uses: actions/upload-artifact@v3
         with:
           name: quality-reports
@@ -52,12 +52,12 @@ data-quality:
       - quality-report.json
 ```
 
-## API Integration
+## API インテグレーション
 
-### REST API Wrapper
+### REST API ラッパー
 
 ```python
-# Example Python wrapper
+# Python ラッパーの例
 import subprocess
 import json
 
@@ -76,7 +76,7 @@ class LawkitAPI:
         return result.stdout
 ```
 
-### Node.js Integration
+### Node.js インテグレーション
 
 ```javascript
 const { spawn } = require('child_process');
@@ -94,28 +94,28 @@ function analyzeBenford(dataFile) {
       if (code === 0) {
         resolve(JSON.parse(output));
       } else {
-        reject(new Error(`Process exited with code ${code}`));
+        reject(new Error(`プロセスが終了コード ${code} で終了しました`));
       }
     });
   });
 }
 ```
 
-## Database Integration
+## データベースインテグレーション
 
 ### PostgreSQL
 
 ```sql
--- Create function to call lawkit
+-- lawkitを呼び出す関数を作成
 CREATE OR REPLACE FUNCTION analyze_benford_law(table_name TEXT, column_name TEXT)
 RETURNS JSON AS $$
 DECLARE
     result JSON;
 BEGIN
-    -- Export data to CSV
+    -- データをCSVにエクスポート
     EXECUTE format('COPY (SELECT %I FROM %I) TO ''/tmp/data.csv'' CSV HEADER', column_name, table_name);
     
-    -- Run lawkit analysis
+    -- lawkit分析を実行
     SELECT INTO result system('lawkit benf /tmp/data.csv --format json');
     
     RETURN result;
@@ -126,38 +126,38 @@ $$ LANGUAGE plpgsql;
 ### MongoDB
 
 ```javascript
-// MongoDB aggregation with lawkit
+// lawkitを使用したMongoDBの集計
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
 
 async function analyzeMongoData(collection, field) {
   const data = await collection.find({}).toArray();
   
-  // Export to CSV
+  // CSVにエクスポート
   const csv = data.map(doc => doc[field]).join('\n');
   fs.writeFileSync('/tmp/mongo_data.csv', csv);
   
-  // Analyze with lawkit
+  // lawkitで分析
   const result = await analyzeBenford('/tmp/mongo_data.csv');
   return result;
 }
 ```
 
-## Business Intelligence Tools
+## ビジネスインテリジェンスツール
 
 ### Tableau
 
 ```python
-# Tableau Python integration
+# Tableau Python インテグレーション
 import pandas as pd
 import subprocess
 import json
 
 def tableau_lawkit_analysis(data_source):
-    # Export from Tableau
+    # Tableauからエクスポート
     df = pd.read_csv(data_source)
     
-    # Analyze with lawkit
+    # lawkitで分析
     result = subprocess.run([
         'lawkit', 'analyze', data_source, 
         '--laws', 'all', '--format', 'json'
@@ -165,36 +165,36 @@ def tableau_lawkit_analysis(data_source):
     
     analysis = json.loads(result.stdout)
     
-    # Convert back to DataFrame for Tableau
+    # Tableau用にDataFrameに変換
     return pd.DataFrame(analysis['recommendations'])
 ```
 
 ### Power BI
 
 ```python
-# Power BI Python script
+# Power BI Python スクリプト
 import os
 import subprocess
 import json
 
-# Get data from Power BI
+# Power BIからデータを取得
 dataset = pd.DataFrame(...)
 
-# Save to temp file
+# 一時ファイルに保存
 temp_file = '/tmp/powerbi_data.csv'
 dataset.to_csv(temp_file, index=False)
 
-# Run lawkit analysis
+# lawkit分析を実行
 result = subprocess.run([
     'lawkit', 'benf', temp_file, '--format', 'json'
 ], capture_output=True, text=True)
 
-# Parse results for Power BI
+# Power BI用に結果を解析
 analysis = json.loads(result.stdout)
 risk_level = analysis['risk_level']
 ```
 
-## Cloud Platforms
+## クラウドプラットフォーム
 
 ### AWS Lambda
 
@@ -204,7 +204,7 @@ import subprocess
 import boto3
 
 def lambda_handler(event, context):
-    # Download data from S3
+    # S3からデータをダウンロード
     s3 = boto3.client('s3')
     s3.download_file(
         event['bucket'], 
@@ -212,12 +212,12 @@ def lambda_handler(event, context):
         '/tmp/data.csv'
     )
     
-    # Run lawkit analysis
+    # lawkit分析を実行
     result = subprocess.run([
         'lawkit', 'benf', '/tmp/data.csv', '--format', 'json'
     ], capture_output=True, text=True)
     
-    # Upload results back to S3
+    # 結果をS3にアップロード
     analysis = json.loads(result.stdout)
     s3.put_object(
         Bucket=event['output_bucket'],
@@ -239,13 +239,13 @@ def analyze_data(request):
     import subprocess
     import json
     
-    # Download from Cloud Storage
+    # Cloud Storageからダウンロード
     client = storage.Client()
     bucket = client.bucket('data-bucket')
     blob = bucket.blob('data.csv')
     blob.download_to_filename('/tmp/data.csv')
     
-    # Run analysis
+    # 分析を実行
     result = subprocess.run([
         'lawkit', 'analyze', '/tmp/data.csv', 
         '--laws', 'all', '--format', 'json'
@@ -254,18 +254,18 @@ def analyze_data(request):
     return json.loads(result.stdout)
 ```
 
-## Monitoring and Alerting
+## 監視とアラート
 
-### Prometheus Metrics
+### Prometheus メトリクス
 
 ```python
 from prometheus_client import Gauge, Counter
 import subprocess
 import json
 
-# Define metrics
-risk_level_gauge = Gauge('lawkit_risk_level', 'Risk level score')
-analysis_counter = Counter('lawkit_analyses_total', 'Total analyses performed')
+# メトリクスを定義
+risk_level_gauge = Gauge('lawkit_risk_level', 'リスクレベルスコア')
+analysis_counter = Counter('lawkit_analyses_total', '実行された分析の総数')
 
 def update_metrics(data_file):
     result = subprocess.run([
@@ -277,20 +277,20 @@ def update_metrics(data_file):
     analysis_counter.inc()
 ```
 
-### Grafana Dashboard
+### Grafanaダッシュボード
 
 ```json
 {
   "dashboard": {
-    "title": "Lawkit Data Quality Dashboard",
+    "title": "lawkitデータ品質ダッシュボード",
     "panels": [
       {
-        "title": "Fraud Likelihood",
+        "title": "不正の可能性",
         "type": "stat",
         "targets": [
           {
             "expr": "lawkit_risk_level",
-            "legendFormat": "Fraud Score"
+            "legendFormat": "不正スコア"
           }
         ]
       }
@@ -299,12 +299,12 @@ def update_metrics(data_file):
 }
 ```
 
-## Custom Integrations
+## カスタムインテグレーション
 
-### Build Your Own
+### 独自の構築
 
 ```rust
-// Rust integration using lawkit as subprocess
+// サブプロセスとしてlawkitを使用するRustインテグレーション
 use std::process::Command;
 use serde_json::Value;
 
@@ -321,4 +321,4 @@ fn custom_analysis(file_path: &str) -> Result<Value, Box<dyn std::error::Error>>
 }
 ```
 
-These integration examples help you incorporate lawkit into your existing workflows and tools.
+これらのインテグレーション例は、既存のワークフローやツールにlawkitを組み込むのに役立ちます。

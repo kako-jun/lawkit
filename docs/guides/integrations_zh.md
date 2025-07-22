@@ -1,13 +1,13 @@
-# Integrations
+# 集成
 
-Learn how to integrate lawkit with other tools and workflows.
+学习如何将lawkit与其他工具和工作流程集成。
 
-## CI/CD Integration
+## CI/CD 集成
 
 ### GitHub Actions
 
 ```yaml
-name: Data Quality Check
+name: 数据质量检查
 
 on:
   push:
@@ -20,16 +20,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install lawkit
+      - name: 安装lawkit
         run: cargo install lawkit
         
-      - name: Quality Analysis
+      - name: 质量分析
         run: |
           for file in data/*.csv; do
             lawkit analyze "$file" --laws benford,normal --format json > "qa_$(basename "$file" .csv).json"
           done
           
-      - name: Upload Results
+      - name: 上传结果
         uses: actions/upload-artifact@v3
         with:
           name: quality-reports
@@ -52,12 +52,12 @@ data-quality:
       - quality-report.json
 ```
 
-## API Integration
+## API 集成
 
-### REST API Wrapper
+### REST API 封装器
 
 ```python
-# Example Python wrapper
+# Python 封装器示例
 import subprocess
 import json
 
@@ -76,7 +76,7 @@ class LawkitAPI:
         return result.stdout
 ```
 
-### Node.js Integration
+### Node.js 集成
 
 ```javascript
 const { spawn } = require('child_process');
@@ -94,28 +94,28 @@ function analyzeBenford(dataFile) {
       if (code === 0) {
         resolve(JSON.parse(output));
       } else {
-        reject(new Error(`Process exited with code ${code}`));
+        reject(new Error(`进程以代码 ${code} 退出`));
       }
     });
   });
 }
 ```
 
-## Database Integration
+## 数据库集成
 
 ### PostgreSQL
 
 ```sql
--- Create function to call lawkit
+-- 创建调用lawkit的函数
 CREATE OR REPLACE FUNCTION analyze_benford_law(table_name TEXT, column_name TEXT)
 RETURNS JSON AS $$
 DECLARE
     result JSON;
 BEGIN
-    -- Export data to CSV
+    -- 导出数据到CSV
     EXECUTE format('COPY (SELECT %I FROM %I) TO ''/tmp/data.csv'' CSV HEADER', column_name, table_name);
     
-    -- Run lawkit analysis
+    -- 运行lawkit分析
     SELECT INTO result system('lawkit benf /tmp/data.csv --format json');
     
     RETURN result;
@@ -126,38 +126,38 @@ $$ LANGUAGE plpgsql;
 ### MongoDB
 
 ```javascript
-// MongoDB aggregation with lawkit
+// 使用lawkit进行MongoDB聚合
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
 
 async function analyzeMongoData(collection, field) {
   const data = await collection.find({}).toArray();
   
-  // Export to CSV
+  // 导出到CSV
   const csv = data.map(doc => doc[field]).join('\n');
   fs.writeFileSync('/tmp/mongo_data.csv', csv);
   
-  // Analyze with lawkit
+  // 使用lawkit分析
   const result = await analyzeBenford('/tmp/mongo_data.csv');
   return result;
 }
 ```
 
-## Business Intelligence Tools
+## 商业智能工具
 
 ### Tableau
 
 ```python
-# Tableau Python integration
+# Tableau Python 集成
 import pandas as pd
 import subprocess
 import json
 
 def tableau_lawkit_analysis(data_source):
-    # Export from Tableau
+    # 从Tableau导出
     df = pd.read_csv(data_source)
     
-    # Analyze with lawkit
+    # 使用lawkit分析
     result = subprocess.run([
         'lawkit', 'analyze', data_source, 
         '--laws', 'all', '--format', 'json'
@@ -165,36 +165,36 @@ def tableau_lawkit_analysis(data_source):
     
     analysis = json.loads(result.stdout)
     
-    # Convert back to DataFrame for Tableau
+    # 转换回DataFrame供Tableau使用
     return pd.DataFrame(analysis['recommendations'])
 ```
 
 ### Power BI
 
 ```python
-# Power BI Python script
+# Power BI Python 脚本
 import os
 import subprocess
 import json
 
-# Get data from Power BI
+# 从Power BI获取数据
 dataset = pd.DataFrame(...)
 
-# Save to temp file
+# 保存到临时文件
 temp_file = '/tmp/powerbi_data.csv'
 dataset.to_csv(temp_file, index=False)
 
-# Run lawkit analysis
+# 运行lawkit分析
 result = subprocess.run([
     'lawkit', 'benf', temp_file, '--format', 'json'
 ], capture_output=True, text=True)
 
-# Parse results for Power BI
+# 解析Power BI的结果
 analysis = json.loads(result.stdout)
 risk_level = analysis['risk_level']
 ```
 
-## Cloud Platforms
+## 云平台
 
 ### AWS Lambda
 
@@ -204,7 +204,7 @@ import subprocess
 import boto3
 
 def lambda_handler(event, context):
-    # Download data from S3
+    # 从S3下载数据
     s3 = boto3.client('s3')
     s3.download_file(
         event['bucket'], 
@@ -212,12 +212,12 @@ def lambda_handler(event, context):
         '/tmp/data.csv'
     )
     
-    # Run lawkit analysis
+    # 运行lawkit分析
     result = subprocess.run([
         'lawkit', 'benf', '/tmp/data.csv', '--format', 'json'
     ], capture_output=True, text=True)
     
-    # Upload results back to S3
+    # 将结果上传回S3
     analysis = json.loads(result.stdout)
     s3.put_object(
         Bucket=event['output_bucket'],
@@ -239,13 +239,13 @@ def analyze_data(request):
     import subprocess
     import json
     
-    # Download from Cloud Storage
+    # 从Cloud Storage下载
     client = storage.Client()
     bucket = client.bucket('data-bucket')
     blob = bucket.blob('data.csv')
     blob.download_to_filename('/tmp/data.csv')
     
-    # Run analysis
+    # 运行分析
     result = subprocess.run([
         'lawkit', 'analyze', '/tmp/data.csv', 
         '--laws', 'all', '--format', 'json'
@@ -254,18 +254,18 @@ def analyze_data(request):
     return json.loads(result.stdout)
 ```
 
-## Monitoring and Alerting
+## 监控和警报
 
-### Prometheus Metrics
+### Prometheus 指标
 
 ```python
 from prometheus_client import Gauge, Counter
 import subprocess
 import json
 
-# Define metrics
-risk_level_gauge = Gauge('lawkit_risk_level', 'Risk level score')
-analysis_counter = Counter('lawkit_analyses_total', 'Total analyses performed')
+# 定义指标
+risk_level_gauge = Gauge('lawkit_risk_level', '风险级别评分')
+analysis_counter = Counter('lawkit_analyses_total', '执行的分析总数')
 
 def update_metrics(data_file):
     result = subprocess.run([
@@ -277,20 +277,20 @@ def update_metrics(data_file):
     analysis_counter.inc()
 ```
 
-### Grafana Dashboard
+### Grafana 仪表板
 
 ```json
 {
   "dashboard": {
-    "title": "Lawkit Data Quality Dashboard",
+    "title": "lawkit数据质量仪表板",
     "panels": [
       {
-        "title": "Fraud Likelihood",
+        "title": "欺诈可能性",
         "type": "stat",
         "targets": [
           {
             "expr": "lawkit_risk_level",
-            "legendFormat": "Fraud Score"
+            "legendFormat": "欺诈评分"
           }
         ]
       }
@@ -299,12 +299,12 @@ def update_metrics(data_file):
 }
 ```
 
-## Custom Integrations
+## 自定义集成
 
-### Build Your Own
+### 构建您自己的集成
 
 ```rust
-// Rust integration using lawkit as subprocess
+// 使用lawkit作为子进程的Rust集成
 use std::process::Command;
 use serde_json::Value;
 
@@ -321,4 +321,4 @@ fn custom_analysis(file_path: &str) -> Result<Value, Box<dyn std::error::Error>>
 }
 ```
 
-These integration examples help you incorporate lawkit into your existing workflows and tools.
+这些集成示例帮助您将lawkit集成到现有的工作流程和工具中。
