@@ -1,130 +1,130 @@
-# Getting Started
+# 入门指南
 
-Learn the basic usage of lawkit. This guide explains the main features using actual sample data.
+学习lawkit的基本使用方法。本指南使用实际样本数据解释主要功能。
 
-## Basic Usage
+## 基本用法
 
-### 1. Benford's Law Analysis
+### 1. 本福德定律分析
 
-Used for fraud detection in accounting data and natural data:
+用于会计数据和自然数据的欺诈检测：
 
 ```bash
-# Basic analysis
+# 基本分析
 lawkit benf data.csv
 
-# Detailed output
+# 详细输出
 lawkit benf data.csv --verbose
 
-# Output in JSON format
+# 以JSON格式输出
 lawkit benf data.csv --format json
 
-# Analyze with specified threshold
+# 使用指定阈值分析
 lawkit benf data.csv --threshold high
 
-# Audit-level analysis (99% confidence)
+# 审计级分析（99%置信度）
 lawkit benf audit_data.csv --confidence 0.99 --verbose
 
-# Optimization for large datasets
+# 大型数据集的优化
 lawkit benf large_data.csv --sample-size 10000 --optimize
 
-# Filter small values (noise removal)
+# 过滤小值（器噪声去除）
 lawkit benf financial_data.csv --min-value 100
 ```
 
-### 2. Pareto Analysis (80/20 Rule)
+### 2. 帕累托分析（80/20法则）
 
-Used for sales analysis and inventory management:
+用于销售分析和库存管理：
 
 ```bash
-# Basic Pareto analysis
+# 基本帕累托分析
 lawkit pareto sales.csv
 
-# Specify threshold (90/10 analysis instead of 80/20)
+# 指定阈值（用 90/10 分析代替 80/20）
 lawkit pareto sales.csv --concentration 0.9
 
-# Also calculate Gini coefficient
+# 同时计算基尼系数
 lawkit pareto sales.csv --gini-coefficient
 ```
 
-### 3. Zipf's Law Analysis
+### 3. 齐普夫定律分析
 
-Word frequency analysis for text data:
+文本数据的词频分析：
 
 ```bash
-# Analyze text files
+# 分析文本文件
 lawkit zipf document.txt
 
-# Japanese text analysis
+# 日语文本分析
 lawkit zipf japanese_text.txt
 
-# Specify minimum occurrence count
+# 指定最少出现次数
 lawkit zipf text.txt --min-count 5
 ```
 
-### 4. Normal Distribution Analysis
+### 4. 正态分布分析
 
-Quality control and outlier detection:
+质量控制和异常值检测：
 
 ```bash
-# Normality testing
+# 正态性检验
 lawkit normal measurements.csv
 
-# Detailed normality testing
+# 详细正态性检验
 lawkit normal quality_data.csv --verbose
 
-# Also detect outliers
+# 同时检测异常值
 lawkit normal process_data.csv --outliers
 ```
 
-### 5. Poisson Distribution Analysis
+### 5. 泊松分布分析
 
-Event occurrence prediction and rare event analysis:
+事件发生预测和稀有事件分析：
 
 ```bash
-# Basic Poisson analysis
+# 基本泊松分析
 lawkit poisson events.csv
 
-# Detailed Poisson analysis
+# 详细泊松分析
 lawkit poisson events.csv --verbose
 
-# High confidence analysis
+# 高置信度分析
 lawkit poisson critical_events.csv --confidence 0.99 --verbose
 ```
 
-### 6. Multi-Law Comparison
+### 6. 多定律比较
 
-Comprehensive analysis by applying multiple statistical laws simultaneously:
+通过同时应用多种统计定律进行综合分析：
 
 ```bash
-# Multi-law analysis and recommendations
+# 多定律分析和建议
 lawkit analyze data.csv --laws benf,pareto,normal
 
-# Data consistency check
+# 数据一致性检查
 lawkit validate data.csv --laws all
 
-# Detailed diagnostic report
+# 详细诊断报告
 lawkit diagnose data.csv --focus conflict
 ```
 
-## Hands-on Practice with Sample Data
+## 使用样本数据的实际操作
 
-### Fraud Detection in Accounting Data
+### 会计数据中的欺诈检测
 
 ```bash
-# Create sample accounting data
+# 创建样本会计数据
 echo "TransactionID,Amount,Date
 1,1234,2024-01-01
 2,2345,2024-01-02
 3,3456,2024-01-03" > accounting.csv
 
-# Analyze with Benford's Law
+# 使用本福德定律分析
 lawkit benf accounting.csv
 ```
 
-### Pareto Analysis of Sales Data
+### 销售数据的帕累托分析
 
 ```bash
-# Create sample sales data
+# 创建样本销售数据
 echo "Product,Sales
 Product A,80000
 Product B,12000
@@ -132,102 +132,102 @@ Product C,5000
 Product D,2000
 Product E,1000" > sales.csv
 
-# Execute Pareto analysis
+# 执行帕累托分析
 lawkit pareto sales.csv --threshold 0.8
 ```
 
-## Output Formats
+## 输出格式
 
-lawkit supports multiple output formats:
+lawkit 支持多种输出格式：
 
 ```bash
-# Text format (default)
+# 文本格式（默认）
 lawkit benf data.csv
 
-# JSON format
+# JSON格式
 lawkit benf data.csv --format json
 
-# CSV format
+# CSV格式
 lawkit benf data.csv --format csv
 
-# YAML format
+# YAML格式
 lawkit benf data.csv --format yaml
 
-# XML format
+# XML格式
 lawkit benf data.csv --format xml
 ```
 
-## Multi-language Support
+## 多语言支持
 
-lawkit supports the following languages:
+lawkit 支持以下语言：
 
 ```bash
-# English output (default unified)
+# 英语输出（默认统一）
 lawkit benf data.csv
 
-# Japanese numbers are automatically recognized
+# 日语数字被自动识别
 echo "１２３４５６ ７８９０" | lawkit benf
 
-# Chinese numbers are also automatically recognized
+# 中文数字也被自动识别
 echo "一千二百三十四" | lawkit benf
 
-# Traditional Chinese (old style) financial numbers are also supported
+# 繁体中文（古式）金融数字也被支持
 echo "壹萬貳仟參佰肆拾伍" | lawkit benf
 
-# Japanese kanji numerals are automatically recognized
+# 日语汉字数字被自动识别
 echo "五万六千七百八十九" | lawkit benf
 ```
 
-## Advanced Features
+## 高级功能
 
-### Filtering
+### 过滤
 
 ```bash
-# Analyze only data within specific range
+# 仅分析特定范围内的数据
 lawkit benf data.csv --filter ">=1000"
 
-# Threshold setting
+# 阈值设置
 lawkit pareto sales.csv --concentration 0.95
 ```
 
-### Performance Tuning
+### 性能调优
 
 ```bash
-# For large files, use sampling
+# 对于大文件，使用采样
 lawkit benf large_data.csv --optimize
 
-# Specify number of threads for parallel processing
+# 指定并行处理的线程数
 lawkit analyze data.csv --recommend
 ```
 
-## Common Workflows
+## 常见工作流
 
-### 1. Data Quality Check
+### 1. 数据质量检查
 ```bash
-# Comprehensive data quality assessment
+# 全面的数据质量评估
 lawkit validate financial_data.csv --laws benf,normal
 ```
 
-### 2. Fraud Detection Pipeline
+### 2. 欺诈检测管道
 ```bash
-# Initial screening with Benford's Law
+# 使用本福德定律进行初步筛查
 lawkit benf transactions.csv --format json > results.json
 
-# Detailed analysis of anomalies
+# 对异常情况进行详细分析
 lawkit normal suspicious_data.csv --verbose
 ```
 
-### 3. Business Analysis
+### 3. 商业分析
 ```bash
-# Pareto analysis of sales
+# 销售的帕累托分析
 lawkit pareto monthly_sales.csv --gini-coefficient
 
-# Customer analysis
+# 客户分析
 lawkit zipf customer_feedback.txt
 ```
 
-## Next Steps
+## 下一步
 
-- [Examples](examples.md) - Real-world use cases
-- [CLI Reference](../reference/cli-reference.md) - All command details
-- [Architecture](../guides/architecture.md) - System design
+- [Examples](examples.md) - 实际用例
+- [CLI Reference](../reference/cli-reference.md) - 所有命令详细信息
+- [Architecture](../guides/architecture.md) - 系统设计

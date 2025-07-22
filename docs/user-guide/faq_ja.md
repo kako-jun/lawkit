@@ -1,221 +1,221 @@
-# Frequently Asked Questions
+# よくある質問
 
-## General Questions
+## 一般的な質問
 
-### What is lawkit?
+### lawkitとは何ですか？
 
-lawkit is a comprehensive statistical analysis toolkit that implements multiple statistical laws including Benford Law, Pareto Principle, Zipf Law, Normal Distribution, and Poisson Distribution. It's designed for fraud detection, data quality assessment, business analytics, and scientific research.
+lawkitは、ベンフォードの法則、パレートの原理、ジップの法則、正規分布、ポアソン分布を含む複数の統計法則を実装した包括的な統計分析ツールキットです。不正検出、データ品質評価、ビジネス分析、科学研究に設計されています。
 
-### What makes lawkit different from other statistical tools?
+### 他の統計ツールと何が違うのですか？
 
-- **Multi-law Integration**: Compare multiple statistical laws in a single analysis
-- **International Support**: Handles numbers in multiple languages and formats
-- **Built-in Risk Assessment**: Automatic anomaly detection and risk evaluation
-- **Comprehensive Input Support**: Reads from CSV, Excel, PDF, Word, JSON, and more
-- **Professional Output**: Multiple output formats including JSON, CSV, YAML, XML
+- **多法則統合**: 単一の分析で複数の統計法則を比較
+- **国際対応**: 複数の言語と形式の数値を処理
+- **組み込みリスク評価**: 自動異常検出とリスク評価
+- **包括的入力対応**: CSV、Excel、PDF、Word、JSONなどから読み取り
+- **プロフェッショナル出力**: JSON、CSV、YAML、XMLを含む複数の出力形式
 
-### Is lawkit free to use?
+### lawkitは無料で使えますか？
 
-Yes, lawkit is open-source software released under the MIT License. You can use it freely for both personal and commercial purposes.
+はい、lawkitはMITライセンスの下でリリースされたオープンソースソフトウェアです。個人および商用目的で自由に使用できます。
 
-## Installation and Setup
+## インストールとセットアップ
 
-### How do I install lawkit?
+### lawkitのインストール方法は？
 
-**Option 1: Download Binary**
-Download pre-built binaries from [GitHub Releases](https://github.com/kako-jun/lawkit/releases).
+**オプション 1: バイナリのダウンロード**
+[GitHub Releases](https://github.com/kako-jun/lawkit/releases)からビルド済みバイナリをダウンロードします。
 
-**Option 2: Build from Source**
+**オプション 2: ソースからビルド**
 ```bash
 git clone https://github.com/kako-jun/lawkit.git
 cd lawkit
 cargo build --release
 ```
 
-**Option 3: As a Library**
-Add to your `Cargo.toml`:
+**オプション 3: ライブラリとして**
+`Cargo.toml`に追加:
 ```toml
 [dependencies]
 lawkit-core = "2.0"
 ```
 
-### What are the system requirements?
+### システム要件は？
 
-- **Operating Systems**: Linux, macOS, Windows
-- **Memory**: Minimum 512MB RAM (more for large datasets)
-- **Disk Space**: 50MB for installation
-- **Dependencies**: None (statically linked binaries)
+- **オペレーティングシステム**: Linux、macOS、Windows
+- **メモリ**: 最低512MB RAM（大きなデータセットにはさらに必要）
+- **ディスク容量**: インストールに50MB
+- **依存関係**: なし（静的リンクバイナリ）
 
-### Why am I getting "command not found" error?
+### 「command not found」エラーが出るのはなぜですか？
 
-Ensure the lawkit binary is in your system's PATH. After downloading:
+lawkitバイナリがシステムのPATHにあることを確認してください。ダウンロード後:
 
 ```bash
-# Make executable (Unix/Linux/macOS)
+# 実行可能にする (Unix/Linux/macOS)
 chmod +x lawkit
 
-# Move to PATH (example)
+# PATHに移動（例）
 sudo mv lawkit /usr/local/bin/
 
-# Or add to PATH in your shell profile
+# またはシェルプロファイルにPATHを追加
 export PATH="/path/to/lawkit:$PATH"
 ```
 
-## Usage Questions
+## 使用に関する質問
 
-### What file formats does lawkit support?
+### lawkitはどのファイル形式をサポートしますか？
 
-**Input Formats:**
-- Spreadsheets: CSV, TSV, Excel (.xlsx, .xls), OpenDocument (.ods)
-- Documents: PDF, Word (.docx), PowerPoint (.pptx), plain text
-- Data: JSON, YAML, TOML, XML
-- Web: HTML (table extraction)
+**入力形式:**
+- スプレッドシート: CSV、TSV、Excel (.xlsx, .xls)、OpenDocument (.ods)
+- 文書: PDF、Word (.docx)、PowerPoint (.pptx)、プレーンテキスト
+- データ: JSON、YAML、TOML、XML
+- Web: HTML（テーブル抽出）
 
-**Output Formats:**
-- text, json, csv, yaml, toml, xml
+**出力形式:**
+- text、json、csv、yaml、toml、xml
 
-### How do I analyze data from a specific column in a CSV file?
+### CSVファイルの特定の列のデータを分析するには？
 
-lawkit automatically extracts numerical data from all columns. For specific columns, pre-process your data:
+lawkitは自動的にすべての列から数値データを抽出します。特定の列に対しては、データを事前処理してください:
 
 ```bash
-# Extract specific column using standard tools
+# 標準ツールを使って特定の列を抽出
 cut -d',' -f2 data.csv | lawkit benf
 
-# Or use awk for more complex extraction
+# より複雑な抽出にはawkを使用
 awk -F',' '{print $2}' data.csv | lawkit pareto
 ```
 
-### How many data points do I need for reliable analysis?
+### 信頼できる分析にはどの程度のデータポイントが必要ですか？
 
-Minimum requirements vary by statistical law:
-- **Benford Law**: 5+ points (recommended: 100+)
-- **Pareto Analysis**: 5+ points (recommended: 20+)
-- **Zipf Law**: 5+ points (recommended: 50+)
-- **Normal Distribution**: 8+ points (recommended: 30+)
-- **Poisson Distribution**: 10+ points (recommended: 50+)
+最小要件は統計法則で異なります:
+- **ベンフォードの法則**: 5以上（推奨: 100以上）
+- **パレート分析**: 5以上（推奨: 20以上）
+- **ジップの法則**: 5以上（推奨: 50以上）
+- **正規分布**: 8以上（推奨: 30以上）
+- **ポアソン分布**: 10以上（推奨: 50以上）
 
-### What does the risk assessment mean?
+### リスク評価は何を意味しますか？
 
-lawkit categorizes results into risk levels:
-- **Low**: Data follows expected statistical patterns
-- **Medium**: Some deviation, worth investigating
-- **High**: Significant deviation, likely issues
-- **Critical**: Extreme deviation, immediate attention needed
+lawkitは結果をリスクレベルで分類します:
+- **Low**: データは期待される統計パターンに従っている
+- **Medium**: いくらかの偏差、調査の価値あり
+- **High**: 有意な偏差、問題の可能性あり
+- **Critical**: 極端な偏差、早急な注意が必要
 
-Customize thresholds with:
+闾値のカスタマイズ:
 ```bash
 lawkit benf --threshold high data.csv
 ```
 
-## Statistical Analysis Questions
+## 統計分析に関する質問
 
-### When should I use Benford Law?
+### ベンフォードの法則はいつ使うべきですか？
 
-Benford Law is ideal for:
-- **Financial fraud detection**: Transaction amounts, accounting data
-- **Data quality assessment**: Naturally occurring numerical data
-- **Scientific validation**: Experimental measurements
-- **Election auditing**: Vote counts and demographics
+ベンフォードの法則は以下に適しています:
+- **金融不正検出**: 取引金額、会計データ
+- **データ品質評価**: 自然に発生する数値データ
+- **科学的検証**: 実験測定値
+- **選挙監査**: 投票数と人口統計
 
-**Not suitable for:**
-- Assigned numbers (phone numbers, IDs)
-- Constrained ranges (percentages, ratings)
-- Uniform distributions
+**不適合:**
+- 割り振り番号（電話番号、ID）
+- 制約された範囲（パーセンテージ、評価）
+- 一様分布
 
-### What's the difference between Pareto analysis and Zipf's law?
+### パレート分析とジップの法則の違いは何ですか？
 
-**Pareto Analysis (80/20 Rule):**
-- Focuses on business applications
-- Calculates Gini coefficient for inequality
-- Provides business insights and recommendations
-- Best for: sales analysis, customer segmentation, resource allocation
+**パレート分析（80/20の原則）:**
+- ビジネスアプリケーションに焦点
+- 不平等のためのジニ係数を計算
+- ビジネス洞察と推奨事項を提供
+- 最適用途: 売上分析、顧客セグメンテーション、リソース配分
 
-**Zipf Law (Power-law Distribution):**
-- Focuses on frequency distributions
-- Analyzes rank-frequency relationships
-- Supports numerical data analysis
-- Best for: linguistic analysis, city populations, website traffic
+**ジップの法則（べき乗分布）:**
+- 頻度分布に焦点
+- 順位と頻度の関係を分析
+- 数値データ分析をサポート
+- 最適用途: 言語分析、都市人口、ウェブサイトトラフィック
 
-### How accurate is the normal distribution testing?
+### 正規分布テストの精度はどの程度ですか？
 
-lawkit implements normality testing with statistical validation. The analysis provides:
-- Statistical measures for normality assessment
-- Confidence intervals and significance testing
-- Outlier detection capabilities
-- Quality control metrics
+lawkitは統計検証を伴う正規性テストを実装しています。分析は以下を提供します:
+- 正規性評価のための統計指標
+- 信頼区間と有意性テスト
+- 外れ値検出機能
+- 品質管理指標
 
-### What does Poisson distribution analysis tell me?
+### ポアソン分布分析は何を教えてくれますか？
 
-Poisson analysis is useful for:
-- **Event counting**: Defects per unit, calls per hour
-- **Rare events**: Accidents, equipment failures
-- **Quality control**: Process monitoring
-- **Capacity planning**: Server load, customer arrivals
+ポアソン分析は以下に有用です:
+- **イベントカウント**: 単位あたりの欠陥数、1時間あたりのコール数
+- **稀なイベント**: 事故、機器故障
+- **品質管理**: プロセス監視
+- **容量計画**: サーバー負荷、顧客の到着
 
-The analysis provides:
-- Lambda parameter (average rate)
-- Statistical validation
-- Event probability assessment
-- Quality metrics
+分析は以下を提供します:
+- λパラメータ（平均率）
+- 統計検証
+- イベント確率評価
+- 品質指標
 
-## International and Language Support
+## 国際化と言語サポート
 
-### How does international number support work?
+### 国際数字サポートはどのように機能しますか？
 
-lawkit automatically recognizes various number formats:
+lawkitはさまざまな数値形式を自動認識します:
 
 ```bash
-# These are all recognized as 1234.56:
-echo "1,234.56" | lawkit benf    # English
-echo "１，２３４．５６" | lawkit benf  # Japanese numbers (auto-detected)
-echo "१,२३४.५६" | lawkit benf    # Hindi numbers (auto-detected)
+# これらはすべて1234.56として認識されます:
+echo "1,234.56" | lawkit benf    # 英語
+echo "１，２３４．５６" | lawkit benf  # 日本語数字（自動検出）
+echo "१,२३४.५६" | lawkit benf    # ヒンディー語数字（自動検出）
 ```
 
-### Can I analyze text in non-English languages?
+### 英語以外の言語のテキストを分析できますか？
 
-Yes! lawkit supports Unicode text analysis with automatic language detection for international number formats in input data.
+はい！lawkitは入力データ内の国際数字形式の自動言語検出を備えたUnicodeテキスト分析をサポートしています。
 
-### What languages does lawkit support?
+### lawkitはどの言語をサポートしていますか？
 
-lawkit provides English output unified across all analysis, with automatic recognition of international number formats:
+lawkitは国際数字形式の自動認識により、すべての分析で統一された英語出力を提供します:
 ```bash
-# English output (unified)
+# 英語出力（統一）
 lawkit benf data.csv
 
-# International numbers automatically recognized
-echo "１２３４５６" | lawkit benf      # Japanese numbers
-echo "一千二百三十四" | lawkit benf    # Chinese numbers
-echo "१२३४५६" | lawkit benf        # Hindi numbers
-echo "١٢٣٤٥٦" | lawkit benf        # Arabic numbers
+# 国際数字は自動的に認識されます
+echo "１２３４５６" | lawkit benf      # 日本語数字
+echo "一千二百三十四" | lawkit benf    # 中国語数字
+echo "१२३४५६" | lawkit benf        # ヒンディー語数字
+echo "١٢٣٤٥٦" | lawkit benf        # アラビア語数字
 ```
 
-## Integration and Advanced Features
+## 統合と高度な機能
 
-### How does multi-law comparison work?
+### 多法則比較はどのように機能しますか？
 
-The `analyze` command analyzes data with multiple statistical laws:
+`analyze`コマンドは複数の統計法則でデータを分析します:
 
 ```bash
-# Analyze with specific laws
+# 特定の法則で分析
 lawkit analyze --laws benf,pareto data.csv
 
-# Analyze with all applicable laws
+# 適用可能なすべての法則で分析
 lawkit analyze --laws all data.csv
 
-# Get recommendations
+# 推奨事項を取得
 lawkit analyze --laws all --recommend data.csv
 ```
 
-Features include:
-- **Contradiction Detection**: Identifies conflicting results
-- **Confidence Scoring**: Rates reliability of each analysis
-- **Recommendations**: Suggests most appropriate law
-- **Meta-Analysis**: Combines insights from multiple perspectives
+機能には以下が含まれます:
+- **矛盾検出**: 相反する結果を特定
+- **信頼度スコアリング**: 各分析の信頼性を評価
+- **推奨事項**: 最も適切な法則を提案
+- **メタ分析**: 複数の觖点からの洞察を結合
 
-### Can I use lawkit in my own software?
+### 自分のソフトウェアでlawkitを使用できますか？
 
-Yes! Use the `lawkit-core` library:
+はい！`lawkit-core`ライブラリを使用してください:
 
 ```rust
 use lawkit_core::laws::benford::BenfordResult;
@@ -226,187 +226,187 @@ fn analyze_data(numbers: &[f64]) {
 }
 ```
 
-### How do I integrate lawkit with CI/CD pipelines?
+### lawkitをCI/CDパイプラインと統合するには？
 
-See our [Integration Guide](../guides/integrations.md) for examples with:
+以下の例は[統合ガイド](../guides/integrations.md)を参照してください:
 - GitHub Actions
 - GitLab CI
 - Jenkins
-- Docker containers
+- Dockerコンテナ
 
-## Performance and Troubleshooting
+## パフォーマンスとトラブルシューティング
 
-### lawkit is slow on large datasets. How can I improve performance?
+### 大きなデータセットでlawkitが遅いです。パフォーマンスを改善するには？
 
-**Optimization strategies:**
+**最適化戦略:**
 ```bash
-# Use quiet mode for faster processing
+# 高速処理のために静音モードを使用
 lawkit benf --quiet large_data.csv
 
-# Use appropriate thresholds
+# 適切な闾値を使用
 lawkit benf --threshold medium large_data.csv
 
-# Choose efficient output formats
-lawkit benf --format json large_data.csv  # Faster than text
+# 効率的な出力形式を選択
+lawkit benf --format json large_data.csv  # テキストより高速
 ```
 
-### I'm getting "insufficient data" errors. What should I do?
+### 「insufficient data」エラーが出ます。どうすべきでしょうか？
 
-This error occurs when your dataset doesn't meet minimum requirements:
+このエラーはデータセットが最小要件を満たさない場合に発生します:
 
 ```bash
-# Check your data size
+# データサイズを確認
 wc -l data.csv
 
-# Use appropriate law for your data size
-lawkit pareto small_data.csv  # Lower requirements than normal
+# データサイズに適した法則を使用
+lawkit pareto small_data.csv  # normalよりも低い要件
 ```
 
-### The analysis results seem incorrect. What could be wrong?
+### 分析結果が不正確に思えます。何が原因でしょうか？
 
-**Common issues:**
-1. **Wrong statistical law**: Not all data fits all laws
-2. **Data preprocessing needed**: Remove headers, filter outliers
-3. **Insufficient data**: Too few data points for reliable analysis
-4. **Wrong format**: Ensure numerical data is properly formatted
+**よくある問題:**
+1. **間違った統計法則**: すべてのデータがすべての法則に適合するわけではない
+2. **データの前処理が必要**: ヘッダーの除去、外れ値のフィルタリング
+3. **データ不足**: 信頼できる分析にはデータポイントが少なすぎる
+4. **間違った形式**: 数値データが適切にフォーマットされていることを確認
 
-**Debugging steps:**
+**デバッグ手順:**
 ```bash
-# Verbose output for more details
+# 詳細な情報のための詳細出力
 lawkit benf --verbose data.csv
 
-# Check data with different laws
+# 異なる法則でデータを確認
 lawkit analyze --laws all data.csv
 
-# Validate data format
+# データ形式を検証
 head -10 data.csv
 ```
 
-### Can I analyze data in real-time?
+### リアルタイムでデータを分析できますか？
 
-Yes, lawkit supports piped input:
+はい、lawkitはパイプ入力をサポートしています:
 
 ```bash
-# Pipe data from other commands
+# 他のコマンドからデータをパイプ
 tail -f logfile.txt | grep "amount:" | lawkit benf
 
-# Process continuous data
+# 継続的データを処理
 while true; do
     get_latest_data | lawkit benf --quiet
     sleep 60
 done
 ```
 
-## Advanced Usage
+## 高度な使用法
 
-### How do I generate test data?
+### テストデータを生成するには？
 
 ```bash
-# Generate sample data for testing
+# テスト用のサンプルデータを生成
 lawkit generate --samples 1000 | lawkit benf
 
-# Generate and save to file
+# 生成してファイルに保存
 lawkit generate --samples 500 > test_data.csv
 ```
 
-### How do I validate data quality?
+### データ品質を検証するには？
 
 ```bash
-# Validate using multiple laws
+# 複数の法則を使用して検証
 lawkit validate --laws all data.csv
 
-# Focus on specific area
+# 特定の領域に焦点を当てる
 lawkit validate --laws benf,pareto --focus fraud-detection data.csv
 ```
 
-### How do I diagnose data problems?
+### データの問題を診断するには？
 
 ```bash
-# Diagnose data issues
+# データの問題を診断
 lawkit diagnose --laws all data.csv
 
-# Specify analysis purpose
+# 分析目的を指定
 lawkit diagnose --laws all --purpose quality-assessment data.csv
 ```
 
-## Error Messages
+## エラーメッセージ
 
 ### "Failed to parse input data"
 
-This usually means:
-- Non-numerical data in input
-- Incorrect file format
-- Encoding issues
+このエラーは通常以下を意味します:
+- 入力に非数値データが含まれている
+- ファイル形式が不正しい
+- エンコーディングの問題
 
-**Solutions:**
+**解決策:**
 ```bash
-# Check file encoding
+# ファイルエンコーディングを確認
 file data.csv
 
-# Validate CSV format
+# CSV形式を検証
 csvlint data.csv
 
-# Extract only numerical columns
+# 数値列のみを抽出
 cut -d',' -f2 data.csv | lawkit benf
 ```
 
 ### "No statistical law applicable"
 
-This occurs when:
-- Dataset is too small
-- Data doesn't fit any implemented law
-- All laws failed their applicability tests
+このエラーは以下の場合に発生します:
+- データセットが小さすぎる
+- データが実装されたいずれの法則にも適合しない
+- すべての法則が適用可能性テストに失敗した
 
-**Solutions:**
+**解決策:**
 ```bash
-# Check data characteristics
+# データ特性を確認
 lawkit analyze --laws all --verbose data.csv
 
-# Try with different thresholds
+# 異なる闾値で試す
 lawkit benf --threshold low data.csv
 ```
 
 ### "Permission denied" or "Access denied"
 
-File permission issues:
+ファイルアクセス権の問題:
 ```bash
-# Check file permissions
+# ファイルアクセス権を確認
 ls -la data.csv
 
-# Make file readable
+# ファイルを読み取り可能にする
 chmod 644 data.csv
 
-# Check if file exists
+# ファイルが存在するか確認
 test -f data.csv && echo "File exists" || echo "File not found"
 ```
 
-## Getting Help
+## ヘルプの取得
 
-### Where can I get more help?
+### さらにサポートを受けるには？
 
-- **Documentation**: [docs/](index.md)
-- **Issues**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
-- **Self-test**: Run `lawkit selftest` to verify installation
+- **ドキュメント**: [docs/](index.md)
+- **問題報告**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
+- **ディスカッション**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
+- **セルフテスト**: `lawkit selftest`を実行してインストールを検証
 
-### How do I report a bug?
+### バグを報告するには？
 
-1. Check existing issues on GitHub
-2. Provide minimal reproduction case
-3. Include system information and lawkit version
-4. Run `lawkit selftest --verbose` and include output
+1. GitHubの既存の問題を確認
+2. 最小限の再現ケースを提供
+3. システム情報とlawkitバージョンを含める
+4. `lawkit selftest --verbose`を実行して出力を含める
 
-### How do I request a new feature?
+### 新機能をリクエストするには？
 
-1. Open a GitHub Discussion to discuss the idea
-2. Explain the use case and expected behavior
-3. Consider contributing the implementation
-4. Check our [Contributing Guide](../CONTRIBUTING.md)
+1. GitHub Discussionでアイデアを議論
+2. ユースケースと期待される動作を説明
+3. 実装への貢献を検討
+4. [貢献ガイド](../CONTRIBUTING.md)を確認
 
-### Is there a community or forum?
+### コミュニティやフォーラムはありますか？
 
-- **GitHub Discussions**: General questions and ideas
-- **GitHub Issues**: Bug reports and feature requests
-- **Email**: Direct contact for sensitive issues
+- **GitHub Discussions**: 一般的な質問とアイデア
+- **GitHub Issues**: バグ報告と機能リクエスト
+- **Email**: 機密な問題に関する直接連絡
 
-We welcome contributions and feedback from the community!
+コミュニティからの貢献とフィードバックを歓迎します！

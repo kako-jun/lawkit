@@ -1,145 +1,145 @@
-# Installation Guide
+# インストールガイド
 
-This guide explains how to install lawkit on your system.
+このガイドでは、您のシステムにlawkitをインストールする方法を説明します。
 
-## System Requirements
+## システム要件
 
-- **OS**: Windows, macOS, Linux
-- **Rust**: 1.70.0 or higher (when installing from Cargo)
-- **Memory**: Minimum 512MB (2GB+ recommended for large file processing)
+- **OS**: Windows、macOS、Linux
+- **Rust**: 1.70.0以上（Cargoからインストールする場合）
+- **メモリ**: 最低512MB（大きなファイル処理には2GB+を推奨）
 
-## Installation Methods
+## インストール方法
 
-### 1. Install from Cargo (Recommended)
+### 1. Cargoからインストール（推奨）
 
 ```bash
-# Install latest version
+# 最新バージョンをインストール
 cargo install lawkit
 
-# Install specific version
+# 特定バージョンをインストール
 cargo install lawkit --version 2.0.0
 ```
 
-### 2. Build from Source
+### 2. ソースからビルド
 
 ```bash
-# Clone repository
+# リポジトリをクローン
 git clone https://github.com/user/lawkit.git
 cd lawkit
 
-# Build and install
+# ビルドとインストール
 cargo build --release
 cargo install --path .
 ```
 
-### 3. Binary Download
+### 3. バイナリダウンロード
 
-Download the binary for your platform from [GitHub Releases](https://github.com/user/lawkit/releases).
+您のプラットフォーム用のバイナリを[GitHub Releases](https://github.com/user/lawkit/releases)からダウンロードしてください。
 
 #### Windows
 ```powershell
-# Run in PowerShell
+# PowerShellで実行
 Invoke-WebRequest -Uri "https://github.com/user/lawkit/releases/latest/download/lawkit-windows.zip" -OutFile "lawkit.zip"
 Expand-Archive lawkit.zip
 ```
 
 #### macOS
 ```bash
-# Install with Homebrew (planned)
+# Homebrewでインストール（予定）
 brew install lawkit
 
-# Or manual download
+# または手動ダウンロード
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-macos.tar.gz | tar xz
 ```
 
 #### Linux
 ```bash
-# Manual download
+# 手動ダウンロード
 curl -L https://github.com/user/lawkit/releases/latest/download/lawkit-linux.tar.gz | tar xz
 sudo mv lawkit /usr/local/bin/
 ```
 
-## Verify Installation
+## インストールの確認
 
-Confirm that installation was successful:
+インストールが成功したことを確認してください:
 
 ```bash
-# Check version
+# バージョンを確認
 lawkit --version
 
-# Display help
+# ヘルプを表示
 lawkit --help
 
-# Show available statistical laws
+# 利用可能な統計法則を表示
 lawkit list
 ```
 
-## Migration from Legacy benf
+## 旧バージョンbenfからの移行
 
-If you're using the existing `benf` tool:
+既存の`benf`ツールを使用している場合:
 
 ```bash
-# Legacy usage
+# 旧バージョンの使用方法
 benf data.csv
 
-# Equivalent new usage
+# 新バージョンの同等の使用方法
 lawkit benf data.csv
 ```
 
-100% compatibility is maintained, so you can use existing scripts as-is.
+100%の互換性が維持されているため、既存のスクリプトをそのまま使用できます。
 
-## Updates
+## アップデート
 
-### If installed via Cargo
+### Cargoでインストールした場合
 ```bash
 cargo install lawkit --force
 ```
 
-### If installed via binary
-Download and replace with the new binary.
+### バイナリでインストールした場合
+新しいバイナリをダウンロードして置き換えてください。
 
-## Uninstallation
+## アンインストール
 
-### If installed via Cargo
+### Cargoでインストールした場合
 ```bash
 cargo uninstall lawkit
 ```
 
-### If installed manually
+### 手動でインストールした場合
 ```bash
-# Check binary location
+# バイナリの場所を確認
 which lawkit
 
-# Remove file
+# ファイルを削除
 sudo rm /usr/local/bin/lawkit
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Compilation Errors
-May be due to outdated Rust version:
+### コンパイルエラー
+Rustのバージョンが古いことが原因の可能性があります:
 ```bash
 rustup update stable
 ```
 
-### Path Configuration
-If binary is not in PATH:
+### PATHの設定
+バイナリがPATHにない場合:
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
+# ~/.bashrc または ~/.zshrc に追加
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Permission Errors
-If permission errors occur on Linux:
+### アクセス権エラー
+Linuxでアクセス権エラーが発生した場合:
 ```bash
 sudo chown $USER:$USER ~/.cargo/bin/lawkit
 chmod +x ~/.cargo/bin/lawkit
 ```
 
-## Next Steps
+## 次のステップ
 
-Once installation is complete, learn basic usage in [Getting Started](getting-started.md).
+インストールが完了したら、[はじめに](getting-started.md)で基本的な使い方を学んでください。
 
-- [Getting Started](getting-started.md) - Basic usage
-- [Examples](examples.md) - Real-world examples
-- [CLI Reference](../reference/cli-reference.md) - Command details
+- [はじめに](getting-started.md) - 基本的な使い方
+- [例](examples.md) - 実世界の例
+- [CLIリファレンス](../reference/cli-reference.md) - コマンド詳細
