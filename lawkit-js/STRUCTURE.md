@@ -5,7 +5,7 @@ This document outlines the complete structure of the lawkit-js NPM package.
 ## 📁 Directory Structure
 
 ```
-lawkit-npm/
+lawkit-js/
 ├── package.json                 # NPM package configuration
 ├── index.js                     # Main CLI entry point
 ├── lib.js                       # Programmatic API wrapper  

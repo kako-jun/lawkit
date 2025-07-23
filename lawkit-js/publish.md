@@ -96,7 +96,7 @@ To add new platforms:
 ## NPM Package Structure
 
 ```
-lawkit-npm/
+lawkit-js/
 ├── package.json          # NPM package configuration
 ├── index.js             # Main wrapper script
 ├── README.md            # Package documentation
