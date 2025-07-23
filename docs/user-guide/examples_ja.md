@@ -330,11 +330,11 @@ lawkit benf data.csv --verbose
 
 ## 設定例
 
-詳細なセットアップ手順と高度な設定オプションについては[Configuration Guide](configuration.md)を参照してください。
+詳細なセットアップ手順と高度な設定オプションについては[Configuration Guide](configuration_ja.md)を参照してください。
 
 ## 次のステップ
 
-- [Installation Guide](installation.md) - セットアップとインストール手順
-- [CLI Reference](../reference/cli-reference.md) - 完全なコマンドドキュメント
-- [Integration Guide](../guides/integrations.md) - CI/CD自動化
-- [Performance Guide](../guides/performance.md) - 最適化技法
+- [インストールガイド](installation_ja.md) - セットアップとインストール手順
+- [CLIリファレンス](../reference/cli-reference_ja.md) - 完全なコマンドドキュメント
+- [Integration Guide](../guides/integrations_ja.md) - CI/CD自動化
+- [Performance Guide](../guides/performance_ja.md) - 最適化技法

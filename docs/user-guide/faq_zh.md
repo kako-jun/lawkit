@@ -228,7 +228,7 @@ fn analyze_data(numbers: &[f64]) {
 
 ### 如何将lawkit与CI/CD管道集成？
 
-查看我们的[集成指南](../guides/integrations.md)，其中包含以下示例：
+查看我们的[集成指南](../guides/integrations_zh.md)，其中包含以下示例：
 - GitHub Actions
 - GitLab CI
 - Jenkins
@@ -384,7 +384,7 @@ test -f data.csv && echo "File exists" || echo "File not found"
 
 ### 在哪里可以获得更多帮助？
 
-- **文档**: [docs/](index.md)
+- **文档**: [docs/](../index_zh.md)
 - **问题报告**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
 - **讨论**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
 - **自测**: 运行`lawkit selftest`验证安装

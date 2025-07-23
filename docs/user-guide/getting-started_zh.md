@@ -228,6 +228,6 @@ lawkit zipf customer_feedback.txt
 
 ## 下一步
 
-- [Examples](examples.md) - 实际用例
-- [CLI Reference](../reference/cli-reference.md) - 所有命令详细信息
-- [Architecture](../guides/architecture.md) - 系统设计
+- [Examples](examples_zh.md) - 实际用例
+- [CLI参考](../reference/cli-reference_zh.md) - 所有命令详细信息
+- [Architecture](../guides/architecture_zh.md) - 系统设计

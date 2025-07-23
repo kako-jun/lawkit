@@ -228,6 +228,6 @@ lawkit zipf customer_feedback.txt
 
 ## 次のステップ
 
-- [Examples](examples.md) - 実世界のユースケース
-- [CLI Reference](../reference/cli-reference.md) - すべてのコマンド詳細
-- [Architecture](../guides/architecture.md) - システム設計
+- [Examples](examples_ja.md) - 実世界のユースケース
+- [CLIリファレンス](../reference/cli-reference_ja.md) - すべてのコマンド詳細
+- [Architecture](../guides/architecture_ja.md) - システム設計

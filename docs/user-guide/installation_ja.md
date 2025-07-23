@@ -138,8 +138,8 @@ chmod +x ~/.cargo/bin/lawkit
 
 ## 次のステップ
 
-インストールが完了したら、[はじめに](getting-started.md)で基本的な使い方を学んでください。
+インストールが完了したら、[はじめに](getting-started_ja.md)で基本的な使い方を学んでください。
 
-- [はじめに](getting-started.md) - 基本的な使い方
-- [例](examples.md) - 実世界の例
-- [CLIリファレンス](../reference/cli-reference.md) - コマンド詳細
+- [はじめに](getting-started_ja.md) - 基本的な使い方
+- [例](examples_ja.md) - 実世界の例
+- [CLIリファレンス](../reference/cli-reference_ja.md) - コマンド詳細

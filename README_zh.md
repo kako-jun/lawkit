@@ -9,7 +9,7 @@
 [![Docs.rs Core](https://docs.rs/lawkit-core/badge.svg)](https://docs.rs/lawkit-core)
 [![npm](https://img.shields.io/npm/v/lawkit-js.svg?label=lawkit-js)](https://www.npmjs.com/package/lawkit-js)
 [![PyPI](https://img.shields.io/pypi/v/lawkit-python.svg?label=lawkit-python)](https://pypi.org/project/lawkit-python/)
-[![Documentation](https://img.shields.io/badge/📚%20User%20Guide-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index.md)
+[![Documentation](https://img.shields.io/badge/📚%20User%20Guide-Documentation-green)](https://github.com/kako-jun/lawkit/tree/main/docs/index_zh.md)
 [![API Reference](https://img.shields.io/badge/🔧%20API%20Reference-docs.rs-blue)](https://docs.rs/lawkit-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -489,11 +489,11 @@ graph LR
 
 有关综合指南、示例和API文档：
 
-📚 **[用户指南](https://github.com/kako-jun/lawkit/tree/main/docs/index.md)** - 安装、用法和示例
-🔧 **[CLI参考](https://github.com/kako-jun/lawkit/tree/main/docs/reference/cli-reference.md)** - 完整命令文档
-📊 **[统计法则指南](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/examples.md)** - 详细分析示例
-⚡ **[性能指南](https://github.com/kako-jun/lawkit/tree/main/docs/guides/performance.md)** - 优化和大型数据集
-🌍 **[国际支持](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/configuration.md)** - 多语言数字解析
+📚 **[用户指南](https://github.com/kako-jun/lawkit/tree/main/docs/index_zh.md)** - 安装、用法和示例
+🔧 **[CLI参考](https://github.com/kako-jun/lawkit/tree/main/docs/reference/cli-reference_zh.md)** - 完整命令文档
+📊 **[统计法则指南](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/examples_zh.md)** - 详细分析示例
+⚡ **[性能指南](https://github.com/kako-jun/lawkit/tree/main/docs/guides/performance_zh.md)** - 优化和大型数据集
+🌍 **[国际支持](https://github.com/kako-jun/lawkit/tree/main/docs/user-guide/configuration_zh.md)** - 多语言数字解析
 
 ## 贡献
 

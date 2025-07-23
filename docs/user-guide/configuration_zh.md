@@ -203,6 +203,6 @@ lawkit benf data.csv --format json | jq '.numbers_analyzed'
 
 ## 下一步
 
-- [示例](examples.md) - 实际配置示例
-- [CLI参考](../reference/cli-reference.md) - 完整的命令文档
-- [集成指南](../guides/integrations.md) - CI/CD自动化
+- [示例](examples_zh.md) - 实际配置示例
+- [CLI参考](../reference/cli-reference_zh.md) - 完整的命令文档
+- [集成指南](../guides/integrations_zh.md) - CI/CD自动化

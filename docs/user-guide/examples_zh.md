@@ -330,11 +330,11 @@ lawkit benf data.csv --verbose
 
 ## 配置示例
 
-有关详细的设置说明和高级配置选项，请参阅[Configuration Guide](configuration.md)。
+有关详细的设置说明和高级配置选项，请参阅[Configuration Guide](configuration_zh.md)。
 
 ## 下一步
 
-- [Installation Guide](installation.md) - 设置和安装说明
-- [CLI Reference](../reference/cli-reference.md) - 完整命令文档
-- [Integration Guide](../guides/integrations.md) - CI/CD自动化
-- [Performance Guide](../guides/performance.md) - 优化技术
+- [安装指南](installation_zh.md) - 设置和安装说明
+- [CLI参考](../reference/cli-reference_zh.md) - 完整命令文档
+- [Integration Guide](../guides/integrations_zh.md) - CI/CD自动化
+- [Performance Guide](../guides/performance_zh.md) - 优化技术
