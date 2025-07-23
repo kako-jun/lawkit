@@ -167,7 +167,7 @@ def _get_lawkit_binary_path() -> str:
     """Get the path to the lawkit binary (embedded in wheel)"""
     import sysconfig
     
-    binary_name = "lawkit.exe" if platform.system() == "Windows" else "lawkit"
+    binary_name = "lawkit_python.exe" if platform.system() == "Windows" else "lawkit"
     
     # Check if binary exists in the package installation
     if hasattr(sys, "_MEIPASS"):  # PyInstaller
