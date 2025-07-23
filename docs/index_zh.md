@@ -30,23 +30,23 @@ lawkit analyze data.csv --laws benf,pareto,normal
 ## 文档
 
 ### 用户指南
-- [安装](user-guide/installation.md)
-- [入门指南](user-guide/getting-started.md)
-- [配置](user-guide/configuration.md)
-- [示例](user-guide/examples.md)
+- [安装](user-guide/installation_zh.md)
+- [入门指南](user-guide/getting-started_zh.md)
+- [配置](user-guide/configuration_zh.md)
+- [示例](user-guide/examples_zh.md)
 
 ### 参考
-- [CLI参考](reference/cli-reference.md)
+- [CLI参考](reference/cli-reference_zh.md)
 
 ### 指南
-- [架构指南](guides/architecture.md) - 系统设计和架构概述
-- [集成指南](guides/integrations.md)
-- [性能指南](guides/performance.md)
-- [高级分析](guides/advanced-analysis.md)
+- [架构指南](guides/architecture_zh.md) - 系统设计和架构概述
+- [集成指南](guides/integrations_zh.md)
+- [性能指南](guides/performance_zh.md)
+- [高级分析](guides/advanced-analysis_zh.md)
 
 
 ### 其他
-- [常见问题](user-guide/faq.md)
+- [常见问题](user-guide/faq_zh.md)
 
 ## 支持
 

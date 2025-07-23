@@ -30,23 +30,23 @@ lawkit analyze data.csv --laws benf,pareto,normal
 ## ドキュメント
 
 ### ユーザーガイド
-- [インストール](user-guide/installation.md)
-- [はじめ方](user-guide/getting-started.md)
-- [設定](user-guide/configuration.md)
-- [例](user-guide/examples.md)
+- [インストール](user-guide/installation_ja.md)
+- [はじめ方](user-guide/getting-started_ja.md)
+- [設定](user-guide/configuration_ja.md)
+- [例](user-guide/examples_ja.md)
 
 ### リファレンス
-- [CLIリファレンス](reference/cli-reference.md)
+- [CLIリファレンス](reference/cli-reference_ja.md)
 
 ### ガイド
-- [アーキテクチャガイド](guides/architecture.md) - システム設計とアーキテクチャの概要
-- [統合ガイド](guides/integrations.md)
-- [性能ガイド](guides/performance.md)
-- [高度な分析](guides/advanced-analysis.md)
+- [アーキテクチャガイド](guides/architecture_ja.md) - システム設計とアーキテクチャの概要
+- [統合ガイド](guides/integrations_ja.md)
+- [性能ガイド](guides/performance_ja.md)
+- [高度な分析](guides/advanced-analysis_ja.md)
 
 
 ### その他
-- [FAQ](user-guide/faq.md)
+- [FAQ](user-guide/faq_ja.md)
 
 ## サポート
 

@@ -228,7 +228,7 @@ fn analyze_data(numbers: &[f64]) {
 
 ### lawkitをCI/CDパイプラインと統合するには？
 
-以下の例は[統合ガイド](../guides/integrations.md)を参照してください:
+以下の例は[統合ガイド](../guides/integrations_ja.md)を参照してください:
 - GitHub Actions
 - GitLab CI
 - Jenkins
@@ -384,7 +384,7 @@ test -f data.csv && echo "File exists" || echo "File not found"
 
 ### さらにサポートを受けるには？
 
-- **ドキュメント**: [docs/](index.md)
+- **ドキュメント**: [docs/](../index_ja.md)
 - **問題報告**: [GitHub Issues](https://github.com/kako-jun/lawkit/issues)
 - **ディスカッション**: [GitHub Discussions](https://github.com/kako-jun/lawkit/discussions)
 - **セルフテスト**: `lawkit selftest`を実行してインストールを検証

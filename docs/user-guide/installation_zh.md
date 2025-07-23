@@ -138,8 +138,8 @@ chmod +x ~/.cargo/bin/lawkit
 
 ## 下一步
 
-安装完成后，请在[入门指南](getting-started.md)中学习基本用法。
+安装完成后，请在[入门指南](getting-started_zh.md)中学习基本用法。
 
-- [入门指南](getting-started.md) - 基本用法
-- [示例](examples.md) - 实际使用示例
-- [CLI参考](../reference/cli-reference.md) - 命令详情
+- [入门指南](getting-started_zh.md) - 基本用法
+- [示例](examples_zh.md) - 实际使用示例
+- [CLI参考](../reference/cli-reference_zh.md) - 命令详情
