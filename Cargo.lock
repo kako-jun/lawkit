@@ -1201,6 +1201,7 @@ dependencies = [
  "calamine",
  "clap",
  "criterion",
+ "csv",
  "diffx-core",
  "docx-rs",
  "mockito",
