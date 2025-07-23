@@ -1,1 +1,0 @@
-# Lawkit Python test package
