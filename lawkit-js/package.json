@@ -17,23 +17,22 @@
     "statistical-analysis",
     "financial-analysis"
   ],
-  "main": "lib.js",
-  "bin": {
-    "lawkit": "./index.js"
-  },
+  "main": "index.js",
   "scripts": {
-    "test": "node test.js",
-    "examples": "node examples.js",
-    "verify": "node index.js --help",
-    "prepublish": "npm run verify"
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "test": "npm run build && node test.js",
+    "examples": "npm run build && node examples.js",
+    "verify": "npm run build && node -e \"console.log(require('./index.js'))\"",
+    "prepublish": "npm run build",
+    "artifacts": "napi artifacts"
   },
   "engines": {
     "node": ">=12.0.0"
   },
   "files": [
     "index.js",
-    "lib.js",
-    "bin/",
+    "*.node",
     "README.md",
     "examples.js",
     "test.js"

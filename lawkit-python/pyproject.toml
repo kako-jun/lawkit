@@ -68,13 +68,14 @@ dev = [
 ]
 
 [tool.maturin]
-# This package includes a binary (lawkit CLI) in the wheel
+# PyO3 bindings for lawkit-python
 python-source = "src"
 module-name = "lawkit_python"
-bindings = "bin"
+bindings = "pyo3"
 # Find Python interpreters automatically
 find-interpreter = true
-# Let maturin auto-detect the best manylinux compatibility
+# Use manylinux for PyPI compatibility
+compatibility = "manylinux2014"
 
 [tool.ruff]
 line-length = 88
