@@ -37,6 +37,10 @@ lawkit analyze data.csv --laws benf,pareto,normal
 
 ### リファレンス
 - [CLIリファレンス](reference/cli-reference_ja.md)
+- [**API リファレンス**](reference/api-reference_ja.md) - Rust クレート API ドキュメント
+
+### 言語バインディング
+- [**統一API リファレンス**](bindings/unified-api_ja.md) - lawkit-python および lawkit-js 言語バインディング
 
 ### ガイド
 - [アーキテクチャガイド](guides/architecture_ja.md) - システム設計とアーキテクチャの概要

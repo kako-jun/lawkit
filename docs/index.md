@@ -37,6 +37,10 @@ lawkit analyze data.csv --laws benf,pareto,normal
 
 ### Reference
 - [CLI Reference](reference/cli-reference.md)
+- [**API Reference**](reference/api-reference.md) - Rust crate API documentation
+
+### Language Bindings
+- [**Unified API Reference**](bindings/unified-api.md) - lawkit-python and lawkit-js language bindings
 
 ### Guides
 - [Architecture Guide](guides/architecture.md) - System design and architecture overview
