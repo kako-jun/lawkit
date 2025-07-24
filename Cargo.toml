@@ -29,6 +29,7 @@ exclude = [
 rust-version = "1.75"
 
 [workspace.dependencies]
+lawkit-core = { version = "2.5.16", path = "lawkit-core" }
 clap = { version = "4.0", features = ["derive", "cargo"] }
 scraper = "0.17"
 calamine = "0.22"

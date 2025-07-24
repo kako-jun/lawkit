@@ -802,13 +802,18 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
 }
 
 // ============================================================================
-// UNIFIED API - Parser Functions
+// PARSER FUNCTIONS - FOR INTERNAL USE ONLY
 // ============================================================================
+// These functions are public only for CLI and language bindings.
+// External users should use the main law() function with file reading.
 
+/// Parse JSON content - FOR INTERNAL USE ONLY
+/// External users should read files themselves and use law() function
 pub fn parse_json(content: &str) -> Result<Value> {
     serde_json::from_str(content).map_err(|e| anyhow!("JSON parse error: {}", e))
 }
 
+/// Parse CSV content - FOR INTERNAL USE ONLY
 pub fn parse_csv(content: &str) -> Result<Value> {
     let mut reader = ReaderBuilder::new()
         .has_headers(true)
@@ -833,10 +838,12 @@ pub fn parse_csv(content: &str) -> Result<Value> {
     Ok(Value::Array(records))
 }
 
+/// Parse YAML content - FOR INTERNAL USE ONLY
 pub fn parse_yaml(content: &str) -> Result<Value> {
     serde_yaml::from_str(content).map_err(|e| anyhow!("YAML parse error: {}", e))
 }
 
+/// Parse TOML content - FOR INTERNAL USE ONLY
 pub fn parse_toml(content: &str) -> Result<Value> {
     let toml_value: toml::Value = content.parse()?;
     toml_to_json_value(toml_value)
@@ -868,6 +875,7 @@ fn toml_to_json_value(toml_val: toml::Value) -> Result<Value> {
     }
 }
 
+/// Parse INI content - FOR INTERNAL USE ONLY
 pub fn parse_ini(content: &str) -> Result<Value> {
     let mut result = serde_json::Map::new();
     let mut current_section = String::new();
@@ -899,6 +907,7 @@ pub fn parse_ini(content: &str) -> Result<Value> {
     Ok(Value::Object(result))
 }
 
+/// Parse XML content - FOR INTERNAL USE ONLY
 pub fn parse_xml(content: &str) -> Result<Value> {
     // Simple XML parser - for production use, consider using quick-xml
     // This is a simplified implementation
@@ -906,9 +915,12 @@ pub fn parse_xml(content: &str) -> Result<Value> {
 }
 
 // ============================================================================
-// UNIFIED API - Utility Functions
+// UTILITY FUNCTIONS - FOR INTERNAL USE ONLY
 // ============================================================================
+// These functions are public only for CLI and language bindings.
+// External users should use the main law() function.
 
+/// Format output to string - FOR INTERNAL USE ONLY
 pub fn format_output<T: Serialize>(
     results: &[T],
     format: OutputFormat,
