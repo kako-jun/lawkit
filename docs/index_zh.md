@@ -37,6 +37,10 @@ lawkit analyze data.csv --laws benf,pareto,normal
 
 ### 参考
 - [CLI参考](reference/cli-reference_zh.md)
+- [**API 参考**](reference/api-reference_zh.md) - Rust crate API 文档
+
+### 语言绑定
+- [**统一API参考**](bindings/unified-api_zh.md) - lawkit-python 和 lawkit-js 语言绑定
 
 ### 指南
 - [架构指南](guides/architecture_zh.md) - 系统设计和架构概述
