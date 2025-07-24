@@ -647,9 +647,7 @@ checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
 
 [[package]]
 name = "diffx-core"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d0d4f27265693669ab5e2ab8d78884f6b1fb18473ad5bc6e9f304ba0c06b5fd"
+version = "0.5.7"
 dependencies = [
  "anyhow",
  "configparser",
@@ -658,6 +656,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "serde_yaml",
  "serde_yml",
  "toml",
 ]
