@@ -300,28 +300,30 @@ result = lawkit_python.law(
 )
 ```
 
-### JavaScript
+### TypeScript/JavaScript
 
-```javascript
-const lawkit = require('lawkit-js');
+```typescript
+import { law, LawkitOptions } from 'lawkit-js';
 
 // Benford's Law analysis
 const data = [123, 456, 789, 111, 222, 333];
-const result = lawkit.law('benford', data);
+const result = await law('benford', data);
 
 // With options
-const result = lawkit.law('benford', data, {
-    format: 'json',
-    minCount: 100,
+const options: LawkitOptions = {
+    outputFormat: 'json',
+    minSampleSize: 100,
     confidenceLevel: 0.99,
     detailedReport: true
-});
+};
+const result = await law('benford', data, options);
 
 // Automatic analysis
-const result = lawkit.law('analyze', { dataset: data }, {
-    laws: ['benford', 'pareto', 'normal'],
-    verbose: true
-});
+const analysisOptions: LawkitOptions = {
+    lawsToCheck: ['benford', 'pareto', 'normal'],
+    includeMetadata: true
+};
+const result = await law('analyze', { dataset: data }, analysisOptions);
 ```
 
 ## Examples

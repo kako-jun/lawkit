@@ -1249,7 +1249,6 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
- "regex",
  "serde",
  "serde_json",
 ]
