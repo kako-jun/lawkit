@@ -1,4 +1,5 @@
-//! Excel format tests
+#[allow(unused_imports)]
+/// Excel format tests
 
 use std::process::Command;
 

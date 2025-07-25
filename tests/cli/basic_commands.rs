@@ -1,5 +1,5 @@
-//! Basic CLI command tests for lawkit
-
+#[allow(unused_imports)]
+/// Basic CLI command tests for lawkit
 use std::process::Command;
 
 #[test]

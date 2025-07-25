@@ -1,6 +1,6 @@
-//! CLI Tests
-//! Tests for command-line interface functionality
-
+#[allow(unused_imports)]
+/// CLI Tests
+/// Tests for command-line interface functionality
 // Original CLI tests
 pub mod basic_commands;
 pub mod no_color_option;

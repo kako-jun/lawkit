@@ -1,4 +1,5 @@
-//! Error handling tests for lawkit
+#[allow(unused_imports)]
+/// Error handling tests for lawkit
 
 use std::process::Command;
 

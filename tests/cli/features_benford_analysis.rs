@@ -1,5 +1,5 @@
-//! Benford's Law analysis tests
-
+#[allow(unused_imports)]
+/// Benford's Law analysis tests
 use std::fs;
 use std::io::Write;
 use std::process::Command;

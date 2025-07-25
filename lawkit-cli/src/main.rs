@@ -69,10 +69,12 @@ fn main() {
                     )),
                 )),
         )
-        .subcommand(common_options::add_common_options(Command::new("list").about("List available statistical laws")))
-        .subcommand(
-            common_options::add_common_options(Command::new("selftest").about("Run self-test for all laws using generated data")),
-        )
+        .subcommand(common_options::add_common_options(
+            Command::new("list").about("List available statistical laws"),
+        ))
+        .subcommand(common_options::add_common_options(
+            Command::new("selftest").about("Run self-test for all laws using generated data"),
+        ))
         .get_matches();
 
     let result = match matches.subcommand() {
@@ -330,24 +332,51 @@ fn handle_generate_command(matches: &clap::ArgMatches) -> Result<(), LawkitError
 
 fn list_laws(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
     let no_color = matches.get_flag("no-color");
-    
+
     println!("{}", colors::info("Available statistical laws:", no_color));
-    println!("  {} - Benford's law analysis", colors::pass("benf", no_color));
-    println!("  {} - Pareto principle (80/20 rule) analysis", colors::pass("pareto", no_color));
+    println!(
+        "  {} - Benford's law analysis",
+        colors::pass("benf", no_color)
+    );
+    println!(
+        "  {} - Pareto principle (80/20 rule) analysis",
+        colors::pass("pareto", no_color)
+    );
     println!("  {} - Zipf's law analysis", colors::pass("zipf", no_color));
-    println!("  {} - Normal distribution analysis", colors::pass("normal", no_color));
-    println!("  {} - Poisson distribution analysis", colors::pass("poisson", no_color));
+    println!(
+        "  {} - Normal distribution analysis",
+        colors::pass("normal", no_color)
+    );
+    println!(
+        "  {} - Poisson distribution analysis",
+        colors::pass("poisson", no_color)
+    );
     println!();
     println!("{}", colors::info("Integration commands:", no_color));
-    println!("  {} - Multi-law basic analysis and recommendations", colors::pass("analyze", no_color));
-    println!("  {} - Data validation and consistency checks", colors::pass("validate", no_color));
-    println!("  {} - Conflict detection and detailed diagnostics", colors::pass("diagnose", no_color));
+    println!(
+        "  {} - Multi-law basic analysis and recommendations",
+        colors::pass("analyze", no_color)
+    );
+    println!(
+        "  {} - Data validation and consistency checks",
+        colors::pass("validate", no_color)
+    );
+    println!(
+        "  {} - Conflict detection and detailed diagnostics",
+        colors::pass("diagnose", no_color)
+    );
     println!();
     println!("{}", colors::info("Generation commands:", no_color));
-    println!("  {} - Generate sample data following statistical laws", colors::pass("generate", no_color));
+    println!(
+        "  {} - Generate sample data following statistical laws",
+        colors::pass("generate", no_color)
+    );
     println!();
     println!("{}", colors::info("Testing commands:", no_color));
-    println!("  {} - Run self-test for all laws using generated data", colors::pass("selftest", no_color));
+    println!(
+        "  {} - Run self-test for all laws using generated data",
+        colors::pass("selftest", no_color)
+    );
     Ok(())
 }
 
@@ -389,7 +418,10 @@ fn run_selftest(matches: &clap::ArgMatches) -> Result<(), LawkitError> {
     } else {
         println!(
             "{}",
-            colors::level_fail("Some tests failed. Please check the implementation.", no_color)
+            colors::level_fail(
+                "Some tests failed. Please check the implementation.",
+                no_color
+            )
         );
         std::process::exit(1);
     }

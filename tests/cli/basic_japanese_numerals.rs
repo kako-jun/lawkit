@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use lawkit_core::laws::benford::japanese::convert_japanese_numerals;
 
 #[cfg(test)]
@@ -98,7 +99,10 @@ mod japanese_numeral_conversion_tests {
     #[test]
     fn test_mixed_japanese_and_context() {
         // Full-width in context
-        assert_eq!(convert_japanese_numerals("売上１２３万円"), "売上12310000円");
+        assert_eq!(
+            convert_japanese_numerals("売上１２３万円"),
+            "売上12310000円"
+        );
 
         // Kanji in context
         assert_eq!(

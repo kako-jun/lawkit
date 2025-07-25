@@ -485,7 +485,10 @@ fn print_poisson_interpretation(result: &PoissonResult, no_color: bool) {
             println!("   Data closely follows Poisson distribution");
         }
         PoissonAssessment::Good => {
-            println!("{}", colors::level_pass("Good Poisson distribution fit", no_color));
+            println!(
+                "{}",
+                colors::level_pass("Good Poisson distribution fit", no_color)
+            );
             println!("   Acceptable fit to Poisson distribution");
         }
         PoissonAssessment::Moderate => {
@@ -496,11 +499,17 @@ fn print_poisson_interpretation(result: &PoissonResult, no_color: bool) {
             println!("   Some deviations from Poisson distribution");
         }
         PoissonAssessment::Poor => {
-            println!("{}", colors::level_fail("Poor Poisson distribution fit", no_color));
+            println!(
+                "{}",
+                colors::level_fail("Poor Poisson distribution fit", no_color)
+            );
             println!("   Significant deviations from Poisson distribution");
         }
         PoissonAssessment::NonPoisson => {
-            println!("{}", colors::level_critical("Non-Poisson distribution", no_color));
+            println!(
+                "{}",
+                colors::level_critical("Non-Poisson distribution", no_color)
+            );
             println!("   Data does not follow Poisson distribution");
         }
     }

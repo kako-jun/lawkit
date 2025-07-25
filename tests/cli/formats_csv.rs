@@ -1,4 +1,5 @@
-//! CSV format tests
+#[allow(unused_imports)]
+/// CSV format tests
 
 use std::fs;
 use std::io::Write;

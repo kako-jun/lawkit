@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use lawkit_core::laws::benford::japanese::extract_numbers;
 
 #[cfg(test)]
@@ -42,9 +43,6 @@ mod number_extraction_tests {
     }
 }
 
-
-
-
 #[cfg(test)]
 mod performance_extraction_tests {
     use super::*;
@@ -63,7 +61,11 @@ mod performance_extraction_tests {
         assert!(numbers.iter().all(|&n| n == 123.45));
 
         // Should complete within reasonable time
-        assert!(duration.as_millis() < 1000, "Large text extraction took too long: {:?}", duration);
+        assert!(
+            duration.as_millis() < 1000,
+            "Large text extraction took too long: {:?}",
+            duration
+        );
     }
 
     #[test]
@@ -77,6 +79,10 @@ mod performance_extraction_tests {
 
         // Should find numbers efficiently
         assert!(!numbers.is_empty());
-        assert!(duration.as_millis() < 500, "Complex regex took too long: {:?}", duration);
+        assert!(
+            duration.as_millis() < 500,
+            "Complex regex took too long: {:?}",
+            duration
+        );
     }
 }
