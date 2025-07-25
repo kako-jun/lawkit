@@ -1,5 +1,5 @@
+#[allow(unused_imports)]
 // Benford's Law calculation tests
-
 #[cfg(test)]
 mod benford_distribution_tests {
     use lawkit_core::laws::benford::analysis;
@@ -97,12 +97,16 @@ mod benford_distribution_tests {
     #[test]
     fn test_calculate_first_digit_distribution_empty() {
         let numbers: Vec<f64> = vec![];
-        let distribution = lawkit_core::laws::benford::analysis::calculate_digit_distribution(&numbers);
+        let distribution =
+            lawkit_core::laws::benford::analysis::calculate_digit_distribution(&numbers);
 
         // Should be all zeros for empty input
         let expected = [0.0; 9];
         for (i, &expected_val) in expected.iter().enumerate() {
-            assert_eq!(distribution[i], expected_val, "Empty distribution should be all zeros");
+            assert_eq!(
+                distribution[i], expected_val,
+                "Empty distribution should be all zeros"
+            );
         }
     }
 
@@ -131,7 +135,7 @@ mod benford_distribution_tests {
             lawkit_core::common::statistics::calculate_chi_square(&observed, &expected);
         let p_value = lawkit_core::common::statistics::calculate_p_value(chi_square, 8);
 
-        // Chi-square should be significantly higher  
+        // Chi-square should be significantly higher
         assert!(
             chi_square > 8.0,
             "Chi-square should be high for skewed distribution, got {}",
@@ -145,11 +149,7 @@ mod benford_distribution_tests {
             p_value
         );
     }
-
 }
-
-
-
 
 #[cfg(test)]
 mod performance_tests {
@@ -163,14 +163,23 @@ mod performance_tests {
             .collect();
 
         let start = Instant::now();
-        let distribution = lawkit_core::laws::benford::analysis::calculate_digit_distribution(&large_dataset);
+        let distribution =
+            lawkit_core::laws::benford::analysis::calculate_digit_distribution(&large_dataset);
         let duration = start.elapsed();
 
         // 分布の合計が100%に近いことを確認
         let sum: f64 = distribution.iter().sum();
-        assert!((sum - 100.0).abs() < 0.1, "分布の合計は100%付近であるべき、実際: {}", sum);
+        assert!(
+            (sum - 100.0).abs() < 0.1,
+            "分布の合計は100%付近であるべき、実際: {}",
+            sum
+        );
 
         // 合理的な時間内で完了すること
-        assert!(duration.as_millis() < 1000, "大きなデータセット分析に時間がかかりすぎる: {:?}", duration);
+        assert!(
+            duration.as_millis() < 1000,
+            "大きなデータセット分析に時間がかかりすぎる: {:?}",
+            duration
+        );
     }
 }

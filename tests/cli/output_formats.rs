@@ -1,5 +1,5 @@
-//! Output format tests for lawkit
-
+#[allow(unused_imports)]
+/// Output format tests for lawkit
 use std::fs;
 use std::process::Command;
 

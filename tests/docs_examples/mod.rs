@@ -1,15 +1,15 @@
-//! Documentation examples tests
-//! Tests that verify examples in documentation work correctly
-
-pub mod readme_examples;
 pub mod index_examples;
 pub mod integrations_examples;
+#[allow(unused_imports)]
+/// Documentation examples tests
+/// Tests that verify examples in documentation work correctly
+pub mod readme_examples;
 
 #[cfg(test)]
 mod tests {
-    use std::process::Command;
     use std::fs;
     use std::io::Write;
+    use std::process::Command;
     use tempfile::tempdir;
 
     // Helper function to create financial test data
@@ -55,8 +55,14 @@ mod tests {
         // Test: lawkit benford data/financial_data.csv
         if let Ok(test_file) = create_financial_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "benf", 
-                       test_file.to_str().unwrap()])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "benf",
+                    test_file.to_str().unwrap(),
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit benf");
@@ -75,8 +81,14 @@ mod tests {
         // Test: lawkit pareto data/sales_data.csv
         if let Ok(test_file) = create_sales_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "pareto", 
-                       test_file.to_str().unwrap()])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "pareto",
+                    test_file.to_str().unwrap(),
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit pareto");
@@ -93,8 +105,14 @@ mod tests {
         // Test: lawkit zipf data/text_frequency.csv
         if let Ok(test_file) = create_frequency_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "zipf", 
-                       test_file.to_str().unwrap()])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "zipf",
+                    test_file.to_str().unwrap(),
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit zipf");
@@ -111,8 +129,14 @@ mod tests {
         // Test: lawkit analyze data/comprehensive_data.csv --all-laws
         if let Ok(test_file) = create_financial_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "analyze", 
-                       test_file.to_str().unwrap()])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "analyze",
+                    test_file.to_str().unwrap(),
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit analyze");
@@ -129,8 +153,16 @@ mod tests {
         // Test: lawkit benford data/financial_data.csv --output json
         if let Ok(test_file) = create_financial_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "benf", 
-                       test_file.to_str().unwrap(), "--format", "json"])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "benf",
+                    test_file.to_str().unwrap(),
+                    "--format",
+                    "json",
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit benf --format json");
@@ -138,8 +170,10 @@ mod tests {
             if output.status.success() {
                 let stdout = String::from_utf8_lossy(&output.stdout);
                 // JSON output should contain valid JSON structure
-                assert!(stdout.contains("{") || stdout.contains("\""), 
-                        "JSON output should contain JSON-like structure");
+                assert!(
+                    stdout.contains("{") || stdout.contains("\""),
+                    "JSON output should contain JSON-like structure"
+                );
             }
         }
     }
@@ -149,16 +183,26 @@ mod tests {
         // Test: lawkit benford data/financial_data.csv --confidence 0.99
         if let Ok(test_file) = create_financial_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "benf", 
-                       test_file.to_str().unwrap(), "--confidence", "0.99"])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "benf",
+                    test_file.to_str().unwrap(),
+                    "--confidence",
+                    "0.99",
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit benf --confidence 0.99");
 
             if !output.status.success() {
                 let stderr = String::from_utf8_lossy(&output.stderr);
-                assert!(!stderr.contains("unrecognized"), 
-                        "Confidence option should be recognized");
+                assert!(
+                    !stderr.contains("unrecognized"),
+                    "Confidence option should be recognized"
+                );
             }
         }
     }
@@ -168,16 +212,26 @@ mod tests {
         // Test: lawkit pareto data/large_dataset.csv --sample-size 10000
         if let Ok(test_file) = create_sales_data() {
             let output = Command::new("cargo")
-                .args(["run", "--bin", "lawkit", "--", "pareto", 
-                       test_file.to_str().unwrap(), "--sample-size", "100"])
+                .args([
+                    "run",
+                    "--bin",
+                    "lawkit",
+                    "--",
+                    "pareto",
+                    test_file.to_str().unwrap(),
+                    "--sample-size",
+                    "100",
+                ])
                 .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .output()
                 .expect("Failed to execute lawkit pareto --sample-size");
 
             if !output.status.success() {
                 let stderr = String::from_utf8_lossy(&output.stderr);
-                assert!(!stderr.contains("unrecognized"), 
-                        "Sample-size option should be recognized");
+                assert!(
+                    !stderr.contains("unrecognized"),
+                    "Sample-size option should be recognized"
+                );
             }
         }
     }
@@ -193,8 +247,10 @@ mod tests {
 
         assert!(output.status.success(), "Help command should succeed");
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("lawkit") || stdout.contains("Usage") || stdout.contains("Commands"), 
-                "Help output should contain program information");
+        assert!(
+            stdout.contains("lawkit") || stdout.contains("Usage") || stdout.contains("Commands"),
+            "Help output should contain program information"
+        );
     }
 
     #[test]
@@ -208,8 +264,10 @@ mod tests {
 
         assert!(output.status.success(), "Version command should succeed");
         let stdout = String::from_utf8_lossy(&output.stdout);
-        assert!(stdout.contains("2.5.16") || stdout.contains("lawkit"), 
-                "Version output should contain version or program name");
+        assert!(
+            stdout.contains("2.5.16") || stdout.contains("lawkit"),
+            "Version output should contain version or program name"
+        );
     }
 
     #[test]
@@ -219,17 +277,29 @@ mod tests {
         let output_file = temp_dir.path().join("generated.csv");
 
         let output = Command::new("cargo")
-            .args(["run", "--bin", "lawkit", "--", "generate", "benford", 
-                   "--count", "100", "--output", output_file.to_str().unwrap()])
+            .args([
+                "run",
+                "--bin",
+                "lawkit",
+                "--",
+                "generate",
+                "benford",
+                "--count",
+                "100",
+                "--output",
+                output_file.to_str().unwrap(),
+            ])
             .current_dir(env!("CARGO_MANIFEST_DIR"))
             .output()
             .expect("Failed to execute lawkit generate");
 
         if output.status.success() {
             assert!(output_file.exists(), "Generated file should exist");
-            let content = fs::read_to_string(&output_file)
-                .expect("Failed to read generated file");
-            assert!(!content.trim().is_empty(), "Generated file should not be empty");
+            let content = fs::read_to_string(&output_file).expect("Failed to read generated file");
+            assert!(
+                !content.trim().is_empty(),
+                "Generated file should not be empty"
+            );
         }
     }
 
@@ -245,9 +315,13 @@ mod tests {
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
             // Should list available statistical laws
-            assert!(stdout.contains("benford") || stdout.contains("pareto") || 
-                    stdout.contains("law") || !stdout.trim().is_empty(),
-                    "List command should show available laws");
+            assert!(
+                stdout.contains("benford")
+                    || stdout.contains("pareto")
+                    || stdout.contains("law")
+                    || !stdout.trim().is_empty(),
+                "List command should show available laws"
+            );
         }
     }
 
@@ -263,9 +337,13 @@ mod tests {
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
             // Should run self-tests
-            assert!(stdout.contains("test") || stdout.contains("pass") || 
-                    stdout.contains("selftest") || !stdout.trim().is_empty(),
-                    "Selftest should provide test results");
+            assert!(
+                stdout.contains("test")
+                    || stdout.contains("pass")
+                    || stdout.contains("selftest")
+                    || !stdout.trim().is_empty(),
+                "Selftest should provide test results"
+            );
         }
     }
 }

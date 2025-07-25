@@ -1,4 +1,5 @@
-//! Edge case tests for lawkit
+#[allow(unused_imports)]
+/// Edge case tests for lawkit
 
 use std::fs;
 use std::io::Write;

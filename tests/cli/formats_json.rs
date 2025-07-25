@@ -1,4 +1,5 @@
-//! JSON format tests
+#[allow(unused_imports)]
+/// JSON format tests
 
 use std::fs;
 use std::io::Write;

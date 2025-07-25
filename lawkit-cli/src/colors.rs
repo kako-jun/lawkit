@@ -102,3 +102,28 @@ pub fn level_fail(message: &str, no_color: bool) -> String {
 pub fn level_warn(message: &str, no_color: bool) -> String {
     format!("[{}] {}", warn("WARN", no_color), message)
 }
+
+/// ボールドテキスト  
+pub fn bold(text: &str) -> String {
+    format!("{}", text.bold())
+}
+
+/// 赤色テキスト
+pub fn red(text: &str) -> String {
+    format!("{}", text.red())
+}
+
+/// 黄色テキスト
+pub fn yellow(text: &str) -> String {
+    format!("{}", text.yellow())
+}
+
+/// 緑色テキスト
+pub fn green(text: &str) -> String {
+    format!("{}", text.green())
+}
+
+/// シアン色テキスト
+pub fn cyan(text: &str) -> String {
+    format!("{}", text.cyan())
+}

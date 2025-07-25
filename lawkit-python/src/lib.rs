@@ -1,6 +1,8 @@
+#![allow(clippy::useless_conversion)]
+
+use lawkit_core::{law, LawkitOptions, LawkitResult, LawkitSpecificOptions};
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyDict};
-use lawkit_core::{law, LawkitOptions, LawkitSpecificOptions, LawkitResult};
 use serde_json::Value;
 
 /// Convert Python object to serde_json::Value
@@ -75,13 +77,19 @@ fn value_to_python(py: Python, value: &Value) -> PyResult<PyObject> {
 /// Convert LawkitResult to Python dictionary
 fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObject> {
     let dict = pyo3::types::PyDict::new_bound(py);
-    
+
     match result {
         LawkitResult::BenfordAnalysis(path, data) => {
             dict.set_item("type", "BenfordAnalysis")?;
             dict.set_item("path", path)?;
-            dict.set_item("observed_distribution", data.observed_distribution.to_object(py))?;
-            dict.set_item("expected_distribution", data.expected_distribution.to_object(py))?;
+            dict.set_item(
+                "observed_distribution",
+                data.observed_distribution.to_object(py),
+            )?;
+            dict.set_item(
+                "expected_distribution",
+                data.expected_distribution.to_object(py),
+            )?;
             dict.set_item("chi_square", data.chi_square)?;
             dict.set_item("p_value", data.p_value)?;
             dict.set_item("mad", data.mad)?;
@@ -92,7 +100,10 @@ fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObje
         LawkitResult::ParetoAnalysis(path, data) => {
             dict.set_item("type", "ParetoAnalysis")?;
             dict.set_item("path", path)?;
-            dict.set_item("top_20_percent_contribution", data.top_20_percent_contribution)?;
+            dict.set_item(
+                "top_20_percent_contribution",
+                data.top_20_percent_contribution,
+            )?;
             dict.set_item("pareto_ratio", data.pareto_ratio)?;
             dict.set_item("concentration_index", data.concentration_index)?;
             dict.set_item("risk_level", &data.risk_level)?;
@@ -136,7 +147,10 @@ fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObje
             dict.set_item("path", path)?;
             dict.set_item("laws_analyzed", data.laws_analyzed.to_object(py))?;
             dict.set_item("overall_risk", &data.overall_risk)?;
-            dict.set_item("conflicting_results", data.conflicting_results.to_object(py))?;
+            dict.set_item(
+                "conflicting_results",
+                data.conflicting_results.to_object(py),
+            )?;
             dict.set_item("recommendations", data.recommendations.to_object(py))?;
             dict.set_item("analysis_summary", &data.analysis_summary)?;
         }
@@ -165,34 +179,34 @@ fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObje
             dict.set_item("sample_data", data.sample_data.to_object(py))?;
         }
     }
-    
+
     Ok(dict.to_object(py))
 }
 
 /// Unified law function for Python
-/// 
+///
 /// Perform statistical law analysis on Python data using various statistical laws.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `subcommand` - The analysis subcommand ("benf", "pareto", "zipf", "normal", "poisson", "analyze", "validate", "diagnose", "generate")
 /// * `data_or_config` - The data to analyze or configuration for generation
 /// * `**kwargs` - Optional keyword arguments for configuration
-/// 
+///
 /// # Returns
-/// 
+///
 /// List of analysis result dictionaries specific to the statistical law used
-/// 
+///
 /// # Example
-/// 
+///
 /// ```python
 /// import lawkit
-/// 
+///
 /// # Benford's law analysis
 /// data = [123, 456, 789, 1234, 5678]
 /// result = lawkit.law("benf", data)
 /// print(result)  # [{"type": "BenfordAnalysis", "conformity": 0.85, ...}]
-/// 
+///
 /// # Pareto analysis
 /// values = [100, 200, 300, 1000, 2000]
 /// result = lawkit.law("pareto", values)
@@ -200,15 +214,20 @@ fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObje
 /// ```
 #[pyfunction]
 #[pyo3(signature = (subcommand, data_or_config, **kwargs))]
-fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwargs: Option<&Bound<'_, PyDict>>) -> PyResult<PyObject> {
+fn law_py(
+    py: Python,
+    subcommand: &str,
+    data_or_config: &Bound<'_, PyAny>,
+    kwargs: Option<&Bound<'_, PyDict>>,
+) -> PyResult<PyObject> {
     // Convert Python objects to serde_json::Value
     let data_value = python_to_value(py, data_or_config)?;
-    
+
     // Build options from kwargs
     let mut options = LawkitOptions::default();
     let mut lawkit_options = LawkitSpecificOptions::default();
     let mut has_lawkit_options = false;
-    
+
     if let Some(kwargs) = kwargs {
         for (key, value) in kwargs.iter() {
             let key_str = key.extract::<String>()?;
@@ -216,8 +235,13 @@ fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwarg
                 // Core options - lawkit doesn't have epsilon or array_id_key
                 "ignore_keys_regex" => {
                     if let Ok(pattern) = value.extract::<String>() {
-                        options.ignore_keys_regex = Some(regex::Regex::new(&pattern)
-                            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Invalid regex: {}", e)))?);
+                        options.ignore_keys_regex =
+                            Some(regex::Regex::new(&pattern).map_err(|e| {
+                                pyo3::exceptions::PyValueError::new_err(format!(
+                                    "Invalid regex: {}",
+                                    e
+                                ))
+                            })?);
                     }
                 }
                 "path_filter" => {
@@ -227,8 +251,13 @@ fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwarg
                 }
                 "output_format" => {
                     if let Ok(format_str) = value.extract::<String>() {
-                        let format = lawkit_core::OutputFormat::from_str(&format_str)
-                            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Invalid format: {}", e)))?;
+                        let format =
+                            lawkit_core::OutputFormat::parse_format(&format_str).map_err(|e| {
+                                pyo3::exceptions::PyValueError::new_err(format!(
+                                    "Invalid format: {}",
+                                    e
+                                ))
+                            })?;
                         options.output_format = Some(format);
                     }
                 }
@@ -239,7 +268,7 @@ fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwarg
                 }
                 "show_recommendations" => {
                     if let Ok(show) = value.extract::<bool>() {
-                        options.show_recommendations = Some(show);  
+                        options.show_recommendations = Some(show);
                     }
                 }
                 "use_memory_optimization" => {
@@ -319,21 +348,22 @@ fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwarg
             }
         }
     }
-    
+
     if has_lawkit_options {
         options.lawkit_options = Some(lawkit_options);
     }
-    
+
     // Perform law analysis
-    let results = law(subcommand, &data_value, Some(&options))
-        .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Law analysis error: {:?}", e)))?;
-    
+    let results = law(subcommand, &data_value, Some(&options)).map_err(|e| {
+        pyo3::exceptions::PyRuntimeError::new_err(format!("Law analysis error: {:?}", e))
+    })?;
+
     // Convert results to Python objects
     let py_list = pyo3::types::PyList::empty_bound(py);
     for result in results {
         py_list.append(lawkit_result_to_python(py, &result)?)?;
     }
-    
+
     Ok(py_list.to_object(py))
 }
 
@@ -341,9 +371,9 @@ fn law_py(py: Python, subcommand: &str, data_or_config: &Bound<'_, PyAny>, kwarg
 #[pymodule]
 fn lawkit_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(law_py, m)?)?;
-    
+
     // Add module-level law function for easier access
     m.add("law", m.getattr("law_py")?)?;
-    
+
     Ok(())
 }

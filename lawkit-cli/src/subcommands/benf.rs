@@ -11,7 +11,6 @@ use lawkit_core::{
     error::{BenfError, Result},
     laws::benford::BenfordResult,
 };
-use std::str::FromStr;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     // Determine input source based on arguments

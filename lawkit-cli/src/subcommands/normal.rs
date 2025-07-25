@@ -558,14 +558,20 @@ fn print_normal_interpretation(result: &NormalResult, no_color: bool) {
         RiskLevel::High => {
             println!(
                 "{}",
-                colors::fail("[FAIL] Data significantly deviates from normality", no_color)
+                colors::fail(
+                    "[FAIL] Data significantly deviates from normality",
+                    no_color
+                )
             );
             println!("   Non-parametric methods recommended");
         }
         RiskLevel::Critical => {
             println!(
                 "{}",
-                colors::critical("[CRITICAL] Data shows extreme deviation from normality", no_color)
+                colors::critical(
+                    "[CRITICAL] Data shows extreme deviation from normality",
+                    no_color
+                )
             );
             println!("   Requires special handling and investigation");
         }
@@ -602,10 +608,13 @@ fn print_normal_interpretation(result: &NormalResult, no_color: bool) {
     if !result.outliers_z_score.is_empty() {
         println!(
             "   {}",
-            colors::alert(&format!(
-                "ALERT: Outliers detected: {}",
-                result.outliers_z_score.len()
-            ), no_color)
+            colors::alert(
+                &format!(
+                    "ALERT: Outliers detected: {}",
+                    result.outliers_z_score.len()
+                ),
+                no_color
+            )
         );
     }
 }
@@ -903,7 +912,7 @@ fn format_normal_histogram(result: &NormalResult) -> String {
 
         // 正規分布の確率密度関数
         let density =
-            (-0.5 * z_score * z_score).exp() / (std_dev * (2.0 * std::f64::consts::PI).sqrt());
+            (-0.5_f64 * z_score * z_score).exp() / (std_dev * (2.0 * std::f64::consts::PI).sqrt());
         bin_densities.push(density);
         max_density = max_density.max(density);
     }

@@ -1,5 +1,6 @@
-//! Lawkit test suite
-//! Unified test structure across all test categories
+#[allow(unused_imports)]
+/// Lawkit test suite
+/// Unified test structure across all test categories
 
 mod basic;
 mod cli;

@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 /// Integration tests for lawkit
 ///
 /// These tests verify the interaction between different components

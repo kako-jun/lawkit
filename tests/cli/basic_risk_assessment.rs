@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use lawkit_core::common::risk::RiskLevel;
 
 #[cfg(test)]
@@ -48,7 +49,7 @@ mod risk_level_tests {
         assert_eq!(RiskLevel::from_p_value(0.05), RiskLevel::High);
         assert_eq!(RiskLevel::from_p_value(0.01), RiskLevel::Critical);
 
-        // Test just above boundaries  
+        // Test just above boundaries
         assert_eq!(RiskLevel::from_p_value(0.100001), RiskLevel::Low);
         assert_eq!(RiskLevel::from_p_value(0.050001), RiskLevel::Medium);
         assert_eq!(RiskLevel::from_p_value(0.010001), RiskLevel::High);
@@ -91,7 +92,8 @@ mod risk_level_tests {
             assert!(
                 risk_numeric <= _previous_risk_numeric,
                 "Risk level should not increase as p-value increases: p={}, risk={:?}",
-                p_value, risk
+                p_value,
+                risk
             );
             _previous_risk_numeric = risk_numeric;
         }

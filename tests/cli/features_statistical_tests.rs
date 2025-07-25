@@ -1,5 +1,5 @@
-//! Statistical analysis tests
-
+#[allow(unused_imports)]
+/// Statistical analysis tests
 use std::fs;
 use std::io::Write;
 use std::process::Command;

@@ -11,31 +11,31 @@ impl TestFixtures {
     pub fn cli_fixtures_dir() -> &'static str {
         "../../tests/fixtures"
     }
-    
+
     /// Load JSON file from CLI fixtures
     pub fn load_cli_fixture(filename: &str) -> Value {
         let path = format!("{}/{}", Self::cli_fixtures_dir(), filename);
         let content = std::fs::read_to_string(&path)
             .unwrap_or_else(|_| panic!("Failed to read fixture: {}", path));
-        
+
         if filename.ends_with(".json") {
             serde_json::from_str(&content).unwrap()
         } else {
             panic!("Only JSON fixtures supported in unified API tests")
         }
     }
-    
+
     /// Basic configuration comparison fixtures (shared with diffx/diffai)
     pub fn config_v1() -> Value {
         Self::load_cli_fixture("config_v1.json")
     }
-    
+
     pub fn config_v2() -> Value {
         Self::load_cli_fixture("config_v2.json")
     }
-    
+
     /// Statistical law analysis specific test fixtures
-    
+
     /// Benford's law test data fixtures
     pub fn benford_compliant_data() -> Value {
         json!({
@@ -52,7 +52,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     pub fn benford_non_compliant_data() -> Value {
         json!({
             "uniform_data": [
@@ -67,7 +67,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Pareto principle test data fixtures
     pub fn pareto_compliant_data() -> Value {
         json!({
@@ -84,7 +84,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     pub fn pareto_non_compliant_data() -> Value {
         json!({
             "uniform_distribution": [
@@ -97,7 +97,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Zipf's law test data fixtures
     pub fn zipf_compliant_data() -> Value {
         json!({
@@ -112,7 +112,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     pub fn zipf_non_compliant_data() -> Value {
         json!({
             "random_frequencies": [
@@ -124,7 +124,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Normal distribution test data fixtures
     pub fn normal_distribution_data() -> Value {
         json!({
@@ -140,7 +140,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     pub fn non_normal_distribution_data() -> Value {
         json!({
             "skewed_data": [
@@ -155,7 +155,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Poisson distribution test data fixtures
     pub fn poisson_distribution_data() -> Value {
         json!({
@@ -169,7 +169,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     pub fn non_poisson_data() -> Value {
         json!({
             "high_variance": [
@@ -182,7 +182,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Integration analysis test data
     pub fn integration_analysis_data() -> Value {
         json!({
@@ -206,7 +206,7 @@ impl TestFixtures {
             }
         })
     }
-    
+
     /// Validation test data fixtures
     pub fn validation_test_data() -> Value {
         json!({
@@ -221,7 +221,7 @@ impl TestFixtures {
             "empty_dataset": []
         })
     }
-    
+
     /// Diagnostic test data fixtures
     pub fn diagnostic_test_data() -> Value {
         json!({
@@ -238,7 +238,7 @@ impl TestFixtures {
             ]
         })
     }
-    
+
     /// Generation configuration fixtures
     pub fn generation_configs() -> Value {
         json!({
@@ -254,7 +254,7 @@ impl TestFixtures {
                 "std_dev": 15.0
             },
             "poisson_config": {
-                "type": "poisson", 
+                "type": "poisson",
                 "count": 300,
                 "lambda": 5.0
             }
@@ -265,7 +265,7 @@ impl TestFixtures {
 /// Helper functions for statistical law test data generation
 pub mod law_generators {
     use super::*;
-    
+
     pub fn generate_benford_data(count: usize, risk_level: &str) -> Value {
         let data = match risk_level {
             "low" => {
@@ -277,7 +277,7 @@ pub mod law_generators {
                     values.push(base * magnitude);
                 }
                 values
-            },
+            }
             "high" => {
                 // Generate data that doesn't follow Benford's law (suspicious pattern)
                 let mut values = Vec::new();
@@ -287,7 +287,7 @@ pub mod law_generators {
                     values.push(suspicious_digit * magnitude);
                 }
                 values
-            },
+            }
             _ => {
                 // Medium risk - mixed pattern
                 let mut values = Vec::new();
@@ -307,23 +307,23 @@ pub mod law_generators {
                 values
             }
         };
-        
+
         json!(data)
     }
-    
+
     pub fn generate_pareto_data(count: usize, compliance: bool) -> Value {
         let mut values = Vec::new();
-        
+
         if compliance {
             // Top 20% contributes ~80%
             let top_20_count = (count as f64 * 0.2) as usize;
             let bottom_80_count = count - top_20_count;
-            
+
             // High values for top 20%
             for i in 0..top_20_count {
                 values.push(10000.0 - i as f64 * 200.0);
             }
-            
+
             // Low values for bottom 80%
             for i in 0..bottom_80_count {
                 values.push(100.0 + i as f64 * 10.0);
@@ -334,48 +334,53 @@ pub mod law_generators {
                 values.push(1000.0 + i as f64 * 10.0);
             }
         }
-        
+
         json!(values)
     }
-    
+
     pub fn generate_zipf_data(count: usize, exponent: f64) -> Value {
         let mut values = Vec::new();
-        
+
         for rank in 1..=count {
             // Zipf distribution: f(k) = C / k^s
             let frequency = 10000.0 / (rank as f64).powf(exponent);
             values.push(frequency);
         }
-        
+
         json!(values)
     }
-    
-    pub fn generate_normal_data(count: usize, mean: f64, std_dev: f64, add_outliers: bool) -> Value {
+
+    pub fn generate_normal_data(
+        count: usize,
+        mean: f64,
+        std_dev: f64,
+        add_outliers: bool,
+    ) -> Value {
         let mut values = Vec::new();
-        
+
         // Simple normal-ish data generation
         for i in 0..count {
             let u1 = (i as f64 + 1.0) / (count as f64 + 1.0);
             let u2 = ((i * 7 + 3) % count) as f64 / count as f64;
-            
+
             // Box-Muller transformation
             let z = (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
             let value = mean + std_dev * z;
             values.push(value);
         }
-        
+
         if add_outliers {
             // Add some outliers
             values.push(mean + 5.0 * std_dev);
             values.push(mean - 5.0 * std_dev);
         }
-        
+
         json!(values)
     }
-    
+
     pub fn generate_poisson_data(count: usize, lambda: f64, add_variance: bool) -> Value {
         let mut values = Vec::new();
-        
+
         if add_variance {
             // Non-Poisson data with high variance
             for i in 0..count {
@@ -393,10 +398,10 @@ pub mod law_generators {
                 values.push(k);
             }
         }
-        
+
         json!(values)
     }
-    
+
     pub fn generate_integration_test_data() -> Value {
         json!({
             "benford_data": generate_benford_data(100, "low"),
@@ -410,88 +415,88 @@ pub mod law_generators {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_benford_fixtures() {
         let compliant = TestFixtures::benford_compliant_data();
         let non_compliant = TestFixtures::benford_non_compliant_data();
-        
+
         assert!(compliant["financial_data"].is_array());
         assert!(non_compliant["uniform_data"].is_array());
-        
+
         // Check that we have different data patterns
         let financial_data = &compliant["financial_data"].as_array().unwrap();
         let uniform_data = &non_compliant["uniform_data"].as_array().unwrap();
-        
+
         assert!(financial_data.len() > 0);
         assert!(uniform_data.len() > 0);
         assert_ne!(financial_data[0], uniform_data[0]);
     }
-    
+
     #[test]
     fn test_pareto_fixtures() {
         let compliant = TestFixtures::pareto_compliant_data();
         let non_compliant = TestFixtures::pareto_non_compliant_data();
-        
+
         assert!(compliant["sales_data"].is_array());
         assert!(non_compliant["uniform_distribution"].is_array());
-        
+
         // Pareto data should have high variance
         let sales_data = compliant["sales_data"].as_array().unwrap();
         let first_val = sales_data[0].as_f64().unwrap();
         let last_val = sales_data[sales_data.len() - 1].as_f64().unwrap();
         assert!(first_val > last_val * 2.0); // Should have large range
     }
-    
+
     #[test]
     fn test_law_generators() {
         let benford_low = law_generators::generate_benford_data(100, "low");
         let benford_high = law_generators::generate_benford_data(100, "high");
-        
+
         assert!(benford_low.is_array());
         assert!(benford_high.is_array());
-        
+
         let pareto_compliant = law_generators::generate_pareto_data(50, true);
         let pareto_non_compliant = law_generators::generate_pareto_data(50, false);
-        
+
         assert!(pareto_compliant.is_array());
         assert!(pareto_non_compliant.is_array());
-        
+
         // Test that generators produce different patterns
         assert_ne!(benford_low, benford_high);
         assert_ne!(pareto_compliant, pareto_non_compliant);
     }
-    
+
     #[test]
     fn test_normal_data_generation() {
         let normal_data = law_generators::generate_normal_data(100, 50.0, 10.0, false);
         let normal_with_outliers = law_generators::generate_normal_data(100, 50.0, 10.0, true);
-        
+
         assert!(normal_data.is_array());
         assert!(normal_with_outliers.is_array());
-        
+
         // With outliers should have more data points
         let normal_len = normal_data.as_array().unwrap().len();
         let outlier_len = normal_with_outliers.as_array().unwrap().len();
         assert!(outlier_len > normal_len);
     }
-    
+
     #[test]
     fn test_poisson_data_generation() {
         let poisson_normal = law_generators::generate_poisson_data(50, 3.0, false);
         let poisson_high_var = law_generators::generate_poisson_data(50, 3.0, true);
-        
+
         assert!(poisson_normal.is_array());
         assert!(poisson_high_var.is_array());
-        
+
         // High variance version should be different
         assert_ne!(poisson_normal, poisson_high_var);
     }
-    
+
     #[test]
     fn test_integration_test_data() {
         let integration_data = law_generators::generate_integration_test_data();
-        
+
         assert!(integration_data["benford_data"].is_array());
         assert!(integration_data["pareto_data"].is_array());
         assert!(integration_data["normal_data"].is_array());
