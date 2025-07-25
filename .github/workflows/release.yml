@@ -1,0 +1,24 @@
+name: Release - lawkit
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: kako-jun/.github/.github/workflows/rust-cli-kiln-release.yml@main
+    with:
+      project-name: lawkit
+    secrets: inherit
+    
+  test-published:
+    needs: release
+    if: success()
+    uses: kako-jun/.github/.github/workflows/rust-cli-kiln-test-published-multiplatform.yml@main
+    with:
+      project: lawkit
+    secrets: inherit
