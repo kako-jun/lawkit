@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Tests for --no-color option across all commands
 /// Ensures color output is properly disabled when flag is specified
 use assert_cmd::Command;

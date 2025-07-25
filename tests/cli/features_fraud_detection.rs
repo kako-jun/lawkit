@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Fraud detection and risk assessment tests
 use std::fs;
 use std::io::Write;

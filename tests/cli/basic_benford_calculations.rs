@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 // Benford's Law calculation tests
 #[cfg(test)]
 mod benford_distribution_tests {

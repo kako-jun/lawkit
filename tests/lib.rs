@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Lawkit test suite
 /// Unified test structure across all test categories
 

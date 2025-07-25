@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Comprehensive tests for international numeral conversion
 /// Tests Chinese, Hindi, and Arabic numeral support from international.rs
 use lawkit_core::common::international::{

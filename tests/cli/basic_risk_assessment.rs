@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 use lawkit_core::common::risk::RiskLevel;
 
 #[cfg(test)]

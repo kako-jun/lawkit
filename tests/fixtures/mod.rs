@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Test fixtures and test data
 /// 
 /// This module provides test data files and fixtures that are used

@@ -1,6 +1,5 @@
 use std::fs;
 use std::io::Write;
-#[allow(unused_imports)]
 /// CLI options tests for lawkit
 use std::process::Command;
 use tempfile::tempdir;

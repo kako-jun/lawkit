@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// CLI Tests
 /// Tests for command-line interface functionality
 // Original CLI tests

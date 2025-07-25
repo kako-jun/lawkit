@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Integration tests for international numeral support across all law commands
 /// Tests Chinese, Hindi, and Arabic numerals with real CLI commands
 use assert_cmd::Command;
