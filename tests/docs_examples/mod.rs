@@ -1,6 +1,5 @@
 pub mod index_examples;
 pub mod integrations_examples;
-#[allow(unused_imports)]
 /// Documentation examples tests
 /// Tests that verify examples in documentation work correctly
 pub mod readme_examples;

@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Edge case tests for lawkit
 
 use std::fs;

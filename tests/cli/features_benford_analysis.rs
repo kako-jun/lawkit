@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Benford's Law analysis tests
 use std::fs;
 use std::io::Write;

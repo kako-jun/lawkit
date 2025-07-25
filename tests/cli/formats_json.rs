@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// JSON format tests
 
 use std::fs;

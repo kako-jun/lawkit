@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 use lawkit_core::laws::benford::japanese::extract_numbers;
 
 #[cfg(test)]

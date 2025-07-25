@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// Integration tests for risk assessment functionality
 /// Tests RiskLevel enum, exit codes, and risk-based output across CLI commands
 use assert_cmd::Command;

@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 use assert_cmd::Command;
 use predicates::prelude::*;
 use std::fs::File;

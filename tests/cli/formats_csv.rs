@@ -1,4 +1,3 @@
-#[allow(unused_imports)]
 /// CSV format tests
 
 use std::fs;
