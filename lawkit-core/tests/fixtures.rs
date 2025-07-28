@@ -1,11 +1,10 @@
 use serde_json::{json, Value};
-use std::path::Path;
 
 /// Common test fixtures shared across lawkit core/python/js tests
 /// These fixtures are focused on statistical law analysis unified API testing
-
 pub struct TestFixtures;
 
+#[allow(dead_code)]
 impl TestFixtures {
     /// Get path to shared CLI fixtures directory
     pub fn cli_fixtures_dir() -> &'static str {
@@ -16,7 +15,7 @@ impl TestFixtures {
     pub fn load_cli_fixture(filename: &str) -> Value {
         let path = format!("{}/{}", Self::cli_fixtures_dir(), filename);
         let content = std::fs::read_to_string(&path)
-            .unwrap_or_else(|_| panic!("Failed to read fixture: {}", path));
+            .unwrap_or_else(|_| panic!("Failed to read fixture: {path}"));
 
         if filename.ends_with(".json") {
             serde_json::from_str(&content).unwrap()
@@ -35,7 +34,6 @@ impl TestFixtures {
     }
 
     /// Statistical law analysis specific test fixtures
-
     /// Benford's law test data fixtures
     pub fn benford_compliant_data() -> Value {
         json!({
@@ -338,6 +336,7 @@ pub mod law_generators {
         json!(values)
     }
 
+    #[allow(dead_code)]
     pub fn generate_zipf_data(count: usize, exponent: f64) -> Value {
         let mut values = Vec::new();
 
@@ -428,8 +427,8 @@ mod tests {
         let financial_data = &compliant["financial_data"].as_array().unwrap();
         let uniform_data = &non_compliant["uniform_data"].as_array().unwrap();
 
-        assert!(financial_data.len() > 0);
-        assert!(uniform_data.len() > 0);
+        assert!(!financial_data.is_empty());
+        assert!(!uniform_data.is_empty());
         assert_ne!(financial_data[0], uniform_data[0]);
     }
 
