@@ -311,9 +311,14 @@ fn calculate_enhanced_consistency_with_diffx(
     let test_json = serde_json::to_value(&test_result.law_scores).unwrap_or_default();
 
     // diffx-coreで構造的差分を検出
-    let diff_results = diff(&train_json, &test_json, None, Some(0.01), None);
+    let diff_results = diff(&train_json, &test_json, None);
 
-    if diff_results.is_empty() {
+    let results = match diff_results {
+        Ok(results) => results,
+        Err(_) => return 0.0, // エラーの場合は一致度0
+    };
+
+    if results.is_empty() {
         return 1.0; // 完全一致
     }
 
@@ -328,7 +333,7 @@ fn calculate_enhanced_consistency_with_diffx(
 
     let mut total_diff_impact = 0.0;
 
-    for diff_result in &diff_results {
+    for diff_result in &results {
         let impact = match diff_result {
             DiffResult::Added(_, _) => 0.5,   // 追加は中程度の影響
             DiffResult::Removed(_, _) => 0.5, // 削除は中程度の影響
@@ -347,7 +352,7 @@ fn calculate_enhanced_consistency_with_diffx(
     }
 
     // 一貫性スコア = 1 - (平均影響度)
-    let average_impact = total_diff_impact / diff_results.len() as f64;
+    let average_impact = total_diff_impact / results.len() as f64;
     (1.0 - average_impact).max(0.0)
 }
 

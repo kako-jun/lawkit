@@ -337,9 +337,14 @@ impl IntegrationResult {
         let actual_json = serde_json::to_value(&self.law_scores).unwrap_or_default();
 
         // diffx-coreで構造的差分を分析
-        let diff_results = diff(&expected_json, &actual_json, None, Some(0.01), None);
+        let diff_results = diff(&expected_json, &actual_json, None);
 
-        if diff_results.is_empty() {
+        let results = match diff_results {
+            Ok(results) => results,
+            Err(_) => return, // エラーの場合は早期リターン
+        };
+
+        if results.is_empty() {
             // 全てのスコアが期待値と一致（疑わしい一致）
             if self.law_scores.len() > 1 {
                 let conflict = Conflict {
@@ -356,7 +361,7 @@ impl IntegrationResult {
             }
         } else {
             // 差分が検出された場合の詳細分析
-            for diff_result in &diff_results {
+            for diff_result in &results {
                 match diff_result {
                     DiffResult::Modified(path, expected_val, actual_val) => {
                         if let (Some(expected), Some(actual)) =
@@ -459,7 +464,7 @@ impl IntegrationResult {
                     });
 
                     // diffx-coreで構造的差分を検出
-                    let diff_results = diff(&law_a_profile, &law_b_profile, None, Some(0.1), None);
+                    let diff_results = diff(&law_a_profile, &law_b_profile, None);
 
                     // 従来の単純差分計算
                     let score_diff = (score_a - score_b).abs();
@@ -470,17 +475,21 @@ impl IntegrationResult {
 
                         // diffx-coreの結果と組み合わせた強化判定
                         let has_structural_conflict = match &diff_results {
-                            Ok(results) => !results.is_empty()
-                                && results.iter().any(|result| {
-                                    if let DiffResult::Modified(path, _old_val, _new_val) = result {
-                                        if path.contains("confidence_level")
-                                            || path.contains("score_category")
+                            Ok(results) => {
+                                !results.is_empty()
+                                    && results.iter().any(|result| {
+                                        if let DiffResult::Modified(path, _old_val, _new_val) =
+                                            result
                                         {
-                                            return true;
+                                            if path.contains("confidence_level")
+                                                || path.contains("score_category")
+                                            {
+                                                return true;
+                                            }
                                         }
-                                    }
-                                    false
-                                }),
+                                        false
+                                    })
+                            }
                             Err(_) => false,
                         };
 
@@ -500,10 +509,17 @@ impl IntegrationResult {
                                     score_b,
                                     results,
                                 ),
-                                Err(_) => format!(
-                                    "Enhanced conflict detected between {} and {} (score: {:.3}, diff analysis failed)",
-                                    law_a, law_b, enhanced_conflict_score.min(1.0)
-                                ),
+                                Err(_) => Conflict {
+                                    conflict_type: self.classify_conflict_type(law_a, law_b),
+                                    laws_involved: vec![law_a.clone(), law_b.clone()],
+                                    conflict_score: enhanced_conflict_score.min(1.0),
+                                    description: format!(
+                                        "Enhanced conflict detected between {} and {} (score: {:.3}, diff analysis failed)",
+                                        law_a, law_b, enhanced_conflict_score.min(1.0)
+                                    ),
+                                    likely_cause: "Diff analysis failed".to_string(),
+                                    resolution_suggestion: "Review data or retry analysis".to_string(),
+                                },
                             };
                             self.conflicts.push(conflict);
                         }

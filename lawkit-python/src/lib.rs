@@ -6,7 +6,7 @@ use pyo3::types::{PyAny, PyDict};
 use serde_json::Value;
 
 /// Convert Python object to serde_json::Value
-fn python_to_value(py: Python, obj: &Bound<'_, PyAny>) -> PyResult<Value> {
+fn python_to_value(_py: Python, obj: &Bound<'_, PyAny>) -> PyResult<Value> {
     if obj.is_none() {
         Ok(Value::Null)
     } else if let Ok(b) = obj.extract::<bool>() {
@@ -25,7 +25,7 @@ fn python_to_value(py: Python, obj: &Bound<'_, PyAny>) -> PyResult<Value> {
         let list = obj.downcast::<pyo3::types::PyList>()?;
         let mut vec = Vec::new();
         for item in list.iter() {
-            vec.push(python_to_value(py, &item)?);
+            vec.push(python_to_value(_py, &item)?);
         }
         Ok(Value::Array(vec))
     } else if obj.is_instance_of::<pyo3::types::PyDict>() {
@@ -33,7 +33,7 @@ fn python_to_value(py: Python, obj: &Bound<'_, PyAny>) -> PyResult<Value> {
         let mut map = serde_json::Map::new();
         for (key, value) in dict.iter() {
             let key_str = key.extract::<String>()?;
-            map.insert(key_str, python_to_value(py, &value)?);
+            map.insert(key_str, python_to_value(_py, &value)?);
         }
         Ok(Value::Object(map))
     } else {
@@ -43,6 +43,7 @@ fn python_to_value(py: Python, obj: &Bound<'_, PyAny>) -> PyResult<Value> {
 }
 
 /// Convert serde_json::Value to Python object
+#[allow(dead_code)]
 fn value_to_python(py: Python, value: &Value) -> PyResult<PyObject> {
     match value {
         Value::Null => Ok(py.None()),
@@ -238,8 +239,7 @@ fn law_py(
                         options.ignore_keys_regex =
                             Some(regex::Regex::new(&pattern).map_err(|e| {
                                 pyo3::exceptions::PyValueError::new_err(format!(
-                                    "Invalid regex: {}",
-                                    e
+                                    "Invalid regex: {e}"
                                 ))
                             })?);
                     }
@@ -254,8 +254,7 @@ fn law_py(
                         let format =
                             lawkit_core::OutputFormat::parse_format(&format_str).map_err(|e| {
                                 pyo3::exceptions::PyValueError::new_err(format!(
-                                    "Invalid format: {}",
-                                    e
+                                    "Invalid format: {e}"
                                 ))
                             })?;
                         options.output_format = Some(format);
@@ -355,7 +354,7 @@ fn law_py(
 
     // Perform law analysis
     let results = law(subcommand, &data_value, Some(&options)).map_err(|e| {
-        pyo3::exceptions::PyRuntimeError::new_err(format!("Law analysis error: {:?}", e))
+        pyo3::exceptions::PyRuntimeError::new_err(format!("Law analysis error: {e:?}"))
     })?;
 
     // Convert results to Python objects

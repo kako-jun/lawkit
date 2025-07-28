@@ -63,7 +63,7 @@ fn run_consistency_check_mode(matches: &ArgMatches) -> Result<()> {
 fn output_cross_validation_result(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::CrossValidationResult,
-    config: &OutputConfig,
+    _config: &OutputConfig,
 ) -> Result<()> {
     writeln!(writer, "Cross-Validation Analysis")?;
     writeln!(writer)?;
@@ -89,7 +89,7 @@ fn output_consistency_check_result(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::IntegrationResult,
     threshold: f64,
-    config: &OutputConfig,
+    _config: &OutputConfig,
 ) -> Result<()> {
     writeln!(writer, "Data Validation and Consistency Check")?;
     writeln!(writer)?;
@@ -117,7 +117,7 @@ fn output_consistency_check_result(
     }
 
     writeln!(writer)?;
-    output_integration_result(writer, result, config)?;
+    output_integration_result(writer, result, _config)?;
 
     Ok(())
 }

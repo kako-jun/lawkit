@@ -1,5 +1,4 @@
 use lawkit_core::*;
-use regex::Regex;
 use serde_json::{json, Value};
 
 mod fixtures;
@@ -756,11 +755,8 @@ fn test_single_value_data() {
     // Should work but with limited data
     if benford_result.is_ok() {
         let results = benford_result.unwrap();
-        match &results[0] {
-            LawkitResult::BenfordAnalysis(_, benford_data) => {
-                assert_eq!(benford_data.total_numbers, 1);
-            }
-            _ => {}
+        if let LawkitResult::BenfordAnalysis(_, benford_data) = &results[0] {
+            assert_eq!(benford_data.total_numbers, 1);
         }
     }
 

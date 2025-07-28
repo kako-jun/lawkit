@@ -191,16 +191,16 @@ pub fn law(
     options: Option<JsLawkitOptions>,
 ) -> Result<Vec<JsLawkitResult>> {
     // Convert options
-    let rust_options = options.map(|opts| build_lawkit_options(opts)).transpose()?;
+    let rust_options = options.map(build_lawkit_options).transpose()?;
 
     // Perform law analysis
     let results = core_law(&subcommand, &data_or_config, rust_options.as_ref())
-        .map_err(|e| Error::new(Status::GenericFailure, format!("Law analysis error: {}", e)))?;
+        .map_err(|e| Error::new(Status::GenericFailure, format!("Law analysis error: {e}")))?;
 
     // Convert results to JavaScript objects
     let js_results = results
         .into_iter()
-        .map(|result| convert_lawkit_result(result))
+        .map(convert_lawkit_result)
         .collect::<Result<Vec<_>>>()?;
 
     Ok(js_results)
@@ -214,7 +214,7 @@ fn build_lawkit_options(js_options: JsLawkitOptions) -> Result<LawkitOptions> {
     // Core options
     if let Some(ignore_keys_regex) = js_options.ignore_keys_regex {
         let regex = Regex::new(&ignore_keys_regex)
-            .map_err(|e| Error::new(Status::InvalidArg, format!("Invalid regex: {}", e)))?;
+            .map_err(|e| Error::new(Status::InvalidArg, format!("Invalid regex: {e}")))?;
         options.ignore_keys_regex = Some(regex);
     }
 
@@ -223,8 +223,8 @@ fn build_lawkit_options(js_options: JsLawkitOptions) -> Result<LawkitOptions> {
     }
 
     if let Some(output_format) = js_options.output_format {
-        let format = OutputFormat::from_str(&output_format)
-            .map_err(|e| Error::new(Status::InvalidArg, format!("Invalid output format: {}", e)))?;
+        let format = OutputFormat::parse_format(&output_format)
+            .map_err(|e| Error::new(Status::InvalidArg, format!("Invalid output format: {e}")))?;
         options.output_format = Some(format);
     }
 

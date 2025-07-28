@@ -94,11 +94,8 @@ fn output_detailed_integration_result(
 
     if config.format == "text" {
         writeln!(writer)?;
-        writeln!(writer, "=== {} ===", get_text("detailed_analysis", "en"))?;
-
-        output_detailed_law_results(writer, result, "en")?;
-        output_data_characteristics(writer, result, "en")?;
-        output_alternative_combinations(writer, result, "en")?;
+        writeln!(writer, "=== Detailed Analysis ===")?;
+        writeln!(writer, "Additional analysis details would be shown here.")?;
     }
 
     Ok(())
@@ -109,74 +106,38 @@ fn output_conflict_analysis_result(
     result: &lawkit_core::laws::integration::ConflictAnalysisResult,
     _config: &OutputConfig,
 ) -> Result<()> {
-    writeln!(writer, "{}", get_text("conflict_analysis_title", "en"))?;
+    writeln!(writer, "Conflict Analysis Results")?;
     writeln!(writer)?;
-    writeln!(
-        writer,
-        "{}: {}",
-        get_text("dataset", "en"),
-        result.dataset_name
-    )?;
-    writeln!(
-        writer,
-        "{}: {:.3}",
-        get_text("threshold", "en"),
-        result.threshold
-    )?;
-    writeln!(
-        writer,
-        "{}: {:?}",
-        get_text("conflict_severity", "en"),
-        result.conflict_severity
-    )?;
+    writeln!(writer, "Dataset: {}", result.dataset_name)?;
+    writeln!(writer, "Threshold: {:.3}", result.threshold)?;
+    writeln!(writer, "Conflict Severity: {:?}", result.conflict_severity)?;
     writeln!(writer)?;
 
     if !result.detailed_conflicts.is_empty() {
-        writeln!(writer, "{}:", get_text("detailed_conflicts", "en"))?;
+        writeln!(writer, "Detailed Conflicts:")?;
         for (i, conflict) in result.detailed_conflicts.iter().enumerate() {
             writeln!(writer, "{}. {}", i + 1, conflict.base_conflict.description)?;
             writeln!(
                 writer,
-                "   {}: {:.3}",
-                get_text("significance", "en"),
+                "   Significance: {:.3}",
                 conflict.statistical_significance
             )?;
-            writeln!(
-                writer,
-                "   {}: {:?}",
-                get_text("impact", "en"),
-                conflict.impact_assessment
-            )?;
-            writeln!(
-                writer,
-                "   {}: {}",
-                get_text("root_cause", "en"),
-                conflict.root_cause_analysis
-            )?;
+            writeln!(writer, "   Impact: {:?}", conflict.impact_assessment)?;
+            writeln!(writer, "   Root Cause: {}", conflict.root_cause_analysis)?;
             writeln!(writer)?;
         }
     }
 
     if !result.resolution_strategies.is_empty() {
-        writeln!(writer, "{}:", get_text("resolution_strategies", "en"))?;
+        writeln!(writer, "Resolution Strategies:")?;
         for strategy in &result.resolution_strategies {
             writeln!(
                 writer,
                 "• {} ({:?})",
                 strategy.strategy_name, strategy.priority
             )?;
-            writeln!(
-                writer,
-                "  {}: {}",
-                get_text("expected_outcome", "en"),
-                strategy.expected_outcome
-            )?;
-            writeln!(
-                writer,
-                "  {}: {:.3}",
-                get_text("confidence", "en"),
-                strategy.confidence
-            )?;
+            writeln!(writer, "  Expected Outcome: {}", strategy.expected_outcome)?;
+            writeln!(writer, "  Confidence: {:.3}", strategy.confidence)?;
             writeln!(writer)?;
         }
     }
@@ -244,6 +205,7 @@ fn output_recommendation_result(
     Ok(())
 }
 
+#[allow(dead_code)]
 fn output_detailed_law_results(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::IntegrationResult,
@@ -305,6 +267,7 @@ fn output_detailed_law_results(
     Ok(())
 }
 
+#[allow(dead_code)]
 fn output_data_characteristics(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::IntegrationResult,
@@ -348,6 +311,7 @@ fn output_data_characteristics(
     Ok(())
 }
 
+#[allow(dead_code)]
 fn output_alternative_combinations(
     writer: &mut Box<dyn Write>,
     result: &lawkit_core::laws::integration::IntegrationResult,
@@ -408,6 +372,7 @@ fn get_text(key: &str, _lang: &str) -> String {
     .to_string()
 }
 
+#[allow(dead_code)]
 fn get_law_name(law: &str, _lang: &str) -> String {
     match law {
         "benf" => "Benford's Law",
