@@ -1,55 +1,8 @@
-pub mod benford;
-pub mod japanese;
-pub mod international;
-pub mod statistics;
-pub mod filtering;
-
-pub use benford::*;
-pub use japanese::*;
-pub use international::*;
-pub use statistics::*;
-pub use filtering::*;
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum RiskLevel {
-    Low,        // p > 0.1 - Normal distribution
-    Medium,     // 0.05 < p ≤ 0.1 - Moderate attention
-    High,       // 0.01 < p ≤ 0.05 - Notable deviation
-    Critical,   // p ≤ 0.01 - Significant attention needed
-}
-
-impl RiskLevel {
-    pub fn from_p_value(p_value: f64) -> Self {
-        if p_value <= 0.01 {
-            RiskLevel::Critical
-        } else if p_value <= 0.05 {
-            RiskLevel::High
-        } else if p_value <= 0.1 {
-            RiskLevel::Medium
-        } else {
-            RiskLevel::Low
-        }
-    }
-
-    pub fn exit_code(&self) -> i32 {
-        match self {
-            RiskLevel::Low | RiskLevel::Medium => 0,
-            RiskLevel::High => 10,
-            RiskLevel::Critical => 11,
-        }
-    }
-}
-
-impl std::fmt::Display for RiskLevel {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            RiskLevel::Low => write!(f, "LOW"),
-            RiskLevel::Medium => write!(f, "MEDIUM"),
-            RiskLevel::High => write!(f, "HIGH"),
-            RiskLevel::Critical => write!(f, "CRITICAL"),
-        }
-    }
-}
+// Re-export from correct module locations
+pub use crate::common::filtering::*;
+pub use crate::common::international::*;
+pub use crate::common::risk::RiskLevel;
+pub use crate::common::statistics::*;
 
 #[derive(Debug, Clone)]
 pub struct BenfordResult {
@@ -70,35 +23,39 @@ impl BenfordResult {
     }
 
     pub fn new_with_threshold(
-        dataset_name: String, 
-        numbers: &[f64], 
+        dataset_name: String,
+        numbers: &[f64],
         threshold: &RiskThreshold,
-        min_count: usize
+        min_count: usize,
     ) -> crate::error::Result<Self> {
         if numbers.is_empty() {
             return Err(crate::error::BenfError::NoNumbersFound);
         }
-        
+
         // Check minimum count requirement
         if numbers.len() < min_count {
             return Err(crate::error::BenfError::InsufficientData(numbers.len()));
         }
-        
+
         // Issue warning for small datasets but continue analysis
         if numbers.len() < 30 {
             let num_len = numbers.len();
             eprintln!("Warning: {num_len} numbers analyzed. For reliable Benford's Law analysis, 30+ numbers recommended.");
         }
 
-        let digit_distribution = benford::calculate_digit_distribution(numbers);
-        let expected_distribution = benford::BENFORD_EXPECTED_PERCENTAGES;
-        let chi_square = statistics::calculate_chi_square(&digit_distribution, &expected_distribution);
-        let p_value = statistics::calculate_p_value(chi_square, 8); // 8 degrees of freedom
-        let mean_absolute_deviation = statistics::calculate_mad(&digit_distribution, &expected_distribution);
-        
+        let digit_distribution = crate::laws::benford::calculate_digit_distribution(numbers);
+        let expected_distribution = crate::laws::benford::BENFORD_EXPECTED_PERCENTAGES;
+        let chi_square = crate::common::statistics::calculate_chi_square(
+            &digit_distribution,
+            &expected_distribution,
+        );
+        let p_value = crate::common::statistics::calculate_p_value(chi_square, 8); // 8 degrees of freedom
+        let mean_absolute_deviation =
+            crate::common::statistics::calculate_mad(&digit_distribution, &expected_distribution);
+
         // Use custom threshold if provided, otherwise use default logic
         let risk_level = threshold.evaluate_risk(p_value);
-        
+
         let verdict = match risk_level {
             RiskLevel::Low => "NORMAL_DISTRIBUTION".to_string(),
             RiskLevel::Medium => "SLIGHT_DEVIATION".to_string(),

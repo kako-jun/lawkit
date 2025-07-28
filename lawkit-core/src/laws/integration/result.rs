@@ -469,17 +469,20 @@ impl IntegrationResult {
                         let conflict_ratio = score_diff / max_score;
 
                         // diffx-coreの結果と組み合わせた強化判定
-                        let has_structural_conflict = !diff_results.is_empty()
-                            && diff_results.iter().any(|result| {
-                                if let DiffResult::Modified(path, _old_val, _new_val) = result {
-                                    if path.contains("confidence_level")
-                                        || path.contains("score_category")
-                                    {
-                                        return true;
+                        let has_structural_conflict = match &diff_results {
+                            Ok(results) => !results.is_empty()
+                                && results.iter().any(|result| {
+                                    if let DiffResult::Modified(path, _old_val, _new_val) = result {
+                                        if path.contains("confidence_level")
+                                            || path.contains("score_category")
+                                        {
+                                            return true;
+                                        }
                                     }
-                                }
-                                false
-                            });
+                                    false
+                                }),
+                            Err(_) => false,
+                        };
 
                         if conflict_ratio > 0.5 || has_structural_conflict {
                             let enhanced_conflict_score = if has_structural_conflict {
@@ -488,14 +491,20 @@ impl IntegrationResult {
                                 conflict_ratio
                             };
 
-                            let conflict = self.create_enhanced_conflict(
-                                law_a.clone(),
-                                law_b.clone(),
-                                enhanced_conflict_score.min(1.0),
-                                score_a,
-                                score_b,
-                                &diff_results,
-                            );
+                            let conflict = match &diff_results {
+                                Ok(results) => self.create_enhanced_conflict(
+                                    law_a.clone(),
+                                    law_b.clone(),
+                                    enhanced_conflict_score.min(1.0),
+                                    score_a,
+                                    score_b,
+                                    results,
+                                ),
+                                Err(_) => format!(
+                                    "Enhanced conflict detected between {} and {} (score: {:.3}, diff analysis failed)",
+                                    law_a, law_b, enhanced_conflict_score.min(1.0)
+                                ),
+                            };
                             self.conflicts.push(conflict);
                         }
                     }

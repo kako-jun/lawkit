@@ -126,9 +126,10 @@ pub struct GeneratedDataInfo {
     pub sample_data: Vec<f64>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum OutputFormat {
     #[serde(rename = "lawkit")]
+    #[default]
     Lawkit,
     #[serde(rename = "json")]
     Json,
@@ -154,12 +155,6 @@ impl OutputFormat {
             "text" | "txt" => Ok(Self::Text),
             _ => Err(anyhow!("Invalid output format: {}", s)),
         }
-    }
-}
-
-impl Default for OutputFormat {
-    fn default() -> Self {
-        OutputFormat::Lawkit
     }
 }
 
@@ -302,10 +297,8 @@ fn analyze_benford_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Law
     }
     .to_string();
 
-    let analysis_summary = format!(
-        "Benford's law analysis: p-value={:.4}, MAD={:.4}, risk={}",
-        p_value, mad, risk_level
-    );
+    let analysis_summary =
+        format!("Benford's law analysis: p-value={p_value:.4}, MAD={mad:.4}, risk={risk_level}");
 
     let benford_data = BenfordData {
         observed_distribution: observed,
@@ -367,8 +360,7 @@ fn analyze_pareto_principle(data: &Value, _options: &LawkitOptions) -> Result<Ve
     .to_string();
 
     let analysis_summary = format!(
-        "Pareto analysis: top 20% contributes {:.1}%, concentration index={:.3}, risk={}",
-        top_20_percent_contribution, concentration_index, risk_level
+        "Pareto analysis: top 20% contributes {top_20_percent_contribution:.1}%, concentration index={concentration_index:.3}, risk={risk_level}"
     );
 
     let pareto_data = ParetoData {
@@ -396,7 +388,7 @@ fn analyze_zipf_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Lawkit
     // Count frequencies and sort by frequency (descending)
     let mut frequency_map: HashMap<String, f64> = HashMap::new();
     for &num in &numbers {
-        let key = format!("{:.6}", num); // Use string representation for grouping
+        let key = format!("{num:.6}"); // Use string representation for grouping
         *frequency_map.entry(key).or_insert(0.0) += 1.0;
     }
 
@@ -433,8 +425,7 @@ fn analyze_zipf_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Lawkit
     .to_string();
 
     let analysis_summary = format!(
-        "Zipf analysis: coefficient={:.3}, correlation={:.3}, deviation={:.3}, risk={}",
-        zipf_coefficient, correlation, deviation_score, risk_level
+        "Zipf analysis: coefficient={zipf_coefficient:.3}, correlation={correlation:.3}, deviation={deviation_score:.3}, risk={risk_level}"
     );
 
     let zipf_data = ZipfData {
@@ -492,8 +483,7 @@ fn analyze_normal_distribution(
     .to_string();
 
     let analysis_summary = format!(
-        "Normal distribution analysis: mean={:.3}, std={:.3}, skew={:.3}, kurt={:.3}, p={:.4}, risk={}",
-        mean, std_dev, skewness, kurtosis, normality_test_p, risk_level
+        "Normal distribution analysis: mean={mean:.3}, std={std_dev:.3}, skew={skewness:.3}, kurt={kurtosis:.3}, p={normality_test_p:.4}, risk={risk_level}"
     );
 
     let normal_data = NormalData {
@@ -568,8 +558,7 @@ fn analyze_poisson_distribution(
     .to_string();
 
     let analysis_summary = format!(
-        "Poisson distribution analysis: lambda={:.3}, var/mean={:.3}, p={:.4}, risk={}",
-        lambda, variance_ratio, poisson_test_p, risk_level
+        "Poisson distribution analysis: lambda={lambda:.3}, var/mean={variance_ratio:.3}, p={poisson_test_p:.4}, risk={risk_level}"
     );
 
     let poisson_data = PoissonData {
@@ -650,9 +639,8 @@ fn analyze_all_laws(data: &Value, _options: &LawkitOptions) -> Result<Vec<Lawkit
     let recommendations = generate_recommendations(&laws_analyzed, &overall_risks);
 
     let analysis_summary = format!(
-        "Integrated analysis of {} laws completed. Overall risk: {}",
-        laws_analyzed.len(),
-        overall_risk
+        "Integrated analysis of {} laws completed. Overall risk: {overall_risk}",
+        laws_analyzed.len()
     );
 
     let integration_data = IntegrationData {
@@ -697,12 +685,12 @@ fn validate_data(data: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitRes
     let nan_count = numbers.iter().filter(|&&x| x.is_nan()).count();
 
     if infinite_count > 0 {
-        issues_found.push(format!("Found {} infinite values", infinite_count));
+        issues_found.push(format!("Found {infinite_count} infinite values"));
         validation_passed = false;
     }
 
     if nan_count > 0 {
-        issues_found.push(format!("Found {} NaN values", nan_count));
+        issues_found.push(format!("Found {nan_count} NaN values"));
         validation_passed = false;
     }
 
@@ -711,7 +699,7 @@ fn validate_data(data: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitRes
     let data_quality_score = if numbers.is_empty() {
         0.0
     } else {
-        (1.0 - (total_issues / 10.0)).max(0.0).min(1.0) // Scale to 0-1
+        (1.0 - (total_issues / 10.0)).clamp(0.0, 1.0) // Scale to 0-1
     };
 
     let analysis_summary = if validation_passed {
@@ -751,8 +739,8 @@ fn diagnose_data(data: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitRes
     };
 
     findings.push(format!("Sample size: {}", numbers.len()));
-    findings.push(format!("Mean: {:.3}", mean));
-    findings.push(format!("Median: {:.3}", median));
+    findings.push(format!("Mean: {mean:.3}"));
+    findings.push(format!("Median: {median:.3}"));
 
     // Data range analysis
     let min_val = numbers.iter().cloned().fold(f64::INFINITY, f64::min);
@@ -760,8 +748,7 @@ fn diagnose_data(data: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitRes
     let range = max_val - min_val;
 
     findings.push(format!(
-        "Range: {:.3} to {:.3} (span: {:.3})",
-        min_val, max_val, range
+        "Range: {min_val:.3} to {max_val:.3} (span: {range:.3})"
     ));
 
     // Distribution shape analysis
@@ -872,7 +859,7 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
 /// Parse JSON content - FOR INTERNAL USE ONLY
 /// External users should read files themselves and use law() function
 pub fn parse_json(content: &str) -> Result<Value> {
-    serde_json::from_str(content).map_err(|e| anyhow!("JSON parse error: {}", e))
+    serde_json::from_str(content).map_err(|e| anyhow!("JSON parse error: {e}"))
 }
 
 /// Parse CSV content - FOR INTERNAL USE ONLY
@@ -1009,7 +996,8 @@ pub fn format_output<T: Serialize>(results: &[T], format: OutputFormat) -> Resul
             output.push_str("type,summary\n");
             for result in results {
                 let json = serde_json::to_string(result)?;
-                output.push_str(&format!("result,\"{}\"\n", json.replace("\"", "\"\"")));
+                let escaped_json = json.replace("\"", "\"\"");
+                output.push_str(&format!("result,\"{escaped_json}\"\n"));
             }
             Ok(output)
         }
@@ -1274,3 +1262,13 @@ fn generate_poisson_data(count: usize, lambda: f64) -> Vec<f64> {
     }
     data
 }
+
+// ============================================================================
+// MODULE DECLARATIONS - For CLI and external access
+// ============================================================================
+
+pub mod common;
+pub mod core;
+pub mod error;
+pub mod generate;
+pub mod laws;
