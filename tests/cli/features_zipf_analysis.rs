@@ -39,7 +39,7 @@ fn test_basic_zipf_text_analysis() -> Result<(), Box<dyn std::error::Error>> {
     for i in 6..=100 {
         let frequency = 1000 / i;
         for _ in 0..frequency {
-            text_content.push_str(&format!("word{} ", i));
+            text_content.push_str(&format!("word{i} "));
         }
     }
 
@@ -115,7 +115,7 @@ fn test_word_count_limit() -> Result<(), Box<dyn std::error::Error>> {
     for i in 1..=10000 {
         let frequency = std::cmp::max(1, 100 / ((i as f64).sqrt() as i32));
         for _ in 0..frequency {
-            text_content.push_str(&format!("word{} ", i));
+            text_content.push_str(&format!("word{i} "));
         }
     }
 
@@ -258,7 +258,7 @@ fn test_language_zipf_analysis() -> Result<(), Box<dyn std::error::Error>> {
     for i in 21..=1000 {
         let frequency = std::cmp::max(1, 1000 / i);
         for _ in 0..frequency {
-            text_content.push_str(&format!("word{} ", i));
+            text_content.push_str(&format!("word{i} "));
         }
     }
 
@@ -299,7 +299,7 @@ fn test_zipf_statistical_significance() -> Result<(), Box<dyn std::error::Error>
         let base_count = 10000 / rank;
         let noise = (rank as f64 * 0.1) as i32;
         let count = base_count + noise - (noise / 2);
-        csv_content.push_str(&format!("Element{},{}\n", rank, count));
+        csv_content.push_str(&format!("Element{rank},{count}\n"));
     }
 
     fs::write(&stats_file, csv_content)?;
@@ -338,7 +338,7 @@ fn test_zipf_edge_cases() -> Result<(), Box<dyn std::error::Error>> {
     let mut csv_content = String::from("item,value\n");
 
     for i in 1..=100 {
-        csv_content.push_str(&format!("Item{},100\n", i)); // All equal values
+        csv_content.push_str(&format!("Item{i},100\n")); // All equal values
     }
 
     fs::write(&uniform_file, csv_content)?;
@@ -448,7 +448,7 @@ fn test_large_dataset_performance() -> Result<(), Box<dyn std::error::Error>> {
     for i in 1..=10000 {
         let frequency = std::cmp::max(1, 10000 / i);
         for _ in 0..frequency {
-            text_content.push_str(&format!("word{} ", i));
+            text_content.push_str(&format!("word{i} "));
         }
     }
 
@@ -472,8 +472,7 @@ fn test_large_dataset_performance() -> Result<(), Box<dyn std::error::Error>> {
     // Should complete large corpus analysis within reasonable time
     assert!(
         duration.as_secs() < 30,
-        "Large corpus analysis took too long: {:?}",
-        duration
+        "Large corpus analysis took too long: {duration:?}"
     );
 
     let stdout = String::from_utf8_lossy(&output.stdout);

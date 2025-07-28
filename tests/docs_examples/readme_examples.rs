@@ -1,7 +1,7 @@
-use assert_cmd::Command;
-use predicates::prelude::*;
-use std::fs::File;
+use assert_cmd::prelude::*;
+use predicates::str::contains;
 use std::io::Write;
+use std::process::Command;
 use tempfile::NamedTempFile;
 
 fn lawkit_cmd() -> Command {
@@ -24,7 +24,7 @@ fn test_benf_basic_analysis() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("benf").arg(temp_file.path());
     cmd.assert()
         .success()
-        .stdout(predicates::str::contains("Benford Law Analysis Results"));
+        .stdout(contains("Benford Law Analysis Results"));
 
     Ok(())
 }
@@ -37,9 +37,7 @@ fn test_pareto_sales_analysis() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("pareto").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Pareto Principle"));
+    cmd.assert().success().stdout(contains("Pareto Principle"));
 
     Ok(())
 }
@@ -55,9 +53,9 @@ fn test_analyze_all_laws() -> Result<(), Box<dyn std::error::Error>> {
         .arg("--laws")
         .arg("all")
         .arg(temp_file.path());
-    cmd.assert().success().stdout(predicates::str::contains(
-        "Statistical Laws Integration Analysis",
-    ));
+    cmd.assert()
+        .success()
+        .stdout(contains("Statistical Laws Integration Analysis"));
 
     Ok(())
 }
@@ -70,9 +68,7 @@ fn test_benf_performance_benchmark() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("benf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Numbers analyzed"));
+    cmd.assert().success().stdout(contains("Numbers analyzed"));
 
     Ok(())
 }
@@ -98,9 +94,7 @@ fn test_zipf_usage_example() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("zipf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Zipf"));
+    cmd.assert().success().stdout(contains("Zipf"));
 
     Ok(())
 }
@@ -113,9 +107,7 @@ fn test_normal_distribution_analysis() -> Result<(), Box<dyn std::error::Error>>
 
     let mut cmd = lawkit_cmd();
     cmd.arg("normal").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Normal"));
+    cmd.assert().success().stdout(contains("Normal"));
 
     Ok(())
 }
@@ -128,9 +120,7 @@ fn test_poisson_distribution_analysis() -> Result<(), Box<dyn std::error::Error>
 
     let mut cmd = lawkit_cmd();
     cmd.arg("poisson").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Poisson"));
+    cmd.assert().success().stdout(contains("Poisson"));
 
     Ok(())
 }
@@ -157,9 +147,7 @@ fn test_validate_data_integrity() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("validate").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("validation"));
+    cmd.assert().success().stdout(contains("validation"));
 
     Ok(())
 }
@@ -172,9 +160,7 @@ fn test_diagnose_conflicts() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("diagnose").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("conflicts"));
+    cmd.assert().success().stdout(contains("conflicts"));
 
     Ok(())
 }
@@ -184,9 +170,7 @@ fn test_list_available_laws() -> Result<(), Box<dyn std::error::Error>> {
     // Test case 12: List available statistical laws
     let mut cmd = lawkit_cmd();
     cmd.arg("list");
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("laws"));
+    cmd.assert().success().stdout(contains("laws"));
 
     Ok(())
 }
@@ -196,9 +180,7 @@ fn test_selftest_execution() -> Result<(), Box<dyn std::error::Error>> {
     // Test case 13: Self-test for all laws
     let mut cmd = lawkit_cmd();
     cmd.arg("selftest");
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("test"));
+    cmd.assert().success().stdout(contains("test"));
 
     Ok(())
 }
@@ -229,7 +211,7 @@ fn test_benf_with_visual_charts() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("benf").arg(temp_file.path());
     cmd.assert()
         .success()
-        .stdout(predicates::str::contains("First Digit Distribution"));
+        .stdout(contains("First Digit Distribution"));
 
     Ok(())
 }
@@ -243,9 +225,7 @@ fn test_pareto_lorenz_curve() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("pareto").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("80/20 Rule"));
+    cmd.assert().success().stdout(contains("80/20 Rule"));
 
     Ok(())
 }
@@ -258,9 +238,7 @@ fn test_analyze_integration_metrics() -> Result<(), Box<dyn std::error::Error>> 
 
     let mut cmd = lawkit_cmd();
     cmd.arg("analyze").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("analyzed"));
+    cmd.assert().success().stdout(contains("analyzed"));
 
     Ok(())
 }
@@ -273,9 +251,7 @@ fn test_risk_assessment() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("benf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Risk Level"));
+    cmd.assert().success().stdout(contains("Risk Level"));
 
     Ok(())
 }
@@ -288,9 +264,7 @@ fn test_statistical_tests() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("benf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Statistical Tests"));
+    cmd.assert().success().stdout(contains("Statistical Tests"));
 
     Ok(())
 }
@@ -303,9 +277,7 @@ fn test_chi_square_test() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("benf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Chi-square"));
+    cmd.assert().success().stdout(contains("Chi-square"));
 
     Ok(())
 }
@@ -320,7 +292,7 @@ fn test_mean_absolute_deviation() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("benf").arg(temp_file.path());
     cmd.assert()
         .success()
-        .stdout(predicates::str::contains("Mean Absolute Deviation"));
+        .stdout(contains("Mean Absolute Deviation"));
 
     Ok(())
 }
@@ -333,9 +305,7 @@ fn test_cumulative_distribution() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("pareto").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("cumulative"));
+    cmd.assert().success().stdout(contains("cumulative"));
 
     Ok(())
 }
@@ -348,9 +318,7 @@ fn test_quality_score_metrics() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("analyze").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Quality Score"));
+    cmd.assert().success().stdout(contains("Quality Score"));
 
     Ok(())
 }
@@ -363,9 +331,7 @@ fn test_consistency_score() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("analyze").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Consistency Score"));
+    cmd.assert().success().stdout(contains("Consistency Score"));
 
     Ok(())
 }
@@ -380,7 +346,7 @@ fn test_conflicts_detection() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("analyze").arg(temp_file.path());
     cmd.assert()
         .success()
-        .stdout(predicates::str::contains("Conflicts Detected"));
+        .stdout(contains("Conflicts Detected"));
 
     Ok(())
 }
@@ -395,7 +361,7 @@ fn test_recommendation_confidence() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("analyze").arg(temp_file.path());
     cmd.assert()
         .success()
-        .stdout(predicates::str::contains("Recommendation Confidence"));
+        .stdout(contains("Recommendation Confidence"));
 
     Ok(())
 }
@@ -411,9 +377,7 @@ fn test_laws_executed_count() -> Result<(), Box<dyn std::error::Error>> {
         .arg("--laws")
         .arg("benf,pareto,zipf")
         .arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Laws Executed"));
+    cmd.assert().success().stdout(contains("Laws Executed"));
 
     Ok(())
 }
@@ -423,9 +387,9 @@ fn test_help_command() -> Result<(), Box<dyn std::error::Error>> {
     // Test case 28: Help command usage
     let mut cmd = lawkit_cmd();
     cmd.arg("--help");
-    cmd.assert().success().stdout(predicates::str::contains(
-        "Statistical law analysis toolkit",
-    ));
+    cmd.assert()
+        .success()
+        .stdout(contains("Statistical law analysis toolkit"));
 
     Ok(())
 }
