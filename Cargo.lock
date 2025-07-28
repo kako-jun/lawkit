@@ -647,7 +647,7 @@ checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
 
 [[package]]
 name = "diffx-core"
-version = "0.5.7"
+version = "0.5.8"
 dependencies = [
  "anyhow",
  "configparser",
@@ -1249,6 +1249,7 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
+ "regex",
  "serde",
  "serde_json",
 ]

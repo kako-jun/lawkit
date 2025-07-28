@@ -22,13 +22,7 @@ crate-type = ["cdylib", "rlib"]
 name = "lawkit"
 path = "src/main.rs"
 
-[[bin]]
-name = "benf"
-path = "src/bin/benf.rs"
-
-[[bin]]
-name = "pareto"
-path = "src/bin/pareto.rs"
+# Standalone binaries are in separate crates: benf-standalone and pareto-standalone
 
 [dependencies]
 lawkit-core = { version = "2.5.16", path = "../lawkit-core" }
@@ -51,29 +45,9 @@ assert_cmd = { workspace = true }
 
 # Integration tests configuration
 [[test]]
-name = "basic"
-path = "../tests/basic/mod.rs"
-
-[[test]]
 name = "cli"
 path = "../tests/cli/mod.rs"
 
 [[test]]
-name = "core"
-path = "../tests/core/mod.rs"
-
-[[test]]
 name = "docs_examples"
 path = "../tests/docs_examples/mod.rs"
-
-[[test]]
-name = "errors"
-path = "../tests/errors/mod.rs"
-
-[[test]]
-name = "features"
-path = "../tests/features/mod.rs"
-
-[[test]]
-name = "formats"
-path = "../tests/formats/mod.rs"
