@@ -75,7 +75,7 @@ mod risk_level_tests {
     #[test]
     fn test_risk_level_consistency() {
         // Test that risk levels are consistently ordered
-        let test_p_values = vec![0.0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.2, 0.5, 1.0];
+        let test_p_values = [0.0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.2, 0.5, 1.0];
         let mut _previous_risk_numeric = 4; // Start higher than any valid risk level
 
         for p_value in test_p_values {
@@ -201,7 +201,7 @@ mod confidence_score_tests {
     #[test]
     fn test_confidence_score_bounds() {
         // Test that confidence score is always between 0 and 1
-        let test_cases = vec![
+        let test_cases = [
             (0, 0.0, 0.0),
             (1, 1.0, 100.0),
             (10000, 0.001, 0.1),
@@ -268,7 +268,7 @@ mod integrated_risk_assessment_tests {
     #[test]
     fn test_borderline_risk_assessment() {
         // Test borderline cases between risk levels
-        let borderline_cases = vec![
+        let borderline_cases = [
             (0.100, lawkit_core::common::risk::RiskLevel::Medium), // Exactly at boundary
             (0.050, lawkit_core::common::risk::RiskLevel::High),   // Exactly at boundary
             (0.010, lawkit_core::common::risk::RiskLevel::Critical), // Exactly at boundary

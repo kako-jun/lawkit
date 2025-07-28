@@ -34,7 +34,7 @@ mod benford_distribution_tests {
 
     #[test]
     fn test_extract_first_digits() {
-        let numbers = vec![123.45, 234.56, 345.67, 456.78];
+        let numbers = [123.45, 234.56, 345.67, 456.78];
         let first_digits: Vec<u8> = numbers
             .iter()
             .filter_map(|&n| lawkit_core::laws::benford::analysis::get_first_digit(n))
@@ -45,7 +45,7 @@ mod benford_distribution_tests {
     #[test]
     fn test_extract_first_digits_edge_cases() {
         // Test with zero - should be filtered out for Benford's Law
-        let numbers = vec![0.0, 123.0, 0.001, 456.0];
+        let numbers = [0.0, 123.0, 0.001, 456.0];
         let first_digits: Vec<u8> = numbers
             .iter()
             .filter_map(|&n| lawkit_core::laws::benford::analysis::get_first_digit(n))
@@ -54,7 +54,7 @@ mod benford_distribution_tests {
         assert_eq!(first_digits, vec![1, 4]);
 
         // Test with negative numbers - should use absolute value
-        let numbers = vec![-123.0, -234.0, 345.0];
+        let numbers = [-123.0, -234.0, 345.0];
         let first_digits: Vec<u8> = numbers
             .iter()
             .filter_map(|&n| lawkit_core::laws::benford::analysis::get_first_digit(n))
@@ -62,7 +62,7 @@ mod benford_distribution_tests {
         assert_eq!(first_digits, vec![1, 2, 3]);
 
         // Test with decimal numbers less than 1 - should be filtered out
-        let numbers = vec![0.123, 0.234, 0.345];
+        let numbers = [0.123, 0.234, 0.345];
         let first_digits: Vec<u8> = numbers
             .iter()
             .filter_map(|&n| lawkit_core::laws::benford::analysis::get_first_digit(n))
@@ -74,7 +74,7 @@ mod benford_distribution_tests {
     #[test]
     fn test_calculate_first_digit_distribution() {
         // Use actual numbers instead of pre-extracted digits
-        let numbers = vec![100.0, 100.0, 100.0, 200.0, 200.0, 300.0];
+        let numbers = [100.0, 100.0, 100.0, 200.0, 200.0, 300.0];
         let distribution =
             lawkit_core::laws::benford::analysis::calculate_digit_distribution(&numbers);
 
