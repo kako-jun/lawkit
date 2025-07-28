@@ -224,7 +224,7 @@ fn test_language_zipf_analysis() -> Result<(), Box<dyn std::error::Error>> {
     let language_file = temp_dir.path().join("language.txt");
 
     // Create realistic English text with natural word distribution
-    let common_words = vec![
+    let common_words = [
         ("the", 1000),
         ("and", 500),
         ("of", 333),

@@ -18,7 +18,7 @@ mod chinese_numerals_tests {
     #[test]
     fn test_chinese_financial_complex() {
         // Test complex Chinese financial numerals
-        let test_cases = vec![
+        let test_cases = [
             ("壹", "1"),
             ("拾", "10"),
             ("壹拾", "10"),
@@ -77,7 +77,7 @@ mod hindi_numerals_tests {
     #[test]
     fn test_all_hindi_digits() {
         // Test all Devanagari digits
-        let test_cases = vec![
+        let test_cases = [
             ("०", "0"),
             ("१", "1"),
             ("२", "2"),
@@ -124,7 +124,7 @@ mod arabic_numerals_tests {
     #[test]
     fn test_all_arabic_digits() {
         // Test all Arabic-Indic digits
-        let test_cases = vec![
+        let test_cases = [
             ("٠", "0"),
             ("١", "1"),
             ("٢", "2"),
