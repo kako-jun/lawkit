@@ -42,6 +42,7 @@ python = ["pyo3"]
 tempfile = { workspace = true }
 pretty_assertions = { workspace = true }
 assert_cmd = { workspace = true }
+predicates = "3.0"
 
 # Integration tests configuration
 [[test]]

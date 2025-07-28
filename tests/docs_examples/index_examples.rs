@@ -1,7 +1,7 @@
-use assert_cmd::Command;
-use predicates::prelude::*;
-use std::fs::File;
+use assert_cmd::prelude::*;
+use predicates::str::contains;
 use std::io::Write;
+use std::process::Command;
 use tempfile::NamedTempFile;
 
 fn lawkit_cmd() -> Command {
@@ -22,9 +22,7 @@ fn test_benf_data_csv() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("benf").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Benford"));
+    cmd.assert().success().stdout(contains("Benford"));
 
     Ok(())
 }
@@ -37,9 +35,7 @@ fn test_pareto_sales_csv() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut cmd = lawkit_cmd();
     cmd.arg("pareto").arg(temp_file.path());
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("Pareto"));
+    cmd.assert().success().stdout(contains("Pareto"));
 
     Ok(())
 }
@@ -55,9 +51,7 @@ fn test_analyze_multi_laws() -> Result<(), Box<dyn std::error::Error>> {
         .arg(temp_file.path())
         .arg("--laws")
         .arg("benf,pareto,normal");
-    cmd.assert()
-        .success()
-        .stdout(predicates::str::contains("analyzed"));
+    cmd.assert().success().stdout(contains("analyzed"));
 
     Ok(())
 }

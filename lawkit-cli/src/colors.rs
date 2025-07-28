@@ -91,6 +91,7 @@ pub fn level_pass(message: &str, no_color: bool) -> String {
     format!("[{}] {}", pass("PASS", no_color), message)
 }
 
+#[allow(dead_code)]
 pub fn level_conflict(message: &str, no_color: bool) -> String {
     format!("[{}] {}", fail("CONFLICT", no_color), message)
 }
@@ -104,26 +105,31 @@ pub fn level_warn(message: &str, no_color: bool) -> String {
 }
 
 /// ボールドテキスト  
+#[allow(dead_code)]
 pub fn bold(text: &str) -> String {
     format!("{}", text.bold())
 }
 
 /// 赤色テキスト
+#[allow(dead_code)]
 pub fn red(text: &str) -> String {
     format!("{}", text.red())
 }
 
 /// 黄色テキスト
+#[allow(dead_code)]
 pub fn yellow(text: &str) -> String {
     format!("{}", text.yellow())
 }
 
 /// 緑色テキスト
+#[allow(dead_code)]
 pub fn green(text: &str) -> String {
     format!("{}", text.green())
 }
 
 /// シアン色テキスト
+#[allow(dead_code)]
 pub fn cyan(text: &str) -> String {
     format!("{}", text.cyan())
 }

@@ -8,6 +8,7 @@ use lawkit_core::laws::integration::IntegrationResult;
 use lawkit_core::{IntegrationData, LawkitResult};
 use std::io::Write;
 
+#[allow(dead_code)]
 pub fn print_integration_header(matches: &ArgMatches) {
     let no_color = matches.get_flag("no-color");
 
@@ -21,6 +22,7 @@ pub fn print_integration_header(matches: &ArgMatches) {
     println!();
 }
 
+#[allow(dead_code)]
 pub fn print_integration_summary(data: &IntegrationData, no_color: bool) {
     // Analysis summary
     println!("{}", data.analysis_summary);
@@ -87,6 +89,7 @@ pub fn print_integration_summary(data: &IntegrationData, no_color: bool) {
     }
 }
 
+#[allow(dead_code)]
 pub fn print_individual_results(results: &[LawkitResult], matches: &ArgMatches) {
     let no_color = matches.get_flag("no-color");
     let verbose = matches.get_flag("verbose");
