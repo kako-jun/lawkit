@@ -101,10 +101,10 @@ async function runExamples(): Promise<void> {
         };
 
         log('Analyzing legitimate transactions...', 'blue');
-        const legitimateResults = await law('benford', legitimateTransactions, fraudOptions);
+        const legitimateResults = law('benford', legitimateTransactions, fraudOptions);
         
         log('Analyzing suspicious transactions...', 'blue');
-        const suspiciousResults = await law('benford', suspiciousTransactions, fraudOptions);
+        const suspiciousResults = law('benford', suspiciousTransactions, fraudOptions);
 
         // Process results
         legitimateResults.forEach((result: LawkitResult) => {
@@ -141,8 +141,8 @@ async function runExamples(): Promise<void> {
             outputFormat: 'json'
         };
 
-        const salesAnalysis = await law('analyze', { sales: salesData }, qualityOptions);
-        const customerAnalysis = await law('analyze', { customers: customerData }, qualityOptions);
+        const salesAnalysis = law('analyze', { sales: salesData }, qualityOptions);
+        const customerAnalysis = law('analyze', { customers: customerData }, qualityOptions);
 
         log('Sales Data Analysis:', 'green');
         salesAnalysis.forEach((result: LawkitResult) => {
@@ -176,7 +176,7 @@ async function runExamples(): Promise<void> {
             detailedReport: true
         };
 
-        const auditResults = await law('validate', expenseData, auditOptions);
+        const auditResults = law('validate', expenseData, auditOptions);
         
         auditResults.forEach((result: LawkitResult) => {
             if (result.type === 'ValidationResult') {
@@ -209,7 +209,7 @@ async function runExamples(): Promise<void> {
             const batchData = generateBenfordData(500);
             log(`Processing batch ${batch}...`, 'yellow');
             
-            const streamResults = await law('benford', batchData, streamingOptions);
+            const streamResults = law('benford', batchData, streamingOptions);
             
             streamResults.forEach((result: LawkitResult) => {
                 if (result.type === 'BenfordAnalysis') {
@@ -237,7 +237,7 @@ async function runExamples(): Promise<void> {
         };
 
         try {
-            const intlResults = await law('benford', mixedData, internationalOptions);
+            const intlResults = law('benford', mixedData, internationalOptions);
             log('International data processed successfully', 'green');
             intlResults.forEach((result: LawkitResult) => {
                 console.log(`  ${result.type}: ${result.analysisSummary || 'Analysis completed'}`);
@@ -261,7 +261,7 @@ async function runExamples(): Promise<void> {
         ];
 
         for (const config of generationConfigs) {
-            const generated = await law('generate', config);
+            const generated = law('generate', config);
             
             generated.forEach((result: LawkitResult) => {
                 if (result.type === 'GeneratedData') {
@@ -291,7 +291,7 @@ async function runExamples(): Promise<void> {
         for (const testCase of edgeCases) {
             try {
                 log(`Testing: ${testCase.description}`, 'yellow');
-                const diagnostics = await law('diagnose', testCase.data);
+                const diagnostics = law('diagnose', testCase.data);
                 
                 diagnostics.forEach((result: LawkitResult) => {
                     if (result.type === 'DiagnosticResult') {
@@ -324,7 +324,7 @@ async function runExamples(): Promise<void> {
             };
 
             const startTime = Date.now();
-            const perfResults = await law('benford', largeDataset, perfOptions);
+            const perfResults = law('benford', largeDataset, perfOptions);
             const endTime = Date.now();
             
             const duration = endTime - startTime;
