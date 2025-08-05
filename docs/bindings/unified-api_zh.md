@@ -309,7 +309,7 @@ import { law, LawkitOptions } from 'lawkit-js';
 
 // 本福德定律分析
 const data = [123, 456, 789, 111, 222, 333];
-const result = await law('benford', data);
+const result = law('benford', data);
 
 // 带选项
 const options: LawkitOptions = {
@@ -318,14 +318,14 @@ const options: LawkitOptions = {
     confidenceLevel: 0.99,
     detailedReport: true
 };
-const result = await law('benford', data, options);
+const result = law('benford', data, options);
 
 // 自动分析
 const analysisOptions: LawkitOptions = {
     lawsToCheck: ['benford', 'pareto', 'normal'],
     includeMetadata: true
 };
-const result = await law('analyze', { dataset: data }, analysisOptions);
+const result = law('analyze', { dataset: data }, analysisOptions);
 ```
 
 ## 示例
