@@ -27,11 +27,11 @@ describe('Lawkit Unified API Tests', () => {
             expect(typeof lawkit.law).toBe('function');
         });
 
-        test('law function accepts expected parameters', async () => {
+        test('law function accepts expected parameters', () => {
             // Should accept subcommand, data, and optional options
             try {
                 // This should not crash due to signature issues
-                await lawkit.law("validate", [1, 2, 3]);
+                lawkit.law("validate", [1, 2, 3]);
                 // Result may fail due to data issues, but function should exist
             } catch (error) {
                 // Function exists if we get a lawkit-specific error, not TypeError
@@ -45,10 +45,10 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Core Statistical Law Analysis', () => {
-        test('Benford analysis through unified API', async () => {
+        test('Benford analysis through unified API', () => {
             const data = fixtures.benfordCompliantData();
             
-            const results = await lawkit.law("benford", data);
+            const results = lawkit.law("benford", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -76,10 +76,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(benfordData.analysis_summary).not.toBe('');
         });
 
-        test('Pareto analysis through unified API', async () => {
+        test('Pareto analysis through unified API', () => {
             const data = fixtures.paretoCompliantData();
             
-            const results = await lawkit.law("pareto", data);
+            const results = lawkit.law("pareto", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -101,10 +101,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(paretoData.top_20_percent_contribution).toBeGreaterThan(60.0); // Should be high for compliant data
         });
 
-        test('Zipf analysis through unified API', async () => {
+        test('Zipf analysis through unified API', () => {
             const data = fixtures.zipfCompliantData();
             
-            const results = await lawkit.law("zipf", data);
+            const results = lawkit.law("zipf", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -126,10 +126,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(zipfData.total_items).toBeGreaterThan(0);
         });
 
-        test('Normal analysis through unified API', async () => {
+        test('Normal analysis through unified API', () => {
             const data = fixtures.normalDistributionData();
             
-            const results = await lawkit.law("normal", data);
+            const results = lawkit.law("normal", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -152,10 +152,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(normalData.total_numbers).toBeGreaterThan(0);
         });
 
-        test('Poisson analysis through unified API', async () => {
+        test('Poisson analysis through unified API', () => {
             const data = fixtures.poissonDistributionData();
             
-            const results = await lawkit.law("poisson", data);
+            const results = lawkit.law("poisson", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -177,10 +177,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(poissonData.total_events).toBeGreaterThan(0);
         });
 
-        test('Data validation through unified API', async () => {
+        test('Data validation through unified API', () => {
             const data = fixtures.validationTestData().valid_dataset;
             
-            const results = await lawkit.law("validate", data);
+            const results = lawkit.law("validate", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -197,10 +197,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(validationData.data_quality_score).toBeGreaterThan(0.0);
         });
 
-        test('Data diagnostics through unified API', async () => {
+        test('Data diagnostics through unified API', () => {
             const data = fixtures.diagnosticTestData().normal_with_outliers;
             
-            const results = await lawkit.law("diagnose", data);
+            const results = lawkit.law("diagnose", data);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -220,10 +220,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(diagnosticData.confidence_level).toBeLessThanOrEqual(1.0);
         });
 
-        test('Data generation through unified API', async () => {
+        test('Data generation through unified API', () => {
             const config = fixtures.generationConfigs().benford_config;
             
-            const results = await lawkit.law("generate", config);
+            const results = lawkit.law("generate", config);
             
             expect(results).toHaveLength(1);
             const result = results[0];
@@ -244,10 +244,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(Object.keys(generatedInfo.parameters).length).toBeGreaterThan(0);
         });
 
-        test('Comprehensive analysis through unified API', async () => {
+        test('Comprehensive analysis through unified API', () => {
             const data = fixtures.integrationAnalysisData();
             
-            const results = await lawkit.law("analyze", data);
+            const results = lawkit.law("analyze", data);
             
             // Should have multiple analysis results plus integration
             expect(results.length).toBeGreaterThan(1);
@@ -270,10 +270,10 @@ describe('Lawkit Unified API Tests', () => {
             expect(integrationData.recommendations.length).toBeGreaterThan(0);
         });
 
-        test('Unknown subcommand error handling', async () => {
+        test('Unknown subcommand error handling', () => {
             const data = [1, 2, 3];
             
-            await expect(lawkit.law("unknown", data)).rejects.toThrow(/Unknown subcommand/);
+            expect(() => lawkit.law("unknown", data)).toThrow(/Unknown subcommand/);
         });
     });
 
@@ -282,26 +282,26 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Statistical Law Risk Assessment', () => {
-        test('Benford risk levels', async () => {
+        test('Benford risk levels', () => {
             // Test compliant data (should be LOW or MEDIUM risk)
             const compliantData = fixtures.benfordCompliantData();
-            const compliantResults = await lawkit.law("benford", compliantData);
+            const compliantResults = lawkit.law("benford", compliantData);
             
             const benfordData = compliantResults[0].data;
             expect(['LOW', 'MEDIUM']).toContain(benfordData.risk_level);
             
             // Test non-compliant data (should be higher risk)
             const nonCompliantData = fixtures.benfordNonCompliantData();
-            const nonCompliantResults = await lawkit.law("benford", nonCompliantData);
+            const nonCompliantResults = lawkit.law("benford", nonCompliantData);
             
             const nonCompliantBenfordData = nonCompliantResults[0].data;
             expect(['MEDIUM', 'HIGH']).toContain(nonCompliantBenfordData.risk_level);
         });
 
-        test('Pareto principle compliance', async () => {
+        test('Pareto principle compliance', () => {
             // Test compliant data
             const compliantData = fixtures.paretoCompliantData();
-            const compliantResults = await lawkit.law("pareto", compliantData);
+            const compliantResults = lawkit.law("pareto", compliantData);
             
             const paretoData = compliantResults[0].data;
             expect(paretoData.top_20_percent_contribution).toBeGreaterThan(60.0);
@@ -309,16 +309,16 @@ describe('Lawkit Unified API Tests', () => {
             
             // Test non-compliant data
             const nonCompliantData = fixtures.paretoNonCompliantData();
-            const nonCompliantResults = await lawkit.law("pareto", nonCompliantData);
+            const nonCompliantResults = lawkit.law("pareto", nonCompliantData);
             
             const nonCompliantParetoData = nonCompliantResults[0].data;
             expect(nonCompliantParetoData.top_20_percent_contribution).toBeLessThan(60.0);
         });
 
-        test('Normal distribution detection', async () => {
+        test('Normal distribution detection', () => {
             // Test normal data
             const normalData = fixtures.normalDistributionData();
-            const normalResults = await lawkit.law("normal", normalData);
+            const normalResults = lawkit.law("normal", normalData);
             
             const normalAnalysis = normalResults[0].data;
             expect(Math.abs(normalAnalysis.skewness)).toBeLessThan(2.0); // Not too skewed
@@ -327,16 +327,16 @@ describe('Lawkit Unified API Tests', () => {
             
             // Test non-normal data
             const nonNormalData = fixtures.nonNormalDistributionData();
-            const nonNormalResults = await lawkit.law("normal", nonNormalData);
+            const nonNormalResults = lawkit.law("normal", nonNormalData);
             
             const nonNormalAnalysis = nonNormalResults[0].data;
             expect(['MEDIUM', 'HIGH']).toContain(nonNormalAnalysis.risk_level);
         });
 
-        test('Poisson distribution detection', async () => {
+        test('Poisson distribution detection', () => {
             // Test Poisson data
             const poissonData = fixtures.poissonDistributionData();
-            const poissonResults = await lawkit.law("poisson", poissonData);
+            const poissonResults = lawkit.law("poisson", poissonData);
             
             const poissonAnalysis = poissonResults[0].data;
             expect(poissonAnalysis.lambda).toBeGreaterThan(0.0);
@@ -345,7 +345,7 @@ describe('Lawkit Unified API Tests', () => {
             
             // Test non-Poisson data
             const nonPoissonData = fixtures.nonPoissonData();
-            const nonPoissonResults = await lawkit.law("poisson", nonPoissonData);
+            const nonPoissonResults = lawkit.law("poisson", nonPoissonData);
             
             const nonPoissonAnalysis = nonPoissonResults[0].data;
             expect(['MEDIUM', 'HIGH']).toContain(nonPoissonAnalysis.risk_level);
@@ -357,7 +357,7 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Options Testing', () => {
-        test('lawkit-specific options', async () => {
+        test('lawkit-specific options', () => {
             const data = fixtures.benfordCompliantData();
             
             const options = {
@@ -368,14 +368,14 @@ describe('Lawkit Unified API Tests', () => {
                 enable_outlier_detection: true
             };
             
-            const results = await lawkit.law("benford", data, options);
+            const results = lawkit.law("benford", data, options);
             
             expect(results).toHaveLength(1);
             const benfordData = results[0].data;
             expect(benfordData.total_numbers).toBeGreaterThan(0);
         });
 
-        test('Benford-specific options', async () => {
+        test('Benford-specific options', () => {
             const data = fixtures.benfordCompliantData();
             
             const options = {
@@ -383,7 +383,7 @@ describe('Lawkit Unified API Tests', () => {
                 benford_base: 10
             };
             
-            const results = await lawkit.law("benford", data, options);
+            const results = lawkit.law("benford", data, options);
             
             const benfordData = results[0].data;
             // Should analyze first digits (9 digits: 1-9)
@@ -391,7 +391,7 @@ describe('Lawkit Unified API Tests', () => {
             expect(benfordData.expected_distribution).toHaveLength(9);
         });
 
-        test('Pareto-specific options', async () => {
+        test('Pareto-specific options', () => {
             const data = fixtures.paretoCompliantData();
             
             const options = {
@@ -399,14 +399,14 @@ describe('Lawkit Unified API Tests', () => {
                 pareto_category_limit: 100
             };
             
-            const results = await lawkit.law("pareto", data, options);
+            const results = lawkit.law("pareto", data, options);
             
             const paretoData = results[0].data;
             expect(paretoData.total_items).toBeGreaterThan(0);
             expect(paretoData.top_20_percent_contribution).toBeGreaterThan(0.0);
         });
 
-        test('Generation options', async () => {
+        test('Generation options', () => {
             const config = {
                 type: "normal",
                 count: 500,
@@ -421,7 +421,7 @@ describe('Lawkit Unified API Tests', () => {
                 generate_seed: 12345
             };
             
-            const results = await lawkit.law("generate", config, options);
+            const results = lawkit.law("generate", config, options);
             
             const generatedInfo = results[0].data;
             expect(generatedInfo.data_type).toBe("normal");
@@ -437,20 +437,20 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Output Format Tests', () => {
-        test('default output format', async () => {
+        test('default output format', () => {
             const data = [1, 2, 3];
             
-            const results = await lawkit.law("validate", data);
+            const results = lawkit.law("validate", data);
             expect(Array.isArray(results)).toBe(true);
             expect(results.length).toBeGreaterThan(0);
         });
 
-        test('output format options if supported', async () => {
+        test('output format options if supported', () => {
             const data = [1, 2, 3];
             
             try {
                 const options = { output_format: "json" };
-                const results = await lawkit.law("validate", data, options);
+                const results = lawkit.law("validate", data, options);
                 expect(Array.isArray(results)).toBe(true);
             } catch (error) {
                 // Format options might not be implemented at JS binding level
@@ -464,28 +464,28 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Error Handling', () => {
-        test('empty data handling', async () => {
+        test('empty data handling', () => {
             const emptyData = [];
             
-            await expect(lawkit.law("benford", emptyData)).rejects.toThrow(/No valid numbers found/);
+            expect(() => lawkit.law("benford", emptyData)).toThrow(/No valid numbers found/);
         });
 
-        test('invalid data handling', async () => {
+        test('invalid data handling', () => {
             const invalidData = { "not": "numbers" };
             
-            await expect(lawkit.law("benford", invalidData)).rejects.toThrow(/No valid numbers found/);
+            expect(() => lawkit.law("benford", invalidData)).toThrow(/No valid numbers found/);
         });
 
-        test('small sample size', async () => {
+        test('small sample size', () => {
             const smallData = [1.0, 2.0];
             
-            await expect(lawkit.law("normal", smallData)).rejects.toThrow(/Insufficient data points/);
+            expect(() => lawkit.law("normal", smallData)).toThrow(/Insufficient data points/);
         });
 
-        test('validation with issues', async () => {
+        test('validation with issues', () => {
             const problematicData = fixtures.validationTestData().small_dataset;
             
-            const results = await lawkit.law("validate", problematicData);
+            const results = lawkit.law("validate", problematicData);
             
             const validationData = results[0].data;
             expect(validationData.validation_passed).toBe(false);
@@ -500,10 +500,10 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('JavaScript Binding Tests', () => {
-        test('JavaScript type conversion', async () => {
+        test('JavaScript type conversion', () => {
             // Test with JavaScript array
             const jsArray = [1.0, 2.0, 3.0, 4.0, 5.0];
-            const results = await lawkit.law("validate", jsArray);
+            const results = lawkit.law("validate", jsArray);
             expect(Array.isArray(results)).toBe(true);
             
             // Test with nested JavaScript objects
@@ -511,47 +511,45 @@ describe('Lawkit Unified API Tests', () => {
                 numbers: [1, 2, 3],
                 values: [4.0, 5.0, 6.0]
             };
-            const nestedResults = await lawkit.law("validate", nestedData);
+            const nestedResults = lawkit.law("validate", nestedData);
             expect(Array.isArray(nestedResults)).toBe(true);
         });
 
-        test('Promise handling', async () => {
+        test('synchronous function handling', () => {
             const data = [1, 2, 3, 4, 5];
             
-            // Test that function returns a Promise
-            const promise = lawkit.law("validate", data);
-            expect(promise).toBeInstanceOf(Promise);
+            // Test that function returns results directly
+            const results = lawkit.law("validate", data);
             
-            // Test Promise resolution
-            const results = await promise;
+            // Test direct result access
             expect(Array.isArray(results)).toBe(true);
         });
 
-        test('Error promise rejection', async () => {
-            // Test that errors are properly rejected as Promises
-            await expect(lawkit.law("invalid_command", [1, 2, 3])).rejects.toThrow();
+        test('Error handling', () => {
+            // Test that errors are properly thrown
+            expect(() => lawkit.law("invalid_command", [1, 2, 3])).toThrow();
             
             // Test with null data
-            await expect(lawkit.law("benford", null)).rejects.toThrow();
+            expect(() => lawkit.law("benford", null)).toThrow();
         });
 
-        test('Large dataset performance', async () => {
+        test('Large dataset performance', () => {
             // Generate larger dataset for JavaScript performance testing
             const largeData = Array.from({ length: 1000 }, (_, i) => i + 1);
             
             const startTime = Date.now();
-            const results = await lawkit.law("validate", largeData);
+            const results = lawkit.law("validate", largeData);
             const endTime = Date.now();
             
             expect(Array.isArray(results)).toBe(true);
             expect(endTime - startTime).toBeLessThan(5000); // Should complete within 5 seconds
         });
 
-        test('Memory management', async () => {
+        test('Memory management', () => {
             // Test that large data structures are properly cleaned up
             for (let i = 0; i < 10; i++) {
                 const largeData = Array.from({ length: 100 }, (_, j) => i * 100 + j);
-                const results = await lawkit.law("validate", largeData);
+                const results = lawkit.law("validate", largeData);
                 expect(Array.isArray(results)).toBe(true);
                 // Force cleanup between iterations
                 global.gc && global.gc();
@@ -564,7 +562,7 @@ describe('Lawkit Unified API Tests', () => {
     // ============================================================================
 
     describe('Integration Tests', () => {
-        test('comprehensive analysis workflow', async () => {
+        test('comprehensive analysis workflow', () => {
             const integrationData = fixtures.integrationAnalysisData();
             
             const options = {
@@ -572,7 +570,7 @@ describe('Lawkit Unified API Tests', () => {
                 show_recommendations: true
             };
             
-            const results = await lawkit.law("analyze", integrationData, options);
+            const results = lawkit.law("analyze", integrationData, options);
             
             // Should have multiple analyses
             expect(results.length).toBeGreaterThan(1);
@@ -588,19 +586,19 @@ describe('Lawkit Unified API Tests', () => {
             expect(resultTypes.has('IntegrationAnalysis')).toBe(true);
         });
 
-        test('data generation and analysis cycle', async () => {
+        test('data generation and analysis cycle', () => {
             // Generate Benford data
             const config = {
                 type: "benford",
                 count: 100
             };
             
-            const generationResults = await lawkit.law("generate", config);
+            const generationResults = lawkit.law("generate", config);
             const generatedInfo = generationResults[0].data;
             const generatedData = generatedInfo.sample_data;
             
             // Analyze the generated data
-            const analysisResults = await lawkit.law("benford", generatedData);
+            const analysisResults = lawkit.law("benford", generatedData);
             
             const benfordData = analysisResults[0].data;
             // Generated Benford data should show low risk

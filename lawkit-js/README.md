@@ -48,82 +48,86 @@ lawkit diagnose data.csv --report detailed
 lawkit generate benf --count 1000 --output-file test-data.csv
 ```
 
-### JavaScript API
+### JavaScript API (Unified API)
 
 ```javascript
-const { benford, pareto, zipf, normal, poisson, analyze, validate, diagnose, generate, list } = require('lawkit-js');
+const { law } = require('lawkit-js');
 
-// Analyze array data
-const numbers = [1, 10, 100, 1000, 2000];
-const result = await benford(numbers, { output: 'json' });
-console.log('Risk level:', result.risk_level);
+// Benford's Law analysis on JavaScript array
+const numbers = [123, 187, 234, 298, 345, 456, 567, 678, 789, 1234];
+const benfordResult = law("benford", numbers);
 
-// Analyze file data
-const fileResult = await benford('data.csv', { 
-  output: 'json',
-  confidence: 0.99 
-});
+console.log(`Benford analysis: ${benfordResult[0].data.analysis_summary}`);
+console.log(`Risk level: ${benfordResult[0].data.risk_level}`);
+console.log(`P-value: ${benfordResult[0].data.p_value}`);
 
-// Generate sample data
-const sampleData = await generate('benf', { 
-  count: 1000,
-  outputFile: 'sample.csv' 
-});
+// Pareto analysis
+const salesData = [10000, 9500, 9000, 8500, 1000, 950, 900, 850, 800, 750];
+const paretoResult = law("pareto", salesData);
 
-// Multi-law analysis
-const analysisResult = await analyze('data.csv', {
-  output: 'json',
-  crossValidation: true
-});
+console.log(`Top 20% contribution: ${paretoResult[0].data.top_20_percent_contribution}%`);
+
+// Normal distribution analysis
+const qualityScores = [98.5, 99.2, 100.1, 99.8, 100.4, 99.6, 100.8, 99.9];
+const normalResult = law("normal", qualityScores);
+
+console.log(`Mean: ${normalResult[0].data.mean}`);
+console.log(`Standard deviation: ${normalResult[0].data.std_dev}`);
 
 // Data validation
-const validationResult = await validate('data.csv', {
-  consistencyCheck: true,
-  report: true
-});
+const testData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const validationResult = law("validate", testData);
 
-// List available laws
-const availableLaws = await list({ output: 'json' });
+console.log(`Validation passed: ${validationResult[0].data.validation_passed}`);
+console.log(`Data quality score: ${validationResult[0].data.data_quality_score}`);
+
+// Generate sample data
+const config = { type: "benford", count: 100 };
+const generatedResult = law("generate", config);
+
+console.log(`Generated ${generatedResult[0].data.count} data points`);
+console.log(`Sample data: ${generatedResult[0].data.sample_data.slice(0, 5)}...`);
+
+// Comprehensive analysis
+const comprehensiveData = {
+  financial_data: [123, 187, 234, 298, 345],
+  quality_scores: [98.5, 99.2, 100.1, 99.8, 100.4]
+};
+const analysisResult = law("analyze", comprehensiveData);
+
+console.log(`Found ${analysisResult.length} analyses`);
+analysisResult.forEach(result => {
+  console.log(`${result.type}: ${result.data.analysis_summary}`);
+});
 ```
 
 ## API Reference
 
-### Analysis Functions
+### Unified API
 
-#### `benford(data, options)`
-Analyze data using Benford's Law for fraud detection.
+#### `law(subcommand, data, options?)`
+The unified function for all statistical law analysis.
 
-#### `pareto(data, options)`
-Analyze data using the Pareto Principle for business insights.
+**Parameters:**
+- `subcommand`: String - The analysis type ("benford", "pareto", "zipf", "normal", "poisson", "analyze", "validate", "diagnose", "generate")
+- `data`: Array or Object - The data to analyze (or configuration object for "generate")
+- `options`: Object (optional) - Analysis options
 
-#### `zipf(data, options)`
-Analyze data using Zipf's Law for text and frequency analysis.
+**Supported Subcommands:**
+- `"benford"` - Benford's Law analysis for fraud detection
+- `"pareto"` - Pareto Principle analysis for business insights  
+- `"zipf"` - Zipf's Law analysis for frequency distributions
+- `"normal"` - Normal distribution analysis for quality control
+- `"poisson"` - Poisson distribution analysis for event analysis
+- `"validate"` - Data quality validation
+- `"diagnose"` - Data anomaly diagnosis
+- `"generate"` - Sample data generation
+- `"analyze"` - Comprehensive multi-law analysis
 
-#### `normal(data, options)`
-Analyze data using Normal Distribution for quality control.
-
-#### `poisson(data, options)`
-Analyze data using Poisson Distribution for event analysis.
-
-#### `analyze(data, options)`
-Perform comprehensive multi-law analysis.
-
-#### `validate(data, options)`
-Validate data quality using statistical tests.
-
-#### `diagnose(data, options)`
-Diagnose data anomalies and provide recommendations.
-
-### Utility Functions
-
-#### `generate(law, options)`
-Generate sample data for testing statistical laws.
-
-#### `list(options)`
-List available statistical laws and commands.
-
-#### `isLawkitAvailable()`
-Check if the lawkit binary is available.
+**Return Value:**
+Returns an array of analysis result objects, each containing:
+- `type`: The analysis type (e.g., 'BenfordAnalysis', 'ParetoAnalysis')
+- `data`: Analysis results with statistical measures and summary
 
 ### Options
 
@@ -152,19 +156,14 @@ interface LawkitOptions {
 ## Error Handling
 
 ```javascript
-const { benford, LawkitError } = require('lawkit-js');
+const { law } = require('lawkit-js');
 
 try {
-  const result = await benford('data.csv', { output: 'json' });
+  const result = law("benford", [1, 2, 3]);
   console.log(result);
 } catch (error) {
-  if (error instanceof LawkitError) {
-    console.error('lawkit error:', error.message);
-    console.error('Exit code:', error.exitCode);
-    console.error('stderr:', error.stderr);
-  } else {
-    console.error('Unexpected error:', error);
-  }
+  console.error('lawkit error:', error.message);
+  // Handle error appropriately
 }
 ```
 
