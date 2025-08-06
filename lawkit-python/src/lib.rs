@@ -213,7 +213,7 @@ fn lawkit_result_to_python(py: Python, result: &LawkitResult) -> PyResult<PyObje
 /// result = lawkit.law("pareto", values)
 /// print(result)  # [{"type": "ParetoAnalysis", "concentration": 0.8, ...}]
 /// ```
-#[pyfunction]
+#[pyfunction(name = "law")]
 #[pyo3(signature = (subcommand, data_or_config, **kwargs))]
 fn law_py(
     py: Python,
@@ -370,9 +370,6 @@ fn law_py(
 #[pymodule]
 fn lawkit_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(law_py, m)?)?;
-
-    // Add module-level law function for easier access
-    m.add("law", m.getattr("law_py")?)?;
-
+    m.add("__version__", "0.2.16")?;
     Ok(())
 }

@@ -68,9 +68,7 @@ dev = [
 ]
 
 [tool.maturin]
-# PyO3 bindings for lawkit-python
-python-source = "src"
-module-name = "lawkit_python"
+# This package includes Python bindings built with PyO3
 bindings = "pyo3"
 # Find Python interpreters automatically
 find-interpreter = true
