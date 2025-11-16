@@ -1267,6 +1267,9 @@ fn generate_poisson_data(count: usize, lambda: f64) -> Vec<f64> {
 // MODULE DECLARATIONS - For CLI and external access
 // ============================================================================
 
+// Temporary diffx-core mock until diffx reboot is complete
+pub mod diffx_core_mock;
+
 pub mod common;
 pub mod core;
 pub mod error;
