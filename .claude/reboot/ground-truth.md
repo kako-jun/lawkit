@@ -231,6 +231,20 @@ members = [
 | diffx-core依存 | ✅ 解決 | モック実装 |
 | 基本機能 | ✅ 動作確認 | benf, pareto確認済み |
 | tests/lib.rs | ✅ 修正 | 壊れたモジュール参照削除 |
+| **lawkit-core構造化** | ✅ 完了 | lib.rs: 1,076→672行 (-37.5%) |
+| **lawkit-cli構造化** | ✅ 完了 | main.rs: 434→102行 (-76.5%) |
+
+### コード構造化の詳細
+
+**lawkit-core/src/**:
+- `lib.rs`: 1,076行 → **672行** (-404行, -37.5%)
+- `parsers.rs`: **133行** (新規) - JSON/CSV/YAML/TOML/INI/XMLパーサー
+- `helpers.rs`: **295行** (新規) - 18個の統計/ユーティリティ関数
+- `types.rs`: **217行** (既存) - 型定義
+
+**lawkit-cli/src/**:
+- `main.rs`: 434行 → **102行** (-332行, -76.5%)
+- `run.rs`: **351行** (新規) - 実行ロジック（generate/list/selftest/help）
 
 ---
 

@@ -94,14 +94,30 @@ lawkitは現在、diffx/diffai/lawkitの3兄弟プロジェクト複雑化から
 ```
 lawkit/
 ├── lawkit-core/          # コアライブラリ
-├── lawkit-cli/           # CLI実装
+│   └── src/
+│       ├── lib.rs (672行)       # 簡潔化 (1,076→672行)
+│       ├── types.rs (217行)     # 型定義抽出
+│       ├── parsers.rs (133行)   # NEW - パーサー抽出
+│       ├── helpers.rs (295行)   # NEW - ヘルパー関数抽出
+│       ├── diffx_core_mock.rs   # 一時モック
+│       ├── common/
+│       ├── laws/
+│       └── ...
+├── lawkit-cli/                  # CLI実装
+│   └── src/
+│       ├── main.rs (102行)      # 簡潔化 (434→102行)
+│       ├── run.rs (351行)       # NEW - 実行ロジック抽出
+│       ├── subcommands/
+│       └── ...
 ├── .claude/reboot/       # リブートドキュメント
 └── to-migrate/           # 別リポジトリ移行候補
     ├── lawkit-js/        → https://github.com/kako-jun/lawkit-js
     └── lawkit-python/    → https://github.com/kako-jun/lawkit-python
 ```
 
-**変更**: lawkit-js, lawkit-pythonを分離し、2メンバーワークスペースに単純化。
+**変更**:
+- lawkit-js, lawkit-pythonを分離し、2メンバーワークスペースに単純化
+- lib.rs, main.rsを分割し、保守性向上（diffx reboot構造に準拠）
 
 ---
 
