@@ -9,11 +9,7 @@
 #![allow(clippy::redundant_closure)]
 #![allow(clippy::needless_borrow)]
 
-mod basic;
 mod cli;
-mod core;
 mod docs_examples;
-mod errors;
-mod features;
-mod formats;
+mod fixtures;
 mod integration;

@@ -1,5 +1,5 @@
 use crate::error::Result;
-use diffx_core::{diff, DiffResult};
+use crate::diffx_core_mock::{diff, DiffResult};
 
 /// 時系列データポイント
 #[derive(Debug, Clone)]

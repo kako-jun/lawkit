@@ -3,8 +3,9 @@ resolver = "2"
 members = [
     "lawkit-core",
     "lawkit-cli",
-    "lawkit-python",
-    "lawkit-js"
+    # Moved to separate repositories (see to-migrate/ directory):
+    # "lawkit-python" -> https://github.com/kako-jun/lawkit-python
+    # "lawkit-js" -> https://github.com/kako-jun/lawkit-js
 ]
 
 [workspace.package]

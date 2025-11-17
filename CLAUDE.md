@@ -6,62 +6,136 @@ lawkitは単一法則の限界を超え、Benford法則・Pareto原理・Zipf法
 
 従来ツールが一つずつ分析する中、lawkitは複数法則の矛盾検出・相関分析・推奨システムにより、データの全体像を把握できます。金融監査・品質管理・不正検知・ビジネス分析での実用性を重視し、JSON/CSV等の構造化出力でAIツールや自動化ワークフローと完全統合します。
 
-## 🚨 重要な開発ルール
+---
 
-### Claude対応時の必須ルール
-- **CI事前テスト**: リリース前に`./github-shared/rust-cli-kiln/scripts/testing/quick-check.sh`でテスト実行
-- **ドキュメント-テスト同期**: 全ドキュメント例がテストで検証済み、変更時は同期必須
-- **バージョン統一**: Cargo.toml/pyproject.toml/package.json の完全同期
+## 🔄 **リブート中 (Phase 0-2 完了)**
 
-### プッシュ前の必須チェック
-```bash
-./github-shared/rust-cli-kiln/scripts/testing/quick-check.sh
-```
+lawkitは現在、diffx/diffai/lawkitの3兄弟プロジェクト複雑化からの回復中です。
 
-### 共有スクリプト利用
-```bash
-# GitHub設定セットアップ（ラベル・ブランチ保護など）
-./github-shared/rust-cli-kiln/scripts/setup/setup-github-workflow.sh
+### **リブート状況**
+- ✅ **Phase 0**: ビルド回復完了 (diffx-core依存解決)
+- ✅ **Phase 1**: ワークスペース単純化完了 (JS/Python分離)
+- ✅ **Phase 2**: 検証・文書化完了 (ground-truth確立)
+- ⏳ **Phase 3**: 独立性確立 (diffxリブート完了待ち)
 
-# 3言語ドキュメント整合性チェック
-./github-shared/rust-cli-kiln/scripts/docs/check-docs-consistency.sh
-```
+### **現在の状態**
+- ✅ **ビルド**: 成功 (dev + release)
+- ✅ **テスト**: 100/100 成功
+- ✅ **警告**: ゼロ
+- ✅ **基本機能**: 完全動作
 
-### コンテキスト効率化ルール
-**CLAUDE.mdは目次として使用し、詳細情報は以下の専用ファイルを参照:**
+詳細: `.claude/reboot/reboot-plan.md` 参照
 
-- **📋 タスクリスト**: `.claude/tasks.md` を参照
-- **🚀 リリース手順**: `github-shared/rust-cli-kiln/release-guide.md` を参照
+---
+
+## 🚨 **重要な開発ルール**
+
+### **リブート原則**
+1. **真実の検証**: 既存ドキュメントを信じない、実行して確認
+2. **シンプル化優先**: 複雑な構成は保守不能になる
+3. **実行重視**: 完璧主義を排除、動くものを優先
+4. **独立性重視**: 過度な依存関係を避ける
+
+### **コンテキスト効率化ルール**
+**CLAUDE.mdは目次として使用し、詳細情報は専用ファイルを参照:**
+
+- **📋 タスクリスト**: `.claude/tasks.md`
+- **🔄 リブート計画**: `.claude/reboot/reboot-plan.md`
+- **🔍 問題分析**: `.claude/reboot/problem-analysis.md`
+- **✅ 検証結果**: `.claude/reboot/ground-truth.md`
 
 **重要**: 詳細が必要な時のみ該当ファイルを読むこと。CLAUDE.md自体は最小限に保つ。
 
-## 🎯 現在の開発状況
+---
 
-### ✅ 完成済み機能
-- **5統計法則完全実装**: Benford/Pareto/Zipf/Normal/Poisson + 統合分析
-- **ruff方式Python実装**: maturin バイナリ埋め込み完了
-- **Phase 2.3機能**: --confidence/--sample-size/--min-value オプション
-- **3言語ドキュメント**: 英語・日本語・中国語対応
-- **99.9%実装率**: 938コマンド例中937個実装済み
+## 🎯 **現在の開発状況**
 
-### 🏆 v2.4.1 リリース完了 (diffx移植成果)
-- **✅ 構造現代化**: .claude/ディレクトリ、release-guide.md完了
-- **✅ scripts現代化**: 分類・改善、バージョンハードコーディング除去完了
-- **✅ npm現代化**: ユニバーサルバイナリ同梱完了
-- **✅ CI/CD改善**: 2幕構成、act1/act2エラー0達成完了
-- **✅ リリース成功**: npm/PyPI/GitHub Release全て自動成功
+### **✅ 完成済み機能 (検証済み)**
+- **5統計法則完全実装**: Benford/Pareto/Zipf/Normal/Poisson
+- **CLI実装**: 11サブコマンド動作確認済み
+- **テスト**: 100個全て成功
+- **国際対応**: 5言語数値形式サポート (EN/JP/CN/HI/AR)
 
-## 📈 統計的特徴
+### **⏳ 未検証の機能**
+以下は実装済みだがリブートで未検証（テストは存在）：
+- 統合分析 (analyze)
+- 検証機能 (validate)
+- 診断機能 (diagnose)
+- 全法則データ生成 (generate)
+- セルフテスト (selftest)
 
-### 実装済み統計法則
+### **🔄 一時的に無効化された機能**
+- diffx強化版の高度な矛盾検出（モック実装中）
+- 時系列分析のdiffx統合（モック実装中）
+
+**理由**: diffxリブート待ち。基本機能は完全動作。
+
+---
+
+## 📈 **統計的特徴**
+
+### **実装済み統計法則**
 - **Benford法則**: 金融監査・不正検知 (自然数の第1桁分布)
 - **Pareto原理**: ビジネス分析・集中度測定 (80/20法則)
 - **Zipf法則**: テキスト分析・頻度分布 (べき法則)
 - **正規分布**: 品質管理・異常値検出 (ベル曲線)
 - **ポアソン分布**: 稀少事象・システム信頼性 (離散確率)
 
-### 高度機能
+### **高度機能**
 - **統合分析**: 複数法則の矛盾検出・相関分析・推奨システム
 - **異常値検出**: LOF・Isolation Forest・DBSCAN
 - **時系列分析**: トレンド・季節性・変化点検出
-- **国際対応**: 5言語数値形式サポート (EN/JP/CN/HI/AR)
+
+---
+
+## 🏗️ **プロジェクト構造 (リブート後)**
+
+### **シンプル化されたワークスペース**
+```
+lawkit/
+├── lawkit-core/          # コアライブラリ
+│   └── src/
+│       ├── lib.rs (672行)       # 簡潔化 (1,076→672行)
+│       ├── types.rs (217行)     # 型定義抽出
+│       ├── parsers.rs (133行)   # NEW - パーサー抽出
+│       ├── helpers.rs (295行)   # NEW - ヘルパー関数抽出
+│       ├── diffx_core_mock.rs   # 一時モック
+│       ├── common/
+│       ├── laws/
+│       └── ...
+├── lawkit-cli/                  # CLI実装
+│   └── src/
+│       ├── main.rs (102行)      # 簡潔化 (434→102行)
+│       ├── run.rs (351行)       # NEW - 実行ロジック抽出
+│       ├── subcommands/
+│       └── ...
+├── .claude/reboot/       # リブートドキュメント
+└── to-migrate/           # 別リポジトリ移行候補
+    ├── lawkit-js/        → https://github.com/kako-jun/lawkit-js
+    └── lawkit-python/    → https://github.com/kako-jun/lawkit-python
+```
+
+**変更**:
+- lawkit-js, lawkit-pythonを分離し、2メンバーワークスペースに単純化
+- lib.rs, main.rsを分割し、保守性向上（diffx reboot構造に準拠）
+
+---
+
+## 📚 **ドキュメント方針 (リブート後)**
+
+### **日本語のみに集中**
+リブート中は日本語ドキュメントのみに集中し、実行とシンプル化を優先。
+
+**理由**: diffxリブートからの教訓「多言語ドキュメントは保守負荷が高く、実行を妨げる」
+
+### **英語・中国語版**
+Phase 4 (成長・改善フェーズ) で復活予定。
+
+---
+
+## 🔗 **関連プロジェクト**
+
+- **diffx**: https://github.com/kako-jun/diffx (リブート中)
+- **diffai**: https://github.com/kako-jun/diffai (リブート待機中)
+
+3兄弟プロジェクトはそれぞれ独立性を確立し、過度な相互依存を解消中。
