@@ -166,3 +166,4 @@ github-shared
 tmp/
 temp-*/
 tmp-*/
+.serena/
