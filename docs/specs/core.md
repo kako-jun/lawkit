@@ -62,8 +62,8 @@ pub enum LawkitResult {
 
 ```rust
 pub struct BenfordData {
-    pub observed_distribution: [f64; 9],  // 桁1-9の観測頻度
-    pub expected_distribution: [f64; 9],  // 桁1-9の期待頻度
+    pub observed_distribution: [f64; 9],  // 桁1-9の観測頻度（比率）
+    pub expected_distribution: [f64; 9],  // 桁1-9の期待頻度（比率）
     pub chi_square: f64,                  // カイ二乗統計量
     pub p_value: f64,                     // p値
     pub mad: f64,                         // 平均絶対偏差
@@ -72,6 +72,13 @@ pub struct BenfordData {
     pub analysis_summary: String,         // 分析要約
 }
 ```
+
+**Benfordの法則 期待分布**: P(d) = log₁₀(1 + 1/d) (d = 1..9)
+- 桁1: 30.1%, 桁2: 17.6%, 桁3: 12.5%, ..., 桁9: 4.6%
+
+**カイ二乗検定**: χ² = Σ((観測数 - 期待数)² / 期待数)
+- 自由度 = 8 (桁1-9で9カテゴリ、制約1つ)
+- 臨界値: χ²(0.01)=20.09, χ²(0.05)=15.51, χ²(0.10)=13.36
 
 ### ParetoData
 
