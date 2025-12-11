@@ -182,6 +182,19 @@ For focused single-law analysis:
 - [benf](https://crates.io/crates/benf) - Benford's Law only
 - [pareto](https://crates.io/crates/pareto) - Pareto Principle only
 
+## Examples
+
+See [lawkit-cli/tests/cmd/](lawkit-cli/tests/cmd/) for executable examples:
+
+- [Benford's Law](lawkit-cli/tests/cmd/benford.md)
+- [Pareto Principle](lawkit-cli/tests/cmd/pareto.md)
+- [Zipf's Law](lawkit-cli/tests/cmd/zipf.md)
+- [Normal Distribution](lawkit-cli/tests/cmd/normal.md)
+- [Poisson Distribution](lawkit-cli/tests/cmd/poisson.md)
+- [Output formats](lawkit-cli/tests/cmd/output.md)
+- [Options](lawkit-cli/tests/cmd/options.md)
+- [Test data generation](lawkit-cli/tests/cmd/generate.md)
+
 ## Documentation
 
 - [CLI Specification](docs/specs/cli.md)
