@@ -6,11 +6,17 @@
 [![Crates.io](https://img.shields.io/crates/v/lawkit.svg)](https://crates.io/crates/lawkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Statistical law analysis toolkit. Analyze data for Benford's law, Pareto principle, Zipf's law, and more. Detect anomalies and assess data quality.
+Statistical law analysis toolkit. Analyze data for Benford's law, Pareto principle, Zipf's law, Normal and Poisson distributions. Detect anomalies and assess data quality.
 
-## Why lawkit?
+## Installation
 
-Traditional tools analyze one pattern at a time. lawkit analyzes multiple statistical laws simultaneously:
+```bash
+cargo install lawkit
+```
+
+## Supported Laws
+
+### Benford's Law (Fraud Detection)
 
 ```bash
 $ lawkit benf financial_data.csv
@@ -18,41 +24,103 @@ Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 1000
-[LOW] Dataset conforms to Benford's Law
+[LOW] Dataset analysis
 
 First Digit Distribution:
-1: ██████████████████████████████  30.1% (expected: 30.1%)
-2: ██████████████████              17.8% (expected: 17.6%)
-3: ████████████                    12.5% (expected: 12.5%)
+1: ███████████████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  30.1% (expected:  30.1%)
+2: █████████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  17.6% (expected:  17.6%)
+3: ██████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  12.5% (expected:  12.5%)
 ...
-
-$ lawkit pareto sales.csv
-80/20 Rule: Top 20% owns 79.2% of total
 ```
 
-## Installation
+### Pareto Principle (80/20 Rule)
 
 ```bash
-# As CLI tool
-cargo install lawkit
+$ lawkit pareto sales.csv
+Pareto Principle (80/20 Rule) Analysis Results
 
-# As library (Cargo.toml)
-[dependencies]
-lawkit-core = "2.5"
+Dataset: sales.csv
+Numbers analyzed: 500
+[LOW] Dataset analysis
+
+Lorenz Curve (Cumulative Distribution):
+ 20%: ███████████████████████████████████████┃░░░░░░░░░░  79.2% cumulative (80/20 point)
+ 40%: █████████████████████████████████████████████░░░░░  91.5% cumulative
+...
+
+80/20 Rule: Top 20% owns 79.2% of total wealth (Ideal: 80.0%, Ratio: 0.99)
+```
+
+### Zipf's Law (Frequency Distribution)
+
+```bash
+$ lawkit zipf word_frequencies.csv
+Zipf Law Analysis Results
+
+Dataset: word_frequencies.csv
+Numbers analyzed: 1000
+[LOW] Dataset analysis
+
+Rank-Frequency Distribution:
+# 1: █████████████████████████████████████████████████┃  11.50% (expected: 11.50%)
+# 2: █████████████████████████┃░░░░░░░░░░░░░░░░░░░░░░░   5.75% (expected: 5.75%)
+# 3: █████████████████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   3.83% (expected: 3.83%)
+...
+
+Zipf Exponent: 1.02 (ideal: 1.0), Correlation: 0.998
+```
+
+### Normal Distribution (Quality Control)
+
+```bash
+$ lawkit normal measurements.csv
+Normal Distribution Analysis Results
+
+Dataset: measurements.csv
+Numbers analyzed: 200
+Quality Level: High
+
+Distribution Histogram:
+ -2.50- -1.89: ██████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  11.5%
+ -1.89- -1.28: █████████████████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  34.0%
+ -1.28- -0.67: ███████████████████████████████████┃░░░░░░░░░░░░░░  69.8%
+...
+
+Distribution: μ=0.02, σ=1.01, Range: [-2.89, 3.12]
+1σ: 68.5%, 2σ: 95.5%, 3σ: 99.7%
+```
+
+### Poisson Distribution (Rare Events)
+
+```bash
+$ lawkit poisson events.csv
+Poisson Distribution Analysis Results
+
+Dataset: events.csv
+Numbers analyzed: 100
+Quality Level: High
+
+Probability Distribution:
+P(X= 0): ██████████████████┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.095
+P(X= 1): ███████████████████████████████████████████┃░░░░░░  0.224
+P(X= 2): █████████████████████████████████████████████████┃  0.263
+...
+
+λ=2.35, Variance/Mean=1.02 (ideal: 1.0), Fit Score=0.95
 ```
 
 ## Usage
 
 ```bash
-# Analysis commands
-lawkit benf data.csv          # Benford's law (fraud detection)
-lawkit pareto data.csv        # Pareto principle (80/20 rule)
-lawkit zipf data.csv          # Zipf's law (frequency distribution)
-lawkit normal data.csv        # Normal distribution (quality control)
-lawkit poisson data.csv       # Poisson distribution (rare events)
+# Single law analysis
+lawkit benf data.csv          # Benford's law
+lawkit pareto data.csv        # Pareto principle
+lawkit zipf data.csv          # Zipf's law
+lawkit normal data.csv        # Normal distribution
+lawkit poisson data.csv       # Poisson distribution
 
-# Integration commands
-lawkit analyze data.csv       # Multi-law analysis
+# Multi-law analysis
+lawkit analyze data.csv       # Run all applicable laws
 lawkit validate data.csv      # Data validation
 lawkit diagnose data.csv      # Detailed diagnostics
 
@@ -60,16 +128,18 @@ lawkit diagnose data.csv      # Detailed diagnostics
 lawkit generate benf -s 1000
 lawkit generate pareto -s 500
 
-# Utility commands
+# Utility
 lawkit list                   # List available laws
 lawkit selftest               # Run self-test
 ```
 
-## Supported Input
+## Input Sources
 
-- File: `lawkit benf data.csv`
-- URL: `lawkit benf https://example.com/data.json`
-- stdin: `cat data.csv | lawkit benf -`
+```bash
+lawkit benf data.csv                        # File
+lawkit benf https://example.com/data.json   # URL
+cat data.csv | lawkit benf -                # stdin
+```
 
 Formats: CSV, JSON, YAML, plain text (one number per line)
 
@@ -82,13 +152,9 @@ Formats: CSV, JSON, YAML, plain text (one number per line)
 --filter <RANGE>           # Filter numbers (e.g., >=100, <1000, 50-500)
 -c, --min-count <N>        # Minimum data count (default: 10)
 --no-color                 # Disable colors
--t, --threshold <LEVEL>    # Detection threshold: low, medium, high, critical
---confidence <LEVEL>       # Confidence level (0.01-0.99, default: 0.95)
---sample-size <N>          # Max sample size for large datasets
---min-value <VALUE>        # Minimum value to include
 ```
 
-## Risk Levels
+## Risk Levels & Exit Codes
 
 | Level | Meaning | Exit Code |
 |-------|---------|-----------|
@@ -96,8 +162,6 @@ Formats: CSV, JSON, YAML, plain text (one number per line)
 | MEDIUM | Minor deviation, likely normal | 0 |
 | HIGH | Significant deviation (p ≤ 0.05) | 10 |
 | CRITICAL | Severe anomaly (p ≤ 0.01) | 11 |
-
-Other exit codes: 1 (general error), 2 (argument error)
 
 ## CI/CD Usage
 
@@ -108,15 +172,20 @@ if ! lawkit benf transactions.csv --quiet; then
   lawkit benf transactions.csv --format json > report.json
 fi
 
-# Validate data quality with cross-validation
+# Validate distribution
 lawkit validate data.csv --cross-validation
 ```
+
+## Standalone Tools
+
+For focused single-law analysis:
+- [benf](https://crates.io/crates/benf) - Benford's Law only
+- [pareto](https://crates.io/crates/pareto) - Pareto Principle only
 
 ## Documentation
 
 - [CLI Specification](docs/specs/cli.md)
 - [Core API Specification](docs/specs/core.md)
-- [Test Examples](lawkit-cli/tests/)
 
 ## License
 
