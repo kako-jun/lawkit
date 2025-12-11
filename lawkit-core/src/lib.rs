@@ -47,39 +47,41 @@ fn analyze_benford_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Law
         return Err(anyhow!("No valid numbers found in input data"));
     }
 
-    // Calculate first digit distribution
-    let mut observed = [0.0; 9];
+    // Calculate first digit distribution (counts)
+    let mut observed_counts = [0.0; 9];
     let mut total = 0;
 
     for &num in &numbers {
         if let Some(digit) = get_first_digit(num.abs()) {
-            observed[digit as usize - 1] += 1.0;
+            observed_counts[digit as usize - 1] += 1.0;
             total += 1;
         }
     }
 
-    // Normalize to proportions
-    for count in &mut observed {
-        *count /= total as f64;
-    }
-
-    // Expected Benford distribution
-    let expected = [
-        (1.0_f64 + 1.0).log10() / 1.0_f64.log10(), // log10(1 + 1/1)
-        (1.0_f64 + 1.0 / 2.0).log10(),
-        (1.0_f64 + 1.0 / 3.0).log10(),
-        (1.0_f64 + 1.0 / 4.0).log10(),
-        (1.0_f64 + 1.0 / 5.0).log10(),
-        (1.0_f64 + 1.0 / 6.0).log10(),
-        (1.0_f64 + 1.0 / 7.0).log10(),
-        (1.0_f64 + 1.0 / 8.0).log10(),
-        (1.0_f64 + 1.0 / 9.0).log10(),
+    // Expected Benford proportions: P(d) = log10(1 + 1/d)
+    let expected_proportions = [
+        (1.0_f64 + 1.0 / 1.0).log10(), // log10(2) ≈ 0.301
+        (1.0_f64 + 1.0 / 2.0).log10(), // log10(1.5) ≈ 0.176
+        (1.0_f64 + 1.0 / 3.0).log10(), // log10(1.333) ≈ 0.125
+        (1.0_f64 + 1.0 / 4.0).log10(), // log10(1.25) ≈ 0.097
+        (1.0_f64 + 1.0 / 5.0).log10(), // log10(1.2) ≈ 0.079
+        (1.0_f64 + 1.0 / 6.0).log10(), // log10(1.167) ≈ 0.067
+        (1.0_f64 + 1.0 / 7.0).log10(), // log10(1.143) ≈ 0.058
+        (1.0_f64 + 1.0 / 8.0).log10(), // log10(1.125) ≈ 0.051
+        (1.0_f64 + 1.0 / 9.0).log10(), // log10(1.111) ≈ 0.046
     ];
 
-    // Calculate chi-square test
-    let chi_square = calculate_chi_square(&observed, &expected);
+    // Convert proportions to counts for chi-square test
+    let total_f = total as f64;
+    let expected_counts: [f64; 9] = expected_proportions.map(|p| p * total_f);
+
+    // Convert observed counts to proportions for output
+    let observed: [f64; 9] = observed_counts.map(|c| c / total_f);
+
+    // Calculate chi-square test (using counts, not proportions)
+    let chi_square = calculate_chi_square(&observed_counts, &expected_counts);
     let p_value = calculate_p_value(chi_square, 8);
-    let mad = calculate_mad(&observed, &expected);
+    let mad = calculate_mad(&observed, &expected_proportions);
 
     // Determine risk level
     let risk_level = if p_value < 0.05 {
@@ -96,7 +98,7 @@ fn analyze_benford_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Law
 
     let benford_data = BenfordData {
         observed_distribution: observed,
-        expected_distribution: expected,
+        expected_distribution: expected_proportions,
         chi_square,
         p_value,
         mad,
@@ -599,6 +601,11 @@ fn diagnose_data(data: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitRes
 }
 
 fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<LawkitResult>> {
+    use crate::generate::{
+        BenfordGenerator, DataGenerator, GenerateConfig, NormalGenerator, ParetoGenerator,
+        PoissonGenerator, ZipfGenerator,
+    };
+
     // Parse generation configuration
     let data_type = config
         .get("type")
@@ -606,12 +613,42 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
         .unwrap_or("benford");
 
     let count = config.get("count").and_then(|v| v.as_u64()).unwrap_or(1000) as usize;
+    let seed = config.get("seed").and_then(|v| v.as_u64());
+
+    let mut gen_config = GenerateConfig::new(count);
+    if let Some(s) = seed {
+        gen_config = gen_config.with_seed(s);
+    }
 
     let mut parameters = HashMap::new();
     let sample_data = match data_type {
-        "benford" => {
-            parameters.insert("base".to_string(), 10.0);
-            generate_benford_data(count)
+        "benford" | "benf" => {
+            let min_value = config.get("min").and_then(|v| v.as_f64()).unwrap_or(1.0);
+            let max_value = config.get("max").and_then(|v| v.as_f64()).unwrap_or(100000.0);
+            parameters.insert("min".to_string(), min_value);
+            parameters.insert("max".to_string(), max_value);
+            let generator = BenfordGenerator::new(min_value, max_value);
+            generator.generate(&gen_config)?
+        }
+        "pareto" => {
+            let alpha = config.get("alpha").and_then(|v| v.as_f64()).unwrap_or(1.16);
+            let x_m = config.get("x_m").and_then(|v| v.as_f64()).unwrap_or(1.0);
+            parameters.insert("alpha".to_string(), alpha);
+            parameters.insert("x_m".to_string(), x_m);
+            let generator = ParetoGenerator::new(alpha, x_m);
+            generator.generate(&gen_config)?
+        }
+        "zipf" => {
+            let s = config.get("s").and_then(|v| v.as_f64()).unwrap_or(1.0);
+            let n = config.get("n").and_then(|v| v.as_u64()).unwrap_or(1000) as usize;
+            parameters.insert("s".to_string(), s);
+            parameters.insert("n".to_string(), n as f64);
+            let generator = ZipfGenerator::new(s, n);
+            generator
+                .generate(&gen_config)?
+                .into_iter()
+                .map(|x| x as f64)
+                .collect()
         }
         "normal" => {
             let mean = config.get("mean").and_then(|v| v.as_f64()).unwrap_or(0.0);
@@ -621,12 +658,22 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
                 .unwrap_or(1.0);
             parameters.insert("mean".to_string(), mean);
             parameters.insert("std_dev".to_string(), std_dev);
-            generate_normal_data(count, mean, std_dev)
+            let generator = NormalGenerator::new(mean, std_dev);
+            generator.generate(&gen_config)?
         }
         "poisson" => {
             let lambda = config.get("lambda").and_then(|v| v.as_f64()).unwrap_or(5.0);
+            let time_series = config
+                .get("time_series")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
             parameters.insert("lambda".to_string(), lambda);
-            generate_poisson_data(count, lambda)
+            let generator = PoissonGenerator::new(lambda, time_series);
+            generator
+                .generate(&gen_config)?
+                .into_iter()
+                .map(|x| x as f64)
+                .collect()
         }
         _ => return Err(anyhow!("Unknown data type for generation: {}", data_type)),
     };

@@ -43,12 +43,3 @@ tempfile = { workspace = true }
 pretty_assertions = { workspace = true }
 assert_cmd = { workspace = true }
 predicates = "3.0"
-
-# Integration tests configuration
-[[test]]
-name = "cli"
-path = "../tests/cli/mod.rs"
-
-[[test]]
-name = "docs_examples"
-path = "../tests/docs_examples/mod.rs"

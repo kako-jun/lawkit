@@ -109,17 +109,37 @@ pub(crate) fn calculate_chi_square(observed: &[f64], expected: &[f64]) -> f64 {
 }
 
 pub(crate) fn calculate_p_value(chi_square: f64, degrees_of_freedom: i32) -> f64 {
-    // Simplified p-value calculation
-    // In a real implementation, use a proper chi-square distribution
-    let critical_value = match degrees_of_freedom {
-        8 => 15.51, // p = 0.05
-        _ => 15.51, // Default
-    };
+    // P-value approximation based on chi-square critical values
+    // For more accuracy, use a proper chi-square distribution function
+    if chi_square <= 0.0 {
+        return 1.0;
+    }
 
-    if chi_square > critical_value {
-        0.01 // Significant
-    } else {
-        0.1 // Not significant
+    match degrees_of_freedom {
+        8 => {
+            // Critical values for df=8: χ²(0.01)=20.09, χ²(0.05)=15.51, χ²(0.10)=13.36
+            if chi_square >= 20.09 {
+                0.01 // p <= 0.01
+            } else if chi_square >= 15.51 {
+                0.05 // p <= 0.05
+            } else if chi_square >= 13.36 {
+                0.10 // p <= 0.10
+            } else {
+                0.50 // p > 0.10
+            }
+        }
+        _ => {
+            // Fallback approximation
+            if chi_square >= 20.0 {
+                0.01
+            } else if chi_square >= 15.0 {
+                0.05
+            } else if chi_square >= 12.0 {
+                0.10
+            } else {
+                0.50
+            }
+        }
     }
 }
 
@@ -296,6 +316,31 @@ pub(crate) fn generate_poisson_data(count: usize, lambda: f64) -> Vec<f64> {
         let u = (i as f64 + 0.5) / (count as f64 + 1.0);
         let k = (-lambda * u.ln()).floor();
         data.push(k.max(0.0));
+    }
+    data
+}
+
+pub(crate) fn generate_pareto_data(count: usize, alpha: f64) -> Vec<f64> {
+    // Generate Pareto distribution: P(X > x) = (x_m / x)^alpha
+    // Using inverse transform: X = x_m / U^(1/alpha) where U ~ Uniform(0,1)
+    let x_m = 1.0; // minimum value
+    let mut data = Vec::new();
+    for i in 0..count {
+        let u = (i as f64 + 1.0) / (count as f64 + 1.0);
+        let value = x_m / u.powf(1.0 / alpha);
+        data.push(value);
+    }
+    data
+}
+
+pub(crate) fn generate_zipf_data(count: usize, s: f64) -> Vec<f64> {
+    // Generate Zipf distribution: f(k) = 1 / (k^s * H_N,s)
+    // Returns frequency counts for ranks 1 to count
+    let mut data = Vec::new();
+    let base_freq = 1000.0; // Base frequency for rank 1
+    for k in 1..=count {
+        let freq = base_freq / (k as f64).powf(s);
+        data.push(freq.round());
     }
     data
 }
