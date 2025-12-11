@@ -44,29 +44,42 @@ fn main() {
             Command::new("generate")
                 .about("Generate sample data following statistical laws")
                 .subcommand(common_options::add_generate_benf_options(
-                    common_options::add_generate_options(common_options::add_common_options(
-                        Command::new("benf").about("Generate Benford's law sample data"),
-                    )),
+                    common_options::add_generate_options(
+                        common_options::add_generate_common_options(
+                            Command::new("benf").about("Generate Benford's law sample data"),
+                        ),
+                    ),
                 ))
                 .subcommand(common_options::add_generate_pareto_options(
-                    common_options::add_generate_options(common_options::add_common_options(
-                        Command::new("pareto").about("Generate Pareto distribution sample data"),
-                    )),
+                    common_options::add_generate_options(
+                        common_options::add_generate_common_options(
+                            Command::new("pareto")
+                                .about("Generate Pareto distribution sample data"),
+                        ),
+                    ),
                 ))
                 .subcommand(common_options::add_generate_zipf_options(
-                    common_options::add_generate_options(common_options::add_common_options(
-                        Command::new("zipf").about("Generate Zipf's law sample data"),
-                    )),
+                    common_options::add_generate_options(
+                        common_options::add_generate_common_options(
+                            Command::new("zipf").about("Generate Zipf's law sample data"),
+                        ),
+                    ),
                 ))
                 .subcommand(common_options::add_generate_normal_options(
-                    common_options::add_generate_options(common_options::add_common_options(
-                        Command::new("normal").about("Generate normal distribution sample data"),
-                    )),
+                    common_options::add_generate_options(
+                        common_options::add_generate_common_options(
+                            Command::new("normal")
+                                .about("Generate normal distribution sample data"),
+                        ),
+                    ),
                 ))
                 .subcommand(common_options::add_generate_poisson_options(
-                    common_options::add_generate_options(common_options::add_common_options(
-                        Command::new("poisson").about("Generate Poisson distribution sample data"),
-                    )),
+                    common_options::add_generate_options(
+                        common_options::add_generate_common_options(
+                            Command::new("poisson")
+                                .about("Generate Poisson distribution sample data"),
+                        ),
+                    ),
                 )),
         )
         .subcommand(common_options::add_common_options(

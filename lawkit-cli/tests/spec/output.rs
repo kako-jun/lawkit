@@ -23,63 +23,30 @@ fn generate_sample() -> Command {
 }
 
 // =============================================================================
-// --format text (default)
+// generate command outputs plain text
 // =============================================================================
 
 #[test]
-fn output_text_default() {
-    // Use generate command which always returns exit 0
+fn output_generate_plain_text() {
+    // generate command outputs 1 number per line
     generate_sample()
         .assert()
         .success()
         .stdout(predicate::str::is_empty().not());
 }
 
-#[test]
-fn output_text_explicit() {
-    generate_sample()
-        .args(["--format", "text"])
-        .assert()
-        .success();
-}
-
 // =============================================================================
-// --format json (tested via formats.rs with analysis commands)
+// --format (not available for generate, tested via formats.rs for analysis)
 // =============================================================================
 
 #[test]
-fn output_json_option_accepted() {
-    // Verify --format json option is accepted (even if generate doesn't change output)
+fn output_format_not_available_for_generate() {
+    // generate command should NOT accept --format option
     generate_sample()
         .args(["--format", "json"])
         .assert()
-        .success();
-}
-
-// =============================================================================
-// --format yaml (tested via formats.rs with analysis commands)
-// =============================================================================
-
-#[test]
-fn output_yaml_option_accepted() {
-    // Verify --format yaml option is accepted
-    generate_sample()
-        .args(["--format", "yaml"])
-        .assert()
-        .success();
-}
-
-// =============================================================================
-// --format csv
-// =============================================================================
-
-#[test]
-fn output_csv() {
-    generate_sample()
-        .args(["--format", "csv"])
-        .assert()
-        .success()
-        .stdout(predicate::str::contains(",").or(predicate::str::is_empty().not()));
+        .failure()
+        .code(2); // argument error
 }
 
 // =============================================================================
@@ -88,10 +55,7 @@ fn output_csv() {
 
 #[test]
 fn output_no_color() {
-    let output = generate_sample()
-        .arg("--no-color")
-        .output()
-        .unwrap();
+    let output = generate_sample().arg("--no-color").output().unwrap();
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(
@@ -106,10 +70,7 @@ fn output_no_color() {
 
 #[test]
 fn output_quiet() {
-    let output = generate_sample()
-        .arg("--quiet")
-        .output()
-        .unwrap();
+    let output = generate_sample().arg("--quiet").output().unwrap();
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     // Generate with quiet still outputs data
@@ -118,10 +79,7 @@ fn output_quiet() {
 
 #[test]
 fn output_quiet_short_form() {
-    generate_sample()
-        .arg("-q")
-        .assert()
-        .success();
+    generate_sample().arg("-q").assert().success();
 }
 
 // =============================================================================
@@ -130,18 +88,12 @@ fn output_quiet_short_form() {
 
 #[test]
 fn output_verbose() {
-    generate_sample()
-        .arg("--verbose")
-        .assert()
-        .success();
+    generate_sample().arg("--verbose").assert().success();
 }
 
 #[test]
 fn output_verbose_short_form() {
-    generate_sample()
-        .arg("-v")
-        .assert()
-        .success();
+    generate_sample().arg("-v").assert().success();
 }
 
 // =============================================================================

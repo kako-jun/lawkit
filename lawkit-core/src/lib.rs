@@ -9,7 +9,6 @@ use std::collections::HashMap;
 // Re-export all types from types module
 pub use crate::types::*;
 
-
 // ============================================================================
 // UNIFIED API - Main Function
 // ============================================================================
@@ -60,7 +59,7 @@ fn analyze_benford_law(data: &Value, _options: &LawkitOptions) -> Result<Vec<Law
 
     // Expected Benford proportions: P(d) = log10(1 + 1/d)
     let expected_proportions = [
-        (1.0_f64 + 1.0 / 1.0).log10(), // log10(2) ≈ 0.301
+        2.0_f64.log10(),               // log10(2) ≈ 0.301 for d=1
         (1.0_f64 + 1.0 / 2.0).log10(), // log10(1.5) ≈ 0.176
         (1.0_f64 + 1.0 / 3.0).log10(), // log10(1.333) ≈ 0.125
         (1.0_f64 + 1.0 / 4.0).log10(), // log10(1.25) ≈ 0.097
@@ -624,7 +623,10 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
     let sample_data = match data_type {
         "benford" | "benf" => {
             let min_value = config.get("min").and_then(|v| v.as_f64()).unwrap_or(1.0);
-            let max_value = config.get("max").and_then(|v| v.as_f64()).unwrap_or(100000.0);
+            let max_value = config
+                .get("max")
+                .and_then(|v| v.as_f64())
+                .unwrap_or(100000.0);
             parameters.insert("min".to_string(), min_value);
             parameters.insert("max".to_string(), max_value);
             let generator = BenfordGenerator::new(min_value, max_value);

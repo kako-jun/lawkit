@@ -24,7 +24,9 @@ fn valid_exit_codes() -> impl predicates::Predicate<i32> {
 fn test_generate_benf_default() {
     let mut cmd = lawkit();
     cmd.args(["generate", "benf"]);
-    cmd.assert().code(valid_exit_codes()).stdout(predicate::str::is_empty().not());
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stdout(predicate::str::is_empty().not());
 }
 
 #[test]
@@ -38,11 +40,21 @@ fn test_generate_benf_samples() {
 fn test_generate_benf_seed() {
     let mut cmd = lawkit();
     cmd.args(["generate", "benf", "--seed", "42"]);
-    let output1 = cmd.assert().code(valid_exit_codes()).get_output().stdout.clone();
+    let output1 = cmd
+        .assert()
+        .code(valid_exit_codes())
+        .get_output()
+        .stdout
+        .clone();
 
     let mut cmd2 = lawkit();
     cmd2.args(["generate", "benf", "--seed", "42"]);
-    let output2 = cmd2.assert().code(valid_exit_codes()).get_output().stdout.clone();
+    let output2 = cmd2
+        .assert()
+        .code(valid_exit_codes())
+        .get_output()
+        .stdout
+        .clone();
 
     assert_eq!(output1, output2, "Same seed should produce same output");
 }

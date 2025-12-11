@@ -1,11 +1,11 @@
 use super::result::*;
+use crate::diffx_core_mock::{diff, DiffResult};
 use crate::error::Result;
 use crate::laws::benford::analyze_benford_law;
 use crate::laws::normal::analyze_normal_distribution;
 use crate::laws::pareto::analyze_pareto_distribution;
 use crate::laws::poisson::analyze_poisson_distribution;
 use crate::laws::zipf::analyze_numeric_zipf;
-use crate::diffx_core_mock::{diff, DiffResult};
 use rayon::prelude::*;
 use std::collections::HashSet;
 
@@ -347,7 +347,7 @@ fn calculate_enhanced_consistency_with_diffx(
                 }
             }
             DiffResult::TypeChanged(_, _, _) => 1.0, // 型変更は最大影響
-            DiffResult::Unchanged => 0.0,             // 変更なし
+            DiffResult::Unchanged => 0.0,            // 変更なし
         };
         total_diff_impact += impact;
     }
