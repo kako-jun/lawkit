@@ -1,0 +1,22 @@
+[package]
+name = "pareto"
+version = "2.5.16"
+edition = "2021"
+authors = ["kako-jun <3541096+kako-jun@users.noreply.github.com>"]
+description = "Pareto Principle (80/20 rule) analysis CLI - convenience wrapper for lawkit pareto"
+license = "MIT"
+repository = "https://github.com/kako-jun/lawkit"
+homepage = "https://github.com/kako-jun/lawkit"
+documentation = "https://docs.rs/pareto"
+readme = "README.md"
+keywords = ["pareto", "statistics", "80-20", "analysis", "cli"]
+categories = ["command-line-utilities", "science"]
+
+[[bin]]
+name = "pareto"
+path = "src/main.rs"
+
+[dependencies]
+lawkit-core = { path = "../lawkit-core", version = "2.5.16" }
+clap = { version = "4.5", features = ["derive"] }
+serde_json = "1.0"
