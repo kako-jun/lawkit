@@ -182,6 +182,19 @@ lawkit validate data.csv --cross-validation
 - [benf](https://crates.io/crates/benf) - ベンフォードの法則のみ
 - [pareto](https://crates.io/crates/pareto) - パレートの法則のみ
 
+## 実行例
+
+[lawkit-cli/tests/cmd/](lawkit-cli/tests/cmd/) に詳細な例があります：
+
+- [ベンフォードの法則](lawkit-cli/tests/cmd/benford.md)
+- [パレートの法則](lawkit-cli/tests/cmd/pareto.md)
+- [ジップの法則](lawkit-cli/tests/cmd/zipf.md)
+- [正規分布](lawkit-cli/tests/cmd/normal.md)
+- [ポアソン分布](lawkit-cli/tests/cmd/poisson.md)
+- [出力形式](lawkit-cli/tests/cmd/output.md)
+- [オプション](lawkit-cli/tests/cmd/options.md)
+- [テストデータ生成](lawkit-cli/tests/cmd/generate.md)
+
 ## ドキュメント
 
 - [CLI仕様書](docs/specs/cli.md)
