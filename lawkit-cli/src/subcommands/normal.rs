@@ -178,7 +178,8 @@ fn run_normality_test_mode(matches: &ArgMatches, test_type: &str) -> Result<()> 
     let test_result = test_normality(&numbers, test)?;
     output_normality_test_result(matches, &test_result);
 
-    let exit_code = if test_result.is_normal { 0 } else { 1 };
+    // Exit code: 0 = normal distribution, 10 = non-normal (HIGH risk indication)
+    let exit_code = if test_result.is_normal { 0 } else { 10 };
     std::process::exit(exit_code);
 }
 
@@ -236,10 +237,11 @@ fn run_outlier_detection_mode(matches: &ArgMatches) -> Result<()> {
             let outlier_result = detect_outliers(&numbers, method)?;
             output_outlier_detection_result(matches, &outlier_result);
 
+            // Exit code: 0 = no outliers, 10 = outliers found (HIGH risk indication)
             let exit_code = if outlier_result.outliers.is_empty() {
                 0
             } else {
-                1
+                10
             };
             std::process::exit(exit_code);
         }
