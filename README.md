@@ -1,5 +1,7 @@
 # lawkit
 
+[日本語](README.ja.md)
+
 [![CI](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml/badge.svg)](https://github.com/kako-jun/lawkit/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/lawkit.svg)](https://crates.io/crates/lawkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -16,7 +18,7 @@ Benford Law Analysis Results
 
 Dataset: financial_data.csv
 Numbers analyzed: 1000
-[LOW] Dataset analysis
+[LOW] Dataset conforms to Benford's Law
 
 First Digit Distribution:
 1: ██████████████████████████████  30.1% (expected: 30.1%)
@@ -57,28 +59,45 @@ lawkit diagnose data.csv      # Detailed diagnostics
 # Generate test data
 lawkit generate benf -s 1000
 lawkit generate pareto -s 500
+
+# Utility commands
+lawkit list                   # List available laws
+lawkit selftest               # Run self-test
 ```
+
+## Supported Input
+
+- File: `lawkit benf data.csv`
+- URL: `lawkit benf https://example.com/data.json`
+- stdin: `cat data.csv | lawkit benf -`
+
+Formats: CSV, JSON, YAML, plain text (one number per line)
 
 ## Main Options
 
 ```bash
--f, --format <FORMAT>     # Output: text, json, yaml, csv, toml, xml
--q, --quiet               # Minimal output
--v, --verbose             # Detailed output
---filter <RANGE>          # Filter numbers (e.g., >=100, <1000, 50-500)
--c, --min-count <N>       # Minimum data count (default: 10)
---no-color                # Disable colors
+-f, --format <FORMAT>      # Output: text, csv, json, yaml, toml, xml
+-q, --quiet                # Minimal output
+-v, --verbose              # Detailed output
+--filter <RANGE>           # Filter numbers (e.g., >=100, <1000, 50-500)
+-c, --min-count <N>        # Minimum data count (default: 10)
+--no-color                 # Disable colors
+-t, --threshold <LEVEL>    # Detection threshold: low, medium, high, critical
+--confidence <LEVEL>       # Confidence level (0.01-0.99, default: 0.95)
+--sample-size <N>          # Max sample size for large datasets
+--min-value <VALUE>        # Minimum value to include
 ```
 
-## Exit Codes
+## Risk Levels
 
-| Code | Meaning |
-|------|---------|
-| 0 | Normal (LOW/MEDIUM risk) |
-| 1 | General error |
-| 2 | Argument error |
-| 10 | HIGH risk (p ≤ 0.05) |
-| 11 | CRITICAL risk (p ≤ 0.01) |
+| Level | Meaning | Exit Code |
+|-------|---------|-----------|
+| LOW | Data conforms to expected distribution | 0 |
+| MEDIUM | Minor deviation, likely normal | 0 |
+| HIGH | Significant deviation (p ≤ 0.05) | 10 |
+| CRITICAL | Severe anomaly (p ≤ 0.01) | 11 |
+
+Other exit codes: 1 (general error), 2 (argument error)
 
 ## CI/CD Usage
 
@@ -89,7 +108,7 @@ if ! lawkit benf transactions.csv --quiet; then
   lawkit benf transactions.csv --format json > report.json
 fi
 
-# Validate data quality
+# Validate data quality with cross-validation
 lawkit validate data.csv --cross-validation
 ```
 
@@ -97,6 +116,7 @@ lawkit validate data.csv --cross-validation
 
 - [CLI Specification](docs/specs/cli.md)
 - [Core API Specification](docs/specs/core.md)
+- [Test Examples](lawkit-cli/tests/)
 
 ## License
 
