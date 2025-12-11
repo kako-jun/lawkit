@@ -47,6 +47,30 @@ pub fn add_common_options(cmd: Command) -> Command {
     )
 }
 
+/// generateサブコマンド用の共通オプション（--format, --filter, --min-count は除外）
+pub fn add_generate_common_options(cmd: Command) -> Command {
+    cmd.arg(
+        Arg::new("quiet")
+            .long("quiet")
+            .short('q')
+            .help("Suppress progress messages")
+            .action(clap::ArgAction::SetTrue),
+    )
+    .arg(
+        Arg::new("verbose")
+            .long("verbose")
+            .short('v')
+            .help("Show generation details")
+            .action(clap::ArgAction::SetTrue),
+    )
+    .arg(
+        Arg::new("no-color")
+            .long("no-color")
+            .help("Disable colored output")
+            .action(clap::ArgAction::SetTrue),
+    )
+}
+
 /// input引数を追加（位置引数）
 pub fn add_input_arg(cmd: Command) -> Command {
     cmd.arg(

@@ -1,10 +1,10 @@
 use crate::common::risk::RiskLevel;
+use crate::diffx_core_mock::{diff, DiffResult};
 use crate::laws::benford::BenfordResult;
 use crate::laws::normal::NormalResult;
 use crate::laws::pareto::ParetoResult;
 use crate::laws::poisson::PoissonResult;
 use crate::laws::zipf::ZipfResult;
-use crate::diffx_core_mock::{diff, DiffResult};
 use std::collections::HashMap;
 
 /// 法則名を短縮形からフルネーム（アポストロフィなし）に変換

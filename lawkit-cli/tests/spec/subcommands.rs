@@ -13,7 +13,8 @@ fn lawkit() -> Command {
 }
 
 const SAMPLE_DATA: &str = "1\n2\n3\n10\n20\n30\n100\n200\n300\n1000\n1\n2\n3\n10\n20\n30\n100\n200\n300\n1000\n1\n2\n3\n10\n20\n30\n100\n200\n300\n1000\n";
-const INTEGER_DATA: &str = "0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n";
+const INTEGER_DATA: &str =
+    "0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n0\n1\n2\n3\n1\n0\n2\n1\n3\n2\n";
 
 fn valid_exit_codes() -> impl predicates::Predicate<i32> {
     predicate::in_iter([0, 10, 11])
@@ -204,7 +205,8 @@ fn test_analyze_laws_option() {
 #[test]
 fn test_analyze_recommend_option() {
     let mut cmd = lawkit();
-    cmd.args(["analyze", "--recommend"]).write_stdin(SAMPLE_DATA);
+    cmd.args(["analyze", "--recommend"])
+        .write_stdin(SAMPLE_DATA);
     cmd.assert().code(valid_exit_codes());
 }
 
