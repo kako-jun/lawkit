@@ -1,4 +1,6 @@
 use clap::{command, Command};
+use clap_complete::{generate, Shell};
+use std::io;
 
 mod colors;
 mod common_options;
@@ -7,8 +9,8 @@ mod subcommands;
 
 const VERSION: &str = "2.2.0";
 
-fn main() {
-    let matches = command!()
+fn build_cli() -> Command {
+    command!()
         .name("lawkit")
         .about("Statistical law analysis toolkit")
         .version(VERSION)
@@ -88,7 +90,20 @@ fn main() {
         .subcommand(common_options::add_common_options(
             Command::new("selftest").about("Run self-test for all laws using generated data"),
         ))
-        .get_matches();
+        .subcommand(
+            Command::new("completions")
+                .about("Generate shell completions")
+                .arg(
+                    clap::Arg::new("shell")
+                        .help("Shell to generate completions for")
+                        .required(true)
+                        .value_parser(clap::value_parser!(Shell)),
+                ),
+        )
+}
+
+fn main() {
+    let matches = build_cli().get_matches();
 
     let result = match matches.subcommand() {
         Some(("benf", sub_matches)) => subcommands::benf::run(sub_matches),
@@ -102,6 +117,15 @@ fn main() {
         Some(("generate", sub_matches)) => run::handle_generate_command(sub_matches),
         Some(("list", sub_matches)) => run::list_laws(sub_matches),
         Some(("selftest", sub_matches)) => run::run_selftest(sub_matches),
+        Some(("completions", sub_matches)) => {
+            let shell = sub_matches
+                .get_one::<Shell>("shell")
+                .copied()
+                .expect("shell is required");
+            let mut cmd = build_cli();
+            generate(shell, &mut cmd, "lawkit", &mut io::stdout());
+            Ok(())
+        }
         _ => {
             run::show_help();
             Ok(())
