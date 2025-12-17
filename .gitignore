@@ -167,3 +167,4 @@ tmp/
 temp-*/
 tmp-*/
 .serena/
+.mcp.json
