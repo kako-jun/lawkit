@@ -6,6 +6,7 @@ members = [
     "benf",
     "pareto",
 ]
+default-members = ["lawkit-cli"]
 
 [workspace.package]
 version = "2.6.0"

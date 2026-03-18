@@ -7,13 +7,11 @@ mod common_options;
 mod run;
 mod subcommands;
 
-const VERSION: &str = "2.2.0";
-
 fn build_cli() -> Command {
     command!()
         .name("lawkit")
         .about("Statistical law analysis toolkit")
-        .version(VERSION)
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand(common_options::add_benf_options(
             common_options::add_common_options(common_options::add_input_arg(
                 Command::new("benf").about("Benford's law analysis"),

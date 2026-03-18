@@ -13,6 +13,7 @@ keywords.workspace = true
 categories.workspace = true
 exclude.workspace = true
 rust-version.workspace = true
+default-run = "lawkit"
 
 [lib]
 name = "lawkit_python"
@@ -25,7 +26,7 @@ path = "src/main.rs"
 # Standalone binaries are in separate crates: benf-standalone and pareto-standalone
 
 [dependencies]
-lawkit-core = { version = "2.5.16", path = "../lawkit-core" }
+lawkit-core = { workspace = true }
 clap = { workspace = true }
 clap_complete = "4.5"
 serde_json = { workspace = true }

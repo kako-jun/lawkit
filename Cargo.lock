@@ -203,7 +203,7 @@ checksum = "55248b47b0caf0546f7988906588779981c43bb1bc9d0c44087278f80cdb44ba"
 
 [[package]]
 name = "benf"
-version = "2.5.16"
+version = "2.6.0"
 dependencies = [
  "clap",
  "lawkit-core",
@@ -1189,7 +1189,7 @@ dependencies = [
 
 [[package]]
 name = "lawkit"
-version = "2.5.16"
+version = "2.6.0"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -1209,7 +1209,7 @@ dependencies = [
 
 [[package]]
 name = "lawkit-core"
-version = "2.5.16"
+version = "2.6.0"
 dependencies = [
  "anyhow",
  "calamine",
@@ -1455,7 +1455,7 @@ checksum = "48dd4f4a2c8405440fd0462561f0e5806bd0f77e86f51c761481bdd4018b545e"
 
 [[package]]
 name = "pareto"
-version = "2.5.16"
+version = "2.6.0"
 dependencies = [
  "clap",
  "lawkit-core",

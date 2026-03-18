@@ -1,6 +1,6 @@
 [package]
 name = "pareto"
-version = "2.5.16"
+version = "2.6.0"
 edition = "2021"
 authors = ["kako-jun <3541096+kako-jun@users.noreply.github.com>"]
 description = "Pareto Principle (80/20 rule) analysis CLI - convenience wrapper for lawkit pareto"
@@ -17,6 +17,6 @@ name = "pareto"
 path = "src/main.rs"
 
 [dependencies]
-lawkit-core = { path = "../lawkit-core", version = "2.5.16" }
+lawkit-core = { path = "../lawkit-core", version = "2.6.0" }
 clap = { version = "4.5", features = ["derive"] }
 serde_json = "1.0"
