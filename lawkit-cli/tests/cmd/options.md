@@ -66,6 +66,6 @@ $ lawkit benf data.txt --no-color
 
 ```console
 $ lawkit --version
-lawkit 2.6.0
+lawkit 2.6.1
 
 ```
