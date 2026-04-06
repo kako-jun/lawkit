@@ -51,6 +51,37 @@
 | `-c, --min-count <N>` | 分析に必要な最小データ数 | 10 |
 | `--no-color` | 色付け無効化 | - |
 
+### `-v, --verbose`
+
+処理の詳細情報を stderr に、追加統計を stdout に表示する。
+
+以下は `benf` サブコマンドの例。stderr のデバッグ情報は全サブコマンド共通、stdout の追加統計はサブコマンドにより異なる。
+
+**stderr出力（デバッグ情報）**:
+```
+Debug: input argument = None
+Debug: Reading from stdin, using automatic optimization
+Debug: Using automatic optimization (streaming + incremental + memory efficiency)
+Debug: Collected 30 numbers from stream
+Debug: Streaming analysis successful - 30 items processed
+Debug: Processed 30 numbers in 1 chunks
+Debug: Memory used: 0.00 MB
+Debug: Processing time: 0 ms
+```
+
+**stdout出力（追加統計）**:
+```
+First Digit Distribution:
+1: 36.7% (expected: 30.1%, deviation: +6.6%)
+2: 36.7% (expected: 17.6%, deviation: +19.1%)
+...
+
+Statistical Tests:
+Chi-square: 35.29 (p-value: 0.010000)
+```
+
+**注意**: デバッグ情報は stderr、分析結果は stdout に出力される。パイプ利用時に干渉しない。
+
 ### フィルタ構文
 
 - `>=100` - 100以上

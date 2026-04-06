@@ -88,12 +88,32 @@ fn output_quiet_short_form() {
 
 #[test]
 fn output_verbose() {
-    generate_sample().arg("--verbose").assert().success();
+    generate_sample()
+        .arg("--verbose")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
 }
 
 #[test]
 fn output_verbose_short_form() {
-    generate_sample().arg("-v").assert().success();
+    generate_sample()
+        .arg("-v")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty().not());
+}
+
+#[test]
+fn output_verbose_analysis_has_debug_stderr() {
+    // Analysis commands (not generate) should output debug info to stderr
+    let mut cmd = lawkit();
+    cmd.args(["benf", "-v"])
+        .write_stdin("10\n20\n30\n40\n50\n60\n70\n80\n90\n100\n110\n120\n130\n140\n150\n");
+    cmd.assert()
+        .code(predicates::prelude::predicate::in_iter([0, 10, 11]))
+        .stderr(predicate::str::contains("Debug:"))
+        .stdout(predicate::str::contains("Statistical Tests:"));
 }
 
 // =============================================================================

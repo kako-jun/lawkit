@@ -43,14 +43,67 @@ fn test_quiet_long_option() {
 fn test_verbose_option() {
     let mut cmd = lawkit();
     cmd.args(["benf", "-v"]).write_stdin(SAMPLE_DATA);
-    cmd.assert().code(valid_exit_codes());
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"))
+        .stdout(predicate::str::contains("deviation:"));
 }
 
 #[test]
 fn test_verbose_long_option() {
     let mut cmd = lawkit();
     cmd.args(["benf", "--verbose"]).write_stdin(SAMPLE_DATA);
-    cmd.assert().code(valid_exit_codes());
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"))
+        .stdout(predicate::str::contains("deviation:"));
+}
+
+#[test]
+fn test_verbose_stderr_contains_debug_info() {
+    let mut cmd = lawkit();
+    cmd.args(["benf", "-v"]).write_stdin(SAMPLE_DATA);
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Streaming analysis successful"))
+        .stderr(predicate::str::contains("Memory used:"))
+        .stderr(predicate::str::contains("Processing time:"));
+}
+
+#[test]
+fn test_verbose_pareto() {
+    let mut cmd = lawkit();
+    cmd.args(["pareto", "-v"]).write_stdin(SAMPLE_DATA);
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"));
+}
+
+#[test]
+fn test_verbose_zipf() {
+    let mut cmd = lawkit();
+    cmd.args(["zipf", "-v"]).write_stdin(SAMPLE_DATA);
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"));
+}
+
+#[test]
+fn test_verbose_normal() {
+    let mut cmd = lawkit();
+    cmd.args(["normal", "-v"]).write_stdin(SAMPLE_DATA);
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"));
+}
+
+#[test]
+fn test_verbose_poisson() {
+    let mut cmd = lawkit();
+    cmd.args(["poisson", "-v"]).write_stdin(SAMPLE_DATA);
+    cmd.assert()
+        .code(valid_exit_codes())
+        .stderr(predicate::str::contains("Debug:"));
 }
 
 #[test]
