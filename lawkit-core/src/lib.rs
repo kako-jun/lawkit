@@ -35,7 +35,7 @@ pub fn law(
         "validate" => validate_data(data_or_config, opts),
         "diagnose" => diagnose_data(data_or_config, opts),
         "generate" => generate_sample_data(data_or_config, opts),
-        _ => Err(anyhow!("Unknown subcommand: {}", subcommand)),
+        _ => Err(anyhow!("Unknown subcommand: {subcommand}")),
     }
 }
 
@@ -677,7 +677,7 @@ fn generate_sample_data(config: &Value, _options: &LawkitOptions) -> Result<Vec<
                 .map(|x| x as f64)
                 .collect()
         }
-        _ => return Err(anyhow!("Unknown data type for generation: {}", data_type)),
+        _ => return Err(anyhow!("Unknown data type for generation: {data_type}")),
     };
 
     let generated_info = GeneratedDataInfo {

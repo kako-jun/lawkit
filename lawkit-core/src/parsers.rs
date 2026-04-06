@@ -41,7 +41,7 @@ pub fn parse_csv(content: &str) -> Result<Value> {
 
 /// Parse YAML content - FOR INTERNAL USE ONLY
 pub fn parse_yaml(content: &str) -> Result<Value> {
-    serde_yaml::from_str(content).map_err(|e| anyhow!("YAML parse error: {}", e))
+    serde_yaml::from_str(content).map_err(|e| anyhow!("YAML parse error: {e}"))
 }
 
 /// Parse TOML content - FOR INTERNAL USE ONLY

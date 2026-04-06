@@ -153,7 +153,7 @@ impl OutputFormat {
             "yaml" | "yml" => Ok(Self::Yaml),
             "csv" => Ok(Self::Csv),
             "text" | "txt" => Ok(Self::Text),
-            _ => Err(anyhow!("Invalid output format: {}", s)),
+            _ => Err(anyhow!("Invalid output format: {s}")),
         }
     }
 }
