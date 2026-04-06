@@ -40,15 +40,15 @@ risk_level: Low
 
 ## Verbose Mode
 
-Detailed output with additional statistics.
+Debug info on stderr, additional statistics on stdout.
 
 ```console
 $ lawkit benf data.txt -v
 ...
-Additional Statistics:
-  Mean Absolute Deviation: 0.002
-  Kolmogorov-Smirnov: 0.045
-  ...
+First Digit Distribution:
+...
+Statistical Tests:
+...
 
 ```
 

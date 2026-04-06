@@ -55,6 +55,8 @@
 
 処理の詳細情報を stderr に、追加統計を stdout に表示する。
 
+以下は `benf` サブコマンドの例。stderr のデバッグ情報は全サブコマンド共通、stdout の追加統計はサブコマンドにより異なる。
+
 **stderr出力（デバッグ情報）**:
 ```
 Debug: input argument = None
