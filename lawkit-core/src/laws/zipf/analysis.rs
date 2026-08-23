@@ -41,7 +41,7 @@ fn extract_word_frequencies(text: &str) -> Vec<(String, usize)> {
 
     // 頻度順にソート
     let mut frequencies: Vec<(String, usize)> = word_counts.into_iter().collect();
-    frequencies.sort_by(|a, b| b.1.cmp(&a.1));
+    frequencies.sort_by_key(|b| std::cmp::Reverse(b.1));
 
     frequencies
 }
